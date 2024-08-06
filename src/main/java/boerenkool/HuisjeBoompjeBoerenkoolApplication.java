@@ -1,4 +1,4 @@
-package nl.hva.miw.boerenkool;
+package boerenkool;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
