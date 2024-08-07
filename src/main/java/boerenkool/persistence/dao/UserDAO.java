@@ -1,4 +1,4 @@
-package boerenkool.communication.dto;
+package boerenkool.persistence.dao;
 
 import boerenkool.business.model.User;
 
