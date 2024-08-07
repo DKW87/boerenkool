@@ -18,6 +18,7 @@ public class User {
     private int coinBalance;
 
     private final static int DEFAULT_COIN_BALANCE = 0;
+    private final static int DEFAULT_USER_ID = 0;
 
     public User(int userId, String typeOfUser, String username, String password, String email, String phone, String firstName, String infix, String lastName, int coinBalance) {
         this.userId = userId;
@@ -31,6 +32,11 @@ public class User {
         this.lastName = lastName;
         this.coinBalance = DEFAULT_COIN_BALANCE;
         logger.info("New user");
+    }
+
+    //user object zonder id
+    public User(String typeOfUser, String username, String password, String email, String phone, String firstName, String infix, String lastName, int coinBalance) {
+        this(DEFAULT_USER_ID, typeOfUser, username, password, email, phone, firstName, infix, lastName, coinBalance);
     }
 
     public User () {
@@ -139,4 +145,7 @@ public class User {
         return (!username.equals(user.username));
     }
 
+    public int getUserId() {
+        return userId;
+    }
 }
