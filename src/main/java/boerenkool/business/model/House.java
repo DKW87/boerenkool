@@ -70,4 +70,60 @@ public class House {
     // getters and setters
     // TODO implement as needed
 
-}
+    public int getHouseId() {
+        return houseId;
+    }
+
+    public String getHouseName() {
+        return houseName;
+    }
+
+    public HouseType getHouseType() {
+        return houseType;
+    }
+
+    public User getHouseOwner() {
+        return houseOwner;
+    }
+
+    public String getProvince() {
+        return province;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public String getStreetAndNumber() {
+        return streetAndNumber;
+    }
+
+    public String getZipcode() {
+        return zipcode;
+    }
+
+    public int getMaxGuest() {
+        return maxGuest;
+    }
+
+    public int getRoomCount() {
+        return roomCount;
+    }
+
+    public int getPricePPPD() {
+        return pricePPPD;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public boolean isNotAvailable() {
+        return isNotAvailable;
+    }
+
+    public void setHouseId(int houseId) {
+        this.houseId = houseId;
+    }
+
+} // class
