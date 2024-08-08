@@ -1,26 +1,30 @@
 package boerenkool.database.dao.mysql;
 
 import boerenkool.business.model.Message;
+import boerenkool.business.model.User;
 import boerenkool.database.dao.GenericDAO;
+
 import java.util.Optional;
 
 import java.util.List;
 
 public interface MessageDAO extends GenericDAO<Message> {
     @Override
+    void storeOne(Message message);
+
+    @Override
     List<Message> getAll();
 
-    List<Message> getAllForRecipient(User recipient);
+    List<Message> getAllForReceiver(User receiver);
 
     @Override
-    Optional<Message> getOne(int id);
-
-    @Override
-    void storeOne(Message message);
+    Optional<Message> getOneById(int id);
 
     @Override
     boolean updateOne(Message message);
 
     @Override
-    boolean removeOne(int id);
+    boolean removeOneById(int id);
 }
+
+

@@ -1,6 +1,8 @@
 package boerenkool.database.dao.mysql;
 
 import boerenkool.business.model.Message;
+import boerenkool.business.model.User;
+import boerenkool.database.dao.mysql.UserDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -9,45 +11,51 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import java.sql.*;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
 @Repository
 public class JdbcMessageDAO implements MessageDAO {
-    JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
+    private final UserDAO userDAO;
 
     @Autowired
-    private UserDAO userDAO;
-
-    @Autowired
-    public JdbcMessageDAO(JdbcTemplate jdbcTemplate) {
+    public JdbcMessageDAO(JdbcTemplate jdbcTemplate, UserDAO userDAO) {
         this.jdbcTemplate = jdbcTemplate;
+        this.userDAO = userDAO;
     }
 
     private class MessageRowMapper implements RowMapper<Message> {
+        //          TODO
+        //           de userDAO geeft een Optional terug, hier moet ik rekening mee houden
+        //           en de datum omzetten van SQL DateTime naar Java OffsetDateTime
+//        @Override
+//        public Message mapRow(ResultSet resultSet, int rowNumber)
+//                throws SQLException {
+//            return new Message(resultSet.getInt("messageId"), // messageId
+//                    userDAO.getOneById(resultSet.getInt("sender")),
+//                    userDAO.getOneById(resultSet.getInt("receiver")),
+//                    resultSet.getDate("dateTimeSent").toLocalDate(),
+//                    resultSet.getString("subject"),
+//                    resultSet.getString("body"));
+//        }
         @Override
-        public Message mapRow(ResultSet resultSet, int rowNumber)
-                throws SQLException {
-            User fromUser = userDAO.getOne(resultSet.getInt("sender"));
-            User toUser = userDAO.getOne(resultSet.getInt("receiver"));
-            return new Message(resultSet.getInt("messageId"), // messageId
-                    fromUser,
-                    toUser,
-                    resultSet.getDate("dateTimeSent"),
-                    resultSet.getString("subject"),
-                    resultSet.getString("body"));
+        public Message mapRow(ResultSet resultSet, int rowNumber) {
+            return null;  // zie hierboven
         }
     }
 
     private PreparedStatement buildInsertMessageStatement(
             Message message, Connection connection) throws SQLException {
         PreparedStatement ps = connection.prepareStatement(
-                "Insert into Message(fromUserId, toUserId, dateTimeSent, subject, body) values (?,?,?,?,?);",
+                "Insert into Message(senderId, receiverId, dateTimeSent, subject, body) values (?,?,?,?,?);",
                 Statement.RETURN_GENERATED_KEYS);
-        ps.setString(1, message.getFromUser().getUserId());
-        ps.setString(2, message.getToUser().getUserId());
-        ps.setString(3, message.getDateTimeSent().toString());
+        ps.setInt(1, message.getSender().getUserId());
+        ps.setInt(2, message.getReceiver().getUserId());
+        ps.setTimestamp(3, Timestamp.valueOf(LocalDateTime.now()));
         ps.setString(4, message.getSubject());
         ps.setString(5, message.getBody());
         return ps;
@@ -56,13 +64,14 @@ public class JdbcMessageDAO implements MessageDAO {
     private PreparedStatement buildUpdateMessageStatement(
             Message message, Connection connection) throws SQLException {
         PreparedStatement ps = connection.prepareStatement(
-                "Insert into Message(fromUserId, toUserId, dateTimeSent, subject, body) values (?,?,?,?,?);",
-                Statement.RETURN_GENERATED_KEYS);
-        ps.setString(1, message.getFromUser().getUserId());
-        ps.setString(2, message.getToUser().getUserId());
-        ps.setString(3, message.getDateTimeSent().toString());
-        ps.setString(4, message.getSubject());
-        ps.setString(5, message.getBody());
+                "UPDATE Message SET " +
+                        "archivedBySender = ?," +
+                        "readByReceiver = ?," +
+                        "archivedByReceiver = ?" +
+                        "where messageId = ?;");
+        ps.setBoolean(1, message.isArchivedBySender());
+        ps.setBoolean(2, message.isReadByReceiver());
+        ps.setBoolean(3, message.isArchivedByReceiver());
         return ps;
     }
 
@@ -77,6 +86,8 @@ public class JdbcMessageDAO implements MessageDAO {
                 buildInsertMessageStatement(message, connection), keyHolder);
         int newKey = Objects.requireNonNull(keyHolder.getKey()).intValue();
         message.setMessageId(newKey);
+        // TODO van opgeslagen DateTime naar OffsetDateTime, opslaan in message object
+        //  kan dat in het preparedStatement object? net zoals een generated key?
     }
 
     /**
@@ -85,7 +96,7 @@ public class JdbcMessageDAO implements MessageDAO {
      * @return optional containing the message
      */
     @Override
-    public Optional<Message> getOne(int messageId) {
+    public Optional<Message> getOneById(int messageId) {
         String sql = "Select * From Message where messageId = ?;";
         List<Message> resultList =
                 jdbcTemplate.query(sql, new MessageRowMapper(), messageId);
@@ -102,18 +113,17 @@ public class JdbcMessageDAO implements MessageDAO {
      */
     @Override
     public List<Message> getAll() {
-        List<Message> allMessages = jdbcTemplate.query("Select * From Message", new MessageRowMapper());
-        return allMessages;
+        return jdbcTemplate.query("Select * From Message", new MessageRowMapper());
     }
 
     @Override
-    public List<Message> getAllForRecipient(User recipient) {
-        int recipientId = recipient.getId();
-        List<Message> messagesForRecipient = jdbcTemplate.query(
-                "Select * From Message where toUserId = ?;",
+    public List<Message> getAllForReceiver(User receiver) {
+        int receiverId = receiver.getUserId();
+        List<Message> messagesForReceiver = jdbcTemplate.query(
+                "Select * From Message where receiverId = ?;",
                 new MessageRowMapper(),
-                recipientId);
-        return messagesForRecipient;
+                receiverId);
+        return messagesForReceiver;
     }
 
     /**
@@ -133,7 +143,7 @@ public class JdbcMessageDAO implements MessageDAO {
      * @return
      */
     @Override
-    public boolean removeOne(int messageId) {
+    public boolean removeOneById(int messageId) {
         // TODO do we ever remove a message from the database? If so, when?
         //  Or do we just set messages as archived for users, and keep them in database "forever" ?
         // useful when resolving (legal) conflicts?
