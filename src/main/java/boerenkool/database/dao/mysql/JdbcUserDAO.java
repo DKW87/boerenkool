@@ -138,6 +138,9 @@ public class JdbcUserDAO  implements UserDAO {
         return Optional.empty();
     }
 
+    public RowMapper<User> getUserRowMapper() {
+        return new UserRowMapper();
+    }
 
     private static class UserRowMapper implements RowMapper<User> {
 
