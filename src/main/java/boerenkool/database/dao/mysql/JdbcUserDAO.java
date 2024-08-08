@@ -1,4 +1,4 @@
-package boerenkool.persistence.dao;
+package boerenkool.database.dao.mysql;
 
 import boerenkool.business.model.User;
 import org.slf4j.Logger;
@@ -85,21 +85,30 @@ public class JdbcUserDAO  implements UserDAO {
 
 
     @Override
-    public void save(User user) {
+    public void storeOne(User user) {
         if(user.getUserId() == 0) {
             insert(user);
         } else {
-            update(user);
+            updateOne(user);
         }
     }
 
+
     @Override
-    public void delete(User user) { String sql  = "DELETE FROM user WHERE userId = ?";
-        jdbcTemplate.update(sql, user.getUserId());
+    public boolean removeOne(int id) {
+        String sql  = "DELETE FROM user WHERE userId = ?";
+        return jdbcTemplate.update(sql, id) != 0;
+    }
+
+
+    @Override
+    public List<User> getAll() {
+        List<User> allUsers = jdbcTemplate.query("Select * From User", new UserRowMapper());
+        return allUsers;
     }
 
     @Override
-    public Optional<User> findById(int id) {
+    public Optional<User> getOne(int id) {
         List<User> users =
                 jdbcTemplate.query("select * from user where userId =?", new UserRowMapper(), id);
         if (users.size() != 1) {
@@ -117,8 +126,10 @@ public class JdbcUserDAO  implements UserDAO {
         user.setUserId(newKey);
     }
 
-    private void update(User user) {
-        jdbcTemplate.update(connection -> updateUserStatement(user, connection));
+
+    @Override
+    public boolean updateOne(User user) {
+        return jdbcTemplate.update(connection -> updateUserStatement(user, connection)) != 0;
     }
 
 
