@@ -2,7 +2,7 @@ package boerenkool.database.dao.mysql;
 
 import boerenkool.business.model.Message;
 import boerenkool.business.model.User;
-import boerenkool.persistence.dao.UserDAO;
+import boerenkool.database.dao.mysql.UserDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -29,15 +29,22 @@ public class JdbcMessageDAO implements MessageDAO {
     }
 
     private class MessageRowMapper implements RowMapper<Message> {
+        //          TODO
+        //           de userDAO geeft een Optional terug, hier moet ik rekening mee houden
+        //           en de datum omzetten van SQL DateTime naar Java OffsetDateTime
+//        @Override
+//        public Message mapRow(ResultSet resultSet, int rowNumber)
+//                throws SQLException {
+//            return new Message(resultSet.getInt("messageId"), // messageId
+//                    userDAO.getOneById(resultSet.getInt("sender")),
+//                    userDAO.getOneById(resultSet.getInt("receiver")),
+//                    resultSet.getDate("dateTimeSent").toLocalDate(),
+//                    resultSet.getString("subject"),
+//                    resultSet.getString("body"));
+//        }
         @Override
-        public Message mapRow(ResultSet resultSet, int rowNumber)
-                throws SQLException {
-            return new Message(resultSet.getInt("messageId"), // messageId
-                    userDAO.getOneById(resultSet.getInt("sender")),
-                    userDAO.getOneById(resultSet.getInt("receiver")),
-                    resultSet.getDate("dateTimeSent").toLocalDate(),
-                    resultSet.getString("subject"),
-                    resultSet.getString("body"));
+        public Message mapRow(ResultSet resultSet, int rowNumber) {
+            return null;  // zie hierboven
         }
     }
 

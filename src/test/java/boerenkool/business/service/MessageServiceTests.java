@@ -1,4 +1,4 @@
 package boerenkool.business.service;
 
-public class MessageServiceTest {
+public class MessageServiceTests {
 }
