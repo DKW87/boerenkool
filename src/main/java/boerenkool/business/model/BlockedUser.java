@@ -1,12 +1,12 @@
 package boerenkool.business.model;
 
-public class BlockedUsers {
+public class BlockedUser {
 
     private User blockedUser;
 
     private User blockedByUser;
 
-    public BlockedUsers(User blockedUser, User blockedByUser) {
+    public BlockedUser(User blockedUser, User blockedByUser) {
         this.blockedUser = blockedUser;
         this.blockedByUser = blockedByUser;
     }

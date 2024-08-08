@@ -1,6 +1,6 @@
 package boerenkool.database.dao.mysql;
 
-import boerenkool.business.model.BlockedUsers;
+import boerenkool.business.model.BlockedUser;
 import boerenkool.business.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,9 +15,9 @@ import java.util.List;
  * in the database using JDBC.
  */
 @Repository
-public class JdbcBlockedUsersDAO implements BlockedUsersDAO {
+public class JdbcBlockedUserDAO implements BlockedUserDAO {
 
-    private final Logger logger = LoggerFactory.getLogger(JdbcBlockedUsersDAO.class);
+    private final Logger logger = LoggerFactory.getLogger(JdbcBlockedUserDAO.class);
 
     private final JdbcTemplate jdbcTemplate;
     private final JdbcUserDAO jdbcUserDAO;
@@ -29,7 +29,7 @@ public class JdbcBlockedUsersDAO implements BlockedUsersDAO {
      * @param jdbcUserDAO  the JdbcUserDAO to use for user-related operations
      */
     @Autowired
-    public JdbcBlockedUsersDAO(JdbcTemplate jdbcTemplate, JdbcUserDAO jdbcUserDAO) {
+    public JdbcBlockedUserDAO(JdbcTemplate jdbcTemplate, JdbcUserDAO jdbcUserDAO) {
         this.jdbcTemplate = jdbcTemplate;
         this.jdbcUserDAO = jdbcUserDAO;
         logger.info("JdbcBlockedUsersDAO instantiated");
@@ -38,23 +38,23 @@ public class JdbcBlockedUsersDAO implements BlockedUsersDAO {
     /**
      * Adds a blocked user relationship to the database.
      *
-     * @param blockedUsers the blocked user relationship to add
+     * @param blockedUser the blocked user relationship to add
      */
     @Override
-    public void addBlockedUser(BlockedUsers blockedUsers) {
+    public void addBlockedUser(BlockedUser blockedUser) {
         String sql = "INSERT INTO BlockedList (blockedUser, userId) VALUES (?, ?)";
-        jdbcTemplate.update(sql, blockedUsers.getBlockedUser().getUserId(), blockedUsers.getBlockedByUser().getUserId());
+        jdbcTemplate.update(sql, blockedUser.getBlockedUser().getUserId(), blockedUser.getBlockedByUser().getUserId());
     }
 
     /**
      * Removes a blocked user relationship from the database.
      *
-     * @param blockedUsers the blocked user relationship to remove
+     * @param blockedUser the blocked user relationship to remove
      */
     @Override
-    public void removeBlockedUser(BlockedUsers blockedUsers) {
+    public boolean removeBlockedUser(BlockedUser blockedUser) {
         String sql = "DELETE FROM BlockedList WHERE blockedUser = ? AND userId = ?";
-        jdbcTemplate.update(sql, blockedUsers.getBlockedUser().getUserId(), blockedUsers.getBlockedByUser().getUserId());
+        return jdbcTemplate.update(sql, blockedUser.getBlockedUser().getUserId(), blockedUser.getBlockedByUser().getUserId()) != 0;
     }
 
     /**

@@ -1,17 +1,16 @@
 package boerenkool.database.dao.mysql;
 
-import boerenkool.business.model.BlockedUsers;
+import boerenkool.business.model.BlockedUser;
 import boerenkool.business.model.User;
-import boerenkool.database.dao.GenericDAO;
 
 import java.util.List;
 
-public interface BlockedUsersDAO {
+public interface BlockedUserDAO {
     // Add a blocked user
-    void addBlockedUser(BlockedUsers blockedUsers);
+    void addBlockedUser(BlockedUser blockedUser);
 
     // Remove a blocked user
-    void removeBlockedUser(BlockedUsers blockedUsers);
+    boolean removeBlockedUser(BlockedUser blockedUser);
 
     // Check if a user is blocked
     boolean isUserBlocked(User blockedUser, User blockedByUser);
