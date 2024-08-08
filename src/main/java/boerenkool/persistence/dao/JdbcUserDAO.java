@@ -5,17 +5,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class JdbcUserDAO  implements UserDAO{
+public class JdbcUserDAO  implements UserDAO {
 
     private final Logger logger = LoggerFactory.getLogger(JdbcUserDAO.class);
 
@@ -49,7 +52,7 @@ public class JdbcUserDAO  implements UserDAO{
                 "insert into user(typeOfUser, username, hashedPassword, firstName, infix, lastName," +
                         " coinBalance, phoneNumber, emailaddress)" +
                         "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", PreparedStatement.RETURN_GENERATED_KEYS);
-       setCommonParameters(ps, user);
+        setCommonParameters(ps, user);
         return ps;
     }
 
@@ -57,7 +60,8 @@ public class JdbcUserDAO  implements UserDAO{
         PreparedStatement ps;
         ps = connection.prepareStatement(
                 """
-        update user 
+        
+                        update user 
             set 
             typeOfUser=?,
             username=?,
@@ -74,6 +78,8 @@ public class JdbcUserDAO  implements UserDAO{
         setCommonParameters(ps, user);
         ps.setInt(10, user.getUserId());
         return ps;
+
+
     }
 
 
@@ -88,15 +94,21 @@ public class JdbcUserDAO  implements UserDAO{
     }
 
     @Override
-    public void delete(User user) {
-        String sql  = "DELETE FROM user WHERE userId = ?";
+    public void delete(User user) { String sql  = "DELETE FROM user WHERE userId = ?";
         jdbcTemplate.update(sql, user.getUserId());
     }
 
     @Override
     public Optional<User> findById(int id) {
-        return Optional.empty();
+        List<User> users =
+                jdbcTemplate.query("select * from user where userId =?", new UserRowMapper(), id);
+        if (users.size() != 1) {
+            return Optional.empty();
+        } else {
+            return Optional.of(users.get(0));
+        }
     }
+
 
     private void insert(User user) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -114,4 +126,25 @@ public class JdbcUserDAO  implements UserDAO{
     public Optional<User> findByUsername(String username) {
         return Optional.empty();
     }
-}
+
+
+    private static class UserRowMapper implements RowMapper<User> {
+
+        @Override
+        public User mapRow(ResultSet rs, int rowNum) throws SQLException {
+            int id = rs.getInt("userId");
+            String typeOfUser = rs.getString("typeOfUser");
+            String username = rs.getString("username");
+            String pw = rs.getString("hashedPassword");
+            String firstName = rs.getString("firstName");
+            String infix = rs.getString("infix");
+            String lastName = rs.getString("lastName");
+            int coinBalance = rs.getInt("coinBalance");
+            String phoneNumber = rs.getString("phoneNumber");
+            String email = rs.getString("email");
+            User user = new User(typeOfUser, username, pw, email, phoneNumber, firstName, infix, lastName, coinBalance);
+            user.setUserId(id);
+            return user;
+        }
+    }
+    }
