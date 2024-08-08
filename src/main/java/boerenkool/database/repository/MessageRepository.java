@@ -1,9 +1,8 @@
 package boerenkool.database.repository;
 
 import boerenkool.business.model.Message;
+import boerenkool.business.model.User;
 import boerenkool.database.dao.mysql.MessageDAO;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collections;
@@ -26,11 +25,11 @@ public class MessageRepository {
     }
 
     public Optional<Message> findMessageById(int messageId) {
-        return messageDAO.getOne(messageId);
+        return messageDAO.getOneById(messageId);
     }
 
-    public List<Message> findMessagesForRecipient(User recipient) {
-        List<Message> messages = messageDAO.getAllForRecipient(recipient);
+    public List<Message> findMessagesForReceiver(User receiver) {
+        List<Message> messages = messageDAO.getAllForReceiver(receiver);
         Collections.sort(messages);
         return messages;
     }
@@ -47,6 +46,6 @@ public class MessageRepository {
     public void archiveMessageForSender(Message message) {
     }
 
-    public void archiveMessageForRecipient(Message message) {
+    public void archiveMessageForReceiver(Message message) {
     }
 }

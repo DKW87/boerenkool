@@ -1,9 +1,8 @@
 package boerenkool.business.service;
 
 import boerenkool.business.model.Message;
+import boerenkool.business.model.User;
 import boerenkool.database.repository.MessageRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,13 +32,13 @@ public class MessageService {
 
     }
 
-    public List<Message> findMessagesForRecipient(User recipient) {
-        Optional<Message> optionalMessage = messageRepository.findMessageById(messageId);
-        if (optionalMessage.isPresent()) {
-            Message message = optionalMessage.get();
-            return messageRepository.findMessagesForRecipient(recipient);
-        }
-        return new ArrayList<>();
+    public List<Message> findMessagesForReceiver(User receiver) {
+//        Optional<Message> optionalMessage = messageRepository.findMessageById(messageId);
+//        if (optionalMessage.isPresent()) {
+//            Message message = optionalMessage.get();
+            return messageRepository.findMessagesForReceiver(receiver);
+//        }
+//        return new ArrayList<>();
     }
 
 
