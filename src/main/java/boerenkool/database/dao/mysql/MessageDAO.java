@@ -13,7 +13,7 @@ public interface MessageDAO extends GenericDAO<Message> {
     List<Message> getAllForRecipient(User recipient);
 
     @Override
-    Optional<Message> getOne(int id);
+    Optional<Message> getOneById(int id);
 
     @Override
     void storeOne(Message message);
@@ -22,5 +22,5 @@ public interface MessageDAO extends GenericDAO<Message> {
     boolean updateOne(Message message);
 
     @Override
-    boolean removeOne(int id);
+    boolean removeOneById(int id);
 }

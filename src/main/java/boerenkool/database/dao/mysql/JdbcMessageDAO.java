@@ -85,7 +85,7 @@ public class JdbcMessageDAO implements MessageDAO {
      * @return optional containing the message
      */
     @Override
-    public Optional<Message> getOne(int messageId) {
+    public Optional<Message> getOneById(int messageId) {
         String sql = "Select * From Message where messageId = ?;";
         List<Message> resultList =
                 jdbcTemplate.query(sql, new MessageRowMapper(), messageId);
@@ -133,7 +133,7 @@ public class JdbcMessageDAO implements MessageDAO {
      * @return
      */
     @Override
-    public boolean removeOne(int messageId) {
+    public boolean removeOneById(int messageId) {
         // TODO do we ever remove a message from the database? If so, when?
         //  Or do we just set messages as archived for users, and keep them in database "forever" ?
         // useful when resolving (legal) conflicts?

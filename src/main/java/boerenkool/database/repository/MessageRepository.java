@@ -4,11 +4,13 @@ import boerenkool.business.model.Message;
 import boerenkool.database.dao.mysql.MessageDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Repository;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+@Repository
 public class MessageRepository {
     // private final Logger logger = LoggerFactory.getLogger(MessageRepository.class);
 
