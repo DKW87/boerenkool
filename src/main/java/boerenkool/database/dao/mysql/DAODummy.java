@@ -3,6 +3,7 @@ package boerenkool.database.dao.mysql;
 import boerenkool.database.dao.GenericDAO;
 
 import java.util.List;
+import java.util.Optional;
 
 public class DAODummy implements GenericDAO<DAODummy> {
     @Override
@@ -11,7 +12,7 @@ public class DAODummy implements GenericDAO<DAODummy> {
     }
 
     @Override
-    public DAODummy getOne(int id) {
+    public Optional<DAODummy> getOne(int id) {
         return null;
     }
 
@@ -25,7 +26,7 @@ public class DAODummy implements GenericDAO<DAODummy> {
     }
 
     @Override
-    public boolean removeOne(int id) {
+    public boolean removeOneById(int id) {
         return false;
     }
 }

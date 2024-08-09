@@ -1,12 +1,14 @@
 package boerenkool.business.model;
 
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Date;
 
 public class Message implements Comparable<Message>{
     private int messageId;
-    private User fromUser;
-    private User toUser;
-    private Date dateTimeSent;
+    private User sender;
+    private User receiver;
+    private OffsetDateTime dateTimeSent;
     private String subject;
     private String body;
     //    private boolean readBySender;
@@ -14,25 +16,26 @@ public class Message implements Comparable<Message>{
     private boolean readByReceiver;
     private boolean archivedByReceiver;
 
-    public Message(int messageId, User fromUser, User toUser, Date dateTimeSent, String subject, String body) {
+    public Message(int messageId, User sender, User receiver, OffsetDateTime dateTimeSent,
+                   String subject, String body) {
         this.messageId = messageId;
-        this.toUser = toUser;
-        this.fromUser = fromUser;
+        this.sender = sender;
+        this.receiver = receiver;
         this.dateTimeSent = dateTimeSent;
         this.subject = subject;
         this.body = body;
     }
 
-    public Message(User fromUser, User toUser, Date dateTimeSent, String subject, String body) {
-        this(null, toUser, dateTimeSent, subject, body);
+    public Message(User sender, User receiver, String subject, String body) {
+        this(0, sender, receiver, null, subject, body);
     }
 
     @Override
     public String toString() {
         return "Message{" +
                 "messageId=" + messageId +
-                ", fromUser=" + fromUser +
-                ", toUser=" + toUser +
+                ", sender=" + sender +
+                ", receiver=" + receiver +
                 ", dateTimeSent=" + dateTimeSent +
                 ", subject='" + subject + '\'' +
                 '}';
@@ -56,15 +59,15 @@ public class Message implements Comparable<Message>{
         return messageId;
     }
 
-    public User getFromUser() {
-        return fromUser;
+    public User getSender() {
+        return sender;
     }
 
-    public User getToUser() {
-        return toUser;
+    public User getReceiver() {
+        return receiver;
     }
 
-    public Date getDateTimeSent() {
+    public OffsetDateTime getDateTimeSent() {
         return dateTimeSent;
     }
 
