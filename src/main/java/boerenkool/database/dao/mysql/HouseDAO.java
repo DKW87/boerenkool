@@ -1,6 +1,7 @@
 package boerenkool.database.dao.mysql;
 
 import boerenkool.business.model.House;
+import boerenkool.business.model.HouseFilter;
 import boerenkool.database.dao.GenericDAO;
 
 import java.util.List;
@@ -19,6 +20,8 @@ public interface HouseDAO extends GenericDAO<House> {
     List<House> getAllHousesByOwner(int ownerId);
 
     List<House> getLimitedList(int limit, int offset);
+
+    List<House> getHousesWithFilter(HouseFilter filter);
 
     @Override
     Optional<House> getOneById(int id);

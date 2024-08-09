@@ -1,6 +1,7 @@
 package boerenkool.database.repository;
 
 import boerenkool.business.model.House;
+import boerenkool.business.model.HouseFilter;
 import boerenkool.database.dao.mysql.HouseDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +34,10 @@ public class HouseRepository {
 
     public List<House> getLimitedListOfHouses(int limit, int offset) {
         return houseDAO.getLimitedList(limit, offset);
+    }
+
+    public List<House> getHousesWithFilter(HouseFilter filter) {
+        return houseDAO.getHousesWithFilter(filter);
     }
 
     public Optional<House> getHouse(int houseId) {

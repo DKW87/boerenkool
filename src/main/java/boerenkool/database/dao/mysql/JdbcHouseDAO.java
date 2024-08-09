@@ -1,6 +1,7 @@
 package boerenkool.database.dao.mysql;
 
 import boerenkool.business.model.House;
+import boerenkool.business.model.HouseFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,8 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,6 +54,74 @@ public class JdbcHouseDAO implements HouseDAO {
     public List<House> getLimitedList(int limit, int offset) {
         String sql = "SELECT * FROM House LIMIT ? OFFSET ?";
         return jdbcTemplate.query(sql, new HouseMapper(userDAO, houseTypeDAO), limit, offset);
+    }
+
+    // TODO refactor with helper methods to make method smaller
+    @Override
+    public List<House> getHousesWithFilter(HouseFilter filter) {
+        StringBuilder sql = new StringBuilder("SELECT * FROM House WHERE 1=1");
+        List<Object> params = new ArrayList<>();
+
+
+        if (filter.getProvinces() != null && !filter.getProvinces().isEmpty()) {
+            sql.append(" AND province IN (")
+                    .append(String.join(", ", Collections.nCopies(filter.getProvinces().size(), "?")))
+                    .append(")");
+            params.addAll(filter.getProvinces());
+        }
+
+        if (filter.getCities() != null && !filter.getCities().isEmpty()) {
+            sql.append(" AND city IN (")
+                    .append(String.join(", ", Collections.nCopies(filter.getCities().size(), "?")))
+                    .append(")");
+            params.addAll(filter.getCities());
+        }
+
+        if (filter.getHouseTypes() != null && !filter.getHouseTypes().isEmpty()) {
+            sql.append(" AND houseTypeId IN (")
+                    .append(String.join(", ", Collections.nCopies(filter.getHouseTypes().size(), "?")))
+                    .append(")");
+            for (HouseType type : filter.getHouseTypes()) {
+                params.add(type.getHouseTypeId());
+            }
+        }
+
+        if (filter.getHouseOwner() != null) {
+            sql.append(" AND houseOwnerId = ?");
+            params.add(filter.getHouseOwner().getUserId());
+        }
+
+        if (filter.getAmountOfGuests() > 0) {
+            sql.append(" AND maxGuest >= ?");
+            params.add(filter.getAmountOfGuests());
+        }
+
+        if (filter.getDesiredRoomCount() > 0) {
+            sql.append(" AND roomCount >= ?");
+            params.add(filter.getDesiredRoomCount());
+        }
+
+        if (filter.getMinPricePPPD() > 0) {
+            sql.append(" AND pricePPPD >= ?");
+            params.add(filter.getMinPricePPPD());
+        }
+
+        if (filter.getMaxPricePPPD() > 0) {
+            sql.append(" AND pricePPPD <= ?");
+            params.add(filter.getMaxPricePPPD());
+        }
+
+        if (filter.getLimit() > 0) {
+            sql.append(" LIMIT ?");
+            params.add(filter.getLimit());
+        }
+
+        if (filter.getOffset() > 0) {
+            sql.append(" OFFSET ?");
+            params.add(filter.getOffset());
+        }
+
+        return jdbcTemplate.query(sql.toString(), params.toArray(), new HouseMapper(userDAO, houseTypeDAO));
     }
 
     @Override
