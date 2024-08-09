@@ -17,8 +17,8 @@ public class HouseFilter {
     private int desiredRoomCount;
     private int minPricePPPD;
     private int maxPricePPD;
-    private int limit;
-    private int offset;
+    private int limit; // used to determine how many results you want per page
+    private int offset; // if you go to page 2 and result limit is 10, offset will become 10 (to hide page 1 results)
 
     public HouseFilter(List<String> provinces, List<String> cities, List<HouseType> houseTypes, User houseOwner,
                         int amountOfGuests, int desiredRoomCount,int minPricePPPD, int maxPricePPD, int limit, int offset) {
