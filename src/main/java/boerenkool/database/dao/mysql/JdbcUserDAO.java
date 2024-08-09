@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class JdbcUserDAO  implements UserDAO {
+public class JdbcUserDAO implements UserDAO {
 
     private final Logger logger = LoggerFactory.getLogger(JdbcUserDAO.class);
 
@@ -49,9 +49,9 @@ public class JdbcUserDAO  implements UserDAO {
     private PreparedStatement insertUserStatement(User user, Connection connection) throws SQLException {
         PreparedStatement ps;
         ps = connection.prepareStatement(
-                "insert into user(typeOfUser, username, hashedPassword, firstName, infix, lastName," +
+                "INSERT INTO \"User\"(typeOfUser, username, hashedPassword, firstName, infix, lastName," +
                         " coinBalance, phoneNumber, emailaddress)" +
-                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", PreparedStatement.RETURN_GENERATED_KEYS);
+                        " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", PreparedStatement.RETURN_GENERATED_KEYS);
         setCommonParameters(ps, user);
         return ps;
     }
@@ -60,57 +60,48 @@ public class JdbcUserDAO  implements UserDAO {
         PreparedStatement ps;
         ps = connection.prepareStatement(
                 """
-        
-                        update user 
-            set 
-            typeOfUser=?,
-            username=?,
-            hashedPassword=?,
-            firstName=?,
-            infix=?,
-            lastName=?,
-            coinBalance=?,
-            phoneNumber=?,
-            emailaddress=?,
-            where userId=?,
-            """
+                UPDATE "User" 
+                SET 
+                typeOfUser=?,
+                username=?,
+                hashedPassword=?,
+                firstName=?,
+                infix=?,
+                lastName=?,
+                coinBalance=?,
+                phoneNumber=?,
+                emailaddress=?
+                WHERE userId=?
+                """
         );
         setCommonParameters(ps, user);
         ps.setInt(10, user.getUserId());
         return ps;
-
-
     }
-
-
 
     @Override
     public void storeOne(User user) {
-        if(user.getUserId() == 0) {
+        if (user.getUserId() == 0) {
             insert(user);
         } else {
             updateOne(user);
         }
     }
 
-
     @Override
     public boolean removeOneById(int id) {
-        String sql  = "DELETE FROM user WHERE userId = ?";
+        String sql = "DELETE FROM \"User\" WHERE userId = ?";
         return jdbcTemplate.update(sql, id) != 0;
     }
 
-
     @Override
     public List<User> getAll() {
-        List<User> allUsers = jdbcTemplate.query("Select * From User", new UserRowMapper());
-        return allUsers;
+        return jdbcTemplate.query("SELECT * FROM \"User\"", new UserRowMapper());
     }
 
     @Override
     public Optional<User> getOneById(int id) {
-        List<User> users =
-                jdbcTemplate.query("select * from user where userId =?", new UserRowMapper(), id);
+        List<User> users = jdbcTemplate.query("SELECT * FROM \"User\" WHERE userId = ?", new UserRowMapper(), id);
         if (users.size() != 1) {
             return Optional.empty();
         } else {
@@ -118,24 +109,26 @@ public class JdbcUserDAO  implements UserDAO {
         }
     }
 
-
     private void insert(User user) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update(connection -> updateUserStatement(user, connection));
+        jdbcTemplate.update(connection -> insertUserStatement(user, connection), keyHolder);
         int newKey = keyHolder.getKey().intValue();
         user.setUserId(newKey);
     }
-
 
     @Override
     public boolean updateOne(User user) {
         return jdbcTemplate.update(connection -> updateUserStatement(user, connection)) != 0;
     }
 
-
     @Override
     public Optional<User> findByUsername(String username) {
-        return Optional.empty();
+        List<User> users = jdbcTemplate.query("SELECT * FROM \"User\" WHERE username = ?", new UserRowMapper(), username);
+        if (users.size() != 1) {
+            return Optional.empty();
+        } else {
+            return Optional.of(users.get(0));
+        }
     }
 
     public RowMapper<User> getUserRowMapper() {
@@ -161,4 +154,4 @@ public class JdbcUserDAO  implements UserDAO {
             return user;
         }
     }
-    }
+}

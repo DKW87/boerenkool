@@ -26,19 +26,19 @@ public class UserRepository {
 
     public void removeOneById(int id) {userDAO.removeOneById(id);}
 
-    List<User> getAll() {
+    public List<User> getAll() {
         return userDAO.getAll();
     };//Read
 
-    Optional getOneById(int id) {
+    public Optional getOneById(int id) {
         return userDAO.getOneById(id);
     }
 
-    boolean updateOne(User user) {
+    public boolean updateOne(User user) {
         return userDAO.updateOne(user);
     }
 
-    Optional<User> findByUsername(String username) {
+    public Optional<User> findByUsername(String username) {
         return userDAO.findByUsername(username);
     };
 }

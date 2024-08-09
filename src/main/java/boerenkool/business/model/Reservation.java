@@ -1,12 +1,15 @@
+/*
 package boerenkool.business.model;
 
 import java.time.LocalDate;
 
+*/
 /**
  * @author Adnan Kilic
  * @project Boerenkool
  * @created 07/08/2024 - 19:49
- */
+ *//*
+
 
 public class Reservation {
 
@@ -74,3 +77,4 @@ public class Reservation {
         this.house = house;
     }
 }
+*/
