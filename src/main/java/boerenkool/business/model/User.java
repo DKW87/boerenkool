@@ -39,6 +39,11 @@ public class User {
         this(DEFAULT_USER_ID, typeOfUser, username, password, email, phone, firstName, infix, lastName, coinBalance);
     }
 
+    //user object om te testen
+    public User(String typeOfUser, String username, String password) {
+        this(DEFAULT_USER_ID, typeOfUser, username, password, "", "", "", "", "", 0);
+    }
+
     public User () {
         logger.info("User created with no-arg constructor");
     }
