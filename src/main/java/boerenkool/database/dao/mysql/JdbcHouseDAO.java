@@ -23,28 +23,28 @@ public class JdbcHouseDAO implements HouseDAO {
     private final Logger logger = LoggerFactory.getLogger(HouseDAO.class);
 
     private JdbcTemplate jdbcTemplate;
-    private final JdbcUserDAO jdbcUserDAO;
-    private final JdbcHouseTypeDAO jdbcHouseTypeDAO;
+    private final UserDAO userDAO;
+    private final HouseTypeDAO houseTypeDAO;
 
     @Autowired
-    public JdbcHouseDAO(JdbcTemplate jdbcTemplate) {
+    public JdbcHouseDAO(JdbcTemplate jdbcTemplate, UserDAO userDAO, HouseTypeDAO houseTypeDAO) {
         this.jdbcTemplate = jdbcTemplate;
+        this.userDAO = userDAO;
+        this.houseTypeDAO = houseTypeDAO;
         logger.info("New HouseDAO");
-        jdbcUserDAO = new JdbcUserDAO(jdbcTemplate);
-        jdbcHouseTypeDAO = new JdbcHouseTypeDAO(jdbcTemplate);
     }
 
     @Override
     public List<House> getAll() {
         String sql = "SELECT * FROM House";
-        List<House> allHouses = jdbcTemplate.query(sql, new HouseMapper());
+        List<House> allHouses = jdbcTemplate.query(sql, new HouseMapper(userDAO, houseTypeDAO));
         return allHouses;
     }
 
     @Override
     public Optional<House> getOneById(int id) {
         String sql = "SELECT * FROM House WHERE houseId = ?";
-        House house = jdbcTemplate.queryForObject(sql, new HouseMapper(), id);
+        House house = jdbcTemplate.queryForObject(sql, new HouseMapper(userDAO, houseTypeDAO), id);
         return house == null ? Optional.empty() : Optional.of(house);
     }
 
@@ -116,6 +116,14 @@ public class JdbcHouseDAO implements HouseDAO {
 
     private static class HouseMapper implements RowMapper<House> {
 
+        private final UserDAO userDAO;
+        private final HouseTypeDAO houseTypeDAO;
+
+        public HouseMapper(UserDAO userDAO, HouseTypeDAO houseTypeDAO) {
+            this.userDAO = userDAO;
+            this.houseTypeDAO = houseTypeDAO;
+        }
+
         @Override
         public House mapRow(ResultSet resultSet, int rowNumber) throws SQLException {
             int houseId = resultSet.getInt("houseId");
@@ -131,7 +139,7 @@ public class JdbcHouseDAO implements HouseDAO {
             int pricePPPD = resultSet.getInt("pricePPPD");
             String description = resultSet.getString("description");
             boolean isNotAvailable = resultSet.getBoolean("isNotAvailable");
-            return new House(houseId, houseName, jdbcHouseTypeDAO.getOneById(houseTypeId), jdbcUserDAO.getOneById(houseOwnerId),
+            return new House(houseId, houseName, houseTypeDAO.getOneById(houseTypeId), userDAO.getOneById(houseOwnerId),
                     province, city, streetAndNumber, zipcode, maxGuest, roomCount, pricePPPD, description, isNotAvailable);
         }
     }
