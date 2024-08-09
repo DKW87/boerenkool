@@ -12,7 +12,7 @@ public class DAODummy implements GenericDAO<DAODummy> {
     }
 
     @Override
-    public Optional<DAODummy> getOne(int id) {
+    public Optional<DAODummy> getOneById(int id) {
         return null;
     }
 
