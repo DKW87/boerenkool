@@ -24,14 +24,14 @@ public class UserRepository {
 
     public void storeOne(User user) {userDAO.storeOne(user);}
 
-    public void removeOne(int id) {userDAO.removeOne(id);}
+    public void removeOneById(int id) {userDAO.removeOneById(id);}
 
     List<User> getAll() {
         return userDAO.getAll();
     };//Read
 
-    Optional getOne(int id) {
-        return userDAO.getOne(id);
+    Optional getOneById(int id) {
+        return userDAO.getOneById(id);
     }
 
     boolean updateOne(User user) {
