@@ -27,6 +27,14 @@ public class HouseRepository {
         return houseDAO.getAll();
     }
 
+    public List<House> getListOfAllHousesByOwner(int ownerId) {
+        return houseDAO.getAllHousesByOwner(ownerId);
+    }
+
+    public List<House> getLimitedListOfHouses(int limit, int offset) {
+        return houseDAO.getLimitedList(limit, offset);
+    }
+
     public Optional<House> getHouse(int houseId) {
         return houseDAO.getOneById(houseId);
     }
