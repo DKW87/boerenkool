@@ -63,8 +63,8 @@ public class HouseFilter {
         return minPricePPPD;
     }
 
-    public int getMaxPricePPD() {
-        return maxPricePPD;
+    public int getMaxPricePPPD() {
+        return maxPricePPPD;
     }
 
     public int getLimit() {
