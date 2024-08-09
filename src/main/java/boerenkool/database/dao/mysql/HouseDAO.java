@@ -17,6 +17,9 @@ public interface HouseDAO extends GenericDAO<House> {
     List<House> getAll();
 
     @Override
+    List<House> getLimitedList(int limit, int offset);
+
+    @Override
     Optional<House> getOneById(int id);
 
     @Override

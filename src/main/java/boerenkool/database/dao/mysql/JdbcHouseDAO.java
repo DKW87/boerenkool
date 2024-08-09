@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
@@ -39,6 +40,12 @@ public class JdbcHouseDAO implements HouseDAO {
         String sql = "SELECT * FROM House";
         List<House> allHouses = jdbcTemplate.query(sql, new HouseMapper(userDAO, houseTypeDAO));
         return allHouses;
+    }
+
+    @Override
+    public List<House> getLimitedList(int limit, int offset) {
+        String sql = "SELECT * FROM House LIMIT ? OFFSET ?";
+        return jdbcTemplate.query(sql, new Object[]{limit, offset}, new HouseMapper(userDAO, houseTypeDAO));
     }
 
     @Override
