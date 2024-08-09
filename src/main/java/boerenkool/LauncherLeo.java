@@ -11,11 +11,12 @@ import java.util.Optional;
 public class LauncherLeo {
 
     public static void main(String[] args) {
-        // Step 1: Set up the DataSource
+        // Step 1: Set up the DataSource for MySQL
         DataSource dataSource = createDataSource();
 
         // Step 2: Create a JdbcTemplate using the DataSource
         JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+
 
         // Step 3: Create an instance of JdbcUserDAO with the JdbcTemplate
         JdbcUserDAO userDAO = new JdbcUserDAO(jdbcTemplate);
@@ -50,12 +51,12 @@ public class LauncherLeo {
     }
 
     private static DataSource createDataSource() {
-        // Configure the DataSource (e.g., H2, MySQL, etc.)
+        // Configure the DataSource for MySQL
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setDriverClassName("org.h2.Driver");  // Use the appropriate driver class for your DB
-        dataSource.setUrl("jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1"); // H2 in-memory database URL
-        dataSource.setUsername("sa");
-        dataSource.setPassword("");
+        dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");  // Ensure you have the MySQL Connector/J driver
+        dataSource.setUrl("jdbc:mysql://oege.ie.hva.nl:3306/zkwantd1?useSSL=false&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC&allowPublicKeyRetrieval=true");
+        dataSource.setUsername("kwantd1");  // Replace with your MySQL username
+        dataSource.setPassword("Izl6yos8LRH2Ly");  // Replace with your MySQL password
         return dataSource;
     }
 }
