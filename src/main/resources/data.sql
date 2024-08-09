@@ -12,13 +12,13 @@ INSERT INTO `User` (typeOfUser,username,hashedPassword,firstName,infix,lastName,
 
 
 
--- INSERT INTO Message (senderId,receiverId,dateTimeSent,subject,body,archivedBySender,archivedByReceiver,readByReceiver) VALUES
---                                                                                                                            (1,2,'2024-01-19 03:14:07','He','blabla','0','0','1');
---                                                                                                                            (1,2,'2024-01-20 03:14:07','Hoi','blablabla','0','0','0'),
---                                                                                                                           (2,1,'2024-01-21 03:14:07','hallo','blablablablablabla','0','0','1'),
---                                                                                                                            (2,1,'2024-01-22 03:14:07','he ha','blablablablablabla','0','0','0'),
---                                                                                                                            (9,7,'2024-01-23 03:14:07','Bonjour','blablabla','0','0','1'),
---                                                                                                                            (9,8,'2024-01-24 03:14:07','Ola','blablablablablabla','0','0','1'),
---                                                                                                                            (9,10,'2024-01-25 03:14:07','Nihon','blablabla','0','0','1'),
---                                                                                                                            (10,9,'2024-01-26 03:14:07','Gruetzi','blablabla','0','0','1'),
---                                                                                                                            (10,9,'2024-01-27 03:14:07','Doei','bla','0','0','1');
+INSERT INTO Message (senderId,receiverId,dateTimeSent,subject,body,archivedBySender,archivedByReceiver,readByReceiver) VALUES
+                                                                                                                           (1,2,'2024-01-19 03:14:07','He','blabla','0','0','1'),
+                                                                                                                            (1,2,'2024-01-20 03:14:07','Hoi','blablabla','0','0','0'),
+                                                                                                                           (2,1,'2024-01-21 03:14:07','hallo','blablablablablabla','0','0','1'),
+                                                                                                                            (2,1,'2024-01-22 03:14:07','he ha','blablablablablabla','0','0','0'),
+                                                                                                                            (9,7,'2024-01-23 03:14:07','Bonjour','blablabla','0','0','1'),
+                                                                                                                            (9,8,'2024-01-24 03:14:07','Ola','blablablablablabla','0','0','1'),
+                                                                                                                            (9,10,'2024-01-25 03:14:07','Nihon','blablabla','0','0','1'),
+                                                                                                                            (10,9,'2024-01-26 03:14:07','Gruetzi','blablabla','0','0','1'),
+                                                                                                                            (10,9,'2024-01-27 03:14:07','Doei','bla','0','0','1');
