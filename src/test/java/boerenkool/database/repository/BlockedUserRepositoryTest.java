@@ -1,3 +1,5 @@
+package boerenkool.database.repository;
+
 import boerenkool.business.model.BlockedUser;
 import boerenkool.business.model.User;
 import boerenkool.database.dao.mysql.BlockedUserDAO;
