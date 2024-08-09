@@ -23,8 +23,8 @@ public interface ReservationDAO extends GenericDAO<Reservation> {
     Optional<Reservation> getOneById (int id);
 
     @Override
-    void updateOne (Reservation reservation);
+    boolean updateOne (Reservation reservation);
 
     @Override
-    void removeOneById (int id);
+    boolean removeOneById (int id);
 }
