@@ -1,0 +1,47 @@
+package boerenkool.database.repository;
+
+import boerenkool.business.model.House;
+import boerenkool.database.dao.mysql.HouseDAO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.Optional;
+
+/**
+ * @author Danny KWANT
+ * @project Boerenkool
+ * @created 09/08/2024 - 11:54
+ */
+public class HouseRepository {
+
+    private final Logger logger = LoggerFactory.getLogger(HouseRepository.class);
+    private final HouseDAO houseDAO;
+
+    public HouseRepository(HouseDAO houseDAO) {
+        logger.info("New HouseRepository");
+        this.houseDAO = houseDAO;
+    }
+
+    public List<House> getListOfAllHouses() {
+        return houseDAO.getAll();
+    }
+
+    public Optional<House> getHouse(int houseId) {
+        return houseDAO.getOneById(houseId);
+    }
+
+    public void saveHouse(House house) {
+        if (house.getHouseId() == 0) {
+            houseDAO.storeOne(house);
+        }
+        else {
+            houseDAO.updateOne(house);
+        }
+    }
+
+    public boolean deleteHouse(int houseId) {
+        return houseDAO.removeOneById(houseId);
+    }
+
+} // class
