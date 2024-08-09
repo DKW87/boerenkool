@@ -29,35 +29,35 @@ public class JdbcMessageDAO implements MessageDAO {
     }
 
     private class MessageRowMapper implements RowMapper<Message> {
-        //          TODO
-        //           de userDAO geeft een Optional terug, hier moet ik rekening mee houden
-        //           en de datum omzetten van SQL DateTime naar Java OffsetDateTime
-//        @Override
-//        public Message mapRow(ResultSet resultSet, int rowNumber)
-//                throws SQLException {
-//            return new Message(resultSet.getInt("messageId"), // messageId
-//                    userDAO.getOneById(resultSet.getInt("sender")),
-//                    userDAO.getOneById(resultSet.getInt("receiver")),
-//                    resultSet.getDate("dateTimeSent").toLocalDate(),
-//                    resultSet.getString("subject"),
-//                    resultSet.getString("body"));
-//        }
         @Override
-        public Message mapRow(ResultSet resultSet, int rowNumber) {
-            return null;  // zie hierboven
+        public Message mapRow(ResultSet resultSet, int rowNumber)
+                throws SQLException {
+            return new Message(resultSet.getInt("messageId"), // messageId
+                    userDAO.getOneById(resultSet.getInt("sender")).orElse(null),
+                    userDAO.getOneById(resultSet.getInt("receiver")).orElse(null),
+                    resultSet.getObject("dateTimeSent", OffsetDateTime.class),
+                    resultSet.getString("subject"),
+                    resultSet.getString("body"));
         }
     }
 
+    /**
+     * build PreparedStatement to insert Message data in database,
+     * using database time to save date
+     * @param message
+     * @param connection
+     * @return
+     * @throws SQLException
+     */
     private PreparedStatement buildInsertMessageStatement(
             Message message, Connection connection) throws SQLException {
         PreparedStatement ps = connection.prepareStatement(
-                "Insert into Message(senderId, receiverId, dateTimeSent, subject, body) values (?,?,?,?,?);",
+                "Insert into Message(senderId, receiverId, dateTimeSent, subject, body) values (?,?, now(),?,?);",
                 Statement.RETURN_GENERATED_KEYS);
         ps.setInt(1, message.getSender().getUserId());
         ps.setInt(2, message.getReceiver().getUserId());
-        ps.setTimestamp(3, Timestamp.valueOf(LocalDateTime.now()));
-        ps.setString(4, message.getSubject());
-        ps.setString(5, message.getBody());
+        ps.setString(3, message.getSubject());
+        ps.setString(4, message.getBody());
         return ps;
     }
 
@@ -86,8 +86,7 @@ public class JdbcMessageDAO implements MessageDAO {
                 buildInsertMessageStatement(message, connection), keyHolder);
         int newKey = Objects.requireNonNull(keyHolder.getKey()).intValue();
         message.setMessageId(newKey);
-        // TODO van opgeslagen DateTime naar OffsetDateTime, opslaan in message object
-        //  kan dat in het preparedStatement object? net zoals een generated key?
+        message.setDateTimeSent(OffsetDateTime.now());
     }
 
     /**
@@ -146,7 +145,7 @@ public class JdbcMessageDAO implements MessageDAO {
     public boolean removeOneById(int messageId) {
         // TODO do we ever remove a message from the database? If so, when?
         //  Or do we just set messages as archived for users, and keep them in database "forever" ?
-        // useful when resolving (legal) conflicts?
+        //  useful when resolving (legal) conflicts?
         return false;
     }
 }
