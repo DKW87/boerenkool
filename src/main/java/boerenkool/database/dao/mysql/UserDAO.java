@@ -25,7 +25,7 @@ public interface UserDAO extends GenericDAO<User> {
      * @param id the ID of the user to retrieve.
      * @return an Optional containing the user if found, or an empty Optional if not found.
      */
-    Optional<User> getOne(int id);
+    Optional<User> getOneById(int id);
 
     /**
      * Stores a user in the database.
@@ -41,7 +41,7 @@ public interface UserDAO extends GenericDAO<User> {
      * @param id the ID of the user to remove.
      * @return true if the user was successfully removed, false otherwise.
      */
-    boolean removeOne(int id);
+    boolean removeOneById(int id);
 
     /**
      * Updates an existing user in the database.
