@@ -69,6 +69,11 @@ public class Picture {
         return picture;
     }
 
+    /**
+     * Setter dictates Picture size limit.
+     * @param picture
+     * @throws IllegalArgumentException
+     */
     public void setPicture(byte[] picture) throws IllegalArgumentException {
         if (picture.length > MAX_PICTURE_SIZE) {
             throw new IllegalArgumentException("Foto overschrijd het maximum grootte van 5MB.");
