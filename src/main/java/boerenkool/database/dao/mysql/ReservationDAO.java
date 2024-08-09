@@ -1,11 +1,17 @@
-package boerenkool.persistence.dao;
+package boerenkool.database.dao.mysql;
 
 import boerenkool.business.model.Reservation;
-
+import boerenkool.database.dao.GenericDAO;
 import java.util.List;
 import java.util.Optional;
 
-public interface ReservationDAO extends GenericsDAO<Reservation> {
+/**
+ * @author Adnan Kilic
+ * @project Boerenkool
+ * @created 08/08/2024 - 13:53
+ */
+
+public interface ReservationDAO extends GenericDAO<Reservation> {
 
     @Override
     void storeOne (Reservation reservation);
@@ -21,5 +27,4 @@ public interface ReservationDAO extends GenericsDAO<Reservation> {
 
     @Override
     void removeOneById (int id);
-
 }

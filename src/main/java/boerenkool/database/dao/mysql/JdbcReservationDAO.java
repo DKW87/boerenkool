@@ -1,6 +1,7 @@
-package boerenkool.persistence.dao;
+package boerenkool.database.dao.mysql;
 
 import boerenkool.business.model.Reservation;
+import boerenkool.business.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,7 @@ import java.util.Optional;
  */
 
 
-public class JdbcReservationDAO {
+public class JdbcReservationDAO implements ReservationDAO {
 
     private final Logger logger = LoggerFactory.getLogger(JdbcReservationDAO.class);
     private JdbcTemplate jdbcTemplate;
@@ -31,11 +32,11 @@ public class JdbcReservationDAO {
     private final HouseDAO houseDAO;
 
     @Autowired
-    public JdbcReservationDAO(JdbcTemplate jdbcTemplate) {
+    public JdbcReservationDAO(JdbcTemplate jdbcTemplate, UserDAO userDAO, HouseDAO houseDAO) {
         this.jdbcTemplate = jdbcTemplate;
+        this.userDAO = userDAO;
+        this.houseDAO = houseDAO;
         logger.info("ReservationDAO instantiated");
-        userDAO = new UserDAO(jdbcTemplate);
-        houseDAO = new HouseDAO(jdbcTemplate);
     }
 
     public List<Reservation> getAll() {
@@ -84,31 +85,46 @@ public class JdbcReservationDAO {
 
     private PreparedStatement updateReservationStatement(Reservation reservation, Connection connection) throws SQLException {
         PreparedStatement preparedStatement;
-        String sql = "UPDATE Reservation SET reservationId=?, reservedByUserId=?, houseId=?, startDate=?, endDate=?, guestCount=? WHERE reservationId = ?";
+        String sql = "UPDATE Reservation SET reservedByUserId=?, houseId=?, startDate=?, endDate=?, guestCount=? WHERE reservationId = ?";
         preparedStatement = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
-        preparedStatement.setInt(1, reservation.getReservationId());
-        preparedStatement.setInt(2, reservation.getReservedByUser().getUserId());
-        preparedStatement.setInt(3, reservation.getHouse().getHouseId());
-        preparedStatement.setDate(4, java.sql.Date.valueOf(reservation.getStartDate()));
-        preparedStatement.setDate(5, java.sql.Date.valueOf(reservation.getEndDate()));
-        preparedStatement.setInt(6, reservation.getGuestCount());
+        preparedStatement.setInt(1, reservation.getReservedByUser().getUserId());
+        preparedStatement.setInt(2, reservation.getHouse().getHouseId());
+        preparedStatement.setDate(3, java.sql.Date.valueOf(reservation.getStartDate()));
+        preparedStatement.setDate(4, java.sql.Date.valueOf(reservation.getEndDate()));
+        preparedStatement.setInt(5, reservation.getGuestCount());
+        preparedStatement.setInt(6, reservation.getReservationId());
         return preparedStatement;
     }
 
     private static class ReservationMapper implements RowMapper<Reservation> {
 
+        private final UserDAO userDAO;
+        private final HouseDAO houseDAO;
+
+        public ReservationMapper(UserDAO userDAO, HouseDAO houseDAO) {
+            this.userDAO = userDAO;
+            this.houseDAO = houseDAO;
+        }
+
         @Override
         public Reservation mapRow(ResultSet resultSet, int rowNumber) throws SQLException {
-            int reservationId= resultSet.getInt("reservationId");
-            User reservedByUser= resultSet.getInt("reservedByUserId");
-            House houseId = resultSet.getInt("houseId");
+            int reservationId = resultSet.getInt("reservationId");
+            int reservedByUserId = resultSet.getInt("reservedByUserId");
+            User reservedByUser = userDAO.getOne(reservedByUserId)
+                    .orElseThrow(() -> new SQLException("User not found with ID: " + reservedByUserId));
+
+            int houseId = resultSet.getInt("houseId");
+            House house = houseDAO.getOne(houseId)
+                    .orElseThrow(() -> new SQLException("House not found with ID: " + houseId));
+
             LocalDate startDate = resultSet.getDate("startDate").toLocalDate();
-            LocalDate endDate= resultSet.getDate("endDate").toLocalDate();
+            LocalDate endDate = resultSet.getDate("endDate").toLocalDate();
             int guestCount = resultSet.getInt("guestCount");
 
-            return new Reservation(reservationId, reservedByUser, houseId, startDate, endDate, guestCount);
+            return new Reservation(reservationId, house, reservedByUser, startDate, endDate, guestCount);
         }
     }
-
-
 }
+
+
+

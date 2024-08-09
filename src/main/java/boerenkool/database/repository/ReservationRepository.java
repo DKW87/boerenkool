@@ -1,4 +1,4 @@
-package boerenkool.persistence.repository;
+package boerenkool.database.repository;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,5 +11,4 @@ public class ReservationRepository {
         super();
         logger.info("ReservationRepository initialized");
     }
-
 }

@@ -42,9 +42,7 @@ public class Reservation {
         this.guestCount = guestCount;
     }
 
-    public LocalDate getEndDate() {
-        return endDate;
-    }
+    public LocalDate getEndDate() {return endDate;}
 
     public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
