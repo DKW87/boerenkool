@@ -16,22 +16,63 @@ public class HouseFilter {
     private int amountOfGuests;
     private int desiredRoomCount;
     private int minPricePPPD;
-    private int maxPricePPD;
+    private int maxPricePPPD;
     private int limit; // used to determine how many results you want per page
     private int offset; // if you go to page 2 and result limit is 10, offset will become 10 (to hide page 1 results)
 
-    public HouseFilter(List<String> provinces, List<String> cities, List<HouseType> houseTypes, User houseOwner,
-                        int amountOfGuests, int desiredRoomCount,int minPricePPPD, int maxPricePPD, int limit, int offset) {
-        this.provinces = provinces;
-        this.cities = cities;
-        this.houseTypes = houseTypes;
-        this.houseOwner = houseOwner;
-        this.amountOfGuests = amountOfGuests;
-        this.desiredRoomCount = desiredRoomCount;
-        this.minPricePPPD = minPricePPPD;
-        this.maxPricePPD = maxPricePPD;
-        this.limit = limit;
-        this.offset = offset;
+    private HouseFilter(Builder builder) {
+        this.provinces = builder.provinces;
+        this.cities = builder.cities;
+        this.houseTypes = builder.houseTypes;
+        this.houseOwner = builder.houseOwner;
+        this.amountOfGuests = builder.amountOfGuests;
+        this.desiredRoomCount = builder.desiredRoomCount;
+        this.minPricePPPD = builder.minPricePPPD;
+        this.maxPricePPPD = builder.maxPricePPPD;
+        this.limit = builder.limit;
+        this.offset = builder.offset;
+    }
+
+    // getters
+
+    public List<String> getProvinces() {
+        return provinces;
+    }
+
+    public List<String> getCities() {
+        return cities;
+    }
+
+    public List<HouseType> getHouseTypes() {
+        return houseTypes;
+    }
+
+    public User getHouseOwner() {
+        return houseOwner;
+    }
+
+    public int getAmountOfGuests() {
+        return amountOfGuests;
+    }
+
+    public int getDesiredRoomCount() {
+        return desiredRoomCount;
+    }
+
+    public int getMinPricePPPD() {
+        return minPricePPPD;
+    }
+
+    public int getMaxPricePPD() {
+        return maxPricePPD;
+    }
+
+    public int getLimit() {
+        return limit;
+    }
+
+    public int getOffset() {
+        return offset;
     }
 
     public static class Builder {
@@ -43,58 +84,62 @@ public class HouseFilter {
         private int amountOfGuests;
         private int desiredRoomCount;
         private int minPricePPPD;
-        private int maxPricePPD;
+        private int maxPricePPPD;
         private int limit;
         private int offset;
 
-        public Builder containsProvinces(List<String> provinces) {
+        public Builder setProvinces(List<String> provinces) {
             this.provinces = provinces;
             return this;
         }
 
-        public Builder containsCities(List<String> cities) {
+        public Builder setCities(List<String> cities) {
             this.cities = cities;
             return this;
         }
 
-        public Builder containsHouseTypes(List<HouseType> houseTypes) {
+        public Builder setHouseTypes(List<HouseType> houseTypes) {
             this.houseTypes = houseTypes;
             return this;
         }
 
-        public Builder containsHouseOwner(User houseOwner) {
+        public Builder setHouseOwner(User houseOwner) {
             this.houseOwner = houseOwner;
             return this;
         }
 
-        public Builder containsAmountOfGuests(int amountOfGuests) {
+        public Builder setAmountOfGuests(int amountOfGuests) {
             this.amountOfGuests = amountOfGuests;
             return this;
         }
 
-        public Builder containsDesiredRoomCount(int desiredRoomCount) {
+        public Builder setDesiredRoomCount(int desiredRoomCount) {
             this.desiredRoomCount = desiredRoomCount;
             return this;
         }
 
-        public Builder containsMinPricePPPD(int minPricePPPD) {
+        public Builder setMinPricePPPD(int minPricePPPD) {
             this.minPricePPPD = minPricePPPD;
             return this;
         }
 
-        public Builder containsMaxPricePPPD(int maxPricePPPD) {
-            this.maxPricePPD = maxPricePPPD;
+        public Builder setMaxPricePPPD(int maxPricePPPD) {
+            this.maxPricePPPD = maxPricePPPD;
             return this;
         }
 
-        public Builder containsLimit(int limit) {
+        public Builder setLimit(int limit) {
             this.limit = limit;
             return this;
         }
 
-        public Builder containsOffset(int offset) {
+        public Builder setOffset(int offset) {
             this.offset = offset;
             return this;
+        }
+
+        public HouseFilter build() {
+            return new HouseFilter(this);
         }
 
     } // builder class
