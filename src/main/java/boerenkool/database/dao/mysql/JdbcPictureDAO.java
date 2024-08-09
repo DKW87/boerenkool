@@ -10,8 +10,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.List;
 import java.util.Optional;
 
@@ -48,21 +47,31 @@ public class JdbcPictureDAO implements PictureDAO {
         } //todo house opvragen bij sql als int ? en dan getHouseById opslaan als house ? dan meegeven aan picture constructor ?
     }
 
+
+
     @Override
     public List<Picture> getAll() {
         List<Picture> allPictures = jdbcTemplate.query("SELECT * FROM Picture;", new JdbcPictureDAO.PictureRowMapper());
         return allPictures;
     }
+    //todo is de new JdbcPictureDAO overbodig ?
 
-    @Override
-    public List<Picture> getAllByHouseId() {
-        List<Picture> allPicturesFromHouseId = jdbcTemplate.query("SELECT * FROM PICTURE WHERE HOUSEID = ?;", new JdbcPictureDAO.PictureRowMapper());
+    public List<Picture> getAllByHouseId(int houseId) {
+        List<Picture> allPicturesFromHouseId = jdbcTemplate.query("SELECT * FROM Picture WHERE houseId = ?;", new JdbcPictureDAO.PictureRowMapper(), houseId);
         return allPicturesFromHouseId;
     }
+    //todo is de new JdbcPictureDAO overbodig ?
 
     @Override
     public Optional<Picture> getOneById(int id) {
-        return Optional.empty();
+        String sql = "SELECT * FROM Picture WHERE pictureId = ?;";
+        List<Picture> resultList =
+                jdbcTemplate.query(sql, new PictureRowMapper(), id);
+        if (resultList.size() == 0) {
+            return Optional.empty();
+        } else {
+            return Optional.of(resultList.get(0));
+        }
     }
 
     @Override
@@ -77,7 +86,29 @@ public class JdbcPictureDAO implements PictureDAO {
 
     @Override
     public boolean removeOneById(int id) {
-        return false;
+        String sql  = "DELETE FROM user WHERE userId = ?";
+        return jdbcTemplate.update(sql, id) != 0;
     }
+
+    private void setCommonParameters(PreparedStatement ps, Picture picture) throws SQLException {
+        ps.setString(1, picture.getPictureId());
+        ps.setString(2, );
+        ps.setString(3, picture.getPicture());
+        ps.setString(4, picture.getDescription());
+    }
+
+    private PreparedStatement InsertPictureStatement(Picture picture, Connection connection) throws SQLException {
+        PreparedStatement ps;
+        ps = connection.prepareStatement(
+                "insert into picture_table (pictureId, houseId, picture, pictureDescription) values (?, ?, ?, ?)",
+                Statement.RETURN_GENERATED_KEYS);
+        ps.setInt(1, picture.getPictureId());
+        ps.setHouse(2, picture.getHouse);
+        ps.setBytes(3, picture.getPicture());
+        ps.setString(4, picture.getDescription());
+        return ps;
+    }
+
+
 
 } // einde klasse
