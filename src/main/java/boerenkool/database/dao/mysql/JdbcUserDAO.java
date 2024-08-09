@@ -95,7 +95,7 @@ public class JdbcUserDAO  implements UserDAO {
 
 
     @Override
-    public boolean removeOne(int id) {
+    public boolean removeOneById(int id) {
         String sql  = "DELETE FROM user WHERE userId = ?";
         return jdbcTemplate.update(sql, id) != 0;
     }
@@ -108,7 +108,7 @@ public class JdbcUserDAO  implements UserDAO {
     }
 
     @Override
-    public Optional<User> getOne(int id) {
+    public Optional<User> getOneById(int id) {
         List<User> users =
                 jdbcTemplate.query("select * from user where userId =?", new UserRowMapper(), id);
         if (users.size() != 1) {

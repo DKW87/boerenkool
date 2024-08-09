@@ -71,6 +71,10 @@ public class Message implements Comparable<Message>{
         return dateTimeSent;
     }
 
+    public void setDateTimeSent(OffsetDateTime dateTimeSent) {
+        this.dateTimeSent = dateTimeSent;
+    }
+
     public String getSubject() {
         return subject;
     }
