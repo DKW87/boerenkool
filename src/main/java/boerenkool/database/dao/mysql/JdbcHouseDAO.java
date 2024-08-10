@@ -3,6 +3,7 @@ package boerenkool.database.dao.mysql;
 import boerenkool.business.model.House;
 import boerenkool.business.model.HouseFilter;
 import boerenkool.business.model.HouseType;
+import boerenkool.business.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -277,15 +278,22 @@ public class JdbcHouseDAO implements HouseDAO {
             String province = resultSet.getString("province");
             String city = resultSet.getString("city");
             String streetAndNumber = resultSet.getString("streetAndNumber");
-            int zipcode = resultSet.getInt("zipcode");
+            String zipcode = resultSet.getString("zipcode");
             int maxGuest = resultSet.getInt("maxGuest");
             int roomCount = resultSet.getInt("roomCount");
             int pricePPPD = resultSet.getInt("pricePPPD");
             String description = resultSet.getString("description");
             boolean isNotAvailable = resultSet.getBoolean("isNotAvailable");
-            return new House(houseId, houseName, houseTypeDAO.getOneById(houseTypeId), userDAO.getOneById(houseOwnerId),
-                    province, city, streetAndNumber, zipcode, maxGuest, roomCount, pricePPPD, description, isNotAvailable);
+            HouseType houseType = houseTypeDAO.getOneById(houseTypeId)
+                    .orElseThrow(() -> new RuntimeException("HouseType not found with id: " + houseTypeId));
+            User houseOwner = userDAO.getOneById(houseOwnerId)
+                    .orElseThrow(() -> new RuntimeException("User not found with id: " + houseOwnerId));
+            House house = new House(houseName, houseType, houseOwner, province, city, streetAndNumber, zipcode,
+                    maxGuest, roomCount, pricePPPD, description, isNotAvailable);
+            house.setHouseId(houseId);
+            return house;
         }
+
     } // HouseMapper class
 
 } // JdbcHouseDAO class
