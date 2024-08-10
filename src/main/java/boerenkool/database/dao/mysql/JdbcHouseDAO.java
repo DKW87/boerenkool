@@ -74,6 +74,34 @@ public class JdbcHouseDAO implements HouseDAO {
         return jdbcTemplate.query(sql.toString(), new HouseMapper(userDAO, houseTypeDAO), params.toArray());
     }
 
+    @Override
+    public Optional<House> getOneById(int id) {
+        String sql = "SELECT * FROM House WHERE houseId = ?";
+        House house = jdbcTemplate.queryForObject(sql, new HouseMapper(userDAO, houseTypeDAO), id);
+        return house == null ? Optional.empty() : Optional.of(house);
+    }
+
+    @Override
+    public void storeOne(House house) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(connection -> insertHouseStatement(house, connection), keyHolder);
+        int pKey = keyHolder.getKey().intValue();
+        house.setHouseId(pKey);
+    }
+
+    @Override
+    public boolean updateOne(House house) {
+        int rowsUpdated = jdbcTemplate.update(connection -> updateHouseStatement(house, connection));
+        return rowsUpdated == 1;
+    }
+
+    @Override
+    public boolean removeOneById(int id) {
+        String sql = "DELETE FROM House WHERE houseId = ?";
+        int rowsUpdated = jdbcTemplate.update(sql, id);
+        return rowsUpdated == 1;
+    }
+
     private void addProvinceFilter(StringBuilder sql, List<Object> params, HouseFilter filter) {
         if (filter.getProvinces() != null && !filter.getProvinces().isEmpty()) {
             List<String> provinces = filter.getProvinces();
@@ -168,34 +196,6 @@ public class JdbcHouseDAO implements HouseDAO {
             sql.append(" OFFSET ?");
             params.add(filter.getOffset());
         }
-    }
-
-    @Override
-    public Optional<House> getOneById(int id) {
-        String sql = "SELECT * FROM House WHERE houseId = ?";
-        House house = jdbcTemplate.queryForObject(sql, new HouseMapper(userDAO, houseTypeDAO), id);
-        return house == null ? Optional.empty() : Optional.of(house);
-    }
-
-    @Override
-    public void storeOne(House house) {
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update(connection -> insertHouseStatement(house, connection), keyHolder);
-        int pKey = keyHolder.getKey().intValue();
-        house.setHouseId(pKey);
-    }
-
-    @Override
-    public boolean updateOne(House house) {
-        int rowsUpdated = jdbcTemplate.update(connection -> updateHouseStatement(house, connection));
-        return rowsUpdated == 1;
-    }
-
-    @Override
-    public boolean removeOneById(int id) {
-        String sql = "DELETE FROM House WHERE houseId = ?";
-        jdbcTemplate.update(sql, id);
-        return getOneById(id).isEmpty();
     }
 
     private PreparedStatement insertHouseStatement(House house, Connection connection) throws SQLException {
