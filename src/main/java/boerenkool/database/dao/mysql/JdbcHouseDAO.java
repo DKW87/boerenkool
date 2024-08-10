@@ -284,6 +284,7 @@ public class JdbcHouseDAO implements HouseDAO {
             int pricePPPD = resultSet.getInt("pricePPPD");
             String description = resultSet.getString("description");
             boolean isNotAvailable = resultSet.getBoolean("isNotAvailable");
+
             HouseType houseType = houseTypeDAO.getOneById(houseTypeId)
                     .orElseThrow(() -> new RuntimeException("HouseType not found with id: " + houseTypeId));
             User houseOwner = userDAO.getOneById(houseOwnerId)
