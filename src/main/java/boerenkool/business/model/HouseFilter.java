@@ -7,18 +7,36 @@ import java.util.List;
  * @project Boerenkool
  * @created 09/08/2024 - 15:36
  */
+
+/**
+ * This HouseFilter class was made to avoid having filter methods in DAO which requires too many param.
+ * Instead, param are consolidated in own class and are build using the builder of this class.
+ *
+ * Example use of HouseFilter:
+ * HouseFilter filter = new HouseFilter.Builder()
+ * .setProvinces(Arrays.asList("Noord-Holland"))
+ * .setCities(Arrays.asList("Amsterdam", "Alkmaar", "Hilversum"))
+ * .setAmountOfGuests(4)
+ * .setDesiredRoomCount(4)
+ * .setMinPricePPPD(25)
+ * .setSortBy("houseId")
+ * .setSortOrder("DESC")
+ * .setLimit(10)
+ * .build();
+ *
+ */
 public class HouseFilter {
 
     private List<String> provinces;
     private List<String> cities;
     private List<HouseType> houseTypes;
-    private User houseOwner;
+    private int houseOwnerId;
     private int amountOfGuests;
     private int desiredRoomCount;
     private int minPricePPPD;
     private int maxPricePPPD;
-    private String sortBy;
-    private String sortOrder;
+    private String sortBy; // use the attribute from the DB to sort on, e.g. "houseId"
+    private String sortOrder; // ASC or DESC
     private int limit; // used to determine how many results you want per page
     private int offset; // if you go to page 2 and result limit is 10, offset will become 10 (to hide page 1 results)
 
@@ -26,7 +44,7 @@ public class HouseFilter {
         this.provinces = builder.provinces;
         this.cities = builder.cities;
         this.houseTypes = builder.houseTypes;
-        this.houseOwner = builder.houseOwner;
+        this.houseOwnerId = builder.houseOwnerId;
         this.amountOfGuests = builder.amountOfGuests;
         this.desiredRoomCount = builder.desiredRoomCount;
         this.minPricePPPD = builder.minPricePPPD;
@@ -51,8 +69,8 @@ public class HouseFilter {
         return houseTypes;
     }
 
-    public User getHouseOwner() {
-        return houseOwner;
+    public int getHouseOwnerId() {
+        return houseOwnerId;
     }
 
     public int getAmountOfGuests() {
@@ -92,7 +110,7 @@ public class HouseFilter {
         private List<String> provinces;
         private List<String> cities;
         private List<HouseType> houseTypes;
-        private User houseOwner;
+        private int houseOwnerId;
         private int amountOfGuests;
         private int desiredRoomCount;
         private int minPricePPPD;
@@ -117,8 +135,8 @@ public class HouseFilter {
             return this;
         }
 
-        public Builder setHouseOwner(User houseOwner) {
-            this.houseOwner = houseOwner;
+        public Builder setHouseOwner(int houseOwnerId) {
+            this.houseOwnerId = houseOwnerId;
             return this;
         }
 

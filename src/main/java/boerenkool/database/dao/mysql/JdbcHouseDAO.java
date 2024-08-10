@@ -155,9 +155,9 @@ public class JdbcHouseDAO implements HouseDAO {
     }
 
     private void addHouseOwnerFilter(StringBuilder sql, List<Object> params, HouseFilter filter) {
-        if (filter.getHouseOwner() != null) {
+        if (filter.getHouseOwnerId() != 0) {
             sql.append(" AND houseOwnerId = ?");
-            params.add(filter.getHouseOwner().getUserId());
+            params.add(filter.getHouseOwnerId());
         }
     }
 
