@@ -16,6 +16,8 @@ import java.util.Optional;
  */
 public class HouseRepository {
 
+    // TODO getListOfHousesWithPictures when PictureDAO is implemented
+
     private final Logger logger = LoggerFactory.getLogger(HouseRepository.class);
     private final HouseDAO houseDAO;
 
