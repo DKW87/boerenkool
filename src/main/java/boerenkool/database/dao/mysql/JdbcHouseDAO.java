@@ -91,15 +91,15 @@ public class JdbcHouseDAO implements HouseDAO {
 
     @Override
     public boolean updateOne(House house) {
-        int rowsUpdated = jdbcTemplate.update(connection -> updateHouseStatement(house, connection));
-        return rowsUpdated == 1;
+        int recordsUpdated = jdbcTemplate.update(connection -> updateHouseStatement(house, connection));
+        return recordsUpdated == 1;
     }
 
     @Override
     public boolean removeOneById(int id) {
         String sql = "DELETE FROM House WHERE houseId = ?";
-        int rowsUpdated = jdbcTemplate.update(sql, id);
-        return rowsUpdated == 1;
+        int recordsUpdated = jdbcTemplate.update(sql, id);
+        return recordsUpdated == 1;
     }
 
     private void addProvinceFilter(StringBuilder sql, List<Object> params, HouseFilter filter) {
