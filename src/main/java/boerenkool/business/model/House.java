@@ -1,11 +1,13 @@
 package boerenkool.business.model;
 
+import java.util.Objects;
+
 /**
  * @author Danny KWANT
  * @project Boerenkool
  * @created 07/08/2024 - 14:35
  */
-public class House {
+public class House implements Comparable<House> {
 
     // attributes
     private int houseId;
@@ -66,6 +68,23 @@ public class House {
         return this.houseName;
     }
 
+    @Override
+    public int compareTo(House other) {
+        return Integer.compare(this.houseId, other.houseId);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        House house = (House) o;
+        return houseId == house.houseId;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(houseId);
+    }
 
     // getters and setters
     // TODO implement as needed
