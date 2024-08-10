@@ -1,5 +1,6 @@
 package boerenkool.database.dao.mysql;
 
+import boerenkool.business.model.House;
 import boerenkool.business.model.Reservation;
 import boerenkool.business.model.User;
 import org.slf4j.Logger;
@@ -9,6 +10,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.stereotype.Repository;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -23,7 +26,7 @@ import java.util.Optional;
  * @created 07/08/2024 - 20:53
  */
 
-
+@Repository
 public class JdbcReservationDAO implements ReservationDAO {
 
     private final Logger logger = LoggerFactory.getLogger(JdbcReservationDAO.class);
@@ -36,17 +39,19 @@ public class JdbcReservationDAO implements ReservationDAO {
         this.jdbcTemplate = jdbcTemplate;
         this.userDAO = userDAO;
         this.houseDAO = houseDAO;
-        logger.info("ReservationDAO instantiated");
+        logger.info("New JdbcReservationDAO instance created.");
     }
 
+    @Override
     public List<Reservation> getAll() {
         String sql = "select * from Reservation;";
-        return jdbcTemplate.query(sql, new ReservationMapper());
+        return jdbcTemplate.query(sql, new ReservationMapper(userDAO, houseDAO));
     }
 
+    @Override
     public Optional<Reservation> getOneById(int id) {
         String sql = "select * from Reservation where reservationId = ?;";
-        List<Reservation> reservations = jdbcTemplate.query(sql, new ReservationMapper(), id);
+        List<Reservation> reservations = jdbcTemplate.query(sql, new ReservationMapper(userDAO, houseDAO), id);
         if (reservations.isEmpty()) {
             return Optional.empty();
         } else {
@@ -54,6 +59,7 @@ public class JdbcReservationDAO implements ReservationDAO {
         }
     }
 
+    @Override
     public void storeOne(Reservation reservation) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> insertReservationStatement(reservation, connection), keyHolder);
@@ -61,25 +67,27 @@ public class JdbcReservationDAO implements ReservationDAO {
         reservation.setReservationId(newKey);
     }
 
-    public void updateOne(Reservation reservation) {
+    @Override
+    public boolean updateOne(Reservation reservation) {
         jdbcTemplate.update(connection -> updateReservationStatement(reservation, connection));
+        return true;
     }
 
-    public void removeOneById(int id) {
+    @Override
+    public boolean removeOneById(int id) {
         String sql = "delete from Reservation where reservationId = ?;";
         jdbcTemplate.update(sql, id);
+        return true;
     }
 
     private PreparedStatement insertReservationStatement(Reservation reservation, Connection connection) throws SQLException {
-        PreparedStatement preparedStatement;
-        String sql = "INSERT INTO Reservation (reservationId, reservedByUserId, houseId, startDate, endDate, guestCount) VALUES (?, ?, ?, ?, ?, ?);";
-        preparedStatement = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
-        preparedStatement.setInt(1, reservation.getReservationId());
-        preparedStatement.setInt(2, reservation.getReservedByUser().getUserId());
-        preparedStatement.setInt(3, reservation.getHouse().getHouseId());
-        preparedStatement.setDate(4, java.sql.Date.valueOf(reservation.getStartDate()));
-        preparedStatement.setDate(5, java.sql.Date.valueOf(reservation.getEndDate()));
-        preparedStatement.setInt(6, reservation.getGuestCount());
+        String sql = "INSERT INTO Reservation (reservedByUserId, houseId, startDate, endDate, guestCount) VALUES (?, ?, ?, ?, ?);";
+        PreparedStatement preparedStatement = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
+        preparedStatement.setInt(1, reservation.getReservedByUser().getUserId());
+        preparedStatement.setInt(2, reservation.getHouse().getHouseId());
+        preparedStatement.setDate(3, java.sql.Date.valueOf(reservation.getStartDate()));
+        preparedStatement.setDate(4, java.sql.Date.valueOf(reservation.getEndDate()));
+        preparedStatement.setInt(5, reservation.getGuestCount());
         return preparedStatement;
     }
 
@@ -110,11 +118,11 @@ public class JdbcReservationDAO implements ReservationDAO {
         public Reservation mapRow(ResultSet resultSet, int rowNumber) throws SQLException {
             int reservationId = resultSet.getInt("reservationId");
             int reservedByUserId = resultSet.getInt("reservedByUserId");
-            User reservedByUser = userDAO.getOne(reservedByUserId)
+            User reservedByUser = userDAO.getOneById(reservedByUserId)
                     .orElseThrow(() -> new SQLException("User not found with ID: " + reservedByUserId));
 
             int houseId = resultSet.getInt("houseId");
-            House house = houseDAO.getOne(houseId)
+            House house = houseDAO.getOneById(houseId)
                     .orElseThrow(() -> new SQLException("House not found with ID: " + houseId));
 
             LocalDate startDate = resultSet.getDate("startDate").toLocalDate();
