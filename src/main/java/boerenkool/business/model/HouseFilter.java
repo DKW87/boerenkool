@@ -17,6 +17,8 @@ public class HouseFilter {
     private int desiredRoomCount;
     private int minPricePPPD;
     private int maxPricePPPD;
+    private String sortBy;
+    private String sortOrder;
     private int limit; // used to determine how many results you want per page
     private int offset; // if you go to page 2 and result limit is 10, offset will become 10 (to hide page 1 results)
 
@@ -29,6 +31,8 @@ public class HouseFilter {
         this.desiredRoomCount = builder.desiredRoomCount;
         this.minPricePPPD = builder.minPricePPPD;
         this.maxPricePPPD = builder.maxPricePPPD;
+        this.sortBy = builder.sortBy;
+        this.sortOrder = builder.sortOrder;
         this.limit = builder.limit;
         this.offset = builder.offset;
     }
@@ -67,6 +71,14 @@ public class HouseFilter {
         return maxPricePPPD;
     }
 
+    public String getSortBy() {
+        return sortBy;
+    }
+
+    public String getSortOrder() {
+        return sortOrder;
+    }
+
     public int getLimit() {
         return limit;
     }
@@ -85,6 +97,8 @@ public class HouseFilter {
         private int desiredRoomCount;
         private int minPricePPPD;
         private int maxPricePPPD;
+        private String sortBy;
+        private String sortOrder;
         private int limit;
         private int offset;
 
@@ -125,6 +139,16 @@ public class HouseFilter {
 
         public Builder setMaxPricePPPD(int maxPricePPPD) {
             this.maxPricePPPD = maxPricePPPD;
+            return this;
+        }
+
+        public Builder setSortBy(String sortBy) {
+            this.sortBy = sortBy;
+            return this;
+        }
+
+        public Builder setSortOrder(String sortOrder) {
+            this.sortOrder = sortOrder;
             return this;
         }
 

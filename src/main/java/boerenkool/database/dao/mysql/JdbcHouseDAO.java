@@ -69,6 +69,7 @@ public class JdbcHouseDAO implements HouseDAO {
         addGuestFilter(sql, params, filter);
         addRoomCountFilter(sql, params, filter);
         addPriceFilter(sql, params, filter);
+        addOrderByClause(sql, filter);
         addLimitOffset(sql, params, filter);
 
         return jdbcTemplate.query(sql.toString(), new HouseMapper(userDAO, houseTypeDAO), params.toArray());
@@ -184,6 +185,20 @@ public class JdbcHouseDAO implements HouseDAO {
         } else if (filter.getMaxPricePPPD() > 0) {
             sql.append(" AND pricePPPD <= ?");
             params.add(filter.getMaxPricePPPD());
+        }
+    }
+
+    private void addOrderByClause(StringBuilder sql, HouseFilter filter) {
+        if (filter.getSortBy() != null && !filter.getSortBy().isEmpty()) {
+            String sortBy = filter.getSortBy();
+            String sortOrder = filter.getSortOrder() != null ? filter.getSortOrder() : "ASC"; // Default to ASC
+
+            // Zorg ervoor dat de sortOrder geldig is
+            if (!"ASC".equalsIgnoreCase(sortOrder) && !"DESC".equalsIgnoreCase(sortOrder)) {
+                sortOrder = "ASC"; // Default to ASC if invalid value
+            }
+
+            sql.append(" ORDER BY ").append(sortBy).append(" ").append(sortOrder);
         }
     }
 
