@@ -142,15 +142,15 @@ public class JdbcHouseDAO implements HouseDAO {
 
     @Override
     public boolean updateOne(House house) {
-        jdbcTemplate.update(connection -> updateHouseStatement(house, connection));
-        return true;
+        int rowsUpdated = jdbcTemplate.update(connection -> updateHouseStatement(house, connection));
+        return rowsUpdated == 1;
     }
 
     @Override
     public boolean removeOneById(int id) {
         String sql = "DELETE FROM House WHERE houseId = ?";
         jdbcTemplate.update(sql, id);
-        return true;
+        return getOneById(id).isEmpty();
     }
 
     private PreparedStatement insertHouseStatement(House house, Connection connection) throws SQLException {
