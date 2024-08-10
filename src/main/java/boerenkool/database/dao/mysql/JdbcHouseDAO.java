@@ -226,6 +226,6 @@ public class JdbcHouseDAO implements HouseDAO {
             return new House(houseId, houseName, houseTypeDAO.getOneById(houseTypeId), userDAO.getOneById(houseOwnerId),
                     province, city, streetAndNumber, zipcode, maxGuest, roomCount, pricePPPD, description, isNotAvailable);
         }
-    }
+    } // HouseMapper class
 
-} // class
+} // JdbcHouseDAO class
