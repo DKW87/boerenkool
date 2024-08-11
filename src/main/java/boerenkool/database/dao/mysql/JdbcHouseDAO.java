@@ -2,6 +2,7 @@ package boerenkool.database.dao.mysql;
 
 import boerenkool.business.model.House;
 import boerenkool.business.model.HouseFilter;
+import boerenkool.business.model.HouseType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
