@@ -32,7 +32,7 @@ public class JdbcMessageDAO implements MessageDAO {
         @Override
         public Message mapRow(ResultSet resultSet, int rowNumber)
                 throws SQLException {
-            return new Message(resultSet.getInt("messageId"), // messageId
+             return new Message(resultSet.getInt("messageId"), // messageId
                     userDAO.getOneById(resultSet.getInt("sender")).orElse(null),
                     userDAO.getOneById(resultSet.getInt("receiver")).orElse(null),
                     resultSet.getObject("dateTimeSent", OffsetDateTime.class),

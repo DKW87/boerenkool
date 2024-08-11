@@ -1,6 +1,7 @@
 package boerenkool.business.model;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 /**
  * @author Adnan Kilic
@@ -21,10 +22,12 @@ public class Reservation {
         this.reservationId = reservationId;
         this.house = house;
         this.reservedByUser = reservedByUser;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.guestCount = guestCount;
+        setStartDate(startDate);
+        setEndDate(endDate);
+        setGuestCount(guestCount);
     }
+
+    public Reservation() {}
 
     public int getReservationId() {
         return reservationId;
@@ -39,12 +42,18 @@ public class Reservation {
     }
 
     public void setGuestCount(int guestCount) {
+        if (guestCount < 0) {
+            throw new IllegalArgumentException("Guest count cannot be negative.");
+        }
         this.guestCount = guestCount;
     }
 
     public LocalDate getEndDate() {return endDate;}
 
     public void setEndDate(LocalDate endDate) {
+        if (startDate != null && endDate.isBefore(startDate)) {
+            throw new IllegalArgumentException("End date cannot be before start date.");
+        }
         this.endDate = endDate;
     }
 
@@ -53,6 +62,9 @@ public class Reservation {
     }
 
     public void setStartDate(LocalDate startDate) {
+        if (endDate != null && startDate.isAfter(endDate)) {
+            throw new IllegalArgumentException("Start date cannot be after end date.");
+        }
         this.startDate = startDate;
     }
 
@@ -70,5 +82,30 @@ public class Reservation {
 
     public void setHouse(House house) {
         this.house = house;
+    }
+
+    @Override
+    public String toString() {
+        return "Reservation{" +
+                "reservationId=" + reservationId +
+                ", house=" + house +
+                ", reservedByUser=" + reservedByUser +
+                ", startDate=" + startDate +
+                ", endDate=" + endDate +
+                ", guestCount=" + guestCount +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Reservation that = (Reservation) o;
+        return reservationId == that.reservationId;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(reservationId);
     }
 }
