@@ -2,10 +2,7 @@ package boerenkool.database.repository;
 
 import boerenkool.business.model.House;
 import boerenkool.business.model.HouseFilter;
-import boerenkool.database.dao.mysql.ExtraFeatureDAO;
-import boerenkool.database.dao.mysql.HouseDAO;
-import boerenkool.database.dao.mysql.HouseExtraFeatureDAO;
-import boerenkool.database.dao.mysql.HouseTypeDAO;
+import boerenkool.database.dao.mysql.*;
 import boerenkool.database.dao.mysql.PictureDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +24,7 @@ public class HouseRepository {
     private final PictureDAO pictureDAO;
     private final HouseExtraFeatureDAO houseExtraFeatureDAO;
 
-    public HouseRepository(HouseDAO houseDAO) {
+    public HouseRepository(HouseDAO houseDAO, PictureDAO pictureDAO, HouseExtraFeatureDAO houseExtraFeatureDAO) {
         logger.info("New HouseRepository");
         this.houseDAO = houseDAO;
         this.pictureDAO = pictureDAO;
@@ -39,36 +36,48 @@ public class HouseRepository {
         for (House house : allHouses) {
             // TODO @Emine > T for getAllFeaturesByHouseId = ExtraFeature
             house.setExtraFeatures(houseExtraFeatureDAO.getAllFeaturesByHouseId(house.getHouseId()));
-        }
-        return houseDAO.getAll();
-    }
-
-    public List<House> getListOfAllHousesWithAllPictures() {
-        List<House> allHouses = getListOfAllHouses();
-        for (House house : allHouses) {
             house.setPictures(pictureDAO.getAllByHouseId(house.getHouseId()));
         }
-        return allHouses;
+        return houseDAO.getAll();
     }
 
     public List<House> getListOfAllHousesWithFirstPicture() {
         List<House> allHouses = getListOfAllHouses();
         for (House house : allHouses) {
+            house.setExtraFeatures(houseExtraFeatureDAO.getAllFeaturesByHouseId(house.getHouseId()));
             // TODO easy solution for first picture only? Maybe need extra DAO method
         }
         return allHouses;
     }
 
     public List<House> getListOfAllHousesByOwner(int ownerId) {
-        return houseDAO.getAllHousesByOwner(ownerId);
+        List<House> allHouses = houseDAO.getAllHousesByOwner(ownerId);
+        for (House house : allHouses) {
+            // load all pics/feats right now
+            house.setExtraFeatures(houseExtraFeatureDAO.getAllFeaturesByHouseId(house.getHouseId()));
+            house.setPictures(pictureDAO.getAllByHouseId(house.getHouseId()));
+        }
+        return allHouses;
     }
 
     public List<House> getLimitedListOfHouses(int limit, int offset) {
-        return houseDAO.getLimitedList(limit, offset);
+        List<House> allHouses = houseDAO.getLimitedList(limit, offset);
+        for (House house : allHouses) {
+            // load all pics/feats right now
+            house.setExtraFeatures(houseExtraFeatureDAO.getAllFeaturesByHouseId(house.getHouseId()));
+            house.setPictures(pictureDAO.getAllByHouseId(house.getHouseId()));
+        }
+        return allHouses;
     }
 
     public List<House> getHousesWithFilter(HouseFilter filter) {
-        return houseDAO.getHousesWithFilter(filter);
+        List<House> allHouses = houseDAO.getHousesWithFilter(filter);
+        for (House house : allHouses) {
+            // load all pics/feats right now
+            house.setExtraFeatures(houseExtraFeatureDAO.getAllFeaturesByHouseId(house.getHouseId()));
+            house.setPictures(pictureDAO.getAllByHouseId(house.getHouseId()));
+        }
+        return allHouses;
     }
 
     public Optional<House> getHouse(int houseId) {
