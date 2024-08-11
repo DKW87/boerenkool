@@ -46,13 +46,12 @@ public class HouseRepository {
         return houseDAO.getOneById(houseId);
     }
 
-    public void saveHouse(House house) {
-        if (house.getHouseId() == 0) {
-            houseDAO.storeOne(house);
-        }
-        else {
-            houseDAO.updateOne(house);
-        }
+    public void storeNewHouse(House house) {
+        houseDAO.storeOne(house);
+    }
+
+    public boolean updateHouse(House house) {
+        return houseDAO.updateOne(house);
     }
 
     public boolean deleteHouse(int houseId) {
