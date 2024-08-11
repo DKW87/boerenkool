@@ -141,22 +141,30 @@ public class HouseFilter {
         }
 
         public Builder setAmountOfGuests(int amountOfGuests) {
-            this.amountOfGuests = amountOfGuests;
+            if (amountOfGuests > 0) {
+                this.amountOfGuests = amountOfGuests;
+            }
             return this;
         }
 
         public Builder setDesiredRoomCount(int desiredRoomCount) {
-            this.desiredRoomCount = desiredRoomCount;
+            if (desiredRoomCount > 0) {
+                this.desiredRoomCount = desiredRoomCount;
+            }
             return this;
         }
 
         public Builder setMinPricePPPD(int minPricePPPD) {
-            this.minPricePPPD = minPricePPPD;
+            if (minPricePPPD > 0) {
+                this.minPricePPPD = minPricePPPD;
+            }
             return this;
         }
 
         public Builder setMaxPricePPPD(int maxPricePPPD) {
-            this.maxPricePPPD = maxPricePPPD;
+            if (maxPricePPPD > 0) {
+                this.maxPricePPPD = maxPricePPPD;
+            }
             return this;
         }
 
@@ -166,17 +174,23 @@ public class HouseFilter {
         }
 
         public Builder setSortOrder(String sortOrder) {
-            this.sortOrder = sortOrder;
+            if (sortOrder.equals("ASC") || sortOrder.equals("DESC")) {
+                this.sortOrder = sortOrder;
+            }
             return this;
         }
 
         public Builder setLimit(int limit) {
-            this.limit = limit;
+            if (limit > 0) {
+                this.limit = limit;
+            }
             return this;
         }
 
         public Builder setOffset(int offset) {
-            this.offset = offset;
+            if (offset > 0) {
+                this.offset = offset;
+            }
             return this;
         }
 
