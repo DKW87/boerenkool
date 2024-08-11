@@ -13,7 +13,7 @@ public class Picture {
 
     private static final int MAX_PICTURE_SIZE = 5 * 1024 * 1024; // 5 MB
     private int pictureId;
-    private House house; //todo House object bestaat nog niet als model
+    private int houseId;
     private byte[] picture;
     private String description;
 
@@ -21,19 +21,14 @@ public class Picture {
     Constructors
      */
 
-    public Picture(int pictureId, House house, byte[] picture, String description) {
-        this.pictureId = pictureId;
-        this.house = house;
+    public Picture(int houseId, byte[] picture, String description) {
+        this.houseId = houseId;
         this.picture = picture;
         this.description = description;
     }
 
-    public Picture(House house, byte[] picture, String description) {
-        this(0, house, picture, description);
-    }
-
-    public Picture(House house, byte[] picture) {
-        this(house, picture, "");
+    public Picture(int houseId, byte[] picture) {
+        this(0, picture, "");
     }
 
     /*
@@ -57,12 +52,12 @@ public class Picture {
         this.pictureId = pictureId;
     }
 
-    public House getHouse() {
-        return house;
+    public int getHouseId() {
+        return houseId;
     }
 
-    public void setHouse(House house) {
-        this.house = house;
+    public void setHouseId(House house) {
+        this.houseId = houseId;
     }
 
     public byte[] getPicture() {
@@ -88,6 +83,5 @@ public class Picture {
     public void setDescription(String description) {
         this.description = description;
     }
-
 
 } // einde klasse
