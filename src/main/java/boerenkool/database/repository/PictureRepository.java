@@ -7,7 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
-
+/**
+ * @author Timothy Houweling
+ * @project Boerenkool
+ */
 @Repository
 public class PictureRepository {
 
@@ -41,6 +44,7 @@ public class PictureRepository {
     public void storeOne(Picture picture) {
         pictureDAO.storeOne(picture);
     }
+
 
     public void removeOneById(int pictureId) {
         pictureDAO.removeOneById(pictureId);

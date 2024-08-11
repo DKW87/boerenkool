@@ -28,7 +28,7 @@ public class JdbcPictureDAO implements PictureDAO {
     public JdbcPictureDAO(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
 
-        logger.info("New JdbcMemberDao.");
+        logger.info("New JdbcPictureDao.");
     }
 
     /**

@@ -1,9 +1,8 @@
 package boerenkool.business.model;
 
-import java.sql.SQLOutput;
-
-/*
-Student: Timothy Houweling
+/**
+ * @author Timothy Houweling
+ * @project Boerenkool
  */
 public class Picture {
 
