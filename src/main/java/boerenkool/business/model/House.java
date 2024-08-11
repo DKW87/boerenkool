@@ -32,13 +32,13 @@ public class House implements Comparable<House> {
         this.houseName = houseName;
         this.houseType = houseType;
         this.houseOwner = houseOwner;
-        this.province = province;
-        this.city = city;
+        this.setProvince(province);
+        this.setCity(city);
         this.streetAndNumber = streetAndNumber;
-        this.zipcode = zipcode;
-        this.maxGuest = maxGuest;
-        this.roomCount = roomCount;
-        this.pricePPPD = pricePPPD;
+        this.setZipcode(zipcode);
+        this.setMaxGuest(maxGuest);
+        this.setRoomCount(roomCount);
+        this.setPricePPPD(pricePPPD);
         this.description = description;
         this.isNotAvailable = isNotAvailable;
     }
@@ -143,6 +143,57 @@ public class House implements Comparable<House> {
 
     public void setHouseId(int houseId) {
         this.houseId = houseId;
+    }
+
+    public void setProvince(String province) {
+        if (province != null && province.matches("^[^0-9]*$")) { // Geen cijfers toegestaan
+            this.province = province;
+        } else {
+            this.province = "Onbekend";
+        }
+    }
+
+    public void setCity(String city) {
+        if (city != null && city.matches("^[^0-9]*$")) { // Geen cijfers toegestaan
+            this.city = city;
+        } else {
+            this.city = "Onbekend";
+        }
+    }
+
+    public void setPricePPPD(int pricePPPD) {
+        if (pricePPPD > 0) {
+            this.pricePPPD = pricePPPD;
+        }
+        else {
+            this.pricePPPD = 0;
+        }
+    }
+
+    public void setRoomCount(int roomCount) {
+        if (roomCount > 0) {
+            this.roomCount = roomCount;
+        }
+        else {
+            this.roomCount = 0;
+        }
+    }
+
+    public void setMaxGuest(int maxGuest) {
+        if (maxGuest > 0) {
+            this.maxGuest = maxGuest;
+        }
+        else {
+            this.maxGuest = 0;
+        }
+    }
+
+    public void setZipcode(String zipcode) {
+        if (zipcode != null && zipcode.matches("\\d{4}[A-Za-z]{2}")) { // zipcode moet bestaan uit 4 cijfers 2 letters
+            this.zipcode = zipcode;
+        } else {
+            this.zipcode = "0000AA";
+        }
     }
 
 } // class
