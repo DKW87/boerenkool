@@ -231,7 +231,7 @@ public class JdbcHouseDAO implements HouseDAO {
         preparedStatement.setInt(9, house.getRoomCount());
         preparedStatement.setInt(10, house.getPricePPPD());
         preparedStatement.setString(11, house.getDescription());
-        preparedStatement.setBoolean(12, house.isNotAvailable());
+        preparedStatement.setBoolean(12, house.getIsNotAvailable());
 
         return preparedStatement;
     }
@@ -253,7 +253,7 @@ public class JdbcHouseDAO implements HouseDAO {
         preparedStatement.setInt(9, house.getRoomCount());
         preparedStatement.setInt(10, house.getPricePPPD());
         preparedStatement.setString(11, house.getDescription());
-        preparedStatement.setBoolean(12, house.isNotAvailable());
+        preparedStatement.setBoolean(12, house.getIsNotAvailable());
         preparedStatement.setInt(13, house.getHouseId());
 
         return preparedStatement;

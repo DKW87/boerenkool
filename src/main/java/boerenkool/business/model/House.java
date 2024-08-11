@@ -1,5 +1,6 @@
 package boerenkool.business.model;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -23,6 +24,8 @@ public class House implements Comparable<House> {
     private int pricePPPD;
     private String description;
     private boolean isNotAvailable;
+    private List<Picture> pictures;
+    private List<ExtraFeature> extraFeatures;
 
 
     // constructors
@@ -137,8 +140,16 @@ public class House implements Comparable<House> {
         return description;
     }
 
-    public boolean isNotAvailable() {
+    public boolean getIsNotAvailable() {
         return isNotAvailable;
+    }
+
+    public List<ExtraFeature> getExtraFeatures() {
+        return extraFeatures;
+    }
+
+    public List<Picture> getPictures() {
+        return pictures;
     }
 
     public void setHouseId(int houseId) {
@@ -194,6 +205,14 @@ public class House implements Comparable<House> {
         } else {
             this.zipcode = "0000AA";
         }
+    }
+
+    public void setExtraFeatures(List<ExtraFeature> extraFeatures) {
+        this.extraFeatures = extraFeatures;
+    }
+
+    public void setPictures(List<Picture> pictures) {
+        this.pictures = pictures;
     }
 
 } // class
