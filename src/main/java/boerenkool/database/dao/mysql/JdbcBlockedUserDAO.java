@@ -14,6 +14,7 @@ import java.util.List;
  * JdbcBlockedUsersDAO is a DAO class responsible for managing blocked users
  * in the database using JDBC.
  */
+
 @Repository
 public class JdbcBlockedUserDAO implements BlockedUserDAO {
 
@@ -28,6 +29,7 @@ public class JdbcBlockedUserDAO implements BlockedUserDAO {
      * @param jdbcTemplate the JdbcTemplate to use for database operations
      * @param jdbcUserDAO  the JdbcUserDAO to use for user-related operations
      */
+
     @Autowired
     public JdbcBlockedUserDAO(JdbcTemplate jdbcTemplate, JdbcUserDAO jdbcUserDAO) {
         this.jdbcTemplate = jdbcTemplate;
@@ -78,6 +80,7 @@ public class JdbcBlockedUserDAO implements BlockedUserDAO {
      * @param blockedByUser the user who has blocked others
      * @return a list of users blocked by the given user
      */
+
     @Override
     public List<User> getBlockedUsers(User blockedByUser) {
         String sql = "SELECT u.* FROM users u INNER JOIN BlockedList b ON u.userId = b.blockedUser WHERE b.userId = ?";
