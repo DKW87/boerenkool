@@ -77,6 +77,15 @@ public class UserController {
         }
     }
 
+    @GetMapping(value = "/{username}")
+    User findOneByUsername(@PathVariable("username") String name) {
+        Optional<User> opt = userService.findByUsername(name);
+        if (opt.isPresent()) {
+            return opt.get();
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+        }
+    }
 }
 
 
