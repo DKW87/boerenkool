@@ -60,7 +60,7 @@ public class JdbcUserDAO implements UserDAO {
         PreparedStatement ps;
         ps = connection.prepareStatement(
                 """
-                UPDATE "User" 
+                UPDATE \"User\" 
                 SET 
                 typeOfUser=?,
                 username=?,
