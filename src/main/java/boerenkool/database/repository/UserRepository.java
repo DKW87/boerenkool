@@ -38,7 +38,24 @@ public class UserRepository {
         return userDAO.updateOne(user);
     }
 
-    public Optional<User> findByUsername(String username) {
+    public List<User> getBlockedUsers(User user) {
+        return userDAO.getBlockedUsers(user);
+    }
+
+    public boolean isUserBlocked(User blockedUser, User blockedByUser) {
+        return userDAO.isUserBlocked(blockedUser, blockedByUser);
+    }
+
+    public boolean removeBlockedUser(User blockedUser, User user) {
+        return userDAO.removeBlockedUser(blockedUser, user);
+    }
+
+    public void addBlockedUser(User blockedUser, User user) {
+        userDAO.addBlockedUser(blockedUser, user);
+    }
+
+
+        public Optional<User> findByUsername(String username) {
         return userDAO.findByUsername(username);
     };
 }
