@@ -24,7 +24,7 @@ public class UserRepository {
 
     public void storeOne(User user) {userDAO.storeOne(user);}
 
-    public void removeOneById(int id) {userDAO.removeOneById(id);}
+    public boolean removeOneById(int id) { return userDAO.removeOneById(id);}
 
     public List<User> getAll() {
         return userDAO.getAll();
