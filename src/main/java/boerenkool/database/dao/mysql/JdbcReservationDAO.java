@@ -69,15 +69,15 @@ public class JdbcReservationDAO implements ReservationDAO {
 
     @Override
     public boolean updateOne(Reservation reservation) {
-        jdbcTemplate.update(connection -> updateReservationStatement(reservation, connection));
-        return true;
+        int rowsAffected = jdbcTemplate.update(connection -> updateReservationStatement(reservation, connection));
+        return rowsAffected > 0;
     }
 
     @Override
     public boolean removeOneById(int id) {
-        String sql = "delete from Reservation where reservationId = ?;";
-        jdbcTemplate.update(sql, id);
-        return true;
+        String sql = "delete from Reservation where reservationId = ?";
+        int rowsAffected = jdbcTemplate.update(sql, id);
+        return rowsAffected > 0;
     }
 
     private PreparedStatement insertReservationStatement(Reservation reservation, Connection connection) throws SQLException {
