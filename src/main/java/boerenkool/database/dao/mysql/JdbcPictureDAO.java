@@ -27,12 +27,11 @@ public class JdbcPictureDAO implements PictureDAO {
      */
     private final Logger logger = LoggerFactory.getLogger(JdbcPictureDAO.class);
     JdbcTemplate jdbcTemplate;
-    HouseDAO houseDAO;
+
 
     @Autowired
-    public JdbcPictureDAO(JdbcTemplate jdbcTemplate, HouseDAO houseDAO) {
+    public JdbcPictureDAO(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-        this.houseDAO = houseDAO;
         logger.info("New JdbcPictureDao.");
     }
 
