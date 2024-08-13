@@ -42,7 +42,7 @@ public class User {
 
     //user object om te testen
     public User(String username, String password) {
-        this(DEFAULT_USER_ID, "huurder", username, password, "", "", "", "", "", 0);
+        this(DEFAULT_USER_ID, "huurder", username, password, "", "", "", "", "", DEFAULT_COIN_BALANCE);
     }
 
     public User () {
