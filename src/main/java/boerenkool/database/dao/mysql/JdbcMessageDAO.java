@@ -3,7 +3,11 @@ package boerenkool.database.dao.mysql;
 import boerenkool.business.model.Message;
 import boerenkool.business.model.User;
 import boerenkool.database.dao.mysql.UserDAO;
+import boerenkool.database.repository.MessageRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.SQLWarningException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -21,6 +25,8 @@ import java.util.Optional;
 public class JdbcMessageDAO implements MessageDAO {
     private final JdbcTemplate jdbcTemplate;
     private final UserDAO userDAO;
+    private final Logger logger = LoggerFactory.getLogger(JdbcMessageDAO.class);
+
 
     @Autowired
     public JdbcMessageDAO(JdbcTemplate jdbcTemplate, UserDAO userDAO) {
@@ -32,12 +38,16 @@ public class JdbcMessageDAO implements MessageDAO {
         @Override
         public Message mapRow(ResultSet resultSet, int rowNumber)
                 throws SQLException {
-             return new Message(resultSet.getInt("messageId"), // messageId
-                    userDAO.getOneById(resultSet.getInt("sender")).orElse(null),
-                    userDAO.getOneById(resultSet.getInt("receiver")).orElse(null),
+            return new Message(resultSet.getInt("messageId"), // messageId
+                    userDAO.getOneById(resultSet.getInt("senderId")).orElse(null),
+                    userDAO.getOneById(resultSet.getInt("receiverId")).orElse(null),
                     resultSet.getObject("dateTimeSent", OffsetDateTime.class),
                     resultSet.getString("subject"),
-                    resultSet.getString("body"));
+                    resultSet.getString("body")
+//                    resultSet.getBoolean("readByReceiver"),
+//                    resultSet.getBoolean("archivedBySender"),
+//                    resultSet.getBoolean("archivedByReceiver")
+            );
         }
     }
 
@@ -96,9 +106,11 @@ public class JdbcMessageDAO implements MessageDAO {
      */
     @Override
     public Optional<Message> getOneById(int messageId) {
+        logger.info("JdbcMessageDAO.getOneById is called");
         String sql = "Select * From Message where messageId = ?;";
         List<Message> resultList =
                 jdbcTemplate.query(sql, new MessageRowMapper(), messageId);
+        logger.info("JdbcMessageDAO.getOneById after executing query");
         if (resultList.isEmpty()) {
             return Optional.empty();
         } else {
