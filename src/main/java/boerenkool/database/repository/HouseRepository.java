@@ -6,6 +6,8 @@ import boerenkool.database.dao.mysql.*;
 import boerenkool.database.dao.mysql.PictureDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,6 +17,7 @@ import java.util.Optional;
  * @project Boerenkool
  * @created 09/08/2024 - 11:54
  */
+@Repository
 public class HouseRepository {
 
     // TODO getListOfHousesWithPictures when PictureDAO is implemented
@@ -24,6 +27,7 @@ public class HouseRepository {
     private final PictureDAO pictureDAO;
     private final HouseExtraFeatureDAO houseExtraFeatureDAO;
 
+    @Autowired
     public HouseRepository(HouseDAO houseDAO, PictureDAO pictureDAO, HouseExtraFeatureDAO houseExtraFeatureDAO) {
         logger.info("New HouseRepository");
         this.houseDAO = houseDAO;
@@ -35,7 +39,7 @@ public class HouseRepository {
         List<House> allHouses = houseDAO.getAll();
         for (House house : allHouses) {
             // TODO @Emine > T for getAllFeaturesByHouseId = ExtraFeature
-            house.setExtraFeatures(houseExtraFeatureDAO.getAllFeaturesByHouseId(house.getHouseId()));
+//            house.setExtraFeatures(houseExtraFeatureDAO.getAllFeaturesByHouseId(house.getHouseId()));
             house.setPictures(pictureDAO.getAllByHouseId(house.getHouseId()));
         }
         return houseDAO.getAll();
@@ -44,7 +48,7 @@ public class HouseRepository {
     public List<House> getListOfAllHousesWithFirstPicture() {
         List<House> allHouses = getListOfAllHouses();
         for (House house : allHouses) {
-            house.setExtraFeatures(houseExtraFeatureDAO.getAllFeaturesByHouseId(house.getHouseId()));
+//            house.setExtraFeatures(houseExtraFeatureDAO.getAllFeaturesByHouseId(house.getHouseId()));
             // TODO easy solution for first picture only? Maybe need extra DAO method
         }
         return allHouses;
@@ -54,7 +58,7 @@ public class HouseRepository {
         List<House> allHouses = houseDAO.getAllHousesByOwner(ownerId);
         for (House house : allHouses) {
             // load all pics/feats right now
-            house.setExtraFeatures(houseExtraFeatureDAO.getAllFeaturesByHouseId(house.getHouseId()));
+//            house.setExtraFeatures(houseExtraFeatureDAO.getAllFeaturesByHouseId(house.getHouseId()));
             house.setPictures(pictureDAO.getAllByHouseId(house.getHouseId()));
         }
         return allHouses;
@@ -64,7 +68,7 @@ public class HouseRepository {
         List<House> allHouses = houseDAO.getLimitedList(limit, offset);
         for (House house : allHouses) {
             // load all pics/feats right now
-            house.setExtraFeatures(houseExtraFeatureDAO.getAllFeaturesByHouseId(house.getHouseId()));
+//            house.setExtraFeatures(houseExtraFeatureDAO.getAllFeaturesByHouseId(house.getHouseId()));
             house.setPictures(pictureDAO.getAllByHouseId(house.getHouseId()));
         }
         return allHouses;
@@ -74,7 +78,7 @@ public class HouseRepository {
         List<House> allHouses = houseDAO.getHousesWithFilter(filter);
         for (House house : allHouses) {
             // load all pics/feats right now
-            house.setExtraFeatures(houseExtraFeatureDAO.getAllFeaturesByHouseId(house.getHouseId()));
+//            house.setExtraFeatures(houseExtraFeatureDAO.getAllFeaturesByHouseId(house.getHouseId()));
             house.setPictures(pictureDAO.getAllByHouseId(house.getHouseId()));
         }
         return allHouses;
