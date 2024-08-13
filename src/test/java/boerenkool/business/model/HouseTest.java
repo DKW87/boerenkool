@@ -14,22 +14,14 @@ class HouseTest {
 
     private House house;
     private House house2;
-    private HouseType houseType;
-    private HouseType houseType2;
-    private User user;
-    private User user2;
 
     @BeforeEach
     void setUp() {
-        user = new User();
-        user2 = new User();
-        houseType = new HouseType(1, "Apartment");
-        houseType2 = new HouseType(2, "Little-House");
-        house = new House("Apartement aan de Wallen", houseType, user, "Noord-Holland", "Amsterdam",
+        house = new House("Apartement aan de Wallen", "Noord-Holland", "Amsterdam",
                 "De Wallen 69","1234AB", 4, 4, 69,
                 "Mooi uitzicht", false);
         house.setHouseId(1);
-        house2 = new House("Oude Molen", houseType2, user2, "Zuid-Holland", "Kinderdijk",
+        house2 = new House("Oude Molen", "Zuid-Holland", "Kinderdijk",
                 "Molenweg 1","4321BA", 2, 1, 123,
                 "Lekker krap, maar uniek", false);
         house2.setHouseId(2);
