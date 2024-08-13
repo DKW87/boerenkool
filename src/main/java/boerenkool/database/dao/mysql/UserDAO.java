@@ -17,6 +17,7 @@ public interface UserDAO extends GenericDAO<User> {
      *
      * @return a list of all users.
      */
+    @Override
     List<User> getAll(); // Read
 
     /**
@@ -25,6 +26,7 @@ public interface UserDAO extends GenericDAO<User> {
      * @param id the ID of the user to retrieve.
      * @return an Optional containing the user if found, or an empty Optional if not found.
      */
+    @Override
     Optional<User> getOneById(int id);
 
     /**
@@ -33,6 +35,7 @@ public interface UserDAO extends GenericDAO<User> {
      *
      * @param user the user to store.
      */
+    @Override
     void storeOne(User user);
 
     /**
@@ -41,6 +44,7 @@ public interface UserDAO extends GenericDAO<User> {
      * @param id the ID of the user to remove.
      * @return true if the user was successfully removed, false otherwise.
      */
+    @Override
     boolean removeOneById(int id);
 
     /**
@@ -49,6 +53,7 @@ public interface UserDAO extends GenericDAO<User> {
      * @param user the user with updated information.
      * @return true if the user was successfully updated, false otherwise.
      */
+    @Override
     boolean updateOne(User user); // Update
 
     /**
@@ -58,4 +63,15 @@ public interface UserDAO extends GenericDAO<User> {
      * @return an Optional containing the user if found, or an empty Optional if not found.
      */
     Optional<User> findByUsername(String username);
+
+
+    void addBlockedUser(User blockedUser, User user);
+
+    boolean isUserBlocked(User blockedUser, User blockedByUser);
+
+    boolean removeBlockedUser(User blockedUser, User user);
+
+    List<User> getBlockedUsers(User user);
 }
+
+

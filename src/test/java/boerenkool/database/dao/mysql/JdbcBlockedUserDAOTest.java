@@ -1,6 +1,5 @@
 package boerenkool.database.dao.mysql;
 
-import boerenkool.business.model.BlockedUser;
 import boerenkool.business.model.User;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;

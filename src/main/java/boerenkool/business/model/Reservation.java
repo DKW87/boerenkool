@@ -1,13 +1,16 @@
+
 package boerenkool.business.model;
 
 import java.time.LocalDate;
 import java.util.Objects;
+
 
 /**
  * @author Adnan Kilic
  * @project Boerenkool
  * @created 07/08/2024 - 19:49
  */
+
 
 public class Reservation {
 
@@ -94,3 +97,4 @@ public class Reservation {
         return Objects.hash(reservationId);
     }
 }
+

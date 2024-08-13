@@ -3,6 +3,9 @@ package boerenkool.business.model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.*;
+import java.util.ArrayList;
+
 public class User {
 
     private final Logger logger = LoggerFactory.getLogger(User.class);
@@ -16,6 +19,7 @@ public class User {
     private String infix;
     private String lastName;
     private int coinBalance;
+    private List blockedUsers;
 
     private final static int DEFAULT_COIN_BALANCE = 0;
     private final static int DEFAULT_USER_ID = 0;
@@ -32,6 +36,7 @@ public class User {
         this.lastName = lastName;
         this.coinBalance = DEFAULT_COIN_BALANCE;
         logger.info("New user");
+        this.blockedUsers = new List();
     }
 
     //user object zonder id
@@ -124,10 +129,15 @@ public class User {
         this.coinBalance = coinBalance;
     }
 
+    public List getBlockedUsers() {
+        return blockedUsers;
+    }
+
     @Override
     public String toString() {
         return "User{" +
-                "typeOfUser='" + typeOfUser + '\'' +
+                "userId=" + userId +
+                ", typeOfUser='" + typeOfUser + '\'' +
                 ", username='" + username + '\'' +
                 ", password='" + password + '\'' +
                 ", email='" + email + '\'' +
@@ -136,7 +146,12 @@ public class User {
                 ", infix='" + infix + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", coinBalance=" + coinBalance +
+                ", blockedUsers=" + blockedUsers +
                 '}';
+    }
+
+    public void setBlockedUsers(List blockedUsers) {
+        this.blockedUsers = blockedUsers;
     }
 
     @Override
