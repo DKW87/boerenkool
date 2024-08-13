@@ -34,7 +34,7 @@ public class HouseExtraFeatureRepository {
     }
 
     public Optional<HouseExtraFeature> getOneByIds(int houseId, int featureId) {
-        return houseExtraFeatureDAO.getOneByIds(houseId, featureId);
+        return houseExtraFeatureDAO.getOneById(houseId, featureId);
     }
 
     public boolean updateOne(HouseExtraFeature houseExtraFeature) {

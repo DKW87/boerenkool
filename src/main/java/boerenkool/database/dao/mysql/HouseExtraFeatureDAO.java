@@ -9,19 +9,19 @@ import java.util.Optional;
 
 public interface HouseExtraFeatureDAO extends GenericDAO<HouseExtraFeature> {
 
-
+    @Override
     List<HouseExtraFeature> getAll();
 
 
-    Optional<HouseExtraFeature> getOneByIds(int houseId, int featureId);
+    Optional<HouseExtraFeature> getOneById(int houseId, int featureId);
 
-
+    @Override
     void storeOne(HouseExtraFeature houseExtraFeature);
 
 
     boolean removeOneByIds(int houseId, int featureId);
 
-
+    @Override
     boolean updateOne(HouseExtraFeature houseExtraFeature);
 
 
