@@ -64,6 +64,10 @@ public class House implements Comparable<House> {
         this(houseName, houseType, houseOwner, province, city, streetAndNumber, zipcode, maxGuest, roomCount, pricePPPD, "", false);
     }
 
+    public House() {
+
+    }
+
     // methods
 
     @Override
