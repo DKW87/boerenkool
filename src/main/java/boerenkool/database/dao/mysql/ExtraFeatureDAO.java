@@ -11,18 +11,19 @@ import java.util.Optional;
 public interface ExtraFeatureDAO extends GenericDAO<ExtraFeature> {
 
 
+    @Override
     List<ExtraFeature> getAll();
 
-
+    @Override
     Optional<ExtraFeature> getOneById(int id);
 
-
+    @Override
     void storeOne(ExtraFeature extraFeature);
 
-
+    @Override
     boolean removeOneById(int id);
 
-
+    @Override
     boolean updateOne(ExtraFeature extraFeature);
 
 
