@@ -28,36 +28,32 @@ import java.util.Optional;
 public class JdbcHouseDAO implements HouseDAO {
 
     private final Logger logger = LoggerFactory.getLogger(HouseDAO.class);
+    private final JdbcTemplate jdbcTemplate;
 
-    private JdbcTemplate jdbcTemplate;
-    private final UserDAO userDAO;
-    private final HouseTypeDAO houseTypeDAO;
 
     @Autowired
-    public JdbcHouseDAO(JdbcTemplate jdbcTemplate, UserDAO userDAO, HouseTypeDAO houseTypeDAO) {
+    public JdbcHouseDAO(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-        this.userDAO = userDAO;
-        this.houseTypeDAO = houseTypeDAO;
         logger.info("New JdbcHouseDAO");
     }
 
     @Override
     public List<House> getAll() {
         String sql = "SELECT * FROM House";
-        List<House> allHouses = jdbcTemplate.query(sql, new HouseMapper(userDAO, houseTypeDAO));
+        List<House> allHouses = jdbcTemplate.query(sql, new HouseMapper());
         return allHouses;
     }
 
     @Override
     public List<House> getAllHousesByOwner(int ownerId) {
         String sql = "SELECT * FROM House WHERE houseOwnerId = ?";
-        return jdbcTemplate.query(sql, new HouseMapper(userDAO, houseTypeDAO), ownerId);
+        return jdbcTemplate.query(sql, new HouseMapper(), ownerId);
     }
 
     @Override
     public List<House> getLimitedList(int limit, int offset) {
         String sql = "SELECT * FROM House LIMIT ? OFFSET ?";
-        return jdbcTemplate.query(sql, new HouseMapper(userDAO, houseTypeDAO), limit, offset);
+        return jdbcTemplate.query(sql, new HouseMapper(), limit, offset);
     }
 
     @Override
@@ -75,13 +71,13 @@ public class JdbcHouseDAO implements HouseDAO {
         addOrderByClause(sql, filter);
         addLimitOffset(sql, params, filter);
 
-        return jdbcTemplate.query(sql.toString(), new HouseMapper(userDAO, houseTypeDAO), params.toArray());
+        return jdbcTemplate.query(sql.toString(), new HouseMapper(), params.toArray());
     }
 
     @Override
     public Optional<House> getOneById(int id) {
         String sql = "SELECT * FROM House WHERE houseId = ?";
-        House house = jdbcTemplate.queryForObject(sql, new HouseMapper(userDAO, houseTypeDAO), id);
+        House house = jdbcTemplate.queryForObject(sql, new HouseMapper(), id);
         return house == null ? Optional.empty() : Optional.of(house);
     }
 
@@ -263,20 +259,12 @@ public class JdbcHouseDAO implements HouseDAO {
 
     private static class HouseMapper implements RowMapper<House> {
 
-        private final UserDAO userDAO;
-        private final HouseTypeDAO houseTypeDAO;
-
-        public HouseMapper(UserDAO userDAO, HouseTypeDAO houseTypeDAO) {
-            this.userDAO = userDAO;
-            this.houseTypeDAO = houseTypeDAO;
-        }
-
         @Override
         public House mapRow(ResultSet resultSet, int rowNumber) throws SQLException {
             int houseId = resultSet.getInt("houseId");
-            String houseName = resultSet.getString("houseName");
             int houseTypeId = resultSet.getInt("houseTypeId");
             int houseOwnerId = resultSet.getInt("houseOwnerId");
+            String houseName = resultSet.getString("houseName");
             String province = resultSet.getString("province");
             String city = resultSet.getString("city");
             String streetAndNumber = resultSet.getString("streetAndNumber");
@@ -287,13 +275,11 @@ public class JdbcHouseDAO implements HouseDAO {
             String description = resultSet.getString("description");
             boolean isNotAvailable = resultSet.getBoolean("isNotAvailable");
 
-            HouseType houseType = houseTypeDAO.getOneById(houseTypeId)
-                    .orElseThrow(() -> new RuntimeException("HouseType not found with id: " + houseTypeId));
-            User houseOwner = userDAO.getOneById(houseOwnerId)
-                    .orElseThrow(() -> new RuntimeException("User not found with id: " + houseOwnerId));
-            House house = new House(houseName, houseType, houseOwner, province, city, streetAndNumber, zipcode,
+            House house = new House(houseName, province, city, streetAndNumber, zipcode,
                     maxGuest, roomCount, pricePPPD, description, isNotAvailable);
             house.setHouseId(houseId);
+            house.accessOtherEntityIds().setHouseTypeId(houseTypeId);
+            house.accessOtherEntityIds().setHouseOwnerId(houseOwnerId);
             return house;
         }
 
