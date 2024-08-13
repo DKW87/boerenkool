@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 /**
@@ -26,61 +27,63 @@ public class HouseRepository {
     private final HouseDAO houseDAO;
     private final PictureDAO pictureDAO;
     private final HouseExtraFeatureDAO houseExtraFeatureDAO;
+    private final UserDAO userDAO;
+    private final HouseTypeDAO houseTypeDAO;
 
     @Autowired
-    public HouseRepository(HouseDAO houseDAO, PictureDAO pictureDAO, HouseExtraFeatureDAO houseExtraFeatureDAO) {
+    public HouseRepository(HouseDAO houseDAO, PictureDAO pictureDAO, HouseExtraFeatureDAO houseExtraFeatureDAO,
+                           UserDAO userDAO, HouseTypeDAO houseTypeDAO) {
         logger.info("New HouseRepository");
         this.houseDAO = houseDAO;
         this.pictureDAO = pictureDAO;
         this.houseExtraFeatureDAO = houseExtraFeatureDAO;
+        this.userDAO = userDAO;
+        this.houseTypeDAO = houseTypeDAO;
     }
 
-    public List<House> getListOfAllHouses() {
-        List<House> allHouses = houseDAO.getAll();
+    private List<House> setAllEntityDependencies(List<House> allHouses) {
         for (House house : allHouses) {
+            house.setHouseOwner(userDAO.getOneById(house.accessOtherEntityIds().getHouseOwnerId())
+                    .orElseThrow(() -> new NoSuchElementException("houseOwner not found")));
+            house.setHouseType(houseTypeDAO.getOneById(house.accessOtherEntityIds().getHouseTypeId())
+                    .orElseThrow(() -> new NoSuchElementException("houseType not found")));
             // TODO @Emine > T for getAllFeaturesByHouseId = ExtraFeature
 //            house.setExtraFeatures(houseExtraFeatureDAO.getAllFeaturesByHouseId(house.getHouseId()));
             house.setPictures(pictureDAO.getAllByHouseId(house.getHouseId()));
         }
-        return houseDAO.getAll();
+        return allHouses;
+    }
+
+    public List<House> getListOfAllHouses() {
+        List<House> allHouses = houseDAO.getAll();
+        setAllEntityDependencies(allHouses);
+        return allHouses;
     }
 
     public List<House> getListOfAllHousesWithFirstPicture() {
         List<House> allHouses = getListOfAllHouses();
-        for (House house : allHouses) {
-//            house.setExtraFeatures(houseExtraFeatureDAO.getAllFeaturesByHouseId(house.getHouseId()));
-            // TODO easy solution for first picture only? Maybe need extra DAO method
-        }
+        // TODO easy solution for first picture only? Maybe need extra PictureDAO method
         return allHouses;
     }
 
     public List<House> getListOfAllHousesByOwner(int ownerId) {
         List<House> allHouses = houseDAO.getAllHousesByOwner(ownerId);
-        for (House house : allHouses) {
-            // load all pics/feats right now
-//            house.setExtraFeatures(houseExtraFeatureDAO.getAllFeaturesByHouseId(house.getHouseId()));
-            house.setPictures(pictureDAO.getAllByHouseId(house.getHouseId()));
-        }
+        // currently gets all pictures
+        setAllEntityDependencies(allHouses);
         return allHouses;
     }
 
     public List<House> getLimitedListOfHouses(int limit, int offset) {
         List<House> allHouses = houseDAO.getLimitedList(limit, offset);
-        for (House house : allHouses) {
-            // load all pics/feats right now
-//            house.setExtraFeatures(houseExtraFeatureDAO.getAllFeaturesByHouseId(house.getHouseId()));
-            house.setPictures(pictureDAO.getAllByHouseId(house.getHouseId()));
-        }
+        // currently gets all pictures
+        setAllEntityDependencies(allHouses);
         return allHouses;
     }
 
     public List<House> getHousesWithFilter(HouseFilter filter) {
         List<House> allHouses = houseDAO.getHousesWithFilter(filter);
-        for (House house : allHouses) {
-            // load all pics/feats right now
-//            house.setExtraFeatures(houseExtraFeatureDAO.getAllFeaturesByHouseId(house.getHouseId()));
-            house.setPictures(pictureDAO.getAllByHouseId(house.getHouseId()));
-        }
+        // currently gets all pictures
+        setAllEntityDependencies(allHouses);
         return allHouses;
     }
 
