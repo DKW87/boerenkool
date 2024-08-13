@@ -92,12 +92,13 @@ public class JdbcMessageDAO implements MessageDAO {
      * @param message object to be saved
      */
     @Override
-    public void storeOne(Message message) {
+    public Optional<Message> storeOne(Message message) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection ->
                 buildInsertMessageStatement(message, connection), keyHolder);
         int newKey = Objects.requireNonNull(keyHolder.getKey()).intValue();
         message.setMessageId(newKey);
+        return Optional.of(message);
     }
 
     /**

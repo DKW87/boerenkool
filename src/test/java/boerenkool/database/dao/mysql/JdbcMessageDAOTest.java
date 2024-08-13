@@ -1,5 +1,7 @@
 package boerenkool.database.dao.mysql;
 
+import boerenkool.business.model.Message;
+import boerenkool.business.model.User;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -7,6 +9,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
+
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.util.Date;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -24,13 +34,17 @@ public class JdbcMessageDAOTest {
 
     @Test
     void storeOne() {
+        User testUser = new User("Huurder", "TestUsername", "TestPassword", "TestEmail",
+                "0600000000", "Firstname", "infix", "lastname", 0 );
+        // create new message with messageId of 0
+        Message testMessage = new Message(Optional.of(testUser), Optional.of(testUser), LocalDateTime.now(),
+                "subject line", "body text", false, false, false );
         // save new message
-//        testingJdbcMessageDAO.storeOne(null);
-        // new message has messageId of 0
-        // save message
+        Optional<Message> testMessageAfterSave = testingJdbcMessageDAO.storeOne(testMessage);
         // check modified messageId in object
-        // check message is stored in database
-        // check if stored message is identical to object message
+        int messageId = testMessageAfterSave.get().getMessageId();
+        // check message is stored in database, and compare message with original message
+        assertEquals(testMessageAfterSave, testingJdbcMessageDAO.getOneById(messageId));
     }
 
     @Test

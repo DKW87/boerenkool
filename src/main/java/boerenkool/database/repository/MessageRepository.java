@@ -3,6 +3,7 @@ package boerenkool.database.repository;
 import boerenkool.business.model.Message;
 import boerenkool.business.model.User;
 import boerenkool.communication.dto.MessageDTO;
+import boerenkool.database.dao.mysql.JdbcUserDAO;
 import boerenkool.database.dao.mysql.MessageDAO;
 import boerenkool.database.dao.mysql.UserDAO;
 import org.slf4j.Logger;
@@ -29,39 +30,42 @@ public class MessageRepository {
         logger.info("New MessageRepository");
     }
 
-    public void saveMessage(Message message) {
-        messageDAO.storeOne(message);
+    public Optional<Message> saveMessage(Message message) {
+        return messageDAO.storeOne(message);
     }
 
     public Optional<Message> findMessageById(int messageId) {
-        Optional<Message> optional = messageDAO.getOneById(messageId);
-        if (optional.isPresent()) {
-            return optional;
-        } else {
-            return Optional.empty();
-        }
+        return messageDAO.getOneById(messageId);
     }
 
     public List<Message> findMessagesForReceiver(User receiver) {
         List<Message> listOfMessages = messageDAO.getAllForReceiver(receiver);
-        for (Message message : listOfMessages) {
-            // TODO nog te maken, zie John's advies
-            //  de zender en ontvanger van de messages worden dan via een speciale methode in de UserDAO opgehaald,
-            //  die een messageId als argument heeft, en een join op de Message tabel doet.
-            message.setSender(userDAO.getSenderByMessageId(message.getMessageId()));
-            message.setReceiver(userDAO.getReceiverByMessageId(message.getMessageId()));
-        }
-        Collections.sort(listOfMessages);
+//        for (Message message : listOfMessages) {
+//            // TODO nog te maken, zie John's advies
+//            //  de zender en ontvanger van de messages worden via een speciale methode in de UserDAO opgehaald,
+//            //  die een messageId als argument heeft, en een join op de Message tabel doet.
+//            // dan heb je toch twee methodes nodig in UserDAO? zie hieronder
+//            message.setSender(userDAO.getSenderByMessageId(message.getMessageId()));
+//            message.setReceiver(userDAO.getReceiverByMessageId(message.getMessageId()));
+//        }
         return listOfMessages;
     }
+
+    // voor in Leo's JdbcUserDAO
+//    public Optional<User> getSenderByMessageId(int messageId) {
+//        Optional<User> sender = jdbcTemplate.query(
+//                "SELECT * FROM `Users` JOIN `Message` ON userId = senderId WHERE messageId = ? LIMIT 1",
+//                new JdbcUserDAO.UserRowMapper(), messageId);
+//        return sender;
+//    }
 
     /**
      * update message, also used for setting the archive flag
      * instead of deleting them from database
      * @param message
      */
-    public void updateMessage(Message message) {
-        messageDAO.updateOne(message);
+    public boolean updateMessage(Message message) {
+        return messageDAO.updateOne(message);
     }
 
     public void archiveMessageForSender(Message message) {

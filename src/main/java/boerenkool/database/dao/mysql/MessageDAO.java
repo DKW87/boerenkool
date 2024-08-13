@@ -12,7 +12,7 @@ import java.util.List;
 public interface MessageDAO {
     // extends GenericDAO<Message> // heb ik even uitgezet vanwege DTO experiment
 //    @Override
-    void storeOne(Message message);
+    Optional<Message> storeOne(Message message);
 
 //    @Override
     List<Message> getAll();
