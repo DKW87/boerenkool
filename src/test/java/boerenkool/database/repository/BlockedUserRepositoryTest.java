@@ -2,15 +2,12 @@ package boerenkool.database.repository;
 
 import boerenkool.business.model.BlockedUser;
 import boerenkool.business.model.User;
-import boerenkool.database.dao.mysql.BlockedUserDAO;
 import boerenkool.database.dao.mysql.UserDAO;
-import boerenkool.database.repository.BlockedUserRepository;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.mockito.Mockito;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;

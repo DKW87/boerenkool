@@ -71,13 +71,13 @@ public class UserController {
     public ResponseEntity<?> deleteOne(@PathVariable("id") int id) {
         boolean removed = userService.removeOneById(id);
         if (removed) {
-            return new ResponseEntity<>("User deleted successfully", HttpStatus.NO_CONTENT);
+            return new ResponseEntity<>("User deleted successfully", HttpStatus.OK);
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
         }
     }
 
-    @GetMapping(value = "/{username}")
+    @GetMapping(value = "/username/{username}")
     User findOneByUsername(@PathVariable("username") String name) {
         Optional<User> opt = userService.findByUsername(name);
         if (opt.isPresent()) {

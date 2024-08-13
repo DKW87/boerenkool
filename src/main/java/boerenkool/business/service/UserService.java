@@ -2,6 +2,7 @@ package boerenkool.business.service;
 
 import boerenkool.business.model.User;
 import boerenkool.database.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,6 +12,11 @@ import java.util.Optional;
 public class UserService {
 
     private UserRepository userRepository;
+
+    @Autowired
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     public void storeOne(User user) {userRepository.storeOne(user);}
 

@@ -1,11 +1,12 @@
 package boerenkool.business.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class User {
 
-    private final Logger logger = LoggerFactory.getLogger(User.class);
+    //private final Logger logger = LoggerFactory.getLogger(User.class);
     private int userId;
     private String typeOfUser;
     private String username;
@@ -31,7 +32,7 @@ public class User {
         this.infix = infix;
         this.lastName = lastName;
         this.coinBalance = DEFAULT_COIN_BALANCE;
-        logger.info("New user");
+        //logger.info("New user");
     }
 
     //user object zonder id
@@ -40,17 +41,14 @@ public class User {
     }
 
     //user object om te testen
-    public User(String typeOfUser, String username, String password) {
-        this(DEFAULT_USER_ID, typeOfUser, username, password, "", "", "", "", "", 0);
+    public User(String username, String password) {
+        this(DEFAULT_USER_ID, "huurder", username, password, "", "", "", "", "", 0);
     }
 
     public User () {
-        logger.info("User created with no-arg constructor");
+        //logger.info("User created with no-arg constructor");
     }
 
-    public Logger getLogger() {
-        return logger;
-    }
 
     public String getTypeOfUser() {
         return typeOfUser;
