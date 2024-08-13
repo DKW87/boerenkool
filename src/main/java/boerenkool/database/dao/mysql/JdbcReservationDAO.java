@@ -1,8 +1,6 @@
 package boerenkool.database.dao.mysql;
 
-import boerenkool.business.model.House;
 import boerenkool.business.model.Reservation;
-import boerenkool.business.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +8,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -25,26 +24,27 @@ import java.util.Optional;
  * @created 07/08/2024 - 20:53
  */
 
+@Repository
 public class JdbcReservationDAO implements ReservationDAO {
 
     private final Logger logger = LoggerFactory.getLogger(JdbcReservationDAO.class);
     private JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public JdbcReservationDAO(JdbcTemplate jdbcTemplate, UserDAO userDAO, HouseDAO houseDAO) {
+    public JdbcReservationDAO(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
         logger.info("New JdbcReservationDAO instance created.");
     }
 
     @Override
     public List<Reservation> getAll() {
-        String sql = "select * from Reservation;";
+        String sql = "select * from Reservation";
         return jdbcTemplate.query(sql, new ReservationMapper());
     }
 
     @Override
     public Optional<Reservation> getOneById(int id) {
-        String sql = "select * from Reservation where reservationId = ?;";
+        String sql = "select * from Reservation where reservationId = ?";
         List<Reservation> reservations = jdbcTemplate.query(sql, new ReservationMapper(), id);
         return reservations.stream().findFirst();
     }
@@ -110,11 +110,7 @@ public class JdbcReservationDAO implements ReservationDAO {
             reservation.setStartDate(startDate);
             reservation.setEndDate(endDate);
             reservation.setGuestCount(guestCount);
-
-            reservation.setHouse(new House()); //TODO: Een lege house constructor
             reservation.getHouse().setHouseId(houseId);
-
-            reservation.setReservedByUser(new User());
             reservation.getReservedByUser().setUserId(reservedByUserId);
 
             return reservation;
