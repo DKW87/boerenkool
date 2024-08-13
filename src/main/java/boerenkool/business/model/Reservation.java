@@ -1,13 +1,16 @@
+
 package boerenkool.business.model;
 
 import java.time.LocalDate;
 import java.util.Objects;
+
 
 /**
  * @author Adnan Kilic
  * @project Boerenkool
  * @created 07/08/2024 - 19:49
  */
+
 
 public class Reservation {
 
@@ -22,9 +25,9 @@ public class Reservation {
         this.reservationId = reservationId;
         this.house = house;
         this.reservedByUser = reservedByUser;
-        setStartDate(startDate);
-        setEndDate(endDate);
-        setGuestCount(guestCount);
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.guestCount = guestCount;
     }
 
     public Reservation() {}
@@ -41,32 +44,17 @@ public class Reservation {
         return guestCount;
     }
 
-    public void setGuestCount(int guestCount) {
-        if (guestCount < 0) {
-            throw new IllegalArgumentException("Guest count cannot be negative.");
-        }
-        this.guestCount = guestCount;
-    }
+    public void setGuestCount(int guestCount) {this.guestCount = guestCount;}
 
     public LocalDate getEndDate() {return endDate;}
 
-    public void setEndDate(LocalDate endDate) {
-        if (startDate != null && endDate.isBefore(startDate)) {
-            throw new IllegalArgumentException("End date cannot be before start date.");
-        }
-        this.endDate = endDate;
-    }
+    public void setEndDate(LocalDate endDate) {this.endDate = endDate;}
 
     public LocalDate getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(LocalDate startDate) {
-        if (endDate != null && startDate.isAfter(endDate)) {
-            throw new IllegalArgumentException("Start date cannot be after end date.");
-        }
-        this.startDate = startDate;
-    }
+    public void setStartDate(LocalDate startDate) {this.startDate = startDate;}
 
     public User getReservedByUser() {
         return reservedByUser;
@@ -109,3 +97,4 @@ public class Reservation {
         return Objects.hash(reservationId);
     }
 }
+

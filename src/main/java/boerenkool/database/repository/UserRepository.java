@@ -26,19 +26,36 @@ public class UserRepository {
 
     public void removeOneById(int id) {userDAO.removeOneById(id);}
 
-    List<User> getAll() {
+    public List<User> getAll() {
         return userDAO.getAll();
     };//Read
 
-    Optional getOneById(int id) {
+    public Optional getOneById(int id) {
         return userDAO.getOneById(id);
     }
 
-    boolean updateOne(User user) {
+    public boolean updateOne(User user) {
         return userDAO.updateOne(user);
     }
 
-    Optional<User> findByUsername(String username) {
+    public List<User> getBlockedUsers(User user) {
+        return userDAO.getBlockedUsers(user);
+    }
+
+    public boolean isUserBlocked(User blockedUser, User blockedByUser) {
+        return userDAO.isUserBlocked(blockedUser, blockedByUser);
+    }
+
+    public boolean removeBlockedUser(User blockedUser, User user) {
+        return userDAO.removeBlockedUser(blockedUser, user);
+    }
+
+    public void addBlockedUser(User blockedUser, User user) {
+        userDAO.addBlockedUser(blockedUser, user);
+    }
+
+
+        public Optional<User> findByUsername(String username) {
         return userDAO.findByUsername(username);
     };
 }
