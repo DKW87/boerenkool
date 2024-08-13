@@ -22,6 +22,8 @@
 ////        logger.info("New MessageService");
 //    }
 //
+////        message.setDateTimeSent(Local.now()); datumtijd instellen (logic) moet in Services laag staan
+//
 //    public void saveMessage(Message message) {
 //        messageRepository.saveMessage(message);
 //    }

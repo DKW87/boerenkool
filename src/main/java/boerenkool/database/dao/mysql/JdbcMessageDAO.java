@@ -2,7 +2,10 @@ package boerenkool.database.dao.mysql;
 
 import boerenkool.business.model.Message;
 import boerenkool.business.model.User;
+import boerenkool.communication.dto.MessageDTO;
 import boerenkool.database.dao.mysql.UserDAO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -20,24 +23,29 @@ import java.util.Optional;
 @Repository
 public class JdbcMessageDAO implements MessageDAO {
     private final JdbcTemplate jdbcTemplate;
-    private final UserDAO userDAO;
+    private final Logger logger = LoggerFactory.getLogger(JdbcMessageDAO.class);
+
 
     @Autowired
-    public JdbcMessageDAO(JdbcTemplate jdbcTemplate, UserDAO userDAO) {
+    public JdbcMessageDAO(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-        this.userDAO = userDAO;
+        logger.info("new JdbcMessageDAO");
     }
 
-    private class MessageRowMapper implements RowMapper<Message> {
+    private class MessageDTORowMapper implements RowMapper<MessageDTO> {
         @Override
-        public Message mapRow(ResultSet resultSet, int rowNumber)
+        public MessageDTO mapRow(ResultSet resultSet, int rowNumber)
                 throws SQLException {
-             return new Message(resultSet.getInt("messageId"), // messageId
-                    userDAO.getOneById(resultSet.getInt("sender")).orElse(null),
-                    userDAO.getOneById(resultSet.getInt("receiver")).orElse(null),
-                    resultSet.getObject("dateTimeSent", OffsetDateTime.class),
+            return new MessageDTO(resultSet.getInt("messageId"),
+                    resultSet.getInt("senderId"),
+                    resultSet.getInt("receiverId"),
+                    resultSet.getObject("dateTimeSent", LocalDateTime.class),
                     resultSet.getString("subject"),
-                    resultSet.getString("body"));
+                    resultSet.getString("body"),
+                    resultSet.getBoolean("readByReceiver"),
+                    resultSet.getBoolean("archivedBySender"),
+                    resultSet.getBoolean("archivedByReceiver")
+                    );
         }
     }
 
@@ -52,27 +60,34 @@ public class JdbcMessageDAO implements MessageDAO {
     private PreparedStatement buildInsertMessageStatement(
             Message message, Connection connection) throws SQLException {
         PreparedStatement ps = connection.prepareStatement(
-                "Insert into Message(senderId, receiverId, dateTimeSent, subject, body) values (?,?, now(),?,?);",
+                "Insert into Message(senderId, receiverId, dateTimeSent, subject, body, archivedBySender, " +
+                        "readByReceiver, archivedByReceiver) values (?,?,?,?,?,?,?,?);",
                 Statement.RETURN_GENERATED_KEYS);
-        ps.setInt(1, message.getSender().getUserId());
-        ps.setInt(2, message.getReceiver().getUserId());
-        ps.setString(3, message.getSubject());
-        ps.setString(4, message.getBody());
+        setCommonParameters(ps, message);
         return ps;
     }
 
     private PreparedStatement buildUpdateMessageStatement(
             Message message, Connection connection) throws SQLException {
         PreparedStatement ps = connection.prepareStatement(
-                "UPDATE Message SET " +
-                        "archivedBySender = ?," +
-                        "readByReceiver = ?," +
-                        "archivedByReceiver = ?" +
+                "UPDATE Message SET senderId = ?, receiverId = ?, dateTimeSent = ?, subject = ?, " +
+                        "body = ?, archivedBySender = ?, readByReceiver = ?, archivedByReceiver = ?" +
                         "where messageId = ?;");
-        ps.setBoolean(1, message.isArchivedBySender());
-        ps.setBoolean(2, message.isReadByReceiver());
-        ps.setBoolean(3, message.isArchivedByReceiver());
+        setCommonParameters(ps, message);
+        ps.setInt(9, message.getMessageId());
         return ps;
+    }
+    private void setCommonParameters(PreparedStatement ps, Message message) throws SQLException {
+//        if (message.getSender().isPresent() {
+            ps.setInt(1, message.getSender().get().getUserId());
+//        } else ps.set
+        ps.setInt(2, message.getReceiver().get().getUserId());
+        ps.setObject(3, message.getDateTimeSent());
+        ps.setString(4, message.getSubject());
+        ps.setString(5, message.getBody());
+        ps.setBoolean(6, message.isArchivedBySender());
+        ps.setBoolean(7, message.isReadByReceiver());
+        ps.setBoolean(8, message.isArchivedByReceiver());
     }
 
     /**
@@ -86,7 +101,6 @@ public class JdbcMessageDAO implements MessageDAO {
                 buildInsertMessageStatement(message, connection), keyHolder);
         int newKey = Objects.requireNonNull(keyHolder.getKey()).intValue();
         message.setMessageId(newKey);
-        message.setDateTimeSent(OffsetDateTime.now());
     }
 
     /**
@@ -95,10 +109,10 @@ public class JdbcMessageDAO implements MessageDAO {
      * @return optional containing the message
      */
     @Override
-    public Optional<Message> getOneById(int messageId) {
+    public Optional<MessageDTO> getOneById(int messageId) {
         String sql = "Select * From Message where messageId = ?;";
-        List<Message> resultList =
-                jdbcTemplate.query(sql, new MessageRowMapper(), messageId);
+        List<MessageDTO> resultList =
+                jdbcTemplate.query(sql, new MessageDTORowMapper(), messageId);
         if (resultList.isEmpty()) {
             return Optional.empty();
         } else {
@@ -111,16 +125,16 @@ public class JdbcMessageDAO implements MessageDAO {
      * @return the List of all messages
      */
     @Override
-    public List<Message> getAll() {
-        return jdbcTemplate.query("Select * From Message", new MessageRowMapper());
+    public List<MessageDTO> getAll() {
+        return jdbcTemplate.query("Select * From Message", new MessageDTORowMapper());
     }
 
     @Override
-    public List<Message> getAllForReceiver(User receiver) {
+    public List<MessageDTO> getAllForReceiver(User receiver) {
         int receiverId = receiver.getUserId();
-        List<Message> messagesForReceiver = jdbcTemplate.query(
+        List<MessageDTO> messagesForReceiver = jdbcTemplate.query(
                 "Select * From Message where receiverId = ?;",
-                new MessageRowMapper(),
+                new MessageDTORowMapper(),
                 receiverId);
         return messagesForReceiver;
     }

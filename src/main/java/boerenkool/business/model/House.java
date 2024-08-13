@@ -26,15 +26,14 @@ public class House implements Comparable<House> {
     private boolean isNotAvailable;
     private List<Picture> pictures;
     private List<ExtraFeature> extraFeatures;
+    private otherEntityIds otherEntityIds;
 
 
     // constructors
 
-    public House(String houseName, HouseType houseType, User houseOwner, String province, String city, String streetAndNumber,
-                 String zipcode, int maxGuest, int roomCount, int pricePPPD, String description, boolean isNotAvailable) {
+    public House(String houseName, String province, String city, String streetAndNumber, String zipcode,
+                 int maxGuest, int roomCount, int pricePPPD, String description, boolean isNotAvailable) {
         this.houseName = houseName;
-        this.houseType = houseType;
-        this.houseOwner = houseOwner;
         this.setProvince(province);
         this.setCity(city);
         this.streetAndNumber = streetAndNumber;
@@ -44,24 +43,25 @@ public class House implements Comparable<House> {
         this.setPricePPPD(pricePPPD);
         this.description = description;
         this.isNotAvailable = isNotAvailable;
+        this.otherEntityIds = new otherEntityIds();
     }
 
     // isNotAvailable optional constructor
-    public House(String houseName, HouseType houseType, User houseOwner, String province, String city, String streetAndNumber,
-                 String zipcode, int maxGuest, int roomCount, int pricePPPD, String description) {
-        this(houseName, houseType, houseOwner, province, city, streetAndNumber, zipcode, maxGuest, roomCount, pricePPPD, description, false);
+    public House(String houseName, HouseType houseType, User houseOwner, String province, String city,
+                 String streetAndNumber, String zipcode, int maxGuest, int roomCount, int pricePPPD, String description) {
+        this(houseName, province, city, streetAndNumber, zipcode, maxGuest, roomCount, pricePPPD, description, false);
     }
 
     // description optional constructor
-    public House(String houseName, HouseType houseType, User houseOwner, String province, String city, String streetAndNumber,
-                 String zipcode, int maxGuest, int roomCount, int pricePPPD, boolean isNotAvailable) {
-        this(houseName, houseType, houseOwner, province, city, streetAndNumber, zipcode, maxGuest, roomCount, pricePPPD, "", isNotAvailable);
+    public House(String houseName, String province, String city, String streetAndNumber, String zipcode,
+                 int maxGuest, int roomCount, int pricePPPD, boolean isNotAvailable) {
+        this(houseName, province, city, streetAndNumber, zipcode, maxGuest, roomCount, pricePPPD, "", isNotAvailable);
     }
 
     // description and isNotAvailable optional constructor
-    public House(String houseName, HouseType houseType, User houseOwner, String province, String city, String streetAndNumber,
+    public House(String houseName, String province, String city, String streetAndNumber,
                  String zipcode, int maxGuest, int roomCount, int pricePPPD) {
-        this(houseName, houseType, houseOwner, province, city, streetAndNumber, zipcode, maxGuest, roomCount, pricePPPD, "", false);
+        this(houseName, province, city, streetAndNumber, zipcode, maxGuest, roomCount, pricePPPD, "", false);
     }
 
     public House() {
@@ -156,12 +156,24 @@ public class House implements Comparable<House> {
         return pictures;
     }
 
+    public otherEntityIds accessOtherEntityIds() {
+        return otherEntityIds;
+    }
+
     public void setHouseId(int houseId) {
         this.houseId = houseId;
     }
 
+    public void setHouseType(HouseType houseType) {
+        this.houseType = houseType;
+    }
+
+    public void setHouseOwner(User houseOwner) {
+        this.houseOwner = houseOwner;
+    }
+
     public void setProvince(String province) {
-        if (province != null && province.matches("^[^0-9]*$")) { // Geen cijfers toegestaan
+        if (province != null && province.matches("^[^0-9]*$")) { // no numbers allowed
             this.province = province;
         } else {
             this.province = "Onbekend";
@@ -169,7 +181,7 @@ public class House implements Comparable<House> {
     }
 
     public void setCity(String city) {
-        if (city != null && city.matches("^[^0-9]*$")) { // Geen cijfers toegestaan
+        if (city != null && city.matches("^[^0-9]*$")) { // no numbers allowed
             this.city = city;
         } else {
             this.city = "Onbekend";
@@ -204,7 +216,7 @@ public class House implements Comparable<House> {
     }
 
     public void setZipcode(String zipcode) {
-        if (zipcode != null && zipcode.matches("\\d{4}[A-Za-z]{2}")) { // zipcode moet bestaan uit 4 cijfers 2 letters
+        if (zipcode != null && zipcode.matches("\\d{4}[A-Za-z]{2}")) { // zipcode consists of 4 numbers 2 letters
             this.zipcode = zipcode;
         } else {
             this.zipcode = "0000AA";
@@ -217,6 +229,29 @@ public class House implements Comparable<House> {
 
     public void setPictures(List<Picture> pictures) {
         this.pictures = pictures;
+    }
+
+    public static class otherEntityIds {
+
+        int houseOwnerId;
+        int houseTypeId;
+
+        public int getHouseOwnerId() {
+            return houseOwnerId;
+        }
+
+        public int getHouseTypeId() {
+            return houseTypeId;
+        }
+
+        public void setHouseOwnerId(int houseOwnerId) {
+            this.houseOwnerId = houseOwnerId;
+        }
+
+        public void setHouseTypeId(int houseTypeId) {
+            this.houseTypeId = houseTypeId;
+        }
+
     }
 
 } // class

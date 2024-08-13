@@ -1,14 +1,12 @@
 package boerenkool.business.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.*;
-import java.util.ArrayList;
-
 public class User {
 
-    private final Logger logger = LoggerFactory.getLogger(User.class);
+    //private final Logger logger = LoggerFactory.getLogger(User.class);
     private int userId;
     private String typeOfUser;
     private String username;
@@ -19,7 +17,6 @@ public class User {
     private String infix;
     private String lastName;
     private int coinBalance;
-    private List blockedUsers;
 
     private final static int DEFAULT_COIN_BALANCE = 0;
     private final static int DEFAULT_USER_ID = 0;
@@ -35,8 +32,7 @@ public class User {
         this.infix = infix;
         this.lastName = lastName;
         this.coinBalance = DEFAULT_COIN_BALANCE;
-        logger.info("New user");
-        this.blockedUsers = new List();
+        //logger.info("New user");
     }
 
     //user object zonder id
@@ -45,17 +41,14 @@ public class User {
     }
 
     //user object om te testen
-    public User(String typeOfUser, String username, String password) {
-        this(DEFAULT_USER_ID, typeOfUser, username, password, "", "", "", "", "", 0);
+    public User(String username, String password) {
+        this(DEFAULT_USER_ID, "huurder", username, password, "", "", "", "", "", 0);
     }
 
     public User () {
-        logger.info("User created with no-arg constructor");
+        //logger.info("User created with no-arg constructor");
     }
 
-    public Logger getLogger() {
-        return logger;
-    }
 
     public String getTypeOfUser() {
         return typeOfUser;
@@ -129,15 +122,10 @@ public class User {
         this.coinBalance = coinBalance;
     }
 
-    public List getBlockedUsers() {
-        return blockedUsers;
-    }
-
     @Override
     public String toString() {
         return "User{" +
-                "userId=" + userId +
-                ", typeOfUser='" + typeOfUser + '\'' +
+                "typeOfUser='" + typeOfUser + '\'' +
                 ", username='" + username + '\'' +
                 ", password='" + password + '\'' +
                 ", email='" + email + '\'' +
@@ -146,12 +134,7 @@ public class User {
                 ", infix='" + infix + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", coinBalance=" + coinBalance +
-                ", blockedUsers=" + blockedUsers +
                 '}';
-    }
-
-    public void setBlockedUsers(List blockedUsers) {
-        this.blockedUsers = blockedUsers;
     }
 
     @Override

@@ -1,42 +1,31 @@
 package boerenkool.database.dao.mysql;
 
-import boerenkool.business.model.Message;
-import boerenkool.business.model.User;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.time.OffsetDateTime;
-import java.util.Date;
-
 @SpringBootTest
 @ActiveProfiles("test")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class JdbcMessageDAOTest {
-    private final JdbcMessageDAO jdbcMessageDAO;
 
-//    User testUser = new User("Huurder", "TestUsername", "TestPassword", "TestEmail",
-//            "0600000000", "Firstname", "infix", "lastname", 0 );
-//    Date testDate = new Date();
-//    OffsetDateTime offsetDateTime = OffsetDateTime.now();
-//    Message testMessage = new Message(testUser, testUser,"subject line", "body text" );
+//    JdbcTemplate jdbcTemplate;
+
+    private final JdbcMessageDAO testingJdbcMessageDAO;
 
     @Autowired
-    public JdbcMessageDAOTest(JdbcTemplate jdbcTemplate, UserDAO userDAO) {
-        super();
-        this.jdbcMessageDAO = new JdbcMessageDAO(jdbcTemplate, userDAO);
-    }
-
-    @Test
-    void contextLoads() {
-        System.out.println("JdbcMessageDAOTest contextLoads");
+    JdbcMessageDAOTest(JdbcTemplate jdbcTemplate) {
+        this.testingJdbcMessageDAO = new JdbcMessageDAO(jdbcTemplate);
     }
 
     @Test
     void storeOne() {
         // save new message
-//        messageDAO.storeOne(testMessage);
+//        testingJdbcMessageDAO.storeOne(null);
         // new message has messageId of 0
         // save message
         // check modified messageId in object
@@ -65,17 +54,17 @@ public class JdbcMessageDAOTest {
 
     @Test
     void getAllForReceiver_noUser() {
-        // no messages
+        // user doesnt exist
     }
 
     @Test
     void getAllForReceiver_noMessages() {
-        // no messages
+        // no messages for user
     }
 
     @Test
     void getAllForReceiver_oneMessage() {
-        // one message
+        // one message for user
     }
 
     @Test
