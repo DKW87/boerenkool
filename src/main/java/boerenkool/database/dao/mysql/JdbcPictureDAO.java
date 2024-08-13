@@ -121,11 +121,13 @@ public class JdbcPictureDAO implements PictureDAO {
         @Override
         public Picture mapRow(ResultSet resultSet, int rowNum) throws SQLException {
             int pictureId = resultSet.getInt("pictureId");
+            int houseId = resultSet.getInt("houseId");
             byte[] pictureData = resultSet.getBytes("picture");
             String pictureDescription = resultSet.getString("pictureDescription");
             Picture picture = new Picture
                     (null, pictureData,pictureDescription);
             picture.setPictureId(pictureId);
+            picture.setHouseId(houseId); // nodig voor repository
             return picture;
         }
     }

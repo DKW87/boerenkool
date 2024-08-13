@@ -13,6 +13,7 @@ public class Picture {
     private static final int MAX_PICTURE_SIZE = 5 * 1024 * 1024; // 5 MB
     private int pictureId;
     private House house;
+    private int houseId;
     private byte[] picture;
     private String description;
 
@@ -22,6 +23,7 @@ public class Picture {
 
     public Picture(House house, byte[] picture, String description) {
         this.house = house;
+        this.houseId = houseId;
         this.picture = picture;
         this.description = description;
     }
@@ -55,8 +57,17 @@ public class Picture {
         return house;
     }
 
+
     public void setHouse(House house) {
         this.house = house;
+    }
+
+    public int getHouseId() {
+        return houseId;
+    }
+
+    public void setHouseId(int houseId) {
+        this.houseId = houseId;
     }
 
     public byte[] getPicture() {

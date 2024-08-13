@@ -1,10 +1,13 @@
 package boerenkool.database.repository;
+import boerenkool.business.model.House;
 import boerenkool.business.model.Picture;
+import boerenkool.database.dao.mysql.HouseDAO;
 import boerenkool.database.dao.mysql.PictureDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+
 import java.util.List;
 import java.util.Optional;
 /**
@@ -14,13 +17,15 @@ import java.util.Optional;
 @Repository
 public class PictureRepository {
 
-    PictureDAO pictureDAO;
+    private final PictureDAO pictureDAO;
+    private final HouseDAO houseDAO;
 
     private final Logger logger = LoggerFactory.getLogger(PictureRepository.class);
 
     @Autowired
-    public PictureRepository(PictureDAO pictureDAO) {
+    public PictureRepository(PictureDAO pictureDAO, HouseDAO houseDAO) {
         this.pictureDAO = pictureDAO;
+        this.houseDAO = houseDAO;
         logger.info("New PictureRepository");
     }
 
@@ -37,8 +42,6 @@ public class PictureRepository {
         }
     }
 
-    //todo aparte methode x3 gebruikt voor alle gets.
-
     public boolean deletePicture(int pictureId) {
         return pictureDAO.removeOneById(pictureId);
     }
@@ -47,17 +50,13 @@ public class PictureRepository {
         pictureDAO.storeOne(picture);
     }
 
-
+    // geef ik hier het object mee of een id ?
     public void removeOneById(int pictureId) {
         pictureDAO.removeOneById(pictureId);
     }
 
-    List<Picture> getAll() {
-        return pictureDAO.getAll();
-    }
-
-    List<Picture> getAllByHouseId() {
-        return pictureDAO.getAll();
+    public List<Picture> getAllByHouseId(int houseId) {
+        return pictureDAO.getAllByHouseId(houseId);
     }
 
     Optional getOneById(int pictureId) {
