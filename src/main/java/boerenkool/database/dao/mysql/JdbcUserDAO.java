@@ -131,8 +131,30 @@ public class JdbcUserDAO implements UserDAO {
         }
     }
 
-    public RowMapper<User> getUserRowMapper() {
-        return new UserRowMapper();
+    @Override
+    public void addBlockedUser(User blockedUser, User user) {
+        String sql = "INSERT INTO BlockedList (blockedUser, userId) VALUES (?, ?)";
+        jdbcTemplate.update(sql, blockedUser.getUserId(), user.getUserId());
+    }
+
+    @Override
+    public boolean removeBlockedUser(User blockedUser, User user) {
+        String sql = "DELETE FROM BlockedList WHERE blockedUser = ? AND userId = ?";
+        return jdbcTemplate.update(sql, blockedUser.getUserId(), user.getUserId()) != 0;
+    }
+
+    @Override
+    public boolean isUserBlocked(User blockedUser, User blockedByUser) {
+        String sql = "SELECT COUNT(*) FROM BlockedList WHERE blockedUser = ? AND userId = ?";
+        // If the query returns a numeric value, JdbcTemplate will convert it to an Integer object.
+        int count = jdbcTemplate.queryForObject(sql, Integer.class, blockedUser.getUserId(), blockedByUser.getUserId());
+        return count > 0;
+    }
+
+    @Override
+    public List<User> getBlockedUsers(User user) {
+        String sql = "SELECT u.* FROM users u INNER JOIN BlockedList b ON u.userId = b.blockedUser WHERE b.userId = ?";
+        return jdbcTemplate.query(sql, new UserRowMapper(), user.getUserId());
     }
 
     private static class UserRowMapper implements RowMapper<User> {
