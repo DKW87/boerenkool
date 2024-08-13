@@ -37,6 +37,8 @@ public class PictureRepository {
         }
     }
 
+    //todo aparte methode x3 gebruikt voor alle gets.
+
     public boolean deletePicture(int pictureId) {
         return pictureDAO.removeOneById(pictureId);
     }
