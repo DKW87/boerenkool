@@ -34,34 +34,25 @@ public class MessageRepository {
     }
 
     public Optional<Message> findMessageById(int messageId) {
-        Optional<MessageDTO> optional = messageDAO.getOneById(messageId);
+        Optional<Message> optional = messageDAO.getOneById(messageId);
         if (optional.isPresent()) {
-            return Optional.of(convertDtoToMessage(optional.get()));
+            return optional;
         } else {
             return Optional.empty();
         }
     }
 
-    public Message convertDtoToMessage(MessageDTO dto) {
-        return new Message(dto.getMessageId(),
-                userDAO.getOneById(dto.getSenderId()),
-                userDAO.getOneById(dto.getReceiverId()),
-                dto.getDateTimeSent(),
-                dto.getSubject(),
-                dto.getBody(),
-                dto.isReadByReceiver(),
-                dto.isArchivedBySender(),
-                dto.isArchivedByReceiver());
-    }
-
     public List<Message> findMessagesForReceiver(User receiver) {
-        List<MessageDTO> listOfMessageDTOs = messageDAO.getAllForReceiver(receiver);
-        List<Message> messages = new ArrayList<>();
-        for (MessageDTO messageDTO : listOfMessageDTOs) {
-            messages.add(convertDtoToMessage(messageDTO));
+        List<Message> listOfMessages = messageDAO.getAllForReceiver(receiver);
+        for (Message message : listOfMessages) {
+            // TODO nog te maken, zie John's advies
+            //  de zender en ontvanger van de messages worden dan via een speciale methode in de UserDAO opgehaald,
+            //  die een messageId als argument heeft, en een join op de Message tabel doet.
+            message.setSender(userDAO.getSenderByMessageId(message.getMessageId()));
+            message.setReceiver(userDAO.getReceiverByMessageId(message.getMessageId()));
         }
-        Collections.sort(messages);
-        return messages;
+        Collections.sort(listOfMessages);
+        return listOfMessages;
     }
 
     /**

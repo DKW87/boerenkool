@@ -15,12 +15,12 @@ public interface MessageDAO {
     void storeOne(Message message);
 
 //    @Override
-    List<MessageDTO> getAll();
+    List<Message> getAll();
 
-    List<MessageDTO> getAllForReceiver(User receiver);
+    List<Message> getAllForReceiver(User receiver);
 
 //    @Override
-    Optional<MessageDTO> getOneById(int id);
+    Optional<Message> getOneById(int id);
 
 //    @Override
     boolean updateOne(Message message);
