@@ -11,6 +11,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.stereotype.Repository;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -23,6 +24,7 @@ import java.util.Optional;
  * @project Boerenkool
  * @created 07/08/2024 - 15:06
  */
+@Repository
 public class JdbcHouseDAO implements HouseDAO {
 
     private final Logger logger = LoggerFactory.getLogger(HouseDAO.class);
