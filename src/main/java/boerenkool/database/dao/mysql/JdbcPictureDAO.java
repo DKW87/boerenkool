@@ -1,4 +1,5 @@
 package boerenkool.database.dao.mysql;
+import boerenkool.business.model.House;
 import boerenkool.business.model.Picture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,21 +22,18 @@ import java.util.Optional;
 
 @Repository
 public class JdbcPictureDAO implements PictureDAO {
-
+    /**
+     Logger class to track the flow throughout the application
+     */
+    private final Logger logger = LoggerFactory.getLogger(JdbcPictureDAO.class);
     JdbcTemplate jdbcTemplate;
+
 
     @Autowired
     public JdbcPictureDAO(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-
         logger.info("New JdbcPictureDao.");
     }
-
-    /**
-    Logger class to track the flow throughout the application
-     */
-    private final Logger logger = LoggerFactory.getLogger(JdbcPictureDAO.class);
-
 
     @Override
     public List<Picture> getAll() {
@@ -83,7 +81,7 @@ public class JdbcPictureDAO implements PictureDAO {
 
 
     private void setCommonParameters(PreparedStatement ps, Picture picture) throws SQLException {
-        ps.setInt(1, picture.getHouseId());
+        ps.setInt(1, picture.getHouse().getHouseId());
         ps.setBytes(2, picture.getPicture());
         ps.setString(3, picture.getDescription());
     }
@@ -91,7 +89,7 @@ public class JdbcPictureDAO implements PictureDAO {
     private PreparedStatement insertPictureStatement(Picture picture, Connection connection) throws SQLException {
         PreparedStatement ps;
         ps = connection.prepareStatement(
-                "insert into picture_table (houseId, picture, pictureDescription) values (?, ?, ?)",
+                "INSERT INTO Picture (houseId, picture, pictureDescription) VALUES (?, ?, ?)",
                 Statement.RETURN_GENERATED_KEYS);
         setCommonParameters(ps, picture);
         return ps;
@@ -102,12 +100,12 @@ public class JdbcPictureDAO implements PictureDAO {
         PreparedStatement ps;
         ps = connection.prepareStatement(
                 """
-         UPDATE Picture_table 
+         UPDATE Picture 
          SET 
             houseId=?,
             picture=?,
             pictureDescription=?
-         where id=?
+         WHERE id=?
       """
         );
         setCommonParameters(ps, picture);
@@ -117,8 +115,8 @@ public class JdbcPictureDAO implements PictureDAO {
 
     /**
      * PictureRowMapper makes KeyMap from picture object for more efficient searching
+     * Creates new picture with a house value of null. This will be implemented later in the Repo class
      */
-
     private static class PictureRowMapper implements RowMapper<Picture> {
         @Override
         public Picture mapRow(ResultSet resultSet, int rowNum) throws SQLException {
@@ -127,8 +125,9 @@ public class JdbcPictureDAO implements PictureDAO {
             byte[] pictureData = resultSet.getBytes("picture");
             String pictureDescription = resultSet.getString("pictureDescription");
             Picture picture = new Picture
-                    (houseId, pictureData,pictureDescription);
+                    (null, pictureData,pictureDescription);
             picture.setPictureId(pictureId);
+            picture.setHouseId(houseId); // nodig voor repository
             return picture;
         }
     }
