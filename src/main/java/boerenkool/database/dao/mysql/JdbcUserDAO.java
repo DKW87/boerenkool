@@ -49,7 +49,7 @@ public class JdbcUserDAO implements UserDAO {
     private PreparedStatement insertUserStatement(User user, Connection connection) throws SQLException {
         PreparedStatement ps;
         ps = connection.prepareStatement(
-                "INSERT INTO \"User\"(typeOfUser, username, hashedPassword, firstName, infix, lastName," +
+                "INSERT INTO `User`(typeOfUser, username, hashedPassword, firstName, infix, lastName," +
                         " coinBalance, phoneNumber, emailaddress)" +
                         " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", PreparedStatement.RETURN_GENERATED_KEYS);
         setCommonParameters(ps, user);
@@ -60,7 +60,7 @@ public class JdbcUserDAO implements UserDAO {
         PreparedStatement ps;
         ps = connection.prepareStatement(
                 """
-                UPDATE \"User\" 
+                UPDATE `User` 
                 SET 
                 typeOfUser=?,
                 username=?,
@@ -90,18 +90,18 @@ public class JdbcUserDAO implements UserDAO {
 
     @Override
     public boolean removeOneById(int id) {
-        String sql = "DELETE FROM \"User\" WHERE userId = ?";
+        String sql = "DELETE FROM `User` WHERE userId = ?";
         return jdbcTemplate.update(sql, id) != 0;
     }
 
     @Override
     public List<User> getAll() {
-        return jdbcTemplate.query("SELECT * FROM \"User\"", new UserRowMapper());
+        return jdbcTemplate.query("SELECT * FROM `User`", new UserRowMapper());
     }
 
     @Override
     public Optional<User> getOneById(int id) {
-        List<User> users = jdbcTemplate.query("SELECT * FROM \"User\" WHERE userId = ?", new UserRowMapper(), id);
+        List<User> users = jdbcTemplate.query("SELECT * FROM `User` WHERE userId = ?", new UserRowMapper(), id);
         if (users.size() != 1) {
             return Optional.empty();
         } else {
@@ -123,7 +123,7 @@ public class JdbcUserDAO implements UserDAO {
 
     @Override
     public Optional<User> findByUsername(String username) {
-        List<User> users = jdbcTemplate.query("SELECT * FROM \"User\" WHERE username = ?", new UserRowMapper(), username);
+        List<User> users = jdbcTemplate.query("SELECT * FROM `User` WHERE username = ?", new UserRowMapper(), username);
         if (users.size() != 1) {
             return Optional.empty();
         } else {
@@ -170,7 +170,7 @@ public class JdbcUserDAO implements UserDAO {
             String lastName = rs.getString("lastName");
             int coinBalance = rs.getInt("coinBalance");
             String phoneNumber = rs.getString("phoneNumber");
-            String email = rs.getString("email");
+            String email = rs.getString("emailaddress");
             User user = new User(typeOfUser, username, pw, email, phoneNumber, firstName, infix, lastName, coinBalance);
             user.setUserId(id);
             return user;
