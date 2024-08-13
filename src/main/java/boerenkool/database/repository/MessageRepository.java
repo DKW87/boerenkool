@@ -2,22 +2,31 @@ package boerenkool.database.repository;
 
 import boerenkool.business.model.Message;
 import boerenkool.business.model.User;
+import boerenkool.communication.dto.MessageDTO;
 import boerenkool.database.dao.mysql.MessageDAO;
+import boerenkool.database.dao.mysql.UserDAO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
 public class MessageRepository {
-    // private final Logger logger = LoggerFactory.getLogger(MessageRepository.class);
+    private static Logger logger = LoggerFactory.getLogger(MessageRepository.class);
 
     private final MessageDAO messageDAO;
+    private final UserDAO userDAO;
 
-    public MessageRepository(MessageDAO messageDAO) {
+    @Autowired
+    public MessageRepository(MessageDAO messageDAO, UserDAO userDAO) {
         this.messageDAO = messageDAO;
-//        logger.info("New MessageRepository");
+        this.userDAO = userDAO;
+        logger.info("New MessageRepository");
     }
 
     public void saveMessage(Message message) {
@@ -25,11 +34,32 @@ public class MessageRepository {
     }
 
     public Optional<Message> findMessageById(int messageId) {
-        return messageDAO.getOneById(messageId);
+        Optional<MessageDTO> optional = messageDAO.getOneById(messageId);
+        if (optional.isPresent()) {
+            return Optional.of(convertDtoToMessage(optional.get()));
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    public Message convertDtoToMessage(MessageDTO dto) {
+        return new Message(dto.getMessageId(),
+                userDAO.getOneById(dto.getSenderId()),
+                userDAO.getOneById(dto.getReceiverId()),
+                dto.getDateTimeSent(),
+                dto.getSubject(),
+                dto.getBody(),
+                dto.isReadByReceiver(),
+                dto.isArchivedBySender(),
+                dto.isArchivedByReceiver());
     }
 
     public List<Message> findMessagesForReceiver(User receiver) {
-        List<Message> messages = messageDAO.getAllForReceiver(receiver);
+        List<MessageDTO> listOfMessageDTOs = messageDAO.getAllForReceiver(receiver);
+        List<Message> messages = new ArrayList<>();
+        for (MessageDTO messageDTO : listOfMessageDTOs) {
+            messages.add(convertDtoToMessage(messageDTO));
+        }
         Collections.sort(messages);
         return messages;
     }
