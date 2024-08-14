@@ -34,9 +34,10 @@ public interface UserDAO extends GenericDAO<User> {
      * If the user already exists, it updates the existing user.
      *
      * @param user the user to store.
+     * @return
      */
     @Override
-    void storeOne(User user);
+    boolean storeOne(User user);
 
     /**
      * Removes a user from the database by their ID.
