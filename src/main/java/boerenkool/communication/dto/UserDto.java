@@ -8,21 +8,18 @@ public class UserDto {
 
     private String typeOfUser;
     private String username;
-    private String password;  // Plain text password for registration/login
+    private String password;
     private String email;
     private String phone;
     private String firstName;
     private String infix;
     private String lastName;
     private int coinBalance;
-    private final static int DEFAULT_COINBALANCE = 500;  // Default coin balance set to 500
 
     private final Logger logger = LoggerFactory.getLogger(UserDto.class);
 
-    // No-arg constructor for JSON deserialization
+
     public UserDto() {
-        super();
-        this.coinBalance = DEFAULT_COINBALANCE;
         logger.info("New UserDto using no-arg constructor");
     }
 
