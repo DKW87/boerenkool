@@ -50,11 +50,16 @@ public class JdbcReservationDAO implements ReservationDAO {
     }
 
     @Override
-    public void storeOne(Reservation reservation) {
+    public boolean storeOne(Reservation reservation) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update(connection -> insertReservationStatement(reservation, connection), keyHolder);
-        int newKey = keyHolder.getKey().intValue();
-        reservation.setReservationId(newKey);
+        int rowsAffected = jdbcTemplate.update(connection -> insertReservationStatement(reservation, connection), keyHolder);
+
+        if (rowsAffected > 0 && keyHolder.getKey() != null) {
+            int newKey = keyHolder.getKey().intValue();
+            reservation.setReservationId(newKey);
+            return true;
+        }
+        return false;
     }
 
     @Override
