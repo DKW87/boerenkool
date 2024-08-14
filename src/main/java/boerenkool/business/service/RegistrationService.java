@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Member;
 import java.util.Optional;
 
 @Service
@@ -41,4 +42,15 @@ public class RegistrationService {
 
         return user;
     }
+
+    public User validateLogin(String username, String password) {
+        Optional<User> optionalUser = userRepository.findByUsername(username);
+        User user = optionalUser.orElse(null);
+        if (user != null && user.getHashedPassword().equals(password)) {
+            return user;
+        } else {
+            return null;
+        }
+    }
+
 }

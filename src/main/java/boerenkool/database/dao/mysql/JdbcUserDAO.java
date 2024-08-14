@@ -33,7 +33,7 @@ public class JdbcUserDAO implements UserDAO {
     private void setCommonParameters(PreparedStatement ps, User user) throws SQLException {
         ps.setString(1, user.getTypeOfUser());
         ps.setString(2, user.getUsername());
-        ps.setString(3, user.getPassword());
+        ps.setString(3, user.getHashedPassword());
         ps.setString(4, user.getFirstName());
         if (user.getInfix() != null) {
             ps.setString(5, user.getInfix());
