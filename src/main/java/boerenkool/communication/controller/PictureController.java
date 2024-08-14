@@ -5,6 +5,7 @@ import boerenkool.business.model.User;
 import boerenkool.business.service.PictureService;
 import boerenkool.communication.dto.PictureDTO;
 import boerenkool.database.dao.mysql.JdbcPictureDAO;
+import boerenkool.utilities.exceptions.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -119,6 +120,19 @@ public class PictureController {
         pictureService.storeOne(picture);
         return new ResponseEntity<>("Picture created successfully", HttpStatus.CREATED);
     }
+
+    //todo methode werkt
+    @DeleteMapping("/delete/{pictureId}")
+    public ResponseEntity<String> deletePictureById(@PathVariable("pictureId") int pictureId) {
+        boolean isDeleted = pictureService.removeOneById(pictureId);
+        if (isDeleted) {
+            return new ResponseEntity<>("Picture deleted successfully", HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("Picture not found or deletion failed", HttpStatus.NOT_FOUND);
+        }
+    }
+
+
 
 
 }
