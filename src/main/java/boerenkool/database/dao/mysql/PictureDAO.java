@@ -9,14 +9,15 @@ import java.util.Optional;
  * @project Boerenkool
  */
 public interface PictureDAO extends GenericDAO<Picture> {
-
     List<Picture> getAll();
 
     List<Picture> getAllByHouseId(int houseId);
 
+    Picture getFirstPictureByHouseId(int houseId);
+
     Optional<Picture> getOneById(int pictureId);
 
-    void storeOne(Picture picture);
+    boolean storeOne(Picture picture);
 
     boolean updateOne(Picture picture);
 
