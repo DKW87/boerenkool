@@ -157,7 +157,41 @@ public class JdbcUserDAO implements UserDAO {
         return jdbcTemplate.query(sql, new UserRowMapper(), user.getUserId());
     }
 
+    @Override
+    public Optional<User> getSenderByMessageId(int messageId) {
+        List<User> users = jdbcTemplate.query(
+                "SELECT User.*, Message.receiverId, Message.senderId FROM `User` JOIN `Message` ON userId = senderId WHERE messageId = ? LIMIT 1;",
+                new JdbcUserDAO.UserRowMapper(),
+                messageId
+        );
+        if (users.isEmpty()) {
+            return Optional.empty();
+        } else {
+            return Optional.of(users.get(0));
+        }
+    }
+    @Override
+    public Optional<User> getReceiverByMessageId(int messageId) {
+        List<User> users = jdbcTemplate.query(
+                "SELECT User.*, Message.receiverId, Message.senderId FROM `User` JOIN `Message` ON userId = receiverId WHERE messageId = ? LIMIT 1;",
+                new JdbcUserDAO.UserRowMapper(),
+                messageId
+        );
+
+        if (users.isEmpty()) {
+            return Optional.empty();
+        } else {
+            return Optional.of(users.get(0));
+        }
+    }
+
     private static class UserRowMapper implements RowMapper<User> {
+
+        private final JdbcTemplate jdbcTemplate;
+
+        public UserRowMapper(JdbcTemplate jdbcTemplate) {
+            this.jdbcTemplate = jdbcTemplate;
+        }
 
         @Override
         public User mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -173,6 +207,10 @@ public class JdbcUserDAO implements UserDAO {
             String email = rs.getString("emailaddress");
             User user = new User(typeOfUser, username, pw, email, phoneNumber, firstName, infix, lastName, coinBalance);
             user.setUserId(id);
+            List<User> blockedUsers = jdbcTemplate.query(
+                    "SELECT u.* FROM `User` u INNER JOIN BlockedList b ON u.userId = b.blockedUser WHERE b.userId = ?",
+                    new UserRowMapper(jdbcTemplate), id);
+            user.setBlockedUser(blockedUsers);
             return user;
         }
     }
