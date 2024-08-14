@@ -10,7 +10,6 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -45,12 +44,13 @@ public class JdbcExtraFeatureDAO implements ExtraFeatureDAO {
     }
 
     @Override
-    public void storeOne(ExtraFeature extraFeature) {
+    public boolean storeOne(ExtraFeature extraFeature) {
         if (extraFeature.getExtraFeatureId() == 0) {
             insert(extraFeature);
         } else {
             updateOne(extraFeature);
         }
+        return false;
     }
 
     @Override

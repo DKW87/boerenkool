@@ -18,7 +18,7 @@ public interface ExtraFeatureDAO extends GenericDAO<ExtraFeature> {
     Optional<ExtraFeature> getOneById(int id);
 
     @Override
-    void storeOne(ExtraFeature extraFeature);
+    boolean storeOne(ExtraFeature extraFeature);
 
     @Override
     boolean removeOneById(int id);
