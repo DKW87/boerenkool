@@ -8,19 +8,19 @@ import java.util.Optional;
 
 public interface HouseTypeDAO extends GenericDAO<HouseType> {
 
-
+    @Override
     List<HouseType> getAll();
 
-
+    @Override
     Optional<HouseType> getOneById(int id);
 
-
+    @Override
     void storeOne(HouseType houseType);
 
-
+    @Override
     boolean removeOneById(int id);
 
-
+    @Override
     boolean updateOne(HouseType houseType);
 
 

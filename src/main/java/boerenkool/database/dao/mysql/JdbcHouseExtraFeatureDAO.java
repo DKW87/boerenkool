@@ -34,13 +34,14 @@ public class JdbcHouseExtraFeatureDAO implements HouseExtraFeatureDAO {
         return jdbcTemplate.query(sql, new HouseExtraFeatureRowMapper());
     }
 
+
     @Override
     public Optional<HouseExtraFeature> getOneById(int id) {
         return Optional.empty();
     }
 
     @Override
-    public Optional<HouseExtraFeature> getOneByIds(int houseId, int featureId) {
+    public Optional<HouseExtraFeature> getOneById(int houseId, int featureId) {
         String sql = "SELECT * FROM HouseExtraFeature WHERE houseId = ? AND featureId = ?";
         return jdbcTemplate.query(sql, new HouseExtraFeatureRowMapper(), houseId, featureId)
                 .stream()
@@ -58,7 +59,7 @@ public class JdbcHouseExtraFeatureDAO implements HouseExtraFeatureDAO {
 
     @Override
     public boolean updateOne(HouseExtraFeature houseExtraFeature) {
-        // Bu tabloda sadece houseId ve featureId var, bu yüzden güncelleme işlemi gerekmeyebilir.
+
         return false; // No actual fields to update
     }
 
@@ -88,7 +89,7 @@ public class JdbcHouseExtraFeatureDAO implements HouseExtraFeatureDAO {
     }
 
     private boolean exists(HouseExtraFeature houseExtraFeature) {
-        return getOneByIds(houseExtraFeature.getHouseId(), houseExtraFeature.getFeatureId()).isPresent();
+        return getOneById(houseExtraFeature.getHouseId(), houseExtraFeature.getFeatureId()).isPresent();
     }
 
     private static class HouseExtraFeatureRowMapper implements RowMapper<HouseExtraFeature> {

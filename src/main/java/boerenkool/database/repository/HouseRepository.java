@@ -50,6 +50,7 @@ public class HouseRepository {
             // TODO @Emine > T for getAllFeaturesByHouseId = ExtraFeature
 //            house.setExtraFeatures(houseExtraFeatureDAO.getAllFeaturesByHouseId(house.getHouseId()));
             house.setPictures(pictureDAO.getAllByHouseId(house.getHouseId()));
+
         }
         return allHouses;
     }

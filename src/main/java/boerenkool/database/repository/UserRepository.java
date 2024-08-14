@@ -30,7 +30,7 @@ public class UserRepository {
         return userDAO.getAll();
     };//Read
 
-    public Optional getOneById(int id) {
+    public Optional<User> getOneById(int id) {
         return userDAO.getOneById(id);
     }
 
@@ -55,7 +55,7 @@ public class UserRepository {
     }
 
 
-        public Optional<User> findByUsername(String username) {
+    public Optional<User> findByUsername(String username) {
         return userDAO.findByUsername(username);
     };
 }

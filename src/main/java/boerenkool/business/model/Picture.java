@@ -12,6 +12,7 @@ public class Picture {
 
     private static final int MAX_PICTURE_SIZE = 5 * 1024 * 1024; // 5 MB
     private int pictureId;
+    private House house;
     private int houseId;
     private byte[] picture;
     private String description;
@@ -20,14 +21,15 @@ public class Picture {
     Constructors
      */
 
-    public Picture(int houseId, byte[] picture, String description) {
+    public Picture(House house, byte[] picture, String description) {
+        this.house = house;
         this.houseId = houseId;
         this.picture = picture;
         this.description = description;
     }
 
-    public Picture(int houseId, byte[] picture) {
-        this(0, picture, "");
+    public Picture(House house, byte[] picture) {
+        this(house, picture, "");
     }
 
     /*
@@ -36,7 +38,7 @@ public class Picture {
 
     @Override
     public String toString() {
-        return "Picture id" + getPictureId();
+        return "Picture id:" + getPictureId();
     }
 
     /*
@@ -51,11 +53,20 @@ public class Picture {
         this.pictureId = pictureId;
     }
 
+    public House getHouse() {
+        return house;
+    }
+
+
+    public void setHouse(House house) {
+        this.house = house;
+    }
+
     public int getHouseId() {
         return houseId;
     }
 
-    public void setHouseId(House house) {
+    public void setHouseId(int houseId) {
         this.houseId = houseId;
     }
 
