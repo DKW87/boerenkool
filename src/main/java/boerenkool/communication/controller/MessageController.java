@@ -3,6 +3,7 @@ package boerenkool.communication.controller;
 import boerenkool.business.model.Message;
 import boerenkool.business.service.MessageService;
 import boerenkool.business.service.UserService;
+import boerenkool.communication.dto.MessageDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,9 +31,9 @@ public class MessageController {
 
     // send a new message
     @PostMapping("/messages")
-    boolean sendMessage(@RequestBody Message message) {
+    boolean sendMessage(@RequestBody MessageDTO messageDTO) {
         logger.info("MessageController.sendMessage is called");
-        if (messageService.saveMessage(message)) {
+        if (messageService.saveMessage(messageDTO)) {
             return true;
         } else {
             logger.info("sendMessage failed");
@@ -83,10 +84,10 @@ public class MessageController {
     }
 
     @PutMapping("/messages")
-    Message updateMessage(@RequestBody Message message) {
+    boolean updateMessage(@RequestBody MessageDTO messageDTO) {
         logger.info("updateMessage is called");
-        if (messageService.updateMessage(message)) {
-            return message;
+        if (messageService.updateMessage(messageDTO)) {
+            return true;
         } else {
             logger.info("updateMessage results in FALSE");
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Message not updated");

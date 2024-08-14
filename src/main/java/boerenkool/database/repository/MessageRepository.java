@@ -40,24 +40,13 @@ public class MessageRepository {
 
     public List<Message> findMessagesForReceiver(User receiver) {
         List<Message> listOfMessages = messageDAO.getAllForReceiver(receiver);
-//        for (Message message : listOfMessages) {
-//            // TODO nog te maken, zie John's advies
-//            //  de zender en ontvanger van de messages worden via een speciale methode in de UserDAO opgehaald,
-//            //  die een messageId als argument heeft, en een join op de Message tabel doet.
-//            // dan heb je toch twee methodes nodig in UserDAO? zie hieronder
+        for (Message message : listOfMessages) {
+//            // TODO aan te passen als Leo's methoden er in staan
 //            message.setSender(userDAO.getSenderByMessageId(message.getMessageId()));
 //            message.setReceiver(userDAO.getReceiverByMessageId(message.getMessageId()));
-//        }
+        }
         return listOfMessages;
     }
-
-//     voor in Leo's JdbcUserDAO
-//    public Optional<User> getSenderByMessageId(int messageId) {
-//        Optional<User> sender = jdbcTemplate.query(
-//                "SELECT User.*, Message.receiverId, Message.senderId  FROM `User` JOIN `Message` ON userId = senderId WHERE messageId = ? LIMIT 1;",
-//                new JdbcUserDAO.UserRowMapper(), messageId);
-//        return sender;
-//    }
 
     /**
      * update message, also used for setting the archive flag

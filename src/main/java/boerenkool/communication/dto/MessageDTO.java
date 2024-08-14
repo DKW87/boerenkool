@@ -1,12 +1,5 @@
 package boerenkool.communication.dto;
 
-import boerenkool.business.model.Message;
-import boerenkool.business.model.User;
-
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.util.Date;
-
 import java.time.LocalDateTime;
 
 public class MessageDTO {
@@ -49,12 +42,16 @@ public class MessageDTO {
         return senderId;
     }
 
+    public void setSenderId(int senderId) {
+        this.senderId = senderId;
+    }
+
     public int getReceiverId() {
         return receiverId;
     }
 
-    public LocalDateTime getDateTimeSent() {
-        return dateTimeSent;
+    public void setReceiverId(int receiverId) {
+        this.receiverId = receiverId;
     }
 
     public String getSubject() {
