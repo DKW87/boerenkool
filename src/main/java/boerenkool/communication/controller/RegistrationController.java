@@ -1,6 +1,7 @@
 package boerenkool.communication.controller;
 
 import boerenkool.business.service.RegistrationService;
+import boerenkool.communication.dto.LoginDTO;
 import boerenkool.communication.dto.UserDto;
 import boerenkool.utilities.exceptions.RegistrationFailedException;
 import org.slf4j.Logger;
@@ -11,6 +12,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import boerenkool.business.model.User;
+
+import javax.security.auth.login.LoginException;
 
 
 @RestController
@@ -32,6 +35,15 @@ public class RegistrationController {
         return ResponseEntity.ok().body(user);
     }
 
+
+/*    @PostMapping("login")
+    public ResponseEntity<UserDto> loginHandler(@RequestBody LoginDTO loginDTO) throws LoginException {
+        User user = registrationService.validateLogin(
+                loginDTO.getUsername(), loginDTO.getPassword());
+        if (user != null) {
+
+        }
+    }*/
 
 
 }
