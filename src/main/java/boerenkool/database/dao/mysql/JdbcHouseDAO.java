@@ -82,11 +82,12 @@ public class JdbcHouseDAO implements HouseDAO {
     }
 
     @Override
-    public void storeOne(House house) {
+    public boolean storeOne(House house) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update(connection -> insertHouseStatement(house, connection), keyHolder);
+        int recordInserted = jdbcTemplate.update(connection -> insertHouseStatement(house, connection), keyHolder);
         int pKey = keyHolder.getKey().intValue();
         house.setHouseId(pKey);
+        return recordInserted == 1;
     }
 
     @Override
