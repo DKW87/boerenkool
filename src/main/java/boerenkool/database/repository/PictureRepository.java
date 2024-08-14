@@ -1,7 +1,7 @@
 package boerenkool.database.repository;
-import boerenkool.business.model.House;
 import boerenkool.business.model.Picture;
 import boerenkool.database.dao.mysql.HouseDAO;
+import boerenkool.database.dao.mysql.JdbcPictureDAO;
 import boerenkool.database.dao.mysql.PictureDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,39 +33,42 @@ public class PictureRepository {
      * Logic to either save or store a picture.
      * @param picture
      */
-    public void savePicture(Picture picture) {
+
+    public boolean savePicture(Picture picture) {
         if (picture.getPictureId() == 0) {
-            pictureDAO.storeOne(picture);
-        }
-        else {
-            pictureDAO.updateOne(picture);
+            return pictureDAO.storeOne(picture);
+        } else {
+            return pictureDAO.updateOne(picture);
         }
     }
 
-    public boolean deletePicture(int pictureId) {
+    public boolean storeOne(Picture picture) {
+        return pictureDAO.storeOne(picture);
+    }
+
+    public boolean updateOne(Picture picture) {
+        return pictureDAO.updateOne(picture);
+    }
+
+    public boolean removeOneById(int pictureId) {
         return pictureDAO.removeOneById(pictureId);
     }
 
-    public void storeOne(Picture picture) {
-        pictureDAO.storeOne(picture);
-    }
-
-    // geef ik hier het object mee of een id ?
-    public void removeOneById(int pictureId) {
-        pictureDAO.removeOneById(pictureId);
+    public Optional getOneById(int pictureId) {
+        return pictureDAO.getOneById(pictureId);
     }
 
     public List<Picture> getAllByHouseId(int houseId) {
         return pictureDAO.getAllByHouseId(houseId);
     }
 
-    Optional getOneById(int pictureId) {
-        return pictureDAO.getOneById(pictureId);
+    public Picture getFirstPictureByHouseId(int houseId) {
+        return pictureDAO.getFirstPictureByHouseId(houseId);
     }
 
-    boolean updateOne(Picture picture) {
-        return pictureDAO.updateOne(picture);
-    }
+
+
+
 
 
 }

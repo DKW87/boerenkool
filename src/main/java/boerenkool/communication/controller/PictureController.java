@@ -59,6 +59,28 @@ public class PictureController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+    //todo tijdelijke mapping om functie te testen.
+    @GetMapping("/houses/first/{houseId}")
+    public ResponseEntity<byte[]> getFirstPictureOfHouse(@PathVariable("houseId") int houseId) {
+        Optional<Picture> picture = Optional.ofNullable(jdbcPictureDAO.getFirstPictureByHouseId(houseId));
+        if (picture.isPresent()) {
+            byte[] imageBytes = picture.get().getPicture(); // 1st get() has to stay there.
+            HttpHeaders headers = new HttpHeaders();
+
+            // Detect image format.
+            String imageFormat = detectImageFormat(imageBytes);
+            if ("png".equalsIgnoreCase(imageFormat)) {
+                headers.setContentType(MediaType.IMAGE_PNG);
+            } else if ("jpeg".equalsIgnoreCase(imageFormat) || "jpg".equalsIgnoreCase(imageFormat)) {
+                headers.setContentType(MediaType.IMAGE_JPEG);
+            } else {
+                return new ResponseEntity<>(HttpStatus.UNSUPPORTED_MEDIA_TYPE);
+            }
+            return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
 
 
 
@@ -105,9 +127,7 @@ public class PictureController {
                     (imageBytes[2] & 0xFF) == 0xFF) {
                 return "jpeg";
             }
-
         }
-
         return null; //
     }
 

@@ -15,7 +15,7 @@ public interface HouseTypeDAO extends GenericDAO<HouseType> {
     Optional<HouseType> getOneById(int id);
 
     @Override
-    void storeOne(HouseType houseType);
+    boolean storeOne(HouseType houseType);
 
     @Override
     boolean removeOneById(int id);

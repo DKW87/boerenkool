@@ -1,5 +1,4 @@
 package boerenkool.database.dao.mysql;
-import boerenkool.business.model.House;
 import boerenkool.business.model.Picture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +22,7 @@ import java.util.Optional;
 @Repository
 public class JdbcPictureDAO implements PictureDAO {
     /**
-     Logger class to track the flow throughout the application
+     * Logger class to track the flow throughout the application
      */
     private final Logger logger = LoggerFactory.getLogger(JdbcPictureDAO.class);
     JdbcTemplate jdbcTemplate;
@@ -47,7 +46,24 @@ public class JdbcPictureDAO implements PictureDAO {
         return allPicturesFromHouseId;
     }
 
+    @Override
+    public Picture getFirstPictureByHouseId(int houseId) {
+        Picture firstPicture = (Picture) jdbcTemplate.query("SELECT * FROM Picture WHERE houseId = ? LIMIT 1;", new PictureRowMapper(), houseId);
+        return firstPicture;
+    }
 
+
+    // oude versie getFirstPictureByHouseId
+//    @Override
+//    public Picture getFirstPictureByHouseId(int houseId) {
+//        List<Picture> allPicturesFromHouseId = getAllByHouseId(houseId);
+//        if (allPicturesFromHouseId.isEmpty()) {
+//            return null;
+//        }
+//        return allPicturesFromHouseId.getFirst();
+//    }
+
+    //todo waarom werken we met een lijst hier ?
     @Override
     public Optional<Picture> getOneById(int pictureId) {
         String sql = "SELECT * FROM Picture WHERE pictureId = ?;";
@@ -60,22 +76,28 @@ public class JdbcPictureDAO implements PictureDAO {
         }
     }
 
+    // jdbcTemplate.update methods returns a int value of the amount of rows affected.
     @Override
-    public void storeOne(Picture picture) {
+    public boolean storeOne(Picture picture) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update(connection -> insertPictureStatement(picture, connection),keyHolder);
-        int pKey = Objects.requireNonNull(keyHolder.getKey()).intValue();
-        picture.setPictureId(pKey);
-    }
+        if (jdbcTemplate.update(connection -> insertPictureStatement(picture, connection), keyHolder) != 0) {
+            int pKey = Objects.requireNonNull(keyHolder.getKey()).intValue(); // deze check lijkt overbodig.
+            picture.setPictureId(pKey);
+            return true;
+    } else
+            return false;
+}
 
     @Override
     public boolean updateOne(Picture picture) {
         return jdbcTemplate.update(connection -> updatePictureStatement(picture, connection)) != 0;
     }
 
+    // gives a value of amount of rows deleted, since ID's are unique and only one can be deleted from this method.
+    // it will either be 1 or 0. if its != 0, it means its true.
     @Override
     public boolean removeOneById(int pictureId) {
-        String sql  = "DELETE FROM Picture WHERE pictureId = ?";
+        String sql = "DELETE FROM Picture WHERE pictureId = ?";
         return jdbcTemplate.update(sql, pictureId) != 0;
     }
 
@@ -125,7 +147,7 @@ public class JdbcPictureDAO implements PictureDAO {
             byte[] pictureData = resultSet.getBytes("picture");
             String pictureDescription = resultSet.getString("pictureDescription");
             Picture picture = new Picture
-                    (null, pictureData,pictureDescription);
+                    (null, pictureData, pictureDescription);
             picture.setPictureId(pictureId);
             picture.setHouseId(houseId); // nodig voor repository
             return picture;
