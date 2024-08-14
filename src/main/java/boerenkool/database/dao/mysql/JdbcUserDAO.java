@@ -157,6 +157,34 @@ public class JdbcUserDAO implements UserDAO {
         return jdbcTemplate.query(sql, new UserRowMapper(), user.getUserId());
     }
 
+    @Override
+    public Optional<User> getSenderByMessageId(int messageId) {
+        List<User> users = jdbcTemplate.query(
+                "SELECT User.*, Message.receiverId, Message.senderId FROM `User` JOIN `Message` ON userId = senderId WHERE messageId = ? LIMIT 1;",
+                new JdbcUserDAO.UserRowMapper(),
+                messageId
+        );
+        if (users.isEmpty()) {
+            return Optional.empty();
+        } else {
+            return Optional.of(users.get(0));
+        }
+    }
+    @Override
+    public Optional<User> getReceiverByMessageId(int messageId) {
+        List<User> users = jdbcTemplate.query(
+                "SELECT User.*, Message.receiverId, Message.senderId FROM `User` JOIN `Message` ON userId = receiverId WHERE messageId = ? LIMIT 1;",
+                new JdbcUserDAO.UserRowMapper(),
+                messageId
+        );
+
+        if (users.isEmpty()) {
+            return Optional.empty();
+        } else {
+            return Optional.of(users.get(0));
+        }
+    }
+
     private static class UserRowMapper implements RowMapper<User> {
 
         @Override
