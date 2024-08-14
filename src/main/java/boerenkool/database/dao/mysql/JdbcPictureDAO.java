@@ -48,14 +48,22 @@ public class JdbcPictureDAO implements PictureDAO {
 
     @Override
     public Picture getFirstPictureByHouseId(int houseId) {
-        List<Picture> allPicturesFromHouseId = getAllByHouseId(houseId);
-        if (allPicturesFromHouseId.isEmpty()) {
-            return null;
-        }
-        return allPicturesFromHouseId.getFirst();
+        Picture firstPicture = (Picture) jdbcTemplate.query("SELECT * FROM Picture WHERE houseId = ? LIMIT 1;", new PictureRowMapper(), houseId);
+        return firstPicture;
     }
 
 
+    // oude versie getFirstPictureByHouseId
+//    @Override
+//    public Picture getFirstPictureByHouseId(int houseId) {
+//        List<Picture> allPicturesFromHouseId = getAllByHouseId(houseId);
+//        if (allPicturesFromHouseId.isEmpty()) {
+//            return null;
+//        }
+//        return allPicturesFromHouseId.getFirst();
+//    }
+
+    //todo waarom werken we met een lijst hier ?
     @Override
     public Optional<Picture> getOneById(int pictureId) {
         String sql = "SELECT * FROM Picture WHERE pictureId = ?;";
@@ -68,11 +76,12 @@ public class JdbcPictureDAO implements PictureDAO {
         }
     }
 
+    // jdbcTemplate.update methods returns a int value of the amount of rows affected.
     @Override
     public boolean storeOne(Picture picture) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         if (jdbcTemplate.update(connection -> insertPictureStatement(picture, connection), keyHolder) != 0) {
-            int pKey = Objects.requireNonNull(keyHolder.getKey()).intValue();
+            int pKey = Objects.requireNonNull(keyHolder.getKey()).intValue(); // deze check lijkt overbodig.
             picture.setPictureId(pKey);
             return true;
     } else
@@ -84,6 +93,8 @@ public class JdbcPictureDAO implements PictureDAO {
         return jdbcTemplate.update(connection -> updatePictureStatement(picture, connection)) != 0;
     }
 
+    // gives a value of amount of rows deleted, since ID's are unique and only one can be deleted from this method.
+    // it will either be 1 or 0. if its != 0, it means its true.
     @Override
     public boolean removeOneById(int pictureId) {
         String sql = "DELETE FROM Picture WHERE pictureId = ?";
