@@ -48,7 +48,7 @@ public class House implements Comparable<House> {
         this.otherEntityIds = new otherEntityIds();
     }
 
-    // housetype optional constructor
+    // housetype + user optional constructor
     public House(String houseName, String province, String city, String streetAndNumber, String zipcode,
                  int maxGuest, int roomCount, int pricePPPD, String description, boolean isNotAvailable) {
         this(houseName, null, null, province, city, streetAndNumber, zipcode, maxGuest,
