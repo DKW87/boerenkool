@@ -2,6 +2,7 @@ package boerenkool.business.service;
 
 import boerenkool.business.model.Message;
 import boerenkool.business.model.User;
+import boerenkool.communication.dto.MessageDTO;
 import boerenkool.database.repository.MessageRepository;
 import boerenkool.database.repository.UserRepository;
 import org.slf4j.Logger;
@@ -31,30 +32,66 @@ public class MessageService {
         logger.info("New MessageService");
     }
 
-    public boolean saveMessage(Message message) {
+    public boolean saveMessage(MessageDTO messageDTO) {
+        // TODO convert MessageDTO to Message using convert method (which uses MessageRepository)
+        return true;
         // set DateTime for new message that is sent
-        message.setDateTimeSent(LocalDateTime.now());
-        return messageRepository.saveMessage(message);
+
+//        message.setDateTimeSent(LocalDateTime.now());
+//        return messageRepository.saveMessage(message);
     }
 
-    public Optional<Message> findMessageById(int messageId) {
-        return messageRepository.findMessageById(messageId);
+    public MessageDTO findMessageById(int messageId) {
+        if (messageRepository.getMessageById(messageId).isPresent()) {
+            return convertMessageToDTO(messageRepository.getMessageById(messageId).get());
+        } else return null;
     }
 
-    public List<Message> findMessagesForReceiverId(int receiverId) {
-        List<Message> listOfMessagesForReceiver = new ArrayList<>();
+    public List<MessageDTO> findMessagesForReceiverId(int receiverId) {
+        List<MessageDTO> listOfMessageDTOsForReceiver = new ArrayList<>();
         if (userRepository.getOneById(receiverId).isPresent()) {
             logger.info("findMessagesForReceiver User found");
-            listOfMessagesForReceiver = messageRepository.findMessagesForReceiver((User) userRepository.getOneById(receiverId).get());
-            Collections.sort(listOfMessagesForReceiver);
-            return listOfMessagesForReceiver;
-        } else {
-            logger.info("findMessagesForReceiver User not found");
-            return listOfMessagesForReceiver;
-        }
+//            listOfMessagesForReceiver = messageRepository.findMessagesForReceiver((User) userRepository.getOneById(receiverId).get());
+            List<Message> listOfMessages = messageRepository.getAllForReceiverId(receiverId);
+            // convert Messages to MessageDTOs
+            for (Message message : listOfMessages){
+                listOfMessageDTOsForReceiver.add(convertMessageToDTO(message));
+            }
+            Collections.sort(listOfMessageDTOsForReceiver);
+            return listOfMessageDTOsForReceiver;
+        } else return null;
     }
 
-    public boolean updateMessage(Message message) {
-        return messageRepository.updateMessage(message);
+    public boolean updateMessage(MessageDTO messageDTO) {
+        return messageRepository.updateMessage(convertDtoToMessage(messageDTO));
+    }
+
+    private Message convertDtoToMessage(MessageDTO dto) {
+        return new Message(dto.getMessageId(),
+                userRepository.getOneById(dto.getSenderId()),
+                userRepository.getOneById(dto.getReceiverId()),
+                LocalDateTime.now(),
+                dto.getSubject(),
+                dto.getBody(),
+                dto.isReadByReceiver(),
+                dto.isArchivedBySender(),
+                dto.isArchivedByReceiver());
+    }
+
+    private MessageDTO convertMessageToDTO(Message message) {
+        MessageDTO messageDTO = new MessageDTO(message.getMessageId(),
+                0,
+                0,
+                message.getDateTimeSent(),
+                message.getSubject(),
+                message.getBody(),
+                message.isReadByReceiver(),
+                message.isArchivedBySender(),
+                message.isArchivedByReceiver());
+        if (message.getSender().isPresent() & message.getReceiver().isPresent()) {
+            messageDTO.setSenderId(message.getSender().get().getUserId());
+            messageDTO.setReceiverId(message.getReceiver().get().getUserId());
+        }
+        return messageDTO;
     }
 }
