@@ -1,5 +1,4 @@
 package boerenkool.database.dao.mysql;
-import boerenkool.business.model.House;
 import boerenkool.business.model.Picture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +44,15 @@ public class JdbcPictureDAO implements PictureDAO {
     public List<Picture> getAllByHouseId(int houseId) {
         List<Picture> allPicturesFromHouseId = jdbcTemplate.query("SELECT * FROM Picture WHERE houseId = ?;", new JdbcPictureDAO.PictureRowMapper(), houseId);
         return allPicturesFromHouseId;
+    }
+
+    @Override
+    public Picture getFirstPictureByHouseId(int houseId) {
+        List<Picture> allPicturesFromHouseId = getAllByHouseId(houseId);
+        if (allPicturesFromHouseId.isEmpty()) {
+            return null;
+        }
+        return allPicturesFromHouseId.getFirst();
     }
 
 
