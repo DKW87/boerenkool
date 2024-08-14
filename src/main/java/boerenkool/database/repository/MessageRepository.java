@@ -34,16 +34,24 @@ public class MessageRepository {
         return messageDAO.storeOne(message);
     }
 
-    public Optional<Message> findMessageById(int messageId) {
+    public Optional<Message> getMessageById(int messageId) {
         return messageDAO.getOneById(messageId);
     }
 
-    public List<Message> findMessagesForReceiver(User receiver) {
+    public List<Message> getAllMessagesForReceiver(User receiver) {
         List<Message> listOfMessages = messageDAO.getAllForReceiver(receiver);
         for (Message message : listOfMessages) {
-//            // TODO aan te passen als Leo's methoden er in staan
-//            message.setSender(userDAO.getSenderByMessageId(message.getMessageId()));
-//            message.setReceiver(userDAO.getReceiverByMessageId(message.getMessageId()));
+            message.setSender(userDAO.getSenderByMessageId(message.getMessageId()));
+            message.setReceiver(userDAO.getReceiverByMessageId(message.getMessageId()));
+        }
+        return listOfMessages;
+    }
+
+    public List<Message> getAllForReceiverId(int receiverId) {
+        List<Message> listOfMessages = messageDAO.getAllForReceiverId(receiverId);
+        for (Message message : listOfMessages) {
+            message.setSender(userDAO.getSenderByMessageId(message.getMessageId()));
+            message.setReceiver(userDAO.getReceiverByMessageId(message.getMessageId()));
         }
         return listOfMessages;
     }

@@ -1,8 +1,10 @@
 package boerenkool.communication.dto;
 
+import boerenkool.business.model.Message;
+
 import java.time.LocalDateTime;
 
-public class MessageDTO {
+public class MessageDTO implements Comparable<MessageDTO>{
     private int messageId;
     private int senderId;
     private int receiverId;
@@ -32,6 +34,11 @@ public class MessageDTO {
                       boolean archivedByReceiver) {
         this(0, senderId, receiverId, dateTimeSent, subject, body, readByReceiver,
                 archivedBySender, archivedByReceiver);
+    }
+
+    @Override
+    public int compareTo(MessageDTO otherMessageDTO) {
+        return this.dateTimeSent.compareTo(otherMessageDTO.dateTimeSent);
     }
 
     public int getMessageId() {

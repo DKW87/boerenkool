@@ -7,12 +7,10 @@ import boerenkool.communication.dto.MessageDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "/api")
@@ -29,79 +27,63 @@ public class MessageController {
         this.userService = userService;
     }
 
-    // send a new message
+    // save ("send") a new message
     @PostMapping("/messages")
-    boolean sendMessage(@RequestBody MessageDTO messageDTO) {
+    ResponseEntity<?> saveMessage(@RequestBody MessageDTO messageDTO) {
         logger.info("MessageController.sendMessage is called");
         if (messageService.saveMessage(messageDTO)) {
-            return true;
+            return ResponseEntity.ok().body(messageDTO);
         } else {
             logger.info("sendMessage failed");
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Message not saved");
-        }
-    }
-
-    @GetMapping("/testmessage/{messageId}")
-    Message getMessageByIdTest(@PathVariable int messageId) {
-        logger.info("MessageController.getMessageByIdTest is called");
-        Optional<Message> optionalMessage = messageService.findMessageById(messageId);
-        if (optionalMessage.isPresent()) {
-            return optionalMessage.get();
-        } else {
-            logger.info("getMessageByIdTest optionalMessage is NOT present");
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Message not found");
+            return ResponseEntity.internalServerError().body("Message not saved");
         }
     }
 
     @GetMapping("user/{userId}/messages")
-    List<Message> getAllMessagesforUserId(@PathVariable int userId) {
+    ResponseEntity<?> getAllMessagesforUserId(@PathVariable int userId) {
         // TODO the user can only request his/her OWN messages.
         //  where to check for authorisation? in MessageService?
         // TODO return only a list of 'stripped' Message objects (sender, date, subject)
         //  without body text?
         logger.info("getAllMessagesforUserId is called");
-//        User receiver = userService.getOneById(userId);
-        List listOfUsersMessages = messageService.findMessagesForReceiverId(userId);
+        List<MessageDTO> listOfUsersMessages = messageService.findMessagesForReceiverId(userId);
         if (!listOfUsersMessages.isEmpty()) {
-            return listOfUsersMessages;
+            return ResponseEntity.ok().body(listOfUsersMessages);
         } else {
             logger.info("getAllMessagesforUserId list is EMPTY");
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Message not found");
+            return ResponseEntity.notFound().build();
         }
     }
 
     @GetMapping("user/{userId}/messages/{messageId}")
-    Message getMessageforUserById(@PathVariable int userId, @PathVariable int messageId) {
+    ResponseEntity<?> getMessageforUserById(@PathVariable int userId, @PathVariable int messageId) {
         logger.info("getMessageforUserById is called");
         // TODO check user validated
-        Optional<Message> optionalMessage = messageService.findMessageById(messageId);
-        if (optionalMessage.isPresent()) {
-            return optionalMessage.get();
+        messageService.findMessageById(messageId);
+        if (messageService.findMessageById(messageId) != null) {
+            return ResponseEntity.ok().body(messageService.findMessageById(messageId));
         } else {
-            logger.info("getMessageforUserById optionalMessage is NOT present");
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Message not found");
+            logger.info("getMessageforUserById message not found");
+            return ResponseEntity.notFound().build();
         }
     }
 
     @PutMapping("/messages")
-    boolean updateMessage(@RequestBody MessageDTO messageDTO) {
+    ResponseEntity<?> updateMessage(@RequestBody MessageDTO messageDTO) {
         logger.info("updateMessage is called");
         if (messageService.updateMessage(messageDTO)) {
-            return true;
+            return ResponseEntity.ok().body(messageService.updateMessage(messageDTO));
         } else {
             logger.info("updateMessage results in FALSE");
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Message not updated");
+            return ResponseEntity.internalServerError().body("Message not updated");
         }
     }
 
-//    @PutMapping("/messages")
-//    String updateMessage() {
-//        return "updateMessage called";
-//    }
-
     @DeleteMapping("/messages")
-    String deleteMessage() {
-        return "deleteMessage called";
+    ResponseEntity<?> deleteMessage() {
+        // if logged in user = senderId, call archivedBySender method
+        // if logged in user = receiverId, call archivedByReceiver method
+        return ResponseEntity.ok("deleteMessage called");
     }
 
 }

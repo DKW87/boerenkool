@@ -42,22 +42,24 @@ public class MessageService {
     }
 
     public MessageDTO findMessageById(int messageId) {
-        if (messageRepository.findMessageById(messageId).isPresent()) {
-            return convertMessageToDTO(messageRepository.findMessageById(messageId).get());
+        if (messageRepository.getMessageById(messageId).isPresent()) {
+            return convertMessageToDTO(messageRepository.getMessageById(messageId).get());
         } else return null;
     }
 
-    public List<Message> findMessagesForReceiverId(int receiverId) {
-        List<Message> listOfMessagesForReceiver = new ArrayList<>();
+    public List<MessageDTO> findMessagesForReceiverId(int receiverId) {
+        List<MessageDTO> listOfMessageDTOsForReceiver = new ArrayList<>();
         if (userRepository.getOneById(receiverId).isPresent()) {
             logger.info("findMessagesForReceiver User found");
-            listOfMessagesForReceiver = messageRepository.findMessagesForReceiver((User) userRepository.getOneById(receiverId).get());
-            Collections.sort(listOfMessagesForReceiver);
-            return listOfMessagesForReceiver;
-        } else {
-            logger.info("findMessagesForReceiver User not found");
-            return listOfMessagesForReceiver;
-        }
+//            listOfMessagesForReceiver = messageRepository.findMessagesForReceiver((User) userRepository.getOneById(receiverId).get());
+            List<Message> listOfMessages = messageRepository.getAllForReceiverId(receiverId);
+            // convert Messages to MessageDTOs
+            for (Message message : listOfMessages){
+                listOfMessageDTOsForReceiver.add(convertMessageToDTO(message));
+            }
+            Collections.sort(listOfMessageDTOsForReceiver);
+            return listOfMessageDTOsForReceiver;
+        } else return null;
     }
 
     public boolean updateMessage(MessageDTO messageDTO) {
