@@ -14,7 +14,7 @@ import java.util.Optional;
 public interface ReservationDAO extends GenericDAO<Reservation> {
 
     @Override
-    void storeOne (Reservation reservation);
+    boolean storeOne (Reservation reservation);
 
     @Override
     List<Reservation> getAll ();
