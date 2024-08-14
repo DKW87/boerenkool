@@ -13,7 +13,7 @@ public interface PictureDAO extends GenericDAO<Picture> {
 
     List<Picture> getAllByHouseId(int houseId);
 
-    Picture getFirstPictureByHouseId(int houseId);
+    Optional<Picture> getFirstPictureByHouseId(int houseId);
 
     Optional<Picture> getOneById(int pictureId);
 

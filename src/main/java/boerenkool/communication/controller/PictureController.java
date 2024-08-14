@@ -1,7 +1,10 @@
 package boerenkool.communication.controller;
 
 import boerenkool.business.model.Picture;
+import boerenkool.business.service.PictureService;
+import boerenkool.communication.dto.PictureDTO;
 import boerenkool.database.dao.mysql.JdbcPictureDAO;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -18,9 +21,11 @@ import java.util.stream.Collectors;
 public class PictureController {
 
     private final JdbcPictureDAO jdbcPictureDAO;
+    private final PictureService pictureService;
 
-    public PictureController(JdbcPictureDAO jdbcPictureDAO) {
+    public PictureController(JdbcPictureDAO jdbcPictureDAO, PictureService pictureService) {
         this.jdbcPictureDAO = jdbcPictureDAO;
+        this.pictureService = pictureService;
     }
 
     @GetMapping
@@ -28,135 +33,52 @@ public class PictureController {
         return "Hello user, if you see this everything is OK.";
     }
 
-    //todo Deze klasse werkt nog niet met een service klasse maar met de DAO.
-    //todo geeft geen foutmelding bij picture id die niet bestaat.
-    //todo ondersteund nog geen JPEG.
-
-    //todo werkt nog niet.
     @GetMapping("/houses/{houseId}")
-    public ResponseEntity<List<String>> getPicturesByHouseId(@PathVariable("houseId") int houseId) {
+    public ResponseEntity<List<PictureDTO>> getPicturesByHouseId(@PathVariable("houseId") int houseId) {
         Optional<List<Picture>> optionalPictures = Optional.ofNullable(jdbcPictureDAO.getAllByHouseId(houseId));
 
-        // Check if the list of pictures is present and not empty
         if (optionalPictures.isPresent() && !optionalPictures.get().isEmpty()) {
-            List<String> encodedImages = optionalPictures.get().stream()
+            List<PictureDTO> pictureResponses = optionalPictures.get().stream()
                     .map(picture -> {
                         byte[] imageBytes = picture.getPicture();
-                        String imageFormat = detectImageFormat(imageBytes);
+                        String imageFormat = pictureService.detectImageFormat(imageBytes);
 
                         if (imageFormat != null &&
                                 ("png".equalsIgnoreCase(imageFormat) ||
                                         "jpeg".equalsIgnoreCase(imageFormat) ||
                                         "jpg".equalsIgnoreCase(imageFormat))) {
-                            return Base64.getEncoder().encodeToString(imageBytes);
+                            return new PictureDTO(picture.getPictureId(), picture.getHouseId(), imageFormat, Base64.getEncoder().encodeToString(imageBytes));
                         }
                         return null;
                     })
-                    .filter(encodedImage -> encodedImage != null)
+                    .filter(pictureResponse -> pictureResponse != null)
                     .collect(Collectors.toList());
-            return new ResponseEntity<>(encodedImages, HttpStatus.OK);
+            return new ResponseEntity<>(pictureResponses, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-    //todo tijdelijke mapping om functie te testen.
+
+    //todo werkt nu
     @GetMapping("/houses/first/{houseId}")
     public ResponseEntity<byte[]> getFirstPictureOfHouse(@PathVariable("houseId") int houseId) {
-        Optional<Picture> picture = Optional.ofNullable(jdbcPictureDAO.getFirstPictureByHouseId(houseId));
-        if (picture.isPresent()) {
-            byte[] imageBytes = picture.get().getPicture(); // 1st get() has to stay there.
-            HttpHeaders headers = new HttpHeaders();
-
-            // Detect image format.
-            String imageFormat = detectImageFormat(imageBytes);
-            if ("png".equalsIgnoreCase(imageFormat)) {
-                headers.setContentType(MediaType.IMAGE_PNG);
-            } else if ("jpeg".equalsIgnoreCase(imageFormat) || "jpg".equalsIgnoreCase(imageFormat)) {
-                headers.setContentType(MediaType.IMAGE_JPEG);
-            } else {
-                return new ResponseEntity<>(HttpStatus.UNSUPPORTED_MEDIA_TYPE);
-            }
-            return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
+        Optional<Picture> picture = jdbcPictureDAO.getFirstPictureByHouseId(houseId);
+        if (picture != null) {
+            return pictureService.buildImageResponse(picture.get().getPicture());
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
-
-
-
-
-
+    //todo werkt nu
     @GetMapping("/{pictureId}")
     public ResponseEntity<byte[]> getPictureById(@PathVariable("pictureId") int pictureId) {
         Optional<Picture> picture = jdbcPictureDAO.getOneById(pictureId);
         if (picture.isPresent()) {
-            byte[] imageBytes = picture.get().getPicture(); // 1st get() has to stay there.
-            HttpHeaders headers = new HttpHeaders();
-
-            // Detect image format.
-            String imageFormat = detectImageFormat(imageBytes);
-            if ("png".equalsIgnoreCase(imageFormat)) {
-                headers.setContentType(MediaType.IMAGE_PNG);
-            } else if ("jpeg".equalsIgnoreCase(imageFormat) || "jpg".equalsIgnoreCase(imageFormat)) {
-                headers.setContentType(MediaType.IMAGE_JPEG);
-            } else {
-                return new ResponseEntity<>(HttpStatus.UNSUPPORTED_MEDIA_TYPE);
-            }
-            return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
+            return pictureService.buildImageResponse(picture.get().getPicture());
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-
-    //todo deze methode een eigen plekje geven weg van deze controller.
-    // Utility method to detect the image format by inspecting the file signature
-    private String detectImageFormat(byte[] imageBytes) {
-        if (imageBytes.length >= 4) {
-            // Check PNG signature
-            if ((imageBytes[0] & 0xFF) == 0x89 &&
-                    (imageBytes[1] & 0xFF) == 0x50 &&
-                    (imageBytes[2] & 0xFF) == 0x4E &&
-                    (imageBytes[3] & 0xFF) == 0x47) {
-                return "png";
-            }
-
-            // Check JPEG signature
-            if ((imageBytes[0] & 0xFF) == 0xFF &&
-                    (imageBytes[1] & 0xFF) == 0xD8 &&
-                    (imageBytes[2] & 0xFF) == 0xFF) {
-                return "jpeg";
-            }
-        }
-        return null; //
-    }
-
-//    @GetMapping("/{pictureId}")
-//    public ResponseEntity<byte[]> getPictureById(@PathVariable("pictureId") int pictureId) {
-//        Optional<Picture> picture = jdbcPictureDAO.getOneById(pictureId);
-//        if (picture.isPresent()) {
-//            byte[] imageBytes = picture.get().getPicture(); //getPicture = data of picture
-//            HttpHeaders headers = new HttpHeaders();
-//            headers.setContentType(MediaType.IMAGE_PNG);
-//            return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
-//        } else {
-//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//        }
-//    }
-
-
-////    todo methode per house Id alle pictures op te halen
-//    @GetMapping("/houses/{houseId}")
-//    public List<Picture> getAllByHouseId(@PathVariable("houseId") int houseId) {
-//        Optional<Picture> pictures = jdbcPictureDAO.getAllByHouseId(houseId);
-//        return pictures.map(ResponseEntity::ok)
-//                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
-//
-//    }
-
-
-
-
-
 
 }
