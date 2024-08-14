@@ -28,12 +28,14 @@ public class House implements Comparable<House> {
     private List<ExtraFeature> extraFeatures;
     private otherEntityIds otherEntityIds;
 
-
     // constructors
 
-    public House(String houseName, String province, String city, String streetAndNumber, String zipcode,
-                 int maxGuest, int roomCount, int pricePPPD, String description, boolean isNotAvailable) {
+    // all args
+    public House(String houseName, HouseType houseType, User houseOwner, String province, String city, String streetAndNumber,
+                 String zipcode, int maxGuest, int roomCount, int pricePPPD, String description, boolean isNotAvailable) {
         this.houseName = houseName;
+        this.houseType = houseType;
+        this.houseOwner = houseOwner;
         this.setProvince(province);
         this.setCity(city);
         this.streetAndNumber = streetAndNumber;
@@ -46,24 +48,31 @@ public class House implements Comparable<House> {
         this.otherEntityIds = new otherEntityIds();
     }
 
+    // housetype optional constructor
+    public House(String houseName, String province, String city, String streetAndNumber, String zipcode,
+                 int maxGuest, int roomCount, int pricePPPD, String description, boolean isNotAvailable) {
+        this(houseName, null, null, province, city, streetAndNumber, zipcode, maxGuest,
+                roomCount, pricePPPD, description, isNotAvailable);
+    }
+
+
     // isNotAvailable optional constructor
-    public House(String houseName, HouseType houseType, User houseOwner, String province, String city,
-                 String streetAndNumber, String zipcode, int maxGuest, int roomCount, int pricePPPD, String description) {
-        this(houseName, province, city, streetAndNumber, zipcode, maxGuest, roomCount, pricePPPD, description, false);
+    public House(String houseName, String province, String city, String streetAndNumber,
+                 String zipcode, int maxGuest, int roomCount, int pricePPPD, String description) {
+        this(houseName, province, city, streetAndNumber, zipcode, maxGuest, roomCount,
+                pricePPPD, description, false);
     }
 
     // description optional constructor
-    public House(String houseName, String province, String city, String streetAndNumber, String zipcode,
-                 int maxGuest, int roomCount, int pricePPPD, boolean isNotAvailable) {
-        this(houseName, province, city, streetAndNumber, zipcode, maxGuest, roomCount, pricePPPD, "", isNotAvailable);
-    }
-
-    // description and isNotAvailable optional constructor
     public House(String houseName, String province, String city, String streetAndNumber,
-                 String zipcode, int maxGuest, int roomCount, int pricePPPD) {
-        this(houseName, province, city, streetAndNumber, zipcode, maxGuest, roomCount, pricePPPD, "", false);
+                 String zipcode, int maxGuest, int roomCount, int pricePPPD, boolean isNotAvailable) {
+        this(houseName, province, city, streetAndNumber, zipcode, maxGuest,
+                roomCount, pricePPPD, "", isNotAvailable);
     }
 
+    public House() {
+        // Standaardconstructor, nodig voor Jackson (de library die JSON naar Java-objecten omzet heeft dit schijnbaar nodig)
+    }
 
     // methods
 
