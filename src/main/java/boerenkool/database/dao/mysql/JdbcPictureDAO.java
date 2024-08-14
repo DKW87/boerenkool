@@ -22,7 +22,7 @@ import java.util.Optional;
 @Repository
 public class JdbcPictureDAO implements PictureDAO {
     /**
-     Logger class to track the flow throughout the application
+     * Logger class to track the flow throughout the application
      */
     private final Logger logger = LoggerFactory.getLogger(JdbcPictureDAO.class);
     JdbcTemplate jdbcTemplate;
@@ -69,12 +69,15 @@ public class JdbcPictureDAO implements PictureDAO {
     }
 
     @Override
-    public void storeOne(Picture picture) {
+    public boolean storeOne(Picture picture) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update(connection -> insertPictureStatement(picture, connection),keyHolder);
-        int pKey = Objects.requireNonNull(keyHolder.getKey()).intValue();
-        picture.setPictureId(pKey);
-    }
+        if (jdbcTemplate.update(connection -> insertPictureStatement(picture, connection), keyHolder) != 0) {
+            int pKey = Objects.requireNonNull(keyHolder.getKey()).intValue();
+            picture.setPictureId(pKey);
+            return true;
+    } else
+            return false;
+}
 
     @Override
     public boolean updateOne(Picture picture) {
@@ -83,7 +86,7 @@ public class JdbcPictureDAO implements PictureDAO {
 
     @Override
     public boolean removeOneById(int pictureId) {
-        String sql  = "DELETE FROM Picture WHERE pictureId = ?";
+        String sql = "DELETE FROM Picture WHERE pictureId = ?";
         return jdbcTemplate.update(sql, pictureId) != 0;
     }
 
@@ -133,7 +136,7 @@ public class JdbcPictureDAO implements PictureDAO {
             byte[] pictureData = resultSet.getBytes("picture");
             String pictureDescription = resultSet.getString("pictureDescription");
             Picture picture = new Picture
-                    (null, pictureData,pictureDescription);
+                    (null, pictureData, pictureDescription);
             picture.setPictureId(pictureId);
             picture.setHouseId(houseId); // nodig voor repository
             return picture;
