@@ -4,7 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class User {
 
@@ -19,7 +20,7 @@ public class User {
     private String infix;
     private String lastName;
     private int coinBalance;
-    private List BlockedUser;
+    private List<User> blockedUser;
 
     private final static int DEFAULT_COIN_BALANCE = 0;
     private final static int DEFAULT_USER_ID = 0;
@@ -34,8 +35,8 @@ public class User {
         this.firstName = firstName;
         this.infix = infix;
         this.lastName = lastName;
-        this.coinBalance = DEFAULT_COIN_BALANCE;
-        List BlockedUser = new List();
+        this.coinBalance = coinBalance;
+        this.blockedUser = new ArrayList<>();
         //logger.info("New user");
     }
 
@@ -50,9 +51,9 @@ public class User {
     }
 
     public User () {
+        this.blockedUser = new ArrayList<>();
         //logger.info("User created with no-arg constructor");
     }
-
 
     public String getTypeOfUser() {
         return typeOfUser;
@@ -126,12 +127,19 @@ public class User {
         this.coinBalance = coinBalance;
     }
 
+    public List<User> getBlockedUser() {
+        return blockedUser;
+    }
 
+    public void setBlockedUser(List<User> blockedUser) {
+        this.blockedUser = blockedUser;
+    }
 
     @Override
     public String toString() {
         return "User{" +
-                "typeOfUser='" + typeOfUser + '\'' +
+                "userId=" + userId +
+                ", typeOfUser='" + typeOfUser + '\'' +
                 ", username='" + username + '\'' +
                 ", password='" + password + '\'' +
                 ", email='" + email + '\'' +
@@ -140,6 +148,7 @@ public class User {
                 ", infix='" + infix + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", coinBalance=" + coinBalance +
+                ", blockedUser=" + blockedUser +
                 '}';
     }
 
@@ -151,7 +160,7 @@ public class User {
         User user = (User) o;
 
         if (userId != user.userId) return false;
-        return (!username.equals(user.username));
+        return username.equals(user.username);
     }
 
     public int getUserId() {
