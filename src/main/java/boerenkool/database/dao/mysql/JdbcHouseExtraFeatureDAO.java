@@ -8,8 +8,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -49,12 +47,13 @@ public class JdbcHouseExtraFeatureDAO implements HouseExtraFeatureDAO {
     }
 
     @Override
-    public void storeOne(HouseExtraFeature houseExtraFeature) {
+    public boolean storeOne(HouseExtraFeature houseExtraFeature) {
         if (exists(houseExtraFeature)) {
             updateOne(houseExtraFeature);
         } else {
             insert(houseExtraFeature);
         }
+        return false;
     }
 
     @Override
