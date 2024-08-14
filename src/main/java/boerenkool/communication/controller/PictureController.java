@@ -96,7 +96,7 @@ public class PictureController {
     @GetMapping("/houses/first/{houseId}")
     public ResponseEntity<byte[]> getFirstPictureOfHouse(@PathVariable("houseId") int houseId) {
         Optional<Picture> picture = jdbcPictureDAO.getFirstPictureByHouseId(houseId);
-        if (picture != null) {
+        if (picture.isPresent()) {
             return pictureService.buildImageResponse(picture.get().getPicture());
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
