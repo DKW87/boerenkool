@@ -33,11 +33,17 @@ public class Message implements Comparable<Message> {
     public Message(Optional<User> sender, Optional<User> receiver, LocalDateTime dateTimeSent,
                    String subject, String body, boolean readByReceiver, boolean archivedBySender,
                    boolean archivedByReceiver) {
-        this(0,sender, receiver, null, subject, body, false, false, false);
+        this(0, sender, receiver, null, subject, body, false, false, false);
 
     }
+
     public Message(Optional<User> sender, Optional<User> receiver, String subject, String body) {
         this(0, sender, receiver, null, subject, body, false, false, false);
+    }
+
+    // necessary for contructing a Message from JSON
+    public Message() {
+        this(0, null, null, null, null, null, false, false, false);
     }
 
     @Override
@@ -101,15 +107,27 @@ public class Message implements Comparable<Message> {
         return body;
     }
 
-    public boolean isArchivedBySender() {
-        return archivedBySender;
-    }
-
     public boolean isReadByReceiver() {
         return readByReceiver;
     }
 
+    public void setReadByReceiver(boolean readByReceiver) {
+        this.readByReceiver = readByReceiver;
+    }
+
+    public boolean isArchivedBySender() {
+        return archivedBySender;
+    }
+
+    public void setArchivedBySender(boolean archivedBySender) {
+        this.archivedBySender = archivedBySender;
+    }
+
     public boolean isArchivedByReceiver() {
         return archivedByReceiver;
+    }
+
+    public void setArchivedByReceiver(boolean archivedByReceiver) {
+        this.archivedByReceiver = archivedByReceiver;
     }
 }

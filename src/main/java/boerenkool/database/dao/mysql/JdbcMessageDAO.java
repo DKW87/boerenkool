@@ -2,8 +2,6 @@ package boerenkool.database.dao.mysql;
 
 import boerenkool.business.model.Message;
 import boerenkool.business.model.User;
-import boerenkool.communication.dto.MessageDTO;
-import boerenkool.database.dao.mysql.UserDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +13,6 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.*;
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -32,13 +29,13 @@ public class JdbcMessageDAO implements MessageDAO {
         logger.info("new JdbcMessageDAO");
     }
 
-    private class MessageDTORowMapper implements RowMapper<MessageDTO> {
+    private class MessageRowMapper implements RowMapper<Message> {
         @Override
-        public MessageDTO mapRow(ResultSet resultSet, int rowNumber)
+        public Message mapRow(ResultSet resultSet, int rowNumber)
                 throws SQLException {
-            return new MessageDTO(resultSet.getInt("messageId"),
-                    resultSet.getInt("senderId"),
-                    resultSet.getInt("receiverId"),
+            return new Message(resultSet.getInt("messageId"),
+                    null,
+                    null,
                     resultSet.getObject("dateTimeSent", LocalDateTime.class),
                     resultSet.getString("subject"),
                     resultSet.getString("body"),
@@ -95,12 +92,16 @@ public class JdbcMessageDAO implements MessageDAO {
      * @param message object to be saved
      */
     @Override
-    public void storeOne(Message message) {
+    public boolean storeOne(Message message) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update(connection ->
-                buildInsertMessageStatement(message, connection), keyHolder);
-        int newKey = Objects.requireNonNull(keyHolder.getKey()).intValue();
-        message.setMessageId(newKey);
+        if (jdbcTemplate.update(connection ->
+                buildInsertMessageStatement(message, connection), keyHolder) != 0) {
+            int newKey = Objects.requireNonNull(keyHolder.getKey()).intValue();
+            message.setMessageId(newKey);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -109,10 +110,10 @@ public class JdbcMessageDAO implements MessageDAO {
      * @return optional containing the message
      */
     @Override
-    public Optional<MessageDTO> getOneById(int messageId) {
+    public Optional<Message> getOneById(int messageId) {
         String sql = "Select * From Message where messageId = ?;";
-        List<MessageDTO> resultList =
-                jdbcTemplate.query(sql, new MessageDTORowMapper(), messageId);
+        List<Message> resultList =
+                jdbcTemplate.query(sql, new MessageRowMapper(), messageId);
         if (resultList.isEmpty()) {
             return Optional.empty();
         } else {
@@ -125,16 +126,16 @@ public class JdbcMessageDAO implements MessageDAO {
      * @return the List of all messages
      */
     @Override
-    public List<MessageDTO> getAll() {
-        return jdbcTemplate.query("Select * From Message", new MessageDTORowMapper());
+    public List<Message> getAll() {
+        return jdbcTemplate.query("Select * From Message", new MessageRowMapper());
     }
 
     @Override
-    public List<MessageDTO> getAllForReceiver(User receiver) {
+    public List<Message> getAllForReceiver(User receiver) {
         int receiverId = receiver.getUserId();
-        List<MessageDTO> messagesForReceiver = jdbcTemplate.query(
+        List<Message> messagesForReceiver = jdbcTemplate.query(
                 "Select * From Message where receiverId = ?;",
-                new MessageDTORowMapper(),
+                new MessageRowMapper(),
                 receiverId);
         return messagesForReceiver;
     }
