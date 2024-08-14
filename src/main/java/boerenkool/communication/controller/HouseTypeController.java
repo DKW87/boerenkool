@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/house-types")
+@RequestMapping(value= "/api/houseTypes")
 public class HouseTypeController {
 
     private final Logger logger = LoggerFactory.getLogger(HouseTypeController.class);
@@ -30,7 +30,7 @@ public class HouseTypeController {
         return houseTypeService.getAllHouseTypes();
     }
 
-    @GetMapping("/{id}")
+    @GetMapping(value="/{id}")
     public ResponseEntity<?> getHouseTypeById(@PathVariable int id) {
         Optional<HouseType> houseType = houseTypeService.getHouseTypeById(id);
         if (houseType.isPresent()) {
@@ -50,7 +50,7 @@ public class HouseTypeController {
         }
     }
 
-    @PutMapping("/{id}")
+    @PutMapping(value = "/{id}")
     public ResponseEntity<?> updateHouseType(@PathVariable int id, @RequestBody HouseType houseType) {
         houseType.setHouseTypeId(id);
         boolean updated = houseTypeService.updateHouseType(houseType);
@@ -61,7 +61,7 @@ public class HouseTypeController {
         }
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping(value = "/{id}")
     public ResponseEntity<?> deleteHouseType(@PathVariable int id) {
         boolean deleted = houseTypeService.deleteHouseTypeById(id);
         if (deleted) {
@@ -71,7 +71,7 @@ public class HouseTypeController {
         }
     }
 
-    @GetMapping("/name/{name}")
+    @GetMapping(value = "/name/{name}")
     public ResponseEntity<?> findHouseTypeByName(@PathVariable String name) {
         Optional<HouseType> houseType = houseTypeService.findHouseTypeByName(name);
         if (houseType.isPresent()) {
