@@ -56,18 +56,15 @@ public class MessageRepository {
         return listOfMessages;
     }
 
-    /**
-     * update message, also used for setting the archive flag
-     * instead of deleting them from database
-     * @param message
-     */
     public boolean updateMessage(Message message) {
         return messageDAO.updateOne(message);
     }
 
-    public void archiveMessageForSender(Message message) {
+    public boolean archiveMessageForSender(Message message) {
+        return messageDAO.archiveMessageForSender(message);
     }
 
-    public void archiveMessageForReceiver(Message message) {
+    public boolean archiveMessageForReceiver(Message message) {
+        return messageDAO.archiveMessageForReceiver(message);
     }
 }

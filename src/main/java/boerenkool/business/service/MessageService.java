@@ -66,6 +66,15 @@ public class MessageService {
         return messageRepository.updateMessage(convertDtoToMessage(messageDTO));
     }
 
+    public boolean archiveMessageForSender(MessageDTO messageDTO) {
+        return messageRepository.archiveMessageForSender(convertDtoToMessage(messageDTO));
+    }
+
+    public boolean archiveMessageForReceiver(MessageDTO messageDTO) {
+        return messageRepository.archiveMessageForReceiver(convertDtoToMessage(messageDTO));
+
+    }
+
     private Message convertDtoToMessage(MessageDTO dto) {
         return new Message(dto.getMessageId(),
                 userRepository.getOneById(dto.getSenderId()),

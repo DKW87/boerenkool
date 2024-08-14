@@ -9,7 +9,7 @@ import java.util.Optional;
 
 import java.util.List;
 
-public interface MessageDAO extends GenericDAO<Message>{
+public interface MessageDAO extends GenericDAO<Message> {
     @Override
     boolean storeOne(Message message);
 
@@ -28,6 +28,10 @@ public interface MessageDAO extends GenericDAO<Message>{
 
     @Override
     boolean removeOneById(int id);
+
+    boolean archiveMessageForSender(Message message);
+
+    boolean archiveMessageForReceiver(Message message);
 }
 
 

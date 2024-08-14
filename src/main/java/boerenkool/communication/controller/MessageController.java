@@ -28,8 +28,9 @@ public class MessageController {
     }
 
     // save ("send") a new message
-    @PostMapping("/messages")
+    @PostMapping("/user/{userId}/messages")
     ResponseEntity<?> saveMessage(@RequestBody MessageDTO messageDTO) {
+        // TODO check user is authenticated as sender of this message
         logger.info("MessageController.sendMessage is called");
         if (messageService.saveMessage(messageDTO)) {
             return ResponseEntity.ok().body(messageDTO);
@@ -43,8 +44,6 @@ public class MessageController {
     ResponseEntity<?> getAllMessagesforUserId(@PathVariable int userId) {
         // TODO the user can only request his/her OWN messages.
         //  where to check for authorisation? in MessageService?
-        // TODO return only a list of 'stripped' Message objects (sender, date, subject)
-        //  without body text?
         logger.info("getAllMessagesforUserId is called");
         List<MessageDTO> listOfUsersMessages = messageService.findMessagesForReceiverId(userId);
         if (!listOfUsersMessages.isEmpty()) {
@@ -58,7 +57,7 @@ public class MessageController {
     @GetMapping("user/{userId}/messages/{messageId}")
     ResponseEntity<?> getMessageforUserById(@PathVariable int userId, @PathVariable int messageId) {
         logger.info("getMessageforUserById is called");
-        // TODO check user validated
+        // TODO check user is authenticated as receiver of this message
         messageService.findMessageById(messageId);
         if (messageService.findMessageById(messageId) != null) {
             return ResponseEntity.ok().body(messageService.findMessageById(messageId));
@@ -68,22 +67,29 @@ public class MessageController {
         }
     }
 
-    @PutMapping("/messages")
+    @PutMapping("/user/{userId}/messages")
     ResponseEntity<?> updateMessage(@RequestBody MessageDTO messageDTO) {
+        // TODO check user is authenticated as sender of this message
         logger.info("updateMessage is called");
         if (messageService.updateMessage(messageDTO)) {
             return ResponseEntity.ok().body(messageService.updateMessage(messageDTO));
         } else {
             logger.info("updateMessage results in FALSE");
-            return ResponseEntity.internalServerError().body("Message not updated");
+            return ResponseEntity.notFound().build();
         }
     }
 
-    @DeleteMapping("/messages")
-    ResponseEntity<?> deleteMessage() {
+    @DeleteMapping("/user/{userId}/messages")
+    ResponseEntity<?> archiveMessage(@RequestBody MessageDTO messageDTO, @PathVariable int userId) {
         // if logged in user = senderId, call archivedBySender method
         // if logged in user = receiverId, call archivedByReceiver method
-        return ResponseEntity.ok("deleteMessage called");
+        // TODO check user is authenticated as sender or receiver of this message
+        if (userId == messageDTO.getSenderId()) {
+            messageService.archiveMessageForSender(messageDTO);
+            return ResponseEntity.ok("message archived for sender");
+        } else if (userId == messageDTO.getReceiverId()) {
+            messageService.archiveMessageForReceiver(messageDTO);
+            return ResponseEntity.ok("message archived for receiver");
+        } else return ResponseEntity.notFound().build();
     }
-
 }

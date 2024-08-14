@@ -133,12 +133,7 @@ public class JdbcMessageDAO implements MessageDAO {
 
     @Override
     public List<Message> getAllForReceiver(User receiver) {
-        int receiverId = receiver.getUserId();
-        List<Message> messagesForReceiver = jdbcTemplate.query(
-                "Select * From Message where receiverId = ?;",
-                new MessageRowMapper(),
-                receiverId);
-        return messagesForReceiver;
+        return getAllForReceiverId(receiver.getUserId());
     }
 
     public List<Message> getAllForReceiverId(int receiverId) {
@@ -158,6 +153,18 @@ public class JdbcMessageDAO implements MessageDAO {
     public boolean updateOne(Message message) {
         return jdbcTemplate.update(connection ->
                 buildInsertMessageStatement(message, connection)) != 0;
+    }
+
+    public boolean archiveMessageForSender(Message message) {
+        return (jdbcTemplate.update(
+                "UPDATE Message SET archivedBySender = TRUE WHERE messageId = ?;",
+                message.getMessageId()) != 0);
+    }
+
+    public boolean archiveMessageForReceiver(Message message) {
+        return (jdbcTemplate.update(
+                "UPDATE Message SET archivedByReceiver = TRUE WHERE messageId = ?;",
+                message.getMessageId()) != 0);
     }
 
     /**
