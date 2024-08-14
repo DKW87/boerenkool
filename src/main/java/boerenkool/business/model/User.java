@@ -1,15 +1,12 @@
 package boerenkool.business.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import boerenkool.communication.dto.UserDto;
+import boerenkool.utilities.authorization.PasswordService;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class User {
-
-    //private final Logger logger = LoggerFactory.getLogger(User.class);
     private int userId;
     private String typeOfUser;
     private String username;
@@ -23,38 +20,56 @@ public class User {
     private int coinBalance;
     private List<User> blockedUser;
 
-    private final static int DEFAULT_COIN_BALANCE = 0;
+    private final static int DEFAULT_COIN_BALANCE = 500;
     private final static int DEFAULT_USER_ID = 0;
+    private final static String DEFAULT_USER = "Huurder";
 
-    public User(int userId, String typeOfUser, String username, String hashedPassword, String salt, String email, String phone, String firstName, String infix, String lastName, int coinBalance) {
+    // Basisconstructor met alle parameters
+    public User(int userId, String typeOfUser, String username, String password, String email, String phone,
+                String firstName, String infix, String lastName, int coinBalance, List<User> blockedUser) {
         this.userId = userId;
-        this.typeOfUser = typeOfUser;
+        this.typeOfUser = DEFAULT_USER;
         this.username = username;
-        this.hashedPassword = hashedPassword;
-        this.salt = salt;  // Assigning salt to the new attribute
+        this.salt = new PasswordService().generateSalt(); // Genereer de salt
+        this.hashedPassword = PasswordService.hashPassword(password, this.salt); // Hash het wachtwoord met de gegenereerde salt
         this.email = email;
         this.phone = phone;
         this.firstName = firstName;
         this.infix = infix;
         this.lastName = lastName;
         this.coinBalance = coinBalance;
-        this.blockedUser = new ArrayList<>();
-        //logger.info("New user");
+        this.blockedUser = blockedUser != null ? blockedUser : new ArrayList<>();
     }
 
-    // User object zonder id
-    public User(String typeOfUser, String username, String hashedPassword, String salt, String email, String phone, String firstName, String infix, String lastName, int coinBalance) {
-        this(DEFAULT_USER_ID, typeOfUser, username, hashedPassword, salt, email, phone, firstName, infix, lastName, coinBalance);
+    //Constructor dto
+    public User(UserDto dto) {
+        this(dto.getTypeOfUser(), dto.getUsername(), dto.getPassword(), dto.getEmail(), dto.getPhone(), dto.getFirstName(), dto.getInfix(), dto.getLastName(), dto.getCoinBalance());
     }
 
-    // User object om te testen
-    public User(String username, String hashedPassword, String salt) {
-        this(DEFAULT_USER_ID, "huurder", username, hashedPassword, salt, "", "", "", "", "", DEFAULT_COIN_BALANCE);
+
+    // Constructor zonder geblokkeerde gebruikers
+    public User(int userId, String typeOfUser, String username, String password, String email, String phone,
+                String firstName, String infix, String lastName, int coinBalance) {
+        this(userId, typeOfUser, username, password, email, phone, firstName, infix, lastName, coinBalance, new ArrayList<>());
     }
 
-    public User () {
-        this.blockedUser = new ArrayList<>();
-        //logger.info("User created with no-arg constructor");
+    // Constructor voor nieuwe gebruikers zonder ID
+    public User(String typeOfUser, String username, String password, String email, String phone,
+                String firstName, String infix, String lastName, int coinBalance) {
+        this(DEFAULT_USER_ID, typeOfUser, username, password, email, phone, firstName, infix, lastName, coinBalance);
+    }
+
+    // Default constructor
+    public User() {
+        this(DEFAULT_USER_ID, "", "", "", "", "", "", "", "", DEFAULT_COIN_BALANCE, new ArrayList<>());
+    }
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
     public String getTypeOfUser() {
@@ -77,16 +92,12 @@ public class User {
         return hashedPassword;
     }
 
-    public void setHashedPassword(String hashedPassword) {
-        this.hashedPassword = hashedPassword;
+    public void setHashedPassword(String password) {
+        this.hashedPassword = PasswordService.hashPassword(password, this.salt);
     }
 
     public String getSalt() {
         return salt;
-    }
-
-    public void setSalt(String salt) {
-        this.salt = salt;
     }
 
     public String getEmail() {
@@ -152,7 +163,7 @@ public class User {
                 ", typeOfUser='" + typeOfUser + '\'' +
                 ", username='" + username + '\'' +
                 ", hashedPassword='" + hashedPassword + '\'' +
-                ", salt='" + salt + '\'' +  // Include salt in the toString method
+                ", salt='" + salt + '\'' +
                 ", email='" + email + '\'' +
                 ", phone='" + phone + '\'' +
                 ", firstName='" + firstName + '\'' +
@@ -174,11 +185,7 @@ public class User {
         return username.equals(user.username);
     }
 
-    public int getUserId() {
-        return userId;
-    }
-
-    public void setUserId(int userId) {
-        this.userId = userId;
+    public void setSalt(String salt) {
+        this.salt = salt;
     }
 }

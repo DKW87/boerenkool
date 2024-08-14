@@ -33,7 +33,7 @@ public class JdbcUserDAO implements UserDAO {
     private void setCommonParameters(PreparedStatement ps, User user) throws SQLException {
         ps.setString(1, user.getTypeOfUser());
         ps.setString(2, user.getUsername());
-        ps.setString(3, user.getPassword());
+        ps.setString(3, user.getHashedPassword());
         ps.setString(4, user.getFirstName());
         if (user.getInfix() != null) {
             ps.setString(5, user.getInfix());
@@ -50,7 +50,7 @@ public class JdbcUserDAO implements UserDAO {
         PreparedStatement ps;
         ps = connection.prepareStatement(
                 "INSERT INTO `User`(typeOfUser, username, hashedPassword, firstName, infix, lastName," +
-                        " coinBalance, phoneNumber, emailaddress)" +
+                        " COINBALANCE, phoneNumber, emailaddress)" +
                         " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", PreparedStatement.RETURN_GENERATED_KEYS);
         setCommonParameters(ps, user);
         return ps;
@@ -68,7 +68,7 @@ public class JdbcUserDAO implements UserDAO {
                 firstName=?,
                 infix=?,
                 lastName=?,
-                coinBalance=?,
+                COINBALANCE=?,
                 phoneNumber=?,
                 emailaddress=?
                 WHERE userId=?
@@ -80,11 +80,12 @@ public class JdbcUserDAO implements UserDAO {
     }
 
     @Override
-    public void storeOne(User user) {
+    public boolean storeOne(User user) {
         if (user.getUserId() == 0) {
             insert(user);
+            return user.getUserId() > 0;
         } else {
-            updateOne(user);
+            return updateOne(user);
         }
     }
 
@@ -186,13 +187,6 @@ public class JdbcUserDAO implements UserDAO {
     }
 
     private static class UserRowMapper implements RowMapper<User> {
-
-        private final JdbcTemplate jdbcTemplate;
-
-        public UserRowMapper(JdbcTemplate jdbcTemplate) {
-            this.jdbcTemplate = jdbcTemplate;
-        }
-
         @Override
         public User mapRow(ResultSet rs, int rowNum) throws SQLException {
             int id = rs.getInt("userId");
@@ -202,15 +196,12 @@ public class JdbcUserDAO implements UserDAO {
             String firstName = rs.getString("firstName");
             String infix = rs.getString("infix");
             String lastName = rs.getString("lastName");
-            int coinBalance = rs.getInt("coinBalance");
+            int COINBALANCE = rs.getInt("COINBALANCE");
             String phoneNumber = rs.getString("phoneNumber");
             String email = rs.getString("emailaddress");
-            User user = new User(typeOfUser, username, pw, email, phoneNumber, firstName, infix, lastName, coinBalance);
+
+            User user = new User(typeOfUser, username, pw, email, phoneNumber, firstName, infix, lastName, COINBALANCE);
             user.setUserId(id);
-            List<User> blockedUsers = jdbcTemplate.query(
-                    "SELECT u.* FROM `User` u INNER JOIN BlockedList b ON u.userId = b.blockedUser WHERE b.userId = ?",
-                    new UserRowMapper(jdbcTemplate), id);
-            user.setBlockedUser(blockedUsers);
             return user;
         }
     }
