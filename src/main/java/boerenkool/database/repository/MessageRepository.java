@@ -2,8 +2,6 @@ package boerenkool.database.repository;
 
 import boerenkool.business.model.Message;
 import boerenkool.business.model.User;
-import boerenkool.communication.dto.MessageDTO;
-import boerenkool.database.dao.mysql.JdbcUserDAO;
 import boerenkool.database.dao.mysql.MessageDAO;
 import boerenkool.database.dao.mysql.UserDAO;
 import org.slf4j.Logger;
@@ -11,8 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,28 +26,62 @@ public class MessageRepository {
         logger.info("New MessageRepository");
     }
 
+    private Optional<Message> addUsersToMessage(Optional<Message> message) {
+        if (message.isPresent()) {
+            message.get().setSender(userDAO.getSenderByMessageId(message.get().getMessageId())
+                    .orElse(null));
+            message.get().setReceiver(userDAO.getReceiverByMessageId(message.get().getMessageId())
+                    .orElse(null));
+        }
+        return message;
+    }
+
+    /**
+     * add users to EXISTING (already stored) message
+     * not used for new messages (that do not have a messageId yet)
+     * @param message
+     * @return
+     */
+    private Message addUsersToMessage(Message message) {
+//        if (message.getMessageId() != 0) {
+        message.setSender(userDAO.getSenderByMessageId(message.getMessageId()).orElse(null));
+        message.setReceiver(userDAO.getReceiverByMessageId(message.getMessageId()).orElse(null));
+        return message;
+    }
+
     public boolean saveMessage(Message message) {
+//        addUsersToNewMessage(message);
         return messageDAO.storeOne(message);
     }
 
     public Optional<Message> getMessageById(int messageId) {
-        return messageDAO.getOneById(messageId);
+        Optional<Message> message = messageDAO.getOneById(messageId);
+        if (message.isPresent()) {
+            addUsersToMessage(message);
+        }
+        return message;
     }
 
-    public List<Message> getAllMessagesForReceiver(User receiver) {
+    public List<Message> getAllForReceiver(User receiver) {
         List<Message> listOfMessages = messageDAO.getAllForReceiver(receiver);
         for (Message message : listOfMessages) {
-            message.setSender(userDAO.getSenderByMessageId(message.getMessageId()));
-            message.setReceiver(userDAO.getReceiverByMessageId(message.getMessageId()));
+            addUsersToMessage(message);
         }
         return listOfMessages;
     }
 
-    public List<Message> getAllForReceiverId(int receiverId) {
-        List<Message> listOfMessages = messageDAO.getAllForReceiverId(receiverId);
+    public List<Message> getAllByReceiverId(int receiverId) {
+        List<Message> listOfMessages = messageDAO.getAllByReceiverId(receiverId);
         for (Message message : listOfMessages) {
-            message.setSender(userDAO.getSenderByMessageId(message.getMessageId()));
-            message.setReceiver(userDAO.getReceiverByMessageId(message.getMessageId()));
+            addUsersToMessage(message);
+        }
+        return listOfMessages;
+    }
+
+    public List<Message> getAll() {
+        List<Message> listOfMessages = messageDAO.getAll();
+        for (Message message : listOfMessages) {
+            addUsersToMessage(message);
         }
         return listOfMessages;
     }

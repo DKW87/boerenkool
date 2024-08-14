@@ -10,7 +10,6 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -45,12 +44,13 @@ public class JdbcHouseTypeDAO implements HouseTypeDAO {
     }
 
     @Override
-    public void storeOne(HouseType houseType) {
+    public boolean storeOne(HouseType houseType) {
         if (houseType.getHouseTypeId() == 0) {
             insert(houseType);
         } else {
             updateOne(houseType);
         }
+        return false;
     }
 
     @Override

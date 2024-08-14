@@ -1,5 +1,6 @@
 package boerenkool.business.model;
 
+import boerenkool.communication.dto.UserDto;
 import boerenkool.utilities.authorization.PasswordService;
 
 import java.util.ArrayList;
@@ -19,14 +20,15 @@ public class User {
     private int coinBalance;
     private List<User> blockedUser;
 
-    private final static int DEFAULT_COIN_BALANCE = 0;
+    private final static int DEFAULT_COIN_BALANCE = 500;
     private final static int DEFAULT_USER_ID = 0;
+    private final static String DEFAULT_USER = "Huurder";
 
     // Basisconstructor met alle parameters
     public User(int userId, String typeOfUser, String username, String password, String email, String phone,
                 String firstName, String infix, String lastName, int coinBalance, List<User> blockedUser) {
         this.userId = userId;
-        this.typeOfUser = typeOfUser;
+        this.typeOfUser = DEFAULT_USER;
         this.username = username;
         this.salt = new PasswordService().generateSalt(); // Genereer de salt
         this.hashedPassword = PasswordService.hashPassword(password, this.salt); // Hash het wachtwoord met de gegenereerde salt
@@ -38,6 +40,12 @@ public class User {
         this.coinBalance = coinBalance;
         this.blockedUser = blockedUser != null ? blockedUser : new ArrayList<>();
     }
+
+    //Constructor dto
+    public User(UserDto dto) {
+        this(dto.getTypeOfUser(), dto.getUsername(), dto.getPassword(), dto.getEmail(), dto.getPhone(), dto.getFirstName(), dto.getInfix(), dto.getLastName(), dto.getCoinBalance());
+    }
+
 
     // Constructor zonder geblokkeerde gebruikers
     public User(int userId, String typeOfUser, String username, String password, String email, String phone,
@@ -175,5 +183,9 @@ public class User {
 
         if (userId != user.userId) return false;
         return username.equals(user.username);
+    }
+
+    public void setSalt(String salt) {
+        this.salt = salt;
     }
 }

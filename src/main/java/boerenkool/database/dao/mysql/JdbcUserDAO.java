@@ -50,7 +50,7 @@ public class JdbcUserDAO implements UserDAO {
         PreparedStatement ps;
         ps = connection.prepareStatement(
                 "INSERT INTO `User`(typeOfUser, username, hashedPassword, firstName, infix, lastName," +
-                        " coinBalance, phoneNumber, emailaddress)" +
+                        " COINBALANCE, phoneNumber, emailaddress)" +
                         " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", PreparedStatement.RETURN_GENERATED_KEYS);
         setCommonParameters(ps, user);
         return ps;
@@ -68,7 +68,7 @@ public class JdbcUserDAO implements UserDAO {
                 firstName=?,
                 infix=?,
                 lastName=?,
-                coinBalance=?,
+                COINBALANCE=?,
                 phoneNumber=?,
                 emailaddress=?
                 WHERE userId=?
@@ -196,11 +196,11 @@ public class JdbcUserDAO implements UserDAO {
             String firstName = rs.getString("firstName");
             String infix = rs.getString("infix");
             String lastName = rs.getString("lastName");
-            int coinBalance = rs.getInt("coinBalance");
+            int COINBALANCE = rs.getInt("COINBALANCE");
             String phoneNumber = rs.getString("phoneNumber");
             String email = rs.getString("emailaddress");
 
-            User user = new User(typeOfUser, username, pw, email, phoneNumber, firstName, infix, lastName, coinBalance);
+            User user = new User(typeOfUser, username, pw, email, phoneNumber, firstName, infix, lastName, COINBALANCE);
             user.setUserId(id);
             return user;
         }

@@ -2,7 +2,6 @@ package boerenkool.database.dao.mysql;
 
 import boerenkool.business.model.Message;
 import boerenkool.business.model.User;
-import boerenkool.communication.dto.MessageDTO;
 import boerenkool.database.dao.GenericDAO;
 
 import java.util.Optional;
@@ -18,7 +17,7 @@ public interface MessageDAO extends GenericDAO<Message> {
 
     List<Message> getAllForReceiver(User receiver);
 
-    List<Message> getAllForReceiverId(int receiverId);
+    List<Message> getAllByReceiverId(int receiverId);
 
     @Override
     Optional<Message> getOneById(int id);

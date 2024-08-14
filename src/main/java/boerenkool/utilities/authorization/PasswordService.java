@@ -1,11 +1,14 @@
 package boerenkool.utilities.authorization;
 
+import org.springframework.stereotype.Service;
+
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Base64;
 
+@Service
 public class PasswordService {
 
     private static final String PEPPER = "TheWholeWorldHatesBoerenkool";

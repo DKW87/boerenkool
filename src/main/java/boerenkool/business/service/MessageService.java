@@ -8,15 +8,12 @@ import boerenkool.database.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class MessageService {
@@ -33,28 +30,34 @@ public class MessageService {
     }
 
     public boolean saveMessage(MessageDTO messageDTO) {
-        // TODO convert MessageDTO to Message using convert method (which uses MessageRepository)
-        return true;
-        // set DateTime for new message that is sent
-
-//        message.setDateTimeSent(LocalDateTime.now());
-//        return messageRepository.saveMessage(message);
+        return messageRepository.saveMessage(convertDtoToMessage(messageDTO));
     }
 
-    public MessageDTO findMessageById(int messageId) {
+    public MessageDTO getByMessageId(int messageId) {
         if (messageRepository.getMessageById(messageId).isPresent()) {
             return convertMessageToDTO(messageRepository.getMessageById(messageId).get());
         } else return null;
     }
 
-    public List<MessageDTO> findMessagesForReceiverId(int receiverId) {
+    public List<MessageDTO> getAllMessages() {
+        logger.info("getAllMessages called");
+        List<MessageDTO> listOfAllMessageDTOs = new ArrayList<>();
+        List<Message> listOfMessages = messageRepository.getAll();
+        for (Message message : listOfMessages) {
+            listOfAllMessageDTOs.add(convertMessageToDTO(message));
+        }
+        Collections.sort(listOfAllMessageDTOs);
+        return listOfAllMessageDTOs;
+    }
+
+    public List<MessageDTO> getAllByReceiverId(int receiverId) {
         List<MessageDTO> listOfMessageDTOsForReceiver = new ArrayList<>();
         if (userRepository.getOneById(receiverId).isPresent()) {
             logger.info("findMessagesForReceiver User found");
 //            listOfMessagesForReceiver = messageRepository.findMessagesForReceiver((User) userRepository.getOneById(receiverId).get());
-            List<Message> listOfMessages = messageRepository.getAllForReceiverId(receiverId);
+            List<Message> listOfMessages = messageRepository.getAllByReceiverId(receiverId);
             // convert Messages to MessageDTOs
-            for (Message message : listOfMessages){
+            for (Message message : listOfMessages) {
                 listOfMessageDTOsForReceiver.add(convertMessageToDTO(message));
             }
             Collections.sort(listOfMessageDTOsForReceiver);
@@ -72,35 +75,42 @@ public class MessageService {
 
     public boolean archiveMessageForReceiver(MessageDTO messageDTO) {
         return messageRepository.archiveMessageForReceiver(convertDtoToMessage(messageDTO));
-
     }
 
     private Message convertDtoToMessage(MessageDTO dto) {
-        return new Message(dto.getMessageId(),
-                userRepository.getOneById(dto.getSenderId()),
-                userRepository.getOneById(dto.getReceiverId()),
-                LocalDateTime.now(),
-                dto.getSubject(),
-                dto.getBody(),
-                dto.isReadByReceiver(),
-                dto.isArchivedBySender(),
-                dto.isArchivedByReceiver());
+        logger.info("convertDtoToMessage called");
+        User sender = userRepository.getOneById(dto.getSenderId()).orElse(null);
+        User receiver = userRepository.getOneById(dto.getReceiverId()).orElse(null);
+//        User sender = userRepository.getOneById(dto.getSenderId()).get();
+//        User receiver = userRepository.getOneById(dto.getReceiverId()).get();
+        System.out.println(sender);
+//        logger.info(sender.getUsername());
+        if (sender != null & receiver != null) {
+            return new Message(sender,
+                    receiver,
+                    LocalDateTime.now(),
+                    dto.getSubject(),
+                    dto.getBody(),
+                    dto.isReadByReceiver(),
+                    dto.isArchivedBySender(),
+                    dto.isArchivedByReceiver());
+        } else {
+            logger.info("sender and/or receiver is null, message will be null");
+            return null;
+        }
     }
 
     private MessageDTO convertMessageToDTO(Message message) {
-        MessageDTO messageDTO = new MessageDTO(message.getMessageId(),
-                0,
-                0,
+        int senderId = message.getSender().getUserId();
+        int receiverId = message.getReceiver().getUserId();
+        return new MessageDTO(message.getMessageId(),
+                senderId,
+                receiverId,
                 message.getDateTimeSent(),
                 message.getSubject(),
                 message.getBody(),
                 message.isReadByReceiver(),
                 message.isArchivedBySender(),
                 message.isArchivedByReceiver());
-        if (message.getSender().isPresent() & message.getReceiver().isPresent()) {
-            messageDTO.setSenderId(message.getSender().get().getUserId());
-            messageDTO.setReceiverId(message.getReceiver().get().getUserId());
-        }
-        return messageDTO;
     }
 }

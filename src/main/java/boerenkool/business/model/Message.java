@@ -7,8 +7,8 @@ import java.util.Optional;
 
 public class Message implements Comparable<Message> {
     private int messageId;
-    private Optional<User> sender;
-    private Optional<User> receiver;
+    private User sender;
+    private User receiver;
     private LocalDateTime dateTimeSent;
     private String subject;
     private String body;
@@ -16,7 +16,7 @@ public class Message implements Comparable<Message> {
     private boolean archivedBySender;
     private boolean archivedByReceiver;
 
-    public Message(int messageId, Optional<User> sender, Optional<User> receiver, LocalDateTime dateTimeSent,
+    public Message(int messageId, User sender, User receiver, LocalDateTime dateTimeSent,
                    String subject, String body, boolean readByReceiver, boolean archivedBySender,
                    boolean archivedByReceiver) {
         this.messageId = messageId;
@@ -30,14 +30,14 @@ public class Message implements Comparable<Message> {
         this.archivedByReceiver = archivedByReceiver;
     }
 
-    public Message(Optional<User> sender, Optional<User> receiver, LocalDateTime dateTimeSent,
+    public Message(User sender, User receiver, LocalDateTime dateTimeSent,
                    String subject, String body, boolean readByReceiver, boolean archivedBySender,
                    boolean archivedByReceiver) {
         this(0, sender, receiver, null, subject, body, false, false, false);
 
     }
 
-    public Message(Optional<User> sender, Optional<User> receiver, String subject, String body) {
+    public Message(User sender, User receiver, String subject, String body) {
         this(0, sender, receiver, null, subject, body, false, false, false);
     }
 
@@ -75,19 +75,19 @@ public class Message implements Comparable<Message> {
         return messageId;
     }
 
-    public void setSender(Optional<User> sender) {
+    public void setSender(User sender) {
         this.sender = sender;
     }
 
-    public Optional<User> getSender() {
+    public User getSender() {
         return sender;
     }
 
-    public void setReceiver(Optional<User> receiver) {
+    public void setReceiver(User receiver) {
         this.receiver = receiver;
     }
 
-    public Optional<User> getReceiver() {
+    public User getReceiver() {
         return receiver;
     }
 

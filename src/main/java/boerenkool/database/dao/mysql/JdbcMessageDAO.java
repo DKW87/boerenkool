@@ -77,9 +77,9 @@ public class JdbcMessageDAO implements MessageDAO {
 
     private void setCommonParameters(PreparedStatement ps, Message message) throws SQLException {
 //        if (message.getSender().isPresent() {
-        ps.setInt(1, message.getSender().get().getUserId());
+        ps.setInt(1, message.getSender().getUserId());
 //        } else ps.set
-        ps.setInt(2, message.getReceiver().get().getUserId());
+        ps.setInt(2, message.getReceiver().getUserId());
         ps.setObject(3, message.getDateTimeSent());
         ps.setString(4, message.getSubject());
         ps.setString(5, message.getBody());
@@ -133,15 +133,14 @@ public class JdbcMessageDAO implements MessageDAO {
 
     @Override
     public List<Message> getAllForReceiver(User receiver) {
-        return getAllForReceiverId(receiver.getUserId());
+        return getAllByReceiverId(receiver.getUserId());
     }
 
-    public List<Message> getAllForReceiverId(int receiverId) {
-        List<Message> messagesForReceiver = jdbcTemplate.query(
+    public List<Message> getAllByReceiverId(int receiverId) {
+        return jdbcTemplate.query(
                 "Select * From Message where receiverId = ?;",
                 new MessageRowMapper(),
                 receiverId);
-        return messagesForReceiver;
     }
 
     /**
