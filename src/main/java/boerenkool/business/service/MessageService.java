@@ -31,7 +31,7 @@ public class MessageService {
         logger.info("New MessageService");
     }
 
-    public Optional<Message> saveMessage(Message message) {
+    public boolean saveMessage(Message message) {
         // set DateTime for new message that is sent
         message.setDateTimeSent(LocalDateTime.now());
         return messageRepository.saveMessage(message);

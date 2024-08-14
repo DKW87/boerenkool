@@ -9,23 +9,22 @@ import java.util.Optional;
 
 import java.util.List;
 
-public interface MessageDAO {
-    // extends GenericDAO<Message> // heb ik even uitgezet vanwege DTO experiment
-//    @Override
-    Optional<Message> storeOne(Message message);
+public interface MessageDAO extends GenericDAO<Message>{
+    @Override
+    boolean storeOne(Message message);
 
-//    @Override
+    @Override
     List<Message> getAll();
 
     List<Message> getAllForReceiver(User receiver);
 
-//    @Override
+    @Override
     Optional<Message> getOneById(int id);
 
-//    @Override
+    @Override
     boolean updateOne(Message message);
 
-//    @Override
+    @Override
     boolean removeOneById(int id);
 }
 

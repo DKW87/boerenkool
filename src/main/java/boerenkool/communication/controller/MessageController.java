@@ -30,11 +30,10 @@ public class MessageController {
 
     // send a new message
     @PostMapping("/messages")
-    Message sendMessage(@RequestBody Message message) {
+    boolean sendMessage(@RequestBody Message message) {
         logger.info("MessageController.sendMessage is called");
-        Optional<Message> optionalMessage = messageService.saveMessage(message);
-        if (optionalMessage.isPresent()) {
-            return optionalMessage.get();
+        if (messageService.saveMessage(message)) {
+            return true;
         } else {
             logger.info("sendMessage failed");
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Message not saved");

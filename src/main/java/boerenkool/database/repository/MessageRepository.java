@@ -30,7 +30,7 @@ public class MessageRepository {
         logger.info("New MessageRepository");
     }
 
-    public Optional<Message> saveMessage(Message message) {
+    public boolean saveMessage(Message message) {
         return messageDAO.storeOne(message);
     }
 
@@ -51,10 +51,10 @@ public class MessageRepository {
         return listOfMessages;
     }
 
-    // voor in Leo's JdbcUserDAO
+//     voor in Leo's JdbcUserDAO
 //    public Optional<User> getSenderByMessageId(int messageId) {
 //        Optional<User> sender = jdbcTemplate.query(
-//                "SELECT * FROM `Users` JOIN `Message` ON userId = senderId WHERE messageId = ? LIMIT 1",
+//                "SELECT User.*, Message.receiverId, Message.senderId  FROM `User` JOIN `Message` ON userId = senderId WHERE messageId = ? LIMIT 1;",
 //                new JdbcUserDAO.UserRowMapper(), messageId);
 //        return sender;
 //    }

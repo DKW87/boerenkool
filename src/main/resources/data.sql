@@ -1,4 +1,4 @@
-INSERT INTO `User` (typeOfUser,username,hashedPassword,firstName,infix,lastName,coinBalance,phoneNumber,emailaddress) VALUES
+INSERT INTO User (typeOfUser,username,hashedPassword,firstName,infix,lastName,coinBalance,phoneNumber,emailaddress) VALUES
                                                                                                                         ('Huurder','t01','t01','t01firstName','','t01lastName',0,'0600000001','t01@fake.com'),
                                                                                                                         ('Huurder','t02','t02','t02firstName','','t02lastName',10,'0600000002','t02@fake.com'),
                                                                                                                         ('Huurder','t03','t03','t03firstName','','t03lastName',800,'0600000003','t03@fake.com'),
