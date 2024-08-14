@@ -72,6 +72,9 @@ public interface UserDAO extends GenericDAO<User> {
     boolean removeBlockedUser(User blockedUser, User user);
 
     List<User> getBlockedUsers(User user);
+
+    Optional<User> getSenderByMessageId(int messageId);
+    Optional<User> getReceiverByMessageId(int messageId);
 }
 
 

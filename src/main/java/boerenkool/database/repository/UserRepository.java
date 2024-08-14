@@ -57,5 +57,13 @@ public class UserRepository {
 
     public Optional<User> findByUsername(String username) {
         return userDAO.findByUsername(username);
-    };
+    }
+
+    public Optional<User> getSenderByMessageId(int messageId) {
+        return userDAO.getSenderByMessageId(messageId);
+    }
+
+    public Optional<User> getReceiverByMessageId(int messageId) {
+        return userDAO.getReceiverByMessageId(messageId);
+    }
 }

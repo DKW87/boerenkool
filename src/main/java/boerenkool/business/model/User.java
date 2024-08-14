@@ -13,7 +13,8 @@ public class User {
     private int userId;
     private String typeOfUser;
     private String username;
-    private String password;
+    private String hashedPassword;
+    private String salt;
     private String email;
     private String phone;
     private String firstName;
@@ -25,11 +26,12 @@ public class User {
     private final static int DEFAULT_COIN_BALANCE = 0;
     private final static int DEFAULT_USER_ID = 0;
 
-    public User(int userId, String typeOfUser, String username, String password, String email, String phone, String firstName, String infix, String lastName, int coinBalance) {
+    public User(int userId, String typeOfUser, String username, String hashedPassword, String salt, String email, String phone, String firstName, String infix, String lastName, int coinBalance) {
         this.userId = userId;
         this.typeOfUser = typeOfUser;
         this.username = username;
-        this.password = password;
+        this.hashedPassword = hashedPassword;
+        this.salt = salt;  // Assigning salt to the new attribute
         this.email = email;
         this.phone = phone;
         this.firstName = firstName;
@@ -40,14 +42,14 @@ public class User {
         //logger.info("New user");
     }
 
-    //user object zonder id
-    public User(String typeOfUser, String username, String password, String email, String phone, String firstName, String infix, String lastName, int coinBalance) {
-        this(DEFAULT_USER_ID, typeOfUser, username, password, email, phone, firstName, infix, lastName, coinBalance);
+    // User object zonder id
+    public User(String typeOfUser, String username, String hashedPassword, String salt, String email, String phone, String firstName, String infix, String lastName, int coinBalance) {
+        this(DEFAULT_USER_ID, typeOfUser, username, hashedPassword, salt, email, phone, firstName, infix, lastName, coinBalance);
     }
 
-    //user object om te testen
-    public User(String username, String password) {
-        this(DEFAULT_USER_ID, "huurder", username, password, "", "", "", "", "", DEFAULT_COIN_BALANCE);
+    // User object om te testen
+    public User(String username, String hashedPassword, String salt) {
+        this(DEFAULT_USER_ID, "huurder", username, hashedPassword, salt, "", "", "", "", "", DEFAULT_COIN_BALANCE);
     }
 
     public User () {
@@ -71,12 +73,20 @@ public class User {
         this.username = username;
     }
 
-    public String getPassword() {
-        return password;
+    public String getHashedPassword() {
+        return hashedPassword;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setHashedPassword(String hashedPassword) {
+        this.hashedPassword = hashedPassword;
+    }
+
+    public String getSalt() {
+        return salt;
+    }
+
+    public void setSalt(String salt) {
+        this.salt = salt;
     }
 
     public String getEmail() {
@@ -141,7 +151,8 @@ public class User {
                 "userId=" + userId +
                 ", typeOfUser='" + typeOfUser + '\'' +
                 ", username='" + username + '\'' +
-                ", password='" + password + '\'' +
+                ", hashedPassword='" + hashedPassword + '\'' +
+                ", salt='" + salt + '\'' +  // Include salt in the toString method
                 ", email='" + email + '\'' +
                 ", phone='" + phone + '\'' +
                 ", firstName='" + firstName + '\'' +
