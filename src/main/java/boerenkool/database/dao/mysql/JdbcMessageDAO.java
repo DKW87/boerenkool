@@ -42,7 +42,7 @@ public class JdbcMessageDAO implements MessageDAO {
                     resultSet.getBoolean("readByReceiver"),
                     resultSet.getBoolean("archivedBySender"),
                     resultSet.getBoolean("archivedByReceiver")
-                    );
+            );
         }
     }
 
@@ -74,9 +74,10 @@ public class JdbcMessageDAO implements MessageDAO {
         ps.setInt(9, message.getMessageId());
         return ps;
     }
+
     private void setCommonParameters(PreparedStatement ps, Message message) throws SQLException {
 //        if (message.getSender().isPresent() {
-            ps.setInt(1, message.getSender().get().getUserId());
+        ps.setInt(1, message.getSender().get().getUserId());
 //        } else ps.set
         ps.setInt(2, message.getReceiver().get().getUserId());
         ps.setObject(3, message.getDateTimeSent());
@@ -133,6 +134,14 @@ public class JdbcMessageDAO implements MessageDAO {
     @Override
     public List<Message> getAllForReceiver(User receiver) {
         int receiverId = receiver.getUserId();
+        List<Message> messagesForReceiver = jdbcTemplate.query(
+                "Select * From Message where receiverId = ?;",
+                new MessageRowMapper(),
+                receiverId);
+        return messagesForReceiver;
+    }
+
+    public List<Message> getAllForReceiverId(int receiverId) {
         List<Message> messagesForReceiver = jdbcTemplate.query(
                 "Select * From Message where receiverId = ?;",
                 new MessageRowMapper(),

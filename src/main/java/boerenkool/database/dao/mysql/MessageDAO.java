@@ -18,6 +18,8 @@ public interface MessageDAO extends GenericDAO<Message>{
 
     List<Message> getAllForReceiver(User receiver);
 
+    List<Message> getAllForReceiverId(int receiverId);
+
     @Override
     Optional<Message> getOneById(int id);
 
