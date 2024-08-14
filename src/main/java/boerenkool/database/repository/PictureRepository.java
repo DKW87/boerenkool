@@ -62,7 +62,7 @@ public class PictureRepository {
         return pictureDAO.getAllByHouseId(houseId);
     }
 
-    public Picture getFirstPictureByHouseId(int houseId) {
+    public Optional getFirstPictureByHouseId(int houseId) {
         return pictureDAO.getFirstPictureByHouseId(houseId);
     }
 
