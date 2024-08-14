@@ -40,7 +40,9 @@ public class User {
         this.coinBalance = coinBalance;
         this.blockedUser = blockedUser != null ? blockedUser : new ArrayList<>();
     }
-
+//De UserDto klasse wordt gebruikt om de gegevens te representeren zoals ze van buitenaf worden ontvangen, bijvoorbeeld
+// in een JSON-formaat via een HTTP-request. Wanneer deze gegevens in de backend worden ontvangen, moeten ze vaak worden
+// omgezet naar een User object, wat het domeinmodel is dat de kernlogica van je applicatie bevat.
     //Constructor dto
     public User(UserDto dto) {
         this(dto.getTypeOfUser(), dto.getUsername(), dto.getPassword(), dto.getEmail(), dto.getPhone(), dto.getFirstName(), dto.getInfix(), dto.getLastName(), dto.getCoinBalance());
