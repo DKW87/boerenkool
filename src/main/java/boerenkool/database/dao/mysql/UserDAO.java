@@ -34,9 +34,10 @@ public interface UserDAO extends GenericDAO<User> {
      * If the user already exists, it updates the existing user.
      *
      * @param user the user to store.
+     * @return
      */
     @Override
-    void storeOne(User user);
+    boolean storeOne(User user);
 
     /**
      * Removes a user from the database by their ID.
@@ -72,6 +73,9 @@ public interface UserDAO extends GenericDAO<User> {
     boolean removeBlockedUser(User blockedUser, User user);
 
     List<User> getBlockedUsers(User user);
+
+    Optional<User> getSenderByMessageId(int messageId);
+    Optional<User> getReceiverByMessageId(int messageId);
 }
 
 

@@ -80,11 +80,12 @@ public class JdbcUserDAO implements UserDAO {
     }
 
     @Override
-    public void storeOne(User user) {
+    public boolean storeOne(User user) {
         if (user.getUserId() == 0) {
             insert(user);
+            return user.getUserId() > 0;
         } else {
-            updateOne(user);
+            return updateOne(user);
         }
     }
 
@@ -157,8 +158,35 @@ public class JdbcUserDAO implements UserDAO {
         return jdbcTemplate.query(sql, new UserRowMapper(), user.getUserId());
     }
 
-    private static class UserRowMapper implements RowMapper<User> {
+    @Override
+    public Optional<User> getSenderByMessageId(int messageId) {
+        List<User> users = jdbcTemplate.query(
+                "SELECT User.*, Message.receiverId, Message.senderId FROM `User` JOIN `Message` ON userId = senderId WHERE messageId = ? LIMIT 1;",
+                new JdbcUserDAO.UserRowMapper(),
+                messageId
+        );
+        if (users.isEmpty()) {
+            return Optional.empty();
+        } else {
+            return Optional.of(users.get(0));
+        }
+    }
+    @Override
+    public Optional<User> getReceiverByMessageId(int messageId) {
+        List<User> users = jdbcTemplate.query(
+                "SELECT User.*, Message.receiverId, Message.senderId FROM `User` JOIN `Message` ON userId = receiverId WHERE messageId = ? LIMIT 1;",
+                new JdbcUserDAO.UserRowMapper(),
+                messageId
+        );
 
+        if (users.isEmpty()) {
+            return Optional.empty();
+        } else {
+            return Optional.of(users.get(0));
+        }
+    }
+
+    private static class UserRowMapper implements RowMapper<User> {
         @Override
         public User mapRow(ResultSet rs, int rowNum) throws SQLException {
             int id = rs.getInt("userId");
@@ -171,6 +199,7 @@ public class JdbcUserDAO implements UserDAO {
             int coinBalance = rs.getInt("coinBalance");
             String phoneNumber = rs.getString("phoneNumber");
             String email = rs.getString("emailaddress");
+
             User user = new User(typeOfUser, username, pw, email, phoneNumber, firstName, infix, lastName, coinBalance);
             user.setUserId(id);
             return user;
