@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.*;
+
 public class User {
 
     //private final Logger logger = LoggerFactory.getLogger(User.class);
@@ -17,6 +19,7 @@ public class User {
     private String infix;
     private String lastName;
     private int coinBalance;
+    private List BlockedUser;
 
     private final static int DEFAULT_COIN_BALANCE = 0;
     private final static int DEFAULT_USER_ID = 0;
@@ -32,6 +35,7 @@ public class User {
         this.infix = infix;
         this.lastName = lastName;
         this.coinBalance = DEFAULT_COIN_BALANCE;
+        List BlockedUser = new List();
         //logger.info("New user");
     }
 
@@ -121,6 +125,8 @@ public class User {
     public void setCoinBalance(int coinBalance) {
         this.coinBalance = coinBalance;
     }
+
+
 
     @Override
     public String toString() {
