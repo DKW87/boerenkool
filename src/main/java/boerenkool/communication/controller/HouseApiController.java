@@ -5,9 +5,9 @@ import boerenkool.business.service.HouseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -29,15 +29,26 @@ public class HouseApiController {
         logger.info("New HouseApiController");
     }
 
-    @GetMapping(value = "/hoi")
-    public String hoi() {
-        System.out.println("Kijken of dit naar de console geprint wordt...");
-        return "Welkom bij Huisje, Boompje, Boerenkool. Dé geur van thuis!";
-    }
-
     @GetMapping
     public List<House> getAllHouses() {
         return houseService.getAllHouses();
+    }
+
+    @GetMapping(value = "/{houseOwnerId}")
+    public List<House> getListOfHousesByHouseOwnerId(@PathVariable int houseOwnerId) {
+        return houseService.getListOfHousesByOwnerId(houseOwnerId);
+    }
+
+    @PostMapping(value = "/new")
+    public ResponseEntity<?> saveNewHouse(@RequestBody House house) {
+        if (house == null) {
+            return new ResponseEntity<>("No house found", HttpStatus.NOT_FOUND);
+        }
+        else {
+            return houseService.saveHouse(house)
+                    ? new ResponseEntity<>("House successfully created: " + house, HttpStatus.CREATED)
+                    : new ResponseEntity<>("Unable to save house: " + house, HttpStatus.CONFLICT);
+        }
     }
 
 }

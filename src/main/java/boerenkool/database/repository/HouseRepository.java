@@ -26,17 +26,17 @@ public class HouseRepository {
     private final Logger logger = LoggerFactory.getLogger(HouseRepository.class);
     private final HouseDAO houseDAO;
     private final PictureDAO pictureDAO;
-    private final HouseExtraFeatureDAO houseExtraFeatureDAO;
+    private final ExtraFeatureDAO extraFeatureDAO;
     private final UserDAO userDAO;
     private final HouseTypeDAO houseTypeDAO;
 
     @Autowired
-    public HouseRepository(HouseDAO houseDAO, PictureDAO pictureDAO, HouseExtraFeatureDAO houseExtraFeatureDAO,
+    public HouseRepository(HouseDAO houseDAO, PictureDAO pictureDAO, ExtraFeatureDAO extraFeatureDAO,
                            UserDAO userDAO, HouseTypeDAO houseTypeDAO) {
         logger.info("New HouseRepository");
         this.houseDAO = houseDAO;
         this.pictureDAO = pictureDAO;
-        this.houseExtraFeatureDAO = houseExtraFeatureDAO;
+        this.extraFeatureDAO = extraFeatureDAO;
         this.userDAO = userDAO;
         this.houseTypeDAO = houseTypeDAO;
     }
@@ -48,7 +48,7 @@ public class HouseRepository {
             house.setHouseType(houseTypeDAO.getOneById(house.accessOtherEntityIds().getHouseTypeId())
                     .orElseThrow(() -> new NoSuchElementException("houseType not found")));
             // TODO @Emine > T for getAllFeaturesByHouseId = ExtraFeature
-//            house.setExtraFeatures(houseExtraFeatureDAO.getAllFeaturesByHouseId(house.getHouseId()));
+//            house.setExtraFeatures(extraFeatureDAO.getAllFeaturesByHouseId(house.getHouseId()));
             house.setPictures(pictureDAO.getAllByHouseId(house.getHouseId()));
 
         }
@@ -92,11 +92,20 @@ public class HouseRepository {
         return houseDAO.getOneById(houseId);
     }
 
-    public void storeNewHouse(House house) {
-        houseDAO.storeOne(house);
+    public boolean saveHouse(House house) {
+        if (house.getHouseId() == 0) {
+            return storeNewHouse(house);
+        }
+        else {
+            return updateHouse(house);
+        }
     }
 
-    public boolean updateHouse(House house) {
+    private boolean storeNewHouse(House house) {
+        return houseDAO.storeOne(house);
+    }
+
+    private boolean updateHouse(House house) {
         return houseDAO.updateOne(house);
     }
 

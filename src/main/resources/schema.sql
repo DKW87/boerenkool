@@ -2,7 +2,7 @@
 -- Schema zkwantd1
 -- -----------------------------------------------------
 CREATE SCHEMA IF NOT EXISTS `zkwantd1` ;
-USE `zkwantd1` ;
+--USE `zkwantd1` ;
 
 -- -----------------------------------------------------
 -- Table `zkwantd1`.`HouseType`
@@ -10,8 +10,8 @@ USE `zkwantd1` ;
 CREATE TABLE IF NOT EXISTS `zkwantd1`.`HouseType` (
                                                       `houseTypeId` INT NOT NULL AUTO_INCREMENT,
                                                       `houseTypeName` VARCHAR(50) NOT NULL,
-                                                      PRIMARY KEY (`houseTypeId`))
-    ENGINE = InnoDB;
+                                                      PRIMARY KEY (`houseTypeId`));
+--    ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
@@ -28,10 +28,10 @@ CREATE TABLE IF NOT EXISTS `zkwantd1`.`User` (
                                                  `coinBalance` BIGINT NOT NULL DEFAULT 0,
                                                  `phoneNumber` VARCHAR(13) NOT NULL,
                                                  `emailaddress` VARCHAR(150) NOT NULL,
-                                                 PRIMARY KEY (`userId`),
-                                                 UNIQUE INDEX `username_UNIQUE` (`username` ASC),
-                                                 UNIQUE INDEX `emailaddress_UNIQUE` (`emailaddress` ASC))
-    ENGINE = InnoDB;
+                                                PRIMARY KEY (`userId`));
+--                                                UNIQUE_INDEX `username_UNIQUE` (`username` ASC),
+--                                                 UNIQUE_INDEX `emailaddress_UNIQUE` (`emailaddress` ASC));
+-- ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
@@ -52,8 +52,8 @@ CREATE TABLE IF NOT EXISTS `zkwantd1`.`House` (
                                                   `description` VARCHAR(2550) NOT NULL,
                                                   `isNotAvailable` TINYINT NOT NULL DEFAULT 0,
                                                   PRIMARY KEY (`houseId`),
-                                                  INDEX `!VERZINZELF!9_idx` (`houseTypeId` ASC),
-                                                  INDEX `!VERZINZELF!10_idx` (`houseOwnerId` ASC),
+--                                                  INDEX `!VERZINZELF!9_idx` (`houseTypeId` ASC),
+--                                                  INDEX `!VERZINZELF!10_idx` (`houseOwnerId` ASC),
                                                   CONSTRAINT `fk_house_housetype`
                                                       FOREIGN KEY (`houseTypeId`)
                                                           REFERENCES `zkwantd1`.`HouseType` (`houseTypeId`)
@@ -63,8 +63,8 @@ CREATE TABLE IF NOT EXISTS `zkwantd1`.`House` (
                                                       FOREIGN KEY (`houseOwnerId`)
                                                           REFERENCES `zkwantd1`.`User` (`userId`)
                                                           ON DELETE CASCADE
-                                                          ON UPDATE CASCADE)
-    ENGINE = InnoDB;
+                                                          ON UPDATE CASCADE);
+--    ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
@@ -76,13 +76,13 @@ CREATE TABLE IF NOT EXISTS `zkwantd1`.`Picture` (
                                                     `picture` MEDIUMBLOB NOT NULL,
                                                     `pictureDescription` VARCHAR(255) NULL,
                                                     PRIMARY KEY (`pictureId`),
-                                                    INDEX `!VERZINZELF!6_idx` (`houseId` ASC),
+--                                                    INDEX `!VERZINZELF!6_idx` (`houseId` ASC),
                                                     CONSTRAINT `fk_picture_house`
                                                         FOREIGN KEY (`houseId`)
-                                                            REFERENCES `zkwantd1`.`House` (`houseId`)
-                                                            ON DELETE CASCADE
-                                                            ON UPDATE CASCADE)
-    ENGINE = InnoDB;
+                                                           REFERENCES `zkwantd1`.`House` (`houseId`)
+                                                           ON DELETE CASCADE
+                                                           ON UPDATE CASCADE);
+--    ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
@@ -91,8 +91,8 @@ CREATE TABLE IF NOT EXISTS `zkwantd1`.`Picture` (
 CREATE TABLE IF NOT EXISTS `zkwantd1`.`ExtraFeature` (
                                                          `extraFeatureId` INT NOT NULL AUTO_INCREMENT,
                                                          `extraFeatureName` VARCHAR(45) NOT NULL,
-                                                         PRIMARY KEY (`extraFeatureId`))
-    ENGINE = InnoDB;
+                                                         PRIMARY KEY (`extraFeatureId`));
+--    ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
@@ -109,8 +109,8 @@ CREATE TABLE IF NOT EXISTS `zkwantd1`.`Message` (
                                                     `archivedByReceiver` TINYINT NOT NULL DEFAULT 0,
                                                     `readByReceiver` TINYINT NOT NULL DEFAULT 0,
                                                     PRIMARY KEY (`messageId`),
-                                                    INDEX `!VERZINZELF!4_idx` (`receiverId` ASC),
-                                                    INDEX `!VERZINZELF!5_idx` (`senderId` ASC),
+--                                                    INDEX `!VERZINZELF!4_idx` (`receiverId` ASC),
+--                                                    INDEX `!VERZINZELF!5_idx` (`senderId` ASC),
                                                     CONSTRAINT `fk_message_toUser`
                                                         FOREIGN KEY (`receiverId`)
                                                             REFERENCES `zkwantd1`.`User` (`userId`)
@@ -120,8 +120,8 @@ CREATE TABLE IF NOT EXISTS `zkwantd1`.`Message` (
                                                         FOREIGN KEY (`senderId`)
                                                             REFERENCES `zkwantd1`.`User` (`userId`)
                                                             ON DELETE NO ACTION
-                                                            ON UPDATE NO ACTION)
-    ENGINE = InnoDB;
+                                                            ON UPDATE NO ACTION);
+--    ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
@@ -131,8 +131,8 @@ CREATE TABLE IF NOT EXISTS `zkwantd1`.`BlockedList` (
                                                         `userId` INT NOT NULL,
                                                         `blockedUser` INT NOT NULL,
                                                         PRIMARY KEY (`userId`, `blockedUser`),
-                                                        INDEX `!VERZINZELF!1_idx` (`blockedUser` ASC),
-                                                        INDEX `!VERZINZELF!_idx` (`userId` ASC),
+--                                                        INDEX `!VERZINZELF!1_idx` (`blockedUser` ASC),
+--                                                        INDEX `!VERZINZELF!_idx` (`userId` ASC),
                                                         CONSTRAINT `fk_blockedlist_user`
                                                             FOREIGN KEY (`userId`)
                                                                 REFERENCES `zkwantd1`.`User` (`userId`)
@@ -142,8 +142,8 @@ CREATE TABLE IF NOT EXISTS `zkwantd1`.`BlockedList` (
                                                             FOREIGN KEY (`blockedUser`)
                                                                 REFERENCES `zkwantd1`.`User` (`userId`)
                                                                 ON DELETE NO ACTION
-                                                                ON UPDATE NO ACTION)
-    ENGINE = InnoDB;
+                                                                ON UPDATE NO ACTION);
+--    ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
@@ -157,8 +157,8 @@ CREATE TABLE IF NOT EXISTS `zkwantd1`.`Reservation` (
                                                         `endDate` DATE NOT NULL,
                                                         `guestCount` INT NOT NULL,
                                                         PRIMARY KEY (`reservationId`),
-                                                        INDEX `!VERZINZELF!3_idx` (`houseId` ASC),
-                                                        INDEX `!VERZINZELF!2_idx` (`reservedByUserId` ASC),
+--                                                        INDEX `!VERZINZELF!3_idx` (`houseId` ASC),
+--                                                        INDEX `!VERZINZELF!2_idx` (`reservedByUserId` ASC),
                                                         CONSTRAINT `fk_reservation_user`
                                                             FOREIGN KEY (`reservedByUserId`)
                                                                 REFERENCES `zkwantd1`.`User` (`userId`)
@@ -168,8 +168,8 @@ CREATE TABLE IF NOT EXISTS `zkwantd1`.`Reservation` (
                                                             FOREIGN KEY (`houseId`)
                                                                 REFERENCES `zkwantd1`.`House` (`houseId`)
                                                                 ON DELETE NO ACTION
-                                                                ON UPDATE NO ACTION)
-    ENGINE = InnoDB;
+                                                                ON UPDATE NO ACTION);
+--    ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
@@ -179,8 +179,8 @@ CREATE TABLE IF NOT EXISTS `zkwantd1`.`HouseExtraFeature` (
                                                               `houseId` INT NOT NULL,
                                                               `featureId` INT NOT NULL,
                                                               PRIMARY KEY (`houseId`, `featureId`),
-                                                              INDEX `!VERZINZELF!8_idx` (`featureId` ASC),
-                                                              INDEX `!VERZINZELF!7_idx` (`houseId` ASC),
+--                                                              INDEX `!VERZINZELF!8_idx` (`featureId` ASC),
+--                                                              INDEX `!VERZINZELF!7_idx` (`houseId` ASC),
                                                               CONSTRAINT `fk_houseextrafeature_house`
                                                                   FOREIGN KEY (`houseId`)
                                                                       REFERENCES `zkwantd1`.`House` (`houseId`)
@@ -190,5 +190,5 @@ CREATE TABLE IF NOT EXISTS `zkwantd1`.`HouseExtraFeature` (
                                                                   FOREIGN KEY (`featureId`)
                                                                       REFERENCES `zkwantd1`.`ExtraFeature` (`extraFeatureId`)
                                                                       ON DELETE NO ACTION
-                                                                      ON UPDATE NO ACTION)
-    ENGINE = InnoDB;
+                                                                      ON UPDATE NO ACTION);
+--    ENGINE = InnoDB;

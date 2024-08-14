@@ -31,4 +31,12 @@ public class HouseService {
         return houseRepository.getListOfAllHouses();
     }
 
+    public List<House> getListOfHousesByOwnerId(int houseOwnerId) {
+       return houseRepository.getListOfAllHousesByOwner(houseOwnerId);
+    }
+
+    public boolean saveHouse(House house) {
+        return houseRepository.saveHouse(house);
+    }
+
 }
