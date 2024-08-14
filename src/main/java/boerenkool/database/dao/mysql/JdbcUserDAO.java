@@ -159,6 +159,12 @@ public class JdbcUserDAO implements UserDAO {
 
     private static class UserRowMapper implements RowMapper<User> {
 
+        private final JdbcTemplate jdbcTemplate;
+
+        public UserRowMapper(JdbcTemplate jdbcTemplate) {
+            this.jdbcTemplate = jdbcTemplate;
+        }
+
         @Override
         public User mapRow(ResultSet rs, int rowNum) throws SQLException {
             int id = rs.getInt("userId");
@@ -173,6 +179,10 @@ public class JdbcUserDAO implements UserDAO {
             String email = rs.getString("emailaddress");
             User user = new User(typeOfUser, username, pw, email, phoneNumber, firstName, infix, lastName, coinBalance);
             user.setUserId(id);
+            List<User> blockedUsers = jdbcTemplate.query(
+                    "SELECT u.* FROM `User` u INNER JOIN BlockedList b ON u.userId = b.blockedUser WHERE b.userId = ?",
+                    new UserRowMapper(jdbcTemplate), id);
+            user.setBlockedUser(blockedUsers);
             return user;
         }
     }
