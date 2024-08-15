@@ -1,6 +1,8 @@
 package boerenkool.database.dao.mysql;
 
+import boerenkool.business.model.House;
 import boerenkool.business.model.Reservation;
+import boerenkool.business.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -115,7 +117,16 @@ public class JdbcReservationDAO implements ReservationDAO {
             reservation.setStartDate(startDate);
             reservation.setEndDate(endDate);
             reservation.setGuestCount(guestCount);
+
+            // Initialize house and user
+            if (reservation.getHouse() == null) {
+                reservation.setHouse(new House());
+            }
             reservation.getHouse().setHouseId(houseId);
+
+            if (reservation.getReservedByUser() == null) {
+                reservation.setReservedByUser(new User());
+            }
             reservation.getReservedByUser().setUserId(reservedByUserId);
 
             return reservation;

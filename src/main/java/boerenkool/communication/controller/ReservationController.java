@@ -5,6 +5,7 @@ import boerenkool.business.service.ReservationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping(value = "/api/reservations")
 public class ReservationController {
 
     private final ReservationService reservationService;
@@ -22,16 +23,11 @@ public class ReservationController {
     @Autowired
     public ReservationController(ReservationService reservationService) {
         this.reservationService = reservationService;
-    }
-
-    //Test
-    @GetMapping("/api/reservations/hoi")
-    public String hoi() {
-        return "Welkom bij Huisje, Boompje, Boerenkool. Dé geur van thuis!";
+        logger.info("ReservationController created");
     }
 
     // 1. GET /api/reservations - Get all reservations
-    @GetMapping("/reservations")
+    @GetMapping
     public ResponseEntity<List<Reservation>> getAllReservations() {
         List<Reservation> reservations = reservationService.getAllReservations();
         if (reservations.isEmpty()) {
@@ -43,8 +39,8 @@ public class ReservationController {
     }
 
     // 2. GET /api/reservations/{id} - Get a specific reservation by ID
-    @GetMapping("/reservations/{id}")
-    public ResponseEntity<Reservation> getReservationById(@PathVariable int id) {
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getReservationById(@PathVariable int id) {
         Optional<Reservation> reservation = reservationService.getReservationById(id);
         if (reservation.isPresent()) {
             logger.info("Fetched reservation with ID: {}", id);
@@ -56,8 +52,8 @@ public class ReservationController {
     }
 
     // 3. PUT /api/reservations/{id} - Update a reservation
-    @PutMapping("/reservations/{id}")
-    public ResponseEntity<Reservation> updateReservation(@PathVariable int id, @RequestBody Reservation updatedReservation) {
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateReservation(@PathVariable int id, @RequestBody Reservation updatedReservation) {
         Optional<Reservation> existingReservation = reservationService.getReservationById(id);
 
         if (existingReservation.isPresent()) {
@@ -78,7 +74,7 @@ public class ReservationController {
     }
 
     // 4. DELETE /api/reservations/{id} - Cancel a reservation
-    @DeleteMapping("/reservations/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteReservationById(@PathVariable int id) {
         boolean isDeleted = reservationService.deleteReservationById(id);
         if (isDeleted) {
@@ -134,6 +130,26 @@ public class ReservationController {
         } else {
             logger.warn("Reservation with ID: {} not found.", reservationId);
             return new ResponseEntity<>("Reservation not found.", HttpStatus.NOT_FOUND);
+        }
+    }
+
+    // 7. CREATE
+    @PostMapping
+    public ResponseEntity<?> saveReservation(@RequestBody Reservation reservation) {
+        try {
+            if (reservation.getGuestCount() <= 0) {
+                logger.warn("Invalid guest count: {}", reservation.getGuestCount());
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+            Reservation savedReservation = reservationService.saveReservation(reservation);
+            logger.info("Saved reservation: {}", savedReservation.getReservationId());
+            return new ResponseEntity<>(savedReservation, HttpStatus.CREATED);
+        } catch (DataAccessException dae) {
+            logger.error("Database error occurred while saving reservation: {}", dae.getMessage());
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            logger.error("An error occurred while saving reservation: {}", e.getMessage());
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }
