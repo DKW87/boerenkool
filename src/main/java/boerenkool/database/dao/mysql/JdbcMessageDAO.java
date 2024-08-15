@@ -149,8 +149,10 @@ public class JdbcMessageDAO implements MessageDAO {
      */
     @Override
     public boolean updateOne(Message message) {
-        return jdbcTemplate.update(connection ->
-                buildUpdateMessageStatement(message, connection)) != 0;
+        int returnvalue = jdbcTemplate.update(connection ->
+                buildUpdateMessageStatement(message, connection));
+        System.out.println(returnvalue);
+        return (returnvalue > 0) ;
     }
 
     public boolean archiveMessageForSender(Message message) {

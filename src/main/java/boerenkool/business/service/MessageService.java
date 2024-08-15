@@ -5,11 +5,10 @@ import boerenkool.business.model.User;
 import boerenkool.communication.dto.MessageDTO;
 import boerenkool.database.repository.MessageRepository;
 import boerenkool.database.repository.UserRepository;
-import boerenkool.utilities.exceptions.MessageDoesNotExist;
+import boerenkool.utilities.exceptions.MessageDoesNotExistException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -36,7 +35,7 @@ public class MessageService {
         return messageRepository.saveMessage(convertDtoToMessage(messageDTO));
     }
 
-    public MessageDTO getByMessageId(int messageId) throws MessageDoesNotExist {
+    public MessageDTO getByMessageId(int messageId) throws MessageDoesNotExistException {
         return convertMessageToDTO(messageRepository.getMessageById(messageId));
     }
 
@@ -66,7 +65,7 @@ public class MessageService {
         } else return null;
     }
 
-    public boolean updateMessage(MessageDTO messageDTO) {
+    public boolean updateMessage(MessageDTO messageDTO) throws MessageDoesNotExistException {
         return messageRepository.updateMessage(convertDtoToMessage(messageDTO));
     }
 

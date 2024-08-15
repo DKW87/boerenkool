@@ -3,7 +3,7 @@ package boerenkool.communication.controller;
 import boerenkool.business.service.MessageService;
 import boerenkool.business.service.UserService;
 import boerenkool.communication.dto.MessageDTO;
-import boerenkool.utilities.exceptions.MessageDoesNotExist;
+import boerenkool.utilities.exceptions.MessageDoesNotExistException;
 import boerenkool.utilities.exceptions.MessageNotSavedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,79 +33,76 @@ public class MessageController {
     @PostMapping("/messages")
     ResponseEntity<?> saveMessage(@RequestBody MessageDTO messageDTO) throws MessageNotSavedException {
         // TODO check user is authenticated as sender of this message
-//        logger.info("saveMessage is called");
         // eventueel aanpassen; geef messageDTO de messageId van de bewaarde Messsage
         // (save methode in MessageDAO moet daarvoor een int teruggeven; genericDAO moet weer aangepast... gedoe!)
         if (messageService.saveMessage(messageDTO)) {
             return ResponseEntity.ok().build();
         } else {
-            logger.info("saveMessage failed");
-            return ResponseEntity.badRequest().body("Message not saved");
+            throw new MessageNotSavedException();
         }
     }
 
     @GetMapping("/messages")
-    ResponseEntity<?> getAllMessages() throws MessageDoesNotExist {
+    ResponseEntity<?> getAllMessages() throws MessageDoesNotExistException {
 //        logger.info("getAllMessages is called");
         List<MessageDTO> listOfUsersMessages = messageService.getAllMessages();
         if (!listOfUsersMessages.isEmpty()) {
             return ResponseEntity.ok().body(listOfUsersMessages);
         } else {
             logger.info("getAllMessages list is EMPTY");
-            return ResponseEntity.notFound().build();
+            throw new MessageDoesNotExistException();
         }
     }
 
     @GetMapping("/users/{userid}/messages")
     ResponseEntity<?> getAllByReceiverId(@PathVariable("userid") int userId) {
         // TODO user authentication (user can only request his/her OWN messages)
-//        logger.info("getAllByReceiverId is called");
-//        userService.getOneById(userId);
         List<MessageDTO> listOfUsersMessages = messageService.getAllByReceiverId(userId);
         if (!listOfUsersMessages.isEmpty()) {
             return ResponseEntity.ok().body(listOfUsersMessages);
         } else {
-            logger.info("getAllByReceiverId list is EMPTY");
+            logger.info("getAllByReceiverId list is empty.");
             return ResponseEntity.notFound().build();
         }
     }
 
     @GetMapping("/messages/{messageid}")
-    ResponseEntity<?> getById(@PathVariable("messageid") int messageId) throws MessageDoesNotExist {
+    ResponseEntity<?> getById(@PathVariable("messageid") int messageId) throws MessageDoesNotExistException {
         // TODO user authentication  (user is receiver of this message)
-        try {
-            MessageDTO messageDTO = messageService.getByMessageId(messageId);
+        MessageDTO messageDTO = messageService.getByMessageId(messageId);
+        if (messageDTO != null) {
             return new ResponseEntity<>(messageDTO, HttpStatus.OK);
-        } catch (MessageDoesNotExist message) {
-            return new ResponseEntity<>(message.getMessage(), HttpStatus.NOT_FOUND);
-        }
+        } else throw new MessageDoesNotExistException();
     }
 
     @PutMapping("/user/{userid}/messages/{messageid}")
     ResponseEntity<?> updateMessage(@PathVariable("userid") int userId,
                                     @PathVariable("messageid") int messageId,
-                                    @RequestBody MessageDTO messageDTO) throws MessageDoesNotExist {
+                                    @RequestBody MessageDTO messageDTO) throws MessageDoesNotExistException {
         // TODO user authentication (user is sender of this message)
-        if (userId == messageDTO.getSenderId() && messageService.updateMessage(messageDTO)) {
+        if (userId == messageDTO.getSenderId() && messageId == messageDTO.getMessageId()
+                && messageService.updateMessage(messageDTO)) {
             return new ResponseEntity<>("Message updated", HttpStatus.OK);
         } else {
-            throw new MessageDoesNotExist();
+            throw new MessageDoesNotExistException();
         }
     }
 
     @DeleteMapping("/messages/{messageid}")
-    ResponseEntity<?> deleteMessage(@PathVariable("messageid") int messageId, @RequestBody MessageDTO messageDTO) {
+    ResponseEntity<?> deleteMessage(@PathVariable("messageid") int messageId,
+                                    @RequestBody MessageDTO messageDTO)
+    throws MessageDoesNotExistException {
         logger.info("deleteMessage is called");
         // TODO user authentication (user must be sender to delete a message)
         // if (userId == messageDTO.getSenderId() ...
         if (messageService.deleteMessage(messageDTO.getMessageId())) {
             return ResponseEntity.ok("message deleted by sender");
         } else {
-            return ResponseEntity.notFound().build();
+            throw new MessageDoesNotExistException();
         }
     }
 
-    // oude versie met delete naar archive methode, met DTO in de requestbody
+// oude versie met delete naar archive methode, met DTO in de requestbody
 //    @DeleteMapping()
 //    ResponseEntity<?> archiveMessage(@RequestBody MessageDTO messageDTO, @PathVariable int userId) {
 //        logger.info("archiveMessage is called");

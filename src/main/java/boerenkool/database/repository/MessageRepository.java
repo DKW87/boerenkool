@@ -4,7 +4,7 @@ import boerenkool.business.model.Message;
 import boerenkool.business.model.User;
 import boerenkool.database.dao.mysql.MessageDAO;
 import boerenkool.database.dao.mysql.UserDAO;
-import boerenkool.utilities.exceptions.MessageDoesNotExist;
+import boerenkool.utilities.exceptions.MessageDoesNotExistException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,13 +55,13 @@ public class MessageRepository {
         return messageDAO.storeOne(message);
     }
 
-    public Message getMessageById(int messageId) throws MessageDoesNotExist {
+    public Message getMessageById(int messageId) throws MessageDoesNotExistException {
         Optional<Message> message = messageDAO.getOneById(messageId);
         if (message.isPresent()) {
             addUsersToMessage(message);
             return message.get();
         }
-        throw new MessageDoesNotExist();
+        throw new MessageDoesNotExistException();
     }
 
     public List<Message> getAllForReceiver(User receiver) {
@@ -88,7 +88,7 @@ public class MessageRepository {
         return listOfMessages;
     }
 
-    public boolean updateMessage(Message message) throws MessageDoesNotExist {
+    public boolean updateMessage(Message message) throws MessageDoesNotExistException {
         return messageDAO.updateOne(message);
     }
 
