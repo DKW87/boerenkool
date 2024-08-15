@@ -1,3 +1,4 @@
+/*
 package boerenkool;
 
 import boerenkool.business.model.Message;
@@ -22,3 +23,4 @@ public class LauncherBart {
 //        jdbcMessageDAO.storeOne(testMessage);
     }
 }
+*/

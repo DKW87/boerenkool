@@ -34,50 +34,46 @@ public class JdbcUserDAO implements UserDAO {
         ps.setString(1, user.getTypeOfUser());
         ps.setString(2, user.getUsername());
         ps.setString(3, user.getHashedPassword());
-        ps.setString(4, user.getFirstName());
+        ps.setString(4, user.getSalt()); // Ensure salt is set here
+        ps.setString(5, user.getFirstName());
         if (user.getInfix() != null) {
-            ps.setString(5, user.getInfix());
+            ps.setString(6, user.getInfix());
         } else {
-            ps.setNull(5, java.sql.Types.VARCHAR);
+            ps.setNull(6, java.sql.Types.VARCHAR);
         }
-        ps.setString(6, user.getLastName());
-        ps.setInt(7, user.getCoinBalance());
-        ps.setString(8, user.getPhone());
-        ps.setString(9, user.getEmail());
+        ps.setString(7, user.getLastName());
+        ps.setInt(8, user.getCoinBalance());
+        ps.setString(9, user.getPhone());
+        ps.setString(10, user.getEmail());
     }
+
+
 
     private PreparedStatement insertUserStatement(User user, Connection connection) throws SQLException {
         PreparedStatement ps;
         ps = connection.prepareStatement(
-                "INSERT INTO `User`(typeOfUser, username, hashedPassword, firstName, infix, lastName," +
-                        " COINBALANCE, phoneNumber, emailaddress)" +
-                        " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", PreparedStatement.RETURN_GENERATED_KEYS);
+                "INSERT INTO `User`(typeOfUser, username, hashedPassword, salt, firstName, infix, lastName," +
+                        " coinBalance, phoneNumber, emailaddress)" +
+                        " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", PreparedStatement.RETURN_GENERATED_KEYS);
         setCommonParameters(ps, user);
         return ps;
     }
 
+
+
     private PreparedStatement updateUserStatement(User user, Connection connection) throws SQLException {
         PreparedStatement ps;
         ps = connection.prepareStatement(
-                """
-                UPDATE `User` 
-                SET 
-                typeOfUser=?,
-                username=?,
-                hashedPassword=?,
-                firstName=?,
-                infix=?,
-                lastName=?,
-                COINBALANCE=?,
-                phoneNumber=?,
-                emailaddress=?
-                WHERE userId=?
-                """
-        );
+                "UPDATE `User` " +
+                        "SET typeOfUser=?, username=?, hashedPassword=?, salt=?, firstName=?, infix=?, lastName=?," +
+                        " coinBalance=?, phoneNumber=?, emailaddress=?" +
+                        " WHERE userId=?");
         setCommonParameters(ps, user);
-        ps.setInt(10, user.getUserId());
+        ps.setInt(11, user.getUserId()); // Adjust index for userId
         return ps;
     }
+
+
 
     @Override
     public boolean storeOne(User user) {
@@ -192,17 +188,20 @@ public class JdbcUserDAO implements UserDAO {
             int id = rs.getInt("userId");
             String typeOfUser = rs.getString("typeOfUser");
             String username = rs.getString("username");
-            String pw = rs.getString("hashedPassword");
+            String hashedPassword = rs.getString("hashedPassword");
+            String salt = rs.getString("salt");  // Retrieve the salt from the ResultSet
             String firstName = rs.getString("firstName");
             String infix = rs.getString("infix");
             String lastName = rs.getString("lastName");
-            int COINBALANCE = rs.getInt("COINBALANCE");
+            int coinBalance = rs.getInt("COINBALANCE");
             String phoneNumber = rs.getString("phoneNumber");
             String email = rs.getString("emailaddress");
 
-            User user = new User(typeOfUser, username, pw, email, phoneNumber, firstName, infix, lastName, COINBALANCE);
+            // Pass salt to the User constructor
+            User user = new User(typeOfUser, username, hashedPassword, salt, email, phoneNumber, firstName, infix, lastName, coinBalance);
             user.setUserId(id);
             return user;
         }
     }
+
 }

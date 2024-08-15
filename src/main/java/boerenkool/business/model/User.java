@@ -25,13 +25,13 @@ public class User {
     private final static String DEFAULT_USER = "Huurder";
 
     // Basisconstructor met alle parameters
-    public User(int userId, String typeOfUser, String username, String password, String email, String phone,
+    public User(int userId, String typeOfUser, String username, String hashedPassword, String salt, String email, String phone,
                 String firstName, String infix, String lastName, int coinBalance, List<User> blockedUser) {
         this.userId = userId;
-        this.typeOfUser = DEFAULT_USER;
+        this.typeOfUser = typeOfUser != null ? typeOfUser : DEFAULT_USER;
         this.username = username;
-        this.salt = new PasswordService().generateSalt(); // Genereer de salt
-        this.hashedPassword = PasswordService.hashPassword(password, this.salt); // Hash het wachtwoord met de gegenereerde salt
+        this.salt = salt;  // Set the salt passed as a parameter
+        this.hashedPassword = hashedPassword;
         this.email = email;
         this.phone = phone;
         this.firstName = firstName;
@@ -44,27 +44,45 @@ public class User {
 // in een JSON-formaat via een HTTP-request. Wanneer deze gegevens in de backend worden ontvangen, moeten ze vaak worden
 // omgezet naar een User object, wat het domeinmodel is dat de kernlogica van je applicatie bevat.
     //Constructor dto
-    public User(UserDto dto) {
-        this(dto.getTypeOfUser(), dto.getUsername(), dto.getPassword(), dto.getEmail(), dto.getPhone(), dto.getFirstName(), dto.getInfix(), dto.getLastName(), dto.getCoinBalance());
-    }
+// Constructor voor het aanmaken van een nieuwe gebruiker vanuit UserDto
+public User(UserDto dto) {
+    this(DEFAULT_USER_ID,
+            dto.getTypeOfUser(),
+            dto.getUsername(),
+            null,  // Pass null for hashedPassword, which will be set later
+            null,  // Pass null for salt, which will be set later
+            dto.getEmail(),
+            dto.getPhone(),
+            dto.getFirstName(),
+            dto.getInfix(),
+            dto.getLastName(),
+            dto.getCoinBalance(),
+            new ArrayList<>() // Create an empty list for blockedUser
+    );
+}
 
 
     // Constructor zonder geblokkeerde gebruikers
-    public User(int userId, String typeOfUser, String username, String password, String email, String phone,
+    public User(int userId, String typeOfUser, String username, String hashedPassword, String salt, String email, String phone,
                 String firstName, String infix, String lastName, int coinBalance) {
-        this(userId, typeOfUser, username, password, email, phone, firstName, infix, lastName, coinBalance, new ArrayList<>());
+        this(userId, typeOfUser, username, hashedPassword, salt, email, phone, firstName, infix, lastName, coinBalance, new ArrayList<>());
     }
 
+
     // Constructor voor nieuwe gebruikers zonder ID
-    public User(String typeOfUser, String username, String password, String email, String phone,
+    public User(String typeOfUser, String username, String hashedPassword, String salt, String email, String phone,
                 String firstName, String infix, String lastName, int coinBalance) {
-        this(DEFAULT_USER_ID, typeOfUser, username, password, email, phone, firstName, infix, lastName, coinBalance);
+        this(DEFAULT_USER_ID, typeOfUser, username, hashedPassword, salt, email, phone, firstName, infix, lastName, coinBalance);
     }
+
 
     // Default constructor
     public User() {
-        this(DEFAULT_USER_ID, "", "", "", "", "", "", "", "", DEFAULT_COIN_BALANCE, new ArrayList<>());
+        this(DEFAULT_USER_ID, "", "", "", "", "", "", "", "", "", DEFAULT_COIN_BALANCE, new ArrayList<>());
     }
+
+
+
 
     public int getUserId() {
         return userId;

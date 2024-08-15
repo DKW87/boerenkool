@@ -49,15 +49,24 @@ public class RegistrationService {
         Optional<User> optionalUser = userRepository.findByUsername(username);
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
+            String storedSalt = user.getSalt();
+            String storedHashedPassword = user.getHashedPassword();
 
-            // Hash the provided password with the stored salt and compare
-            String hashedInputPassword = PasswordService.hashPassword(plainPassword, user.getSalt());
+            // Log the values
+            logger.info("Stored Salt: " + storedSalt);
+            logger.info("Stored Hashed Password: " + storedHashedPassword);
 
-            if (user.getHashedPassword().equals(hashedInputPassword)) {
+            String hashedInputPassword = PasswordService.hashPassword(plainPassword, storedSalt);
+            logger.info("Hashed Input Password: " + hashedInputPassword);
+
+            if (storedHashedPassword.equals(hashedInputPassword)) {
                 return user;
+            } else {
+                logger.warn("Password mismatch");
             }
         }
         return null;  // Return null if the user doesn't exist or the password doesn't match
     }
+
 
 }
