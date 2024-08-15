@@ -52,11 +52,11 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping
+  /*  @PostMapping
     public ResponseEntity<Void> createOne(@RequestBody User user) {
         userService.storeOne(user);
         return ResponseEntity.status(HttpStatus.CREATED).build();
-    }
+    }*/
 
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<Void> deleteOne(@PathVariable("id") int id) {

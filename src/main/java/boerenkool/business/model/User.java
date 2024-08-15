@@ -61,6 +61,25 @@ public User(UserDto dto) {
     );
 }
 
+    public User(UserDto dto, PasswordService passwordService) {
+        this(DEFAULT_USER_ID,
+                dto.getTypeOfUser(),
+                dto.getUsername(),
+                null,  // Salt en hashed password worden later ingesteld
+                null,
+                dto.getEmail(),
+                dto.getPhone(),
+                dto.getFirstName(),
+                dto.getInfix(),
+                dto.getLastName(),
+                dto.getCoinBalance(),
+                new ArrayList<>()
+        );
+        this.salt = passwordService.generateSalt();
+        this.hashedPassword = passwordService.hashPassword(dto.getPassword(), this.salt);
+    }
+
+
 
     // Constructor zonder geblokkeerde gebruikers
     public User(int userId, String typeOfUser, String username, String hashedPassword, String salt, String email, String phone,
