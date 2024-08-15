@@ -6,6 +6,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ResponseStatus(value = HttpStatus.NOT_FOUND)
 public class MessageDoesNotExistException extends Exception {
     public MessageDoesNotExistException() {
-        super("Message does not exist.");
+        super("Message does not exist");
     }
 }

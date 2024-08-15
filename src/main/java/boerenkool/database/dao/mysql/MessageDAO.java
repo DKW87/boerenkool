@@ -8,6 +8,9 @@ import java.util.Optional;
 
 import java.util.List;
 
+/**
+ * @author Bart Notelaers
+ */
 public interface MessageDAO extends GenericDAO<Message> {
     @Override
     boolean storeOne(Message message);
@@ -15,9 +18,7 @@ public interface MessageDAO extends GenericDAO<Message> {
     @Override
     List<Message> getAll();
 
-    List<Message> getAllForReceiver(User receiver);
-
-    List<Message> getAllByReceiverId(int receiverId);
+    List<Message> getAllByUserId(int userId);
 
     @Override
     Optional<Message> getOneById(int id);
@@ -27,10 +28,6 @@ public interface MessageDAO extends GenericDAO<Message> {
 
     @Override
     boolean removeOneById(int id);
-
-    boolean archiveMessageForSender(Message message);
-
-    boolean archiveMessageForReceiver(Message message);
 }
 
 

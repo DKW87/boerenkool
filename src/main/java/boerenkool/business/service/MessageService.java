@@ -6,6 +6,7 @@ import boerenkool.communication.dto.MessageDTO;
 import boerenkool.database.repository.MessageRepository;
 import boerenkool.database.repository.UserRepository;
 import boerenkool.utilities.exceptions.MessageDoesNotExistException;
+import boerenkool.utilities.exceptions.UserNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,23 +17,29 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * @author Bart Notelaers
+ */
 @Service
 public class MessageService {
     private final MessageRepository messageRepository;
-
-    private final Logger logger = LoggerFactory.getLogger(MessageService.class);
     private final UserRepository userRepository;
+    private final Logger logger = LoggerFactory.getLogger(MessageService.class);
 
     @Autowired
     public MessageService(MessageRepository messageRepository, UserRepository userRepository) {
         this.messageRepository = messageRepository;
         this.userRepository = userRepository;
-        logger.info("New MessageService");
     }
 
-    public boolean saveMessage(MessageDTO messageDTO) {
-        messageDTO.setDateTimeSent(LocalDateTime.now());
-        return messageRepository.saveMessage(convertDtoToMessage(messageDTO));
+    public boolean saveMessage(MessageDTO messageDTO) throws UserNotFoundException {
+        if (userRepository.getOneById(messageDTO.getReceiverId()).isPresent()
+                && userRepository.getOneById(messageDTO.getSenderId()).isPresent()) {
+            messageDTO.setDateTimeSent(LocalDateTime.now());
+            return messageRepository.saveMessage(convertDtoToMessage(messageDTO));
+        } else {
+            throw new UserNotFoundException("MessageDTO's senderId and / or userId not linked to existing users");
+        }
     }
 
     public MessageDTO getByMessageId(int messageId) throws MessageDoesNotExistException {
@@ -40,7 +47,6 @@ public class MessageService {
     }
 
     public List<MessageDTO> getAllMessages() {
-        logger.info("getAllMessages called");
         List<MessageDTO> listOfAllMessageDTOs = new ArrayList<>();
         List<Message> listOfMessages = messageRepository.getAll();
         for (Message message : listOfMessages) {
@@ -50,18 +56,16 @@ public class MessageService {
         return listOfAllMessageDTOs;
     }
 
-    public List<MessageDTO> getAllByReceiverId(int receiverId) {
-        List<MessageDTO> listOfMessageDTOsForReceiver = new ArrayList<>();
-        if (userRepository.getOneById(receiverId).isPresent()) {
-            logger.info("findMessagesForReceiver User found");
-//            listOfMessagesForReceiver = messageRepository.findMessagesForReceiver((User) userRepository.getOneById(receiverId).get());
-            List<Message> listOfMessages = messageRepository.getAllByReceiverId(receiverId);
+    public List<MessageDTO> getAllByUserId(int userId) {
+        List<MessageDTO> listOfMessageDTOsForUser = new ArrayList<>();
+        if (userRepository.getOneById(userId).isPresent()) {
+            List<Message> listOfMessages = messageRepository.getAllByUserId(userId);
             // convert Messages to MessageDTOs
             for (Message message : listOfMessages) {
-                listOfMessageDTOsForReceiver.add(convertMessageToDTO(message));
+                listOfMessageDTOsForUser.add(convertMessageToDTO(message));
             }
-            Collections.sort(listOfMessageDTOsForReceiver);
-            return listOfMessageDTOsForReceiver;
+//            Collections.sort(listOfMessages); // perhaps not necessary
+            return listOfMessageDTOsForUser;
         } else return null;
     }
 
@@ -73,18 +77,9 @@ public class MessageService {
         return messageRepository.deleteMessage(messageId);
     }
 
-    public boolean archiveMessageForSender(MessageDTO messageDTO) {
-        return messageRepository.archiveMessageForSender(convertDtoToMessage(messageDTO));
-    }
-
-    public boolean archiveMessageForReceiver(MessageDTO messageDTO) {
-        return messageRepository.archiveMessageForReceiver(convertDtoToMessage(messageDTO));
-    }
-
     private Message convertDtoToMessage(MessageDTO dto) {
         User sender = userRepository.getOneById(dto.getSenderId()).orElse(null);
         User receiver = userRepository.getOneById(dto.getReceiverId()).orElse(null);
-//        System.out.println(dto);
         if (sender != null & receiver != null) {
             return new Message(
                     dto.getMessageId(),

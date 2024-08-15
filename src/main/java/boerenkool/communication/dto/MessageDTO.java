@@ -4,6 +4,9 @@ import boerenkool.business.model.Message;
 
 import java.time.LocalDateTime;
 
+/**
+ * @author Bart Notelaers
+ */
 public class MessageDTO implements Comparable<MessageDTO> {
     private int messageId;
     private int senderId;

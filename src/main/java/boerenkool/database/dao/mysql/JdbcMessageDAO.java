@@ -17,6 +17,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+/**
+ * @author Bart Notelaers
+ */
 @Repository
 public class JdbcMessageDAO implements MessageDAO {
     private final JdbcTemplate jdbcTemplate;
@@ -26,7 +29,6 @@ public class JdbcMessageDAO implements MessageDAO {
     @Autowired
     public JdbcMessageDAO(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-        logger.info("new JdbcMessageDAO");
     }
 
     private class MessageRowMapper implements RowMapper<Message> {
@@ -46,14 +48,6 @@ public class JdbcMessageDAO implements MessageDAO {
         }
     }
 
-    /**
-     * build PreparedStatement to insert Message data in database,
-     * using database time to save date
-     * @param message
-     * @param connection
-     * @return
-     * @throws SQLException
-     */
     private PreparedStatement buildInsertMessageStatement(
             Message message, Connection connection) throws SQLException {
         System.out.println(message);
@@ -87,10 +81,6 @@ public class JdbcMessageDAO implements MessageDAO {
         ps.setBoolean(8, message.isArchivedByReceiver());
     }
 
-    /**
-     * save a message to the database
-     * @param message object to be saved
-     */
     @Override
     public boolean storeOne(Message message) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -104,11 +94,6 @@ public class JdbcMessageDAO implements MessageDAO {
         }
     }
 
-    /**
-     * read message from database using its unique id
-     * @param messageId the unique id for the message
-     * @return optional containing the message
-     */
     @Override
     public Optional<Message> getOneById(int messageId) {
         String sql = "Select * From Message where messageId = ?;";
@@ -121,18 +106,9 @@ public class JdbcMessageDAO implements MessageDAO {
         }
     }
 
-    /**
-     * read all messages from every user database
-     * @return the List of all messages
-     */
     @Override
     public List<Message> getAll() {
         return jdbcTemplate.query("Select * From Message", new MessageRowMapper());
-    }
-
-    @Override
-    public List<Message> getAllForReceiver(User receiver) {
-        return getAllByReceiverId(receiver.getUserId());
     }
 
     public List<Message> getAllByReceiverId(int receiverId) {
@@ -140,6 +116,13 @@ public class JdbcMessageDAO implements MessageDAO {
                 "Select * From Message where receiverId = ?;",
                 new MessageRowMapper(),
                 receiverId);
+    }
+
+    public List<Message> getAllByUserId(int userId) {
+        return jdbcTemplate.query(
+                "Select * From Message where ? IN (senderId, receiverId);",
+                new MessageRowMapper(),
+                userId);
     }
 
     /**
@@ -170,8 +153,6 @@ public class JdbcMessageDAO implements MessageDAO {
 
     @Override
     public boolean removeOneById(int messageId) {
-        // TODO do we ever remove a message from the database? If so, when?
-        //  Or do we just set messages as archived for users, and keep them in database "forever" ?
         String sql = "DELETE FROM `Message` WHERE messageId = ?";
         return jdbcTemplate.update(sql, messageId) != 0;
     }

@@ -13,6 +13,9 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * @author Bart Notelaers
+ */
 @Repository
 public class MessageRepository {
     private static Logger logger = LoggerFactory.getLogger(MessageRepository.class);
@@ -44,14 +47,12 @@ public class MessageRepository {
      * @return
      */
     private Message addUsersToMessage(Message message) {
-//        if (message.getMessageId() != 0) {
         message.setSender(userDAO.getSenderByMessageId(message.getMessageId()).orElse(null));
         message.setReceiver(userDAO.getReceiverByMessageId(message.getMessageId()).orElse(null));
         return message;
     }
 
     public boolean saveMessage(Message message) {
-//        addUsersToNewMessage(message);
         return messageDAO.storeOne(message);
     }
 
@@ -64,16 +65,8 @@ public class MessageRepository {
         throw new MessageDoesNotExistException();
     }
 
-    public List<Message> getAllForReceiver(User receiver) {
-        List<Message> listOfMessages = messageDAO.getAllForReceiver(receiver);
-        for (Message message : listOfMessages) {
-            addUsersToMessage(message);
-        }
-        return listOfMessages;
-    }
-
-    public List<Message> getAllByReceiverId(int receiverId) {
-        List<Message> listOfMessages = messageDAO.getAllByReceiverId(receiverId);
+    public List<Message> getAllByUserId(int userId) {
+        List<Message> listOfMessages = messageDAO.getAllByUserId(userId);
         for (Message message : listOfMessages) {
             addUsersToMessage(message);
         }
@@ -94,14 +87,5 @@ public class MessageRepository {
 
     public boolean deleteMessage(int messageId) {
         return messageDAO.removeOneById(messageId);
-    }
-
-    public boolean archiveMessageForSender(Message message) {
-        logger.info("archiveMessageForSender called");
-        return messageDAO.archiveMessageForSender(message);
-    }
-
-    public boolean archiveMessageForReceiver(Message message) {
-        return messageDAO.archiveMessageForReceiver(message);
     }
 }
