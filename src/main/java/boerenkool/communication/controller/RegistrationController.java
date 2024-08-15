@@ -12,10 +12,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import boerenkool.business.model.User;
 
 import javax.security.auth.login.LoginException;
+import java.util.Optional;
+import java.util.UUID;
 
 
 @RestController
@@ -50,6 +53,21 @@ public class RegistrationController {
                     .header("Authorization", tokenUserPair.getKey().toString())
                     .body(new UserDto(user));
         } else {
+            throw new LoginException();
+        }
+    }
+
+    @PostMapping("validate")
+    public ResponseEntity<String> validationHandler(@RequestHeader String authorization) throws LoginException {
+        try {
+            UUID uuid = UUID.fromString(authorization);
+            Optional<User> user = authorizationService.validate(uuid);
+            if (user.isPresent()) {
+                return ResponseEntity.ok().body(user.get().getUsername());
+            } else {
+                throw new LoginException();
+            }
+        } catch (IllegalArgumentException e) {
             throw new LoginException();
         }
     }

@@ -2,9 +2,13 @@ package boerenkool.communication.controller;
 
 import boerenkool.business.model.User;
 import boerenkool.business.service.UserService;
+import boerenkool.utilities.exceptions.UserNotFoundException;
+import boerenkool.utilities.exceptions.UserUpdateFailedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,7 +18,6 @@ import java.util.List;
 public class UserController {
 
     private final Logger logger = LoggerFactory.getLogger(UserController.class);
-
     private final UserService userService;
 
     @Autowired
@@ -24,33 +27,49 @@ public class UserController {
     }
 
     @GetMapping
-    public List<User> getAll() {
-        return userService.getAll();
+    public ResponseEntity<List<User>> getAll() {
+        List<User> users = userService.getAll();
+        return ResponseEntity.ok(users);
     }
 
     @GetMapping(value = "/{id}")
-    public User getOneById(@PathVariable("id") int id) {
-        return userService.getOneById(id).orElse(null);
+    public ResponseEntity<User> getOneById(@PathVariable("id") int id) {
+        User user = userService.getOneById(id)
+                .orElseThrow(UserNotFoundException::new);
+        return ResponseEntity.ok(user);
     }
 
     @PutMapping(value = "/{id}")
-    public void updateOne(@RequestBody User user, @PathVariable("id") int id) {
-        user.setUserId(id);
-        userService.updateOne(user);
+    public ResponseEntity<Void> updateOne(@RequestBody User user, @PathVariable("id") int id) {
+        userService.getOneById(id).orElseThrow(UserNotFoundException::new);
+        try {
+            user.setUserId(id);
+            userService.updateOne(user);
+        } catch (Exception e) {
+            throw new UserUpdateFailedException();
+        }
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping
-    public void createOne(@RequestBody User user) {
+    public ResponseEntity<Void> createOne(@RequestBody User user) {
         userService.storeOne(user);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @DeleteMapping(value = "/{id}")
-    public void deleteOne(@PathVariable("id") int id) {
+    public ResponseEntity<Void> deleteOne(@PathVariable("id") int id) {
+        //zelfde als: () -> new UserNotFoundException().
+        userService.getOneById(id).orElseThrow(UserNotFoundException::new);
         userService.removeOneById(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping(value = "/username/{username}")
-    public User findOneByUsername(@PathVariable("username") String name) {
-        return userService.findByUsername(name).orElse(null);
+    public ResponseEntity<User> findOneByUsername(@PathVariable("username") String name) {
+        User user = userService.findByUsername(name)
+                //zelfde als: () -> new UserNotFoundException().
+                .orElseThrow(UserNotFoundException::new);
+        return ResponseEntity.ok(user);
     }
 }
