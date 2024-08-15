@@ -56,6 +56,7 @@ public class JdbcMessageDAO implements MessageDAO {
      */
     private PreparedStatement buildInsertMessageStatement(
             Message message, Connection connection) throws SQLException {
+        System.out.println(message);
         PreparedStatement ps = connection.prepareStatement(
                 "Insert into Message(senderId, receiverId, dateTimeSent, subject, body, archivedBySender, " +
                         "readByReceiver, archivedByReceiver) values (?,?,?,?,?,?,?,?);",
@@ -68,7 +69,7 @@ public class JdbcMessageDAO implements MessageDAO {
             Message message, Connection connection) throws SQLException {
         PreparedStatement ps = connection.prepareStatement(
                 "UPDATE Message SET senderId = ?, receiverId = ?, dateTimeSent = ?, subject = ?, " +
-                        "body = ?, archivedBySender = ?, readByReceiver = ?, archivedByReceiver = ?" +
+                        "body = ?, archivedBySender = ?, readByReceiver = ?, archivedByReceiver = ? " +
                         "where messageId = ?;");
         setCommonParameters(ps, message);
         ps.setInt(9, message.getMessageId());
@@ -76,9 +77,7 @@ public class JdbcMessageDAO implements MessageDAO {
     }
 
     private void setCommonParameters(PreparedStatement ps, Message message) throws SQLException {
-//        if (message.getSender().isPresent() {
         ps.setInt(1, message.getSender().getUserId());
-//        } else ps.set
         ps.setInt(2, message.getReceiver().getUserId());
         ps.setObject(3, message.getDateTimeSent());
         ps.setString(4, message.getSubject());
@@ -151,10 +150,11 @@ public class JdbcMessageDAO implements MessageDAO {
     @Override
     public boolean updateOne(Message message) {
         return jdbcTemplate.update(connection ->
-                buildInsertMessageStatement(message, connection)) != 0;
+                buildUpdateMessageStatement(message, connection)) != 0;
     }
 
     public boolean archiveMessageForSender(Message message) {
+        logger.info("archiveMessageForSender");
         return (jdbcTemplate.update(
                 "UPDATE Message SET archivedBySender = TRUE WHERE messageId = ?;",
                 message.getMessageId()) != 0);
@@ -166,16 +166,11 @@ public class JdbcMessageDAO implements MessageDAO {
                 message.getMessageId()) != 0);
     }
 
-    /**
-     * delete message from database
-     * @param messageId the unique id for the message
-     * @return
-     */
     @Override
     public boolean removeOneById(int messageId) {
         // TODO do we ever remove a message from the database? If so, when?
         //  Or do we just set messages as archived for users, and keep them in database "forever" ?
-        //  useful when resolving (legal) conflicts?
-        return false;
+        String sql = "DELETE FROM `Message` WHERE messageId = ?";
+        return jdbcTemplate.update(sql, messageId) != 0;
     }
 }

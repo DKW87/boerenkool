@@ -33,13 +33,13 @@ public class Message implements Comparable<Message> {
     public Message(User sender, User receiver, LocalDateTime dateTimeSent,
                    String subject, String body, boolean readByReceiver, boolean archivedBySender,
                    boolean archivedByReceiver) {
-        this(0, sender, receiver, null, subject, body, false, false, false);
+        this(0, sender, receiver, dateTimeSent, subject, body, false, false, false);
 
     }
 
-    public Message(User sender, User receiver, String subject, String body) {
-        this(0, sender, receiver, null, subject, body, false, false, false);
-    }
+//    public Message(User sender, User receiver, String subject, String body) {
+//        this(0, sender, receiver, null, subject, body, false, false, false);
+//    }
 
     // necessary for contructing a Message from JSON
     public Message() {
@@ -49,11 +49,15 @@ public class Message implements Comparable<Message> {
     @Override
     public String toString() {
         return "Message{" +
-                "messageId=" + messageId +
-                ", sender=" + sender +
-                ", receiver=" + receiver +
-                ", dateTimeSent=" + dateTimeSent +
-                ", subject='" + subject + '\'' +
+                "\n\tmessageId=" + messageId +
+                "\n\tsender=" + sender +
+                "\n\treceiver=" + receiver +
+                "\n\tdateTimeSent=" + dateTimeSent +
+                "\n\tsubject='" + subject + '\'' +
+                "\n\tbody='" + body + '\'' +
+                "\n\treadByReceiver=" + readByReceiver +
+                "\n\tarchivedBySender=" + archivedBySender +
+                "\n\tarchivedByReceiver=" + archivedByReceiver +
                 '}';
     }
 

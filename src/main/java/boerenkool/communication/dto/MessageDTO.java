@@ -46,6 +46,21 @@ public class MessageDTO implements Comparable<MessageDTO> {
         return this.dateTimeSent.compareTo(otherMessageDTO.dateTimeSent);
     }
 
+    @Override
+    public String toString() {
+        return "MessageDTO{" +
+                "\n\tmessageId=" + messageId +
+                "\n\tsenderId=" + senderId +
+                "\n\treceiverId=" + receiverId +
+                "\n\tdateTimeSent=" + dateTimeSent +
+                "\n\tsubject='" + subject + '\'' +
+                "\n\tbody='" + body + '\'' +
+                "\n\tarchivedBySender=" + archivedBySender +
+                "\n\treadByReceiver=" + readByReceiver +
+                "\n\tarchivedByReceiver=" + archivedByReceiver +
+                '}';
+    }
+
     public int getMessageId() {
         return messageId;
     }

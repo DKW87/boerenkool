@@ -5,9 +5,11 @@ import boerenkool.business.model.User;
 import boerenkool.communication.dto.MessageDTO;
 import boerenkool.database.repository.MessageRepository;
 import boerenkool.database.repository.UserRepository;
+import boerenkool.utilities.exceptions.MessageDoesNotExist;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -30,13 +32,12 @@ public class MessageService {
     }
 
     public boolean saveMessage(MessageDTO messageDTO) {
+        messageDTO.setDateTimeSent(LocalDateTime.now());
         return messageRepository.saveMessage(convertDtoToMessage(messageDTO));
     }
 
-    public MessageDTO getByMessageId(int messageId) {
-        if (messageRepository.getMessageById(messageId).isPresent()) {
-            return convertMessageToDTO(messageRepository.getMessageById(messageId).get());
-        } else return null;
+    public MessageDTO getByMessageId(int messageId) throws MessageDoesNotExist {
+        return convertMessageToDTO(messageRepository.getMessageById(messageId));
     }
 
     public List<MessageDTO> getAllMessages() {
@@ -69,6 +70,10 @@ public class MessageService {
         return messageRepository.updateMessage(convertDtoToMessage(messageDTO));
     }
 
+    public boolean deleteMessage(int messageId) {
+        return messageRepository.deleteMessage(messageId);
+    }
+
     public boolean archiveMessageForSender(MessageDTO messageDTO) {
         return messageRepository.archiveMessageForSender(convertDtoToMessage(messageDTO));
     }
@@ -78,17 +83,15 @@ public class MessageService {
     }
 
     private Message convertDtoToMessage(MessageDTO dto) {
-        logger.info("convertDtoToMessage called");
         User sender = userRepository.getOneById(dto.getSenderId()).orElse(null);
         User receiver = userRepository.getOneById(dto.getReceiverId()).orElse(null);
-//        User sender = userRepository.getOneById(dto.getSenderId()).get();
-//        User receiver = userRepository.getOneById(dto.getReceiverId()).get();
-        System.out.println(sender);
-//        logger.info(sender.getUsername());
+//        System.out.println(dto);
         if (sender != null & receiver != null) {
-            return new Message(sender,
+            return new Message(
+                    dto.getMessageId(),
+                    sender,
                     receiver,
-                    LocalDateTime.now(),
+                    dto.getDateTimeSent(),
                     dto.getSubject(),
                     dto.getBody(),
                     dto.isReadByReceiver(),
