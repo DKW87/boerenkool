@@ -22,7 +22,7 @@ public class HouseTypeController {
     @Autowired
     public HouseTypeController(HouseTypeService houseTypeService) {
         this.houseTypeService = houseTypeService;
-        logger.info("New HouseTypeController created");
+        logger.info("Nieuwe HouseTypeController aangemaakt");
     }
 
     @GetMapping
@@ -36,28 +36,29 @@ public class HouseTypeController {
         if (houseType.isPresent()) {
             return new ResponseEntity<>(houseType.get(), HttpStatus.OK);
         } else {
-            return new ResponseEntity<>("HouseType not found", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("HouseType niet gevonden", HttpStatus.NOT_FOUND);
         }
     }
 
     @PostMapping
-    public ResponseEntity<?> createHouseType(@RequestBody HouseType houseType) {
+    public ResponseEntity<String> createHouseType(@RequestBody HouseType houseType) {
         try {
             HouseType savedHouseType = houseTypeService.saveHouseType(houseType);
-            return new ResponseEntity<>(savedHouseType, HttpStatus.CREATED);
+            return new ResponseEntity<>("HouseType succesvol aangemaakt met ID: " + savedHouseType.getHouseTypeId(), HttpStatus.CREATED);
         } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("Mislukt om HouseType aan te maken: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
+
 
     @PutMapping(value = "/{id}")
     public ResponseEntity<?> updateHouseType(@PathVariable int id, @RequestBody HouseType houseType) {
         houseType.setHouseTypeId(id);
         boolean updated = houseTypeService.updateHouseType(houseType);
         if (updated) {
-            return new ResponseEntity<>("HouseType updated successfully", HttpStatus.OK);
+            return new ResponseEntity<>("HouseType succesvol bijgewerkt", HttpStatus.OK);
         } else {
-            return new ResponseEntity<>("Failed to update HouseType", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>("Mislukt om HouseType bij te werken", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -65,9 +66,9 @@ public class HouseTypeController {
     public ResponseEntity<?> deleteHouseType(@PathVariable int id) {
         boolean deleted = houseTypeService.deleteHouseTypeById(id);
         if (deleted) {
-            return new ResponseEntity<>("HouseType deleted successfully", HttpStatus.OK);
+            return new ResponseEntity<>("HouseType succesvol verwijderd", HttpStatus.OK);
         } else {
-            return new ResponseEntity<>("Failed to delete HouseType", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>("Mislukt om HouseType te verwijderen", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -77,7 +78,7 @@ public class HouseTypeController {
         if (houseType.isPresent()) {
             return new ResponseEntity<>(houseType.get(), HttpStatus.OK);
         } else {
-            return new ResponseEntity<>("HouseType not found", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("HouseType niet gevonden", HttpStatus.NOT_FOUND);
         }
     }
 }
