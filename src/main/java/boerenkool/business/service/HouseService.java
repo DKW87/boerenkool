@@ -40,6 +40,10 @@ public class HouseService {
         return houseRepository.getHousesWithFilter(filter);
     }
 
+    public List<House> getFilteredListOfHouses(HouseFilter filter) {
+        return houseRepository.getHousesWithFilter(filter);
+    }
+
     public boolean saveHouse(House house) {
         return houseRepository.saveHouse(house);
     }

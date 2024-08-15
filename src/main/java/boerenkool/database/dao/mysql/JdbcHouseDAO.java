@@ -70,6 +70,8 @@ public class JdbcHouseDAO implements HouseDAO {
         addPriceFilter(sql, params, filter);
         addOrderByClause(sql, filter);
         addLimitOffset(sql, params, filter);
+        System.out.println("Final sql string was: " + sql.toString());
+        System.out.println("Final parameters were: " + params.toString());
 
         return jdbcTemplate.query(sql.toString(), new HouseMapper(), params.toArray());
     }
@@ -136,25 +138,25 @@ public class JdbcHouseDAO implements HouseDAO {
     }
 
     private void addHouseTypeFilter(StringBuilder sql, List<Object> params, HouseFilter filter) {
-        if (filter.getHouseTypes() != null && !filter.getHouseTypes().isEmpty()) {
-            List<HouseType> houseTypes = filter.getHouseTypes();
+        if (filter.getHouseTypeIds() != null && !filter.getHouseTypeIds().isEmpty()) {
+            List<Integer> houseTypes = filter.getHouseTypeIds();
 
             if (houseTypes.size() == 1) {
                 sql.append(" AND houseTypeId = ?");
-                params.add(houseTypes.get(0).getHouseTypeId());
+                params.add(houseTypes.get(0));
             } else {
                 sql.append(" AND houseTypeId IN (")
                         .append(String.join(", ", Collections.nCopies(houseTypes.size(), "?")))
                         .append(")");
-                for (HouseType type : houseTypes) {
-                    params.add(type.getHouseTypeId());
+                for (Integer type : houseTypes) {
+                    params.add(type);
                 }
             }
         }
     }
 
     private void addHouseOwnerFilter(StringBuilder sql, List<Object> params, HouseFilter filter) {
-        if (filter.getHouseOwnerId() != 0) {
+        if (filter.getHouseOwnerId() > 0) {
             sql.append(" AND houseOwnerId = ?");
             params.add(filter.getHouseOwnerId());
         }
@@ -281,6 +283,7 @@ public class JdbcHouseDAO implements HouseDAO {
             house.setHouseId(houseId);
             house.accessOtherEntityIds().setHouseTypeId(houseTypeId);
             house.accessOtherEntityIds().setHouseOwnerId(houseOwnerId);
+
             return house;
         }
 

@@ -27,7 +27,7 @@ public class UserService {
     public boolean removeOneById(int id) {
         boolean removed = userRepository.removeOneById(id);
         if (!removed) {
-            throw new UserNotFoundException("User not found with id: " + id);
+            throw new UserNotFoundException();
         }
         return true;
     }
@@ -43,13 +43,17 @@ public class UserService {
     public boolean updateOne(User user) {
         boolean updated = userRepository.updateOne(user);
         if (!updated) {
-            throw new UserUpdateFailedException("Failed to update user with id: " + user.getUserId());
+            throw new UserUpdateFailedException();
         }
         return true;
     }
 
-    public User findByUsername(String username) {
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new UserNotFoundException("User not found with username: " + username));
+    public Optional<User> findByUsername(String username) {
+        Optional<User> user = userRepository.findByUsername(username);
+        if (user.isPresent()) {
+            return user;
+        } else {
+            throw new UserNotFoundException();
+        }
     }
 }

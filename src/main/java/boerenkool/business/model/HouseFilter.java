@@ -29,7 +29,7 @@ public class HouseFilter {
 
     private List<String> provinces;
     private List<String> cities;
-    private List<HouseType> houseTypes;
+    private List<Integer> houseTypeIds;
     private int houseOwnerId;
     private int amountOfGuests;
     private int desiredRoomCount;
@@ -43,7 +43,7 @@ public class HouseFilter {
     private HouseFilter(Builder builder) {
         this.provinces = builder.provinces;
         this.cities = builder.cities;
-        this.houseTypes = builder.houseTypes;
+        this.houseTypeIds = builder.houseTypeIds;
         this.houseOwnerId = builder.houseOwnerId;
         this.amountOfGuests = builder.amountOfGuests;
         this.desiredRoomCount = builder.desiredRoomCount;
@@ -65,8 +65,8 @@ public class HouseFilter {
         return cities;
     }
 
-    public List<HouseType> getHouseTypes() {
-        return houseTypes;
+    public List<Integer> getHouseTypeIds() {
+        return houseTypeIds;
     }
 
     public int getHouseOwnerId() {
@@ -109,7 +109,7 @@ public class HouseFilter {
 
         private List<String> provinces;
         private List<String> cities;
-        private List<HouseType> houseTypes;
+        private List<Integer> houseTypeIds;
         private int houseOwnerId;
         private int amountOfGuests;
         private int desiredRoomCount;
@@ -130,8 +130,8 @@ public class HouseFilter {
             return this;
         }
 
-        public Builder setHouseTypes(List<HouseType> houseTypes) {
-            this.houseTypes = houseTypes;
+        public Builder setHouseTypeIds(List<Integer> houseTypeIds) {
+            this.houseTypeIds = houseTypeIds;
             return this;
         }
 
