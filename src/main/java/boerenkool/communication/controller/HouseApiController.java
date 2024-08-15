@@ -1,6 +1,7 @@
 package boerenkool.communication.controller;
 
 import boerenkool.business.model.House;
+import boerenkool.business.model.HouseFilter;
 import boerenkool.business.service.HouseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,9 +35,42 @@ public class HouseApiController {
         return houseService.getAllHouses();
     }
 
-    @GetMapping(value = "/{houseOwnerId}")
-    public List<House> getListOfHousesByHouseOwnerId(@PathVariable int houseOwnerId) {
-        return houseService.getListOfHousesByOwnerId(houseOwnerId);
+    @GetMapping(value = "/owner")
+    public List<House> getListOfHousesByHouseOwnerId(@RequestParam int id) {
+        return houseService.getListOfHousesByOwnerId(id);
+    }
+
+    @GetMapping(value = "/filter")
+    public List<House> getListOfHousesByFilter(
+            @RequestParam(required = false, defaultValue = "") List<String> provinces,
+            @RequestParam(required = false, defaultValue = "") List<String> cities,
+            @RequestParam(required = false, defaultValue = "") List<Integer> houseTypeIds,
+            @RequestParam(required = false, defaultValue = "0") int houseOwnerId,
+            @RequestParam(required = false, defaultValue = "0") int amountOfGuests,
+            @RequestParam(required = false, defaultValue = "0") int desiredRoomCount,
+            @RequestParam(required = false, defaultValue = "0") int minPricePPPD,
+            @RequestParam(required = false, defaultValue = "0") int maxPricePPPD,
+            @RequestParam(required = false, defaultValue = "houseId") String sortBy,
+            @RequestParam(required = false, defaultValue = "ASC") String sortOrder,
+            @RequestParam(required = false, defaultValue = "0") int limit,
+            @RequestParam(required = false, defaultValue = "0") int offset) {
+
+        HouseFilter filter = new HouseFilter.Builder()
+                .setProvinces(provinces)
+                .setCities(cities)
+                .setHouseTypeIds(houseTypeIds)
+                .setHouseOwner(houseOwnerId)
+                .setAmountOfGuests(amountOfGuests)
+                .setDesiredRoomCount(desiredRoomCount)
+                .setMinPricePPPD(minPricePPPD)
+                .setMaxPricePPPD(maxPricePPPD)
+                .setSortBy(sortBy)
+                .setSortOrder(sortOrder)
+                .setLimit(limit)
+                .setOffset(offset)
+                .build();
+
+        return houseService.getFilteredListOfHouses(filter);
     }
 
     @PostMapping(value = "/new")

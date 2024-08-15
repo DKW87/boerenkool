@@ -20,8 +20,7 @@ class HouseFilterTest {
     public void testHouseFilterBuilder_FullConfiguration() {
         List<String> provinces = Arrays.asList("Noord-Holland", "Zuid-Holland");
         List<String> cities = Arrays.asList("Amsterdam", "Rotterdam");
-        List<HouseType> houseTypes = Arrays.asList(new HouseType(1, "Villa"),
-                new HouseType(2, "Krot"));
+        List<Integer> houseTypes = Arrays.asList(1, 2);
         int houseOwnerId = 1;
         int amountOfGuests = 4;
         int desiredRoomCount = 3;
@@ -35,7 +34,7 @@ class HouseFilterTest {
         HouseFilter filter = new HouseFilter.Builder()
                 .setProvinces(provinces)
                 .setCities(cities)
-                .setHouseTypes(houseTypes)
+                .setHouseTypeIds(houseTypes)
                 .setHouseOwner(houseOwnerId)
                 .setAmountOfGuests(amountOfGuests)
                 .setDesiredRoomCount(desiredRoomCount)
@@ -49,7 +48,7 @@ class HouseFilterTest {
 
         assertEquals(provinces, filter.getProvinces());
         assertEquals(cities, filter.getCities());
-        assertEquals(houseTypes, filter.getHouseTypes());
+        assertEquals(houseTypes, filter.getHouseTypeIds());
         assertEquals(houseOwnerId, filter.getHouseOwnerId());
         assertEquals(amountOfGuests, filter.getAmountOfGuests());
         assertEquals(desiredRoomCount, filter.getDesiredRoomCount());
@@ -71,7 +70,7 @@ class HouseFilterTest {
 
         assertEquals(Arrays.asList("Noord-Holland"), filter.getProvinces());
         assertEquals(Arrays.asList("Amsterdam"), filter.getCities());
-        assertNull(filter.getHouseTypes());
+        assertNull(filter.getHouseTypeIds());
         assertEquals(0, filter.getHouseOwnerId());
         assertEquals(0, filter.getAmountOfGuests());
         assertEquals(0, filter.getDesiredRoomCount());
@@ -89,7 +88,7 @@ class HouseFilterTest {
 
         assertNull(filter.getProvinces());
         assertNull(filter.getCities());
-        assertNull(filter.getHouseTypes());
+        assertNull(filter.getHouseTypeIds());
         assertEquals(0, filter.getHouseOwnerId());
         assertEquals(0, filter.getAmountOfGuests());
         assertEquals(0, filter.getDesiredRoomCount());
@@ -115,7 +114,7 @@ class HouseFilterTest {
 
         assertNull(filter.getProvinces());
         assertNull(filter.getCities());
-        assertNull(filter.getHouseTypes());
+        assertNull(filter.getHouseTypeIds());
         assertEquals(0, filter.getHouseOwnerId());
         assertEquals(0, filter.getAmountOfGuests());
         assertEquals(0, filter.getDesiredRoomCount());

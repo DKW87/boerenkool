@@ -47,21 +47,16 @@ public class JdbcPictureDAO implements PictureDAO {
     }
 
     @Override
-    public Picture getFirstPictureByHouseId(int houseId) {
-        Picture firstPicture = (Picture) jdbcTemplate.query("SELECT * FROM Picture WHERE houseId = ? LIMIT 1;", new PictureRowMapper(), houseId);
-        return firstPicture;
+    public Optional<Picture> getFirstPictureByHouseId(int houseId) {
+        String sql = "SELECT * FROM Picture WHERE pictureId = ? LIMIT 1;";
+        List<Picture> resultList =
+                jdbcTemplate.query(sql, new PictureRowMapper(), houseId);
+        if (resultList.isEmpty()) {
+            return Optional.empty();
+        } else {
+            return Optional.of(resultList.get(0));
+        }
     }
-
-
-    // oude versie getFirstPictureByHouseId
-//    @Override
-//    public Picture getFirstPictureByHouseId(int houseId) {
-//        List<Picture> allPicturesFromHouseId = getAllByHouseId(houseId);
-//        if (allPicturesFromHouseId.isEmpty()) {
-//            return null;
-//        }
-//        return allPicturesFromHouseId.getFirst();
-//    }
 
     //todo waarom werken we met een lijst hier ?
     @Override
