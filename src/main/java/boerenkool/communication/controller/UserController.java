@@ -12,73 +12,64 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "api/users")
 public class UserController {
 
     private final Logger logger = LoggerFactory.getLogger(UserController.class);
-
-    UserService userService;
+    private final UserService userService;
 
     @Autowired
     public UserController(UserService userService) {
         this.userService = userService;
-        logger.info("New UserController");
+        logger.info("New UserController created");
     }
 
     @GetMapping
-    public List<User> getAll() {
-        return userService.getAll();
+    public ResponseEntity<List<User>> getAll() {
+        List<User> users = userService.getAll();
+        return ResponseEntity.ok(users);
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<?> getOneById(@PathVariable("id") int id) {
-        try {
-            Optional<User> user = userService.getOneById(id);
-            return new ResponseEntity<>(user, HttpStatus.OK);
-        } catch (UserNotFoundException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-        }
+    public ResponseEntity<User> getOneById(@PathVariable("id") int id) {
+        User user = userService.getOneById(id)
+                .orElseThrow(UserNotFoundException::new);
+        return ResponseEntity.ok(user);
     }
 
     @PutMapping(value = "/{id}")
-    public ResponseEntity<?> updateOne(@RequestBody User user, @PathVariable("id") int id) {
+    public ResponseEntity<Void> updateOne(@RequestBody User user, @PathVariable("id") int id) {
+        userService.getOneById(id).orElseThrow(UserNotFoundException::new);
         try {
             user.setUserId(id);
             userService.updateOne(user);
-            return new ResponseEntity<>("User updated successfully", HttpStatus.OK);
-        } catch (UserNotFoundException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-        } catch (UserUpdateFailedException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            throw new UserUpdateFailedException();
         }
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping
-    public ResponseEntity<?> createOne(@RequestBody User user) {
+    public ResponseEntity<Void> createOne(@RequestBody User user) {
         userService.storeOne(user);
-        return new ResponseEntity<>("User created successfully", HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @DeleteMapping(value = "/{id}")
-    public ResponseEntity<?> deleteOne(@PathVariable("id") int id) {
-        try {
-            userService.removeOneById(id);
-            return new ResponseEntity<>("User deleted successfully", HttpStatus.OK);
-        } catch (UserNotFoundException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-        }
+    public ResponseEntity<Void> deleteOne(@PathVariable("id") int id) {
+        //zelfde als: () -> new UserNotFoundException().
+        userService.getOneById(id).orElseThrow(UserNotFoundException::new);
+        userService.removeOneById(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping(value = "/username/{username}")
-    public ResponseEntity<?> findOneByUsername(@PathVariable("username") String name) {
-        try {
-            User user = userService.findByUsername(name);
-            return new ResponseEntity<>(user, HttpStatus.OK);
-        } catch (UserNotFoundException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-        }
+    public ResponseEntity<User> findOneByUsername(@PathVariable("username") String name) {
+        User user = userService.findByUsername(name)
+                //zelfde als: () -> new UserNotFoundException().
+                .orElseThrow(UserNotFoundException::new);
+        return ResponseEntity.ok(user);
     }
 }
