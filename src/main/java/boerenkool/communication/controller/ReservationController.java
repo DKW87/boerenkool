@@ -79,7 +79,7 @@ public class ReservationController {
         boolean isDeleted = reservationService.deleteReservationById(id);
         if (isDeleted) {
             logger.info("Deleted reservation with ID: {}", id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            return new ResponseEntity<>(HttpStatus.OK);
         } else {
             logger.warn("Failed to delete reservation with ID: {}", id);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -97,7 +97,7 @@ public class ReservationController {
                 if (isDeleted) {
                     // Notify landlord if necessary, placeholder for notification
                     logger.info("User with ID: {} canceled reservation with ID: {}", userId, reservationId);
-                    return new ResponseEntity<>("Reservation canceled successfully.", HttpStatus.NO_CONTENT);
+                    return new ResponseEntity<>("Reservation canceled successfully.", HttpStatus.OK);
                 } else {
                     logger.warn("Failed to cancel reservation with ID: {}", reservationId);
                     return new ResponseEntity<>("Failed to cancel reservation.", HttpStatus.NOT_FOUND);
@@ -122,7 +122,7 @@ public class ReservationController {
             if (isDeleted) {
                 // Notify tenant if necessary, placeholder for notification
                 logger.info("Landlord with ID: {} canceled reservation with ID: {}", userId, reservationId);
-                return new ResponseEntity<>("Reservation canceled by landlord successfully.", HttpStatus.NO_CONTENT);
+                return new ResponseEntity<>("Reservation canceled by landlord successfully.", HttpStatus.OK);
             } else {
                 logger.warn("Failed to cancel reservation with ID: {}", reservationId);
                 return new ResponseEntity<>("Failed to cancel reservation.", HttpStatus.NOT_FOUND);
@@ -138,7 +138,7 @@ public class ReservationController {
     public ResponseEntity<?> saveReservation(@RequestBody Reservation reservation) {
         try {
             if (reservation.getGuestCount() <= 0) {
-                logger.warn("Invalid guest count: {}", reservation.getGuestCount());
+                logger.warn("Invalid guest count: {}", reservationService.saveReservation(reservation));
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
             Reservation savedReservation = reservationService.saveReservation(reservation);
