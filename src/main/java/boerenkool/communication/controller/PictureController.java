@@ -1,7 +1,9 @@
 package boerenkool.communication.controller;
 
+import boerenkool.business.model.House;
 import boerenkool.business.model.Picture;
 import boerenkool.business.model.User;
+import boerenkool.business.service.HouseService;
 import boerenkool.business.service.PictureService;
 import boerenkool.communication.dto.PictureDTO;
 import boerenkool.database.dao.mysql.JdbcPictureDAO;
@@ -24,10 +26,12 @@ public class PictureController {
 
     private final JdbcPictureDAO jdbcPictureDAO;
     private final PictureService pictureService;
+    private final HouseService houseService;
 
-    public PictureController(JdbcPictureDAO jdbcPictureDAO, PictureService pictureService) {
+    public PictureController(JdbcPictureDAO jdbcPictureDAO, PictureService pictureService, HouseService houseService) {
         this.jdbcPictureDAO = jdbcPictureDAO;
         this.pictureService = pictureService;
+        this.houseService = houseService;
     }
 
     @GetMapping
@@ -37,7 +41,7 @@ public class PictureController {
 
     //todo onderstaande methode nog formatten
     @GetMapping("/houses/{houseId}")
-    public ResponseEntity<String> getPicturesByHouseId(@PathVariable("houseId") int houseId) {
+    public ResponseEntity<?> getPicturesByHouseId(@PathVariable("houseId") int houseId) {
         Optional<List<Picture>> optionalPictures = Optional.ofNullable(jdbcPictureDAO.getAllByHouseId(houseId));
 
         if (optionalPictures.isPresent() && !optionalPictures.get().isEmpty()) {
@@ -95,7 +99,7 @@ public class PictureController {
 
     //todo werkt nu
     @GetMapping("/houses/first/{houseId}")
-    public ResponseEntity<byte[]> getFirstPictureOfHouse(@PathVariable("houseId") int houseId) {
+    public ResponseEntity<?> getFirstPictureOfHouse(@PathVariable("houseId") int houseId) {
         Optional<Picture> picture = jdbcPictureDAO.getFirstPictureByHouseId(houseId);
         if (picture.isPresent()) {
             return pictureService.buildImageResponse(picture.get().getPicture());
@@ -106,24 +110,24 @@ public class PictureController {
 
     //todo werkt nu
     @GetMapping("/{pictureId}")
-    public ResponseEntity<byte[]> getPictureById(@PathVariable("pictureId") int pictureId) {
+    public ResponseEntity<?> getPictureById(@PathVariable("pictureId") int pictureId) {
         Optional<Picture> picture = jdbcPictureDAO.getOneById(pictureId);
         if (picture.isPresent()) {
             return pictureService.buildImageResponse(picture.get().getPicture());
         } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("Picture not found", HttpStatus.NOT_FOUND);
         }
     }
 
-    @PostMapping("/create")
-    public ResponseEntity<?> createOne(@RequestBody Picture picture) {
-        pictureService.storeOne(picture);
-        return new ResponseEntity<>("Picture created successfully", HttpStatus.CREATED);
-    }
+//    @PostMapping("/create")
+//    public ResponseEntity<?> createOne(@RequestBody Picture picture) {
+//        pictureService.savePicture(picture);
+//        return new ResponseEntity<>("Picture created successfully", HttpStatus.CREATED);
+//    }
 
     //todo methode werkt
     @DeleteMapping("/delete/{pictureId}")
-    public ResponseEntity<String> deletePictureById(@PathVariable("pictureId") int pictureId) {
+    public ResponseEntity<?> deletePictureById(@PathVariable("pictureId") int pictureId) {
         boolean isDeleted = pictureService.removeOneById(pictureId);
         if (isDeleted) {
             return new ResponseEntity<>("Picture deleted successfully", HttpStatus.OK);
@@ -131,6 +135,10 @@ public class PictureController {
             return new ResponseEntity<>("Picture not found or deletion failed", HttpStatus.NOT_FOUND);
         }
     }
+
+
+
+
 
 
 
