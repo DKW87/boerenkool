@@ -1,6 +1,7 @@
 package boerenkool.business.service;
 
 import boerenkool.business.model.House;
+import boerenkool.business.model.HouseFilter;
 import boerenkool.database.repository.HouseRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +33,11 @@ public class HouseService {
     }
 
     public List<House> getListOfHousesByOwnerId(int houseOwnerId) {
-       return houseRepository.getListOfAllHousesByOwner(houseOwnerId);
+        return houseRepository.getListOfAllHousesByOwner(houseOwnerId);
+    }
+
+    public List<House> getFilteredListOfHouses(HouseFilter filter) {
+        return houseRepository.getHousesWithFilter(filter);
     }
 
     public boolean saveHouse(House house) {
