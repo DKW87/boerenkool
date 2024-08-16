@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 
 /**
@@ -28,6 +30,10 @@ public class HouseService {
         logger.info("New HouseService");
     }
 
+    public House getOneById(int houseId) {
+        return houseRepository.getHouseById(houseId).orElse(null);
+    }
+
     public List<House> getAllHouses() {
         return houseRepository.getListOfAllHouses();
     }
@@ -42,6 +48,10 @@ public class HouseService {
 
     public boolean saveHouse(House house) {
         return houseRepository.saveHouse(house);
+    }
+
+    public boolean deleteHouse(int houseId) {
+        return houseRepository.deleteHouse(houseId);
     }
 
 }

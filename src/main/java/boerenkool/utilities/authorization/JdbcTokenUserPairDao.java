@@ -52,7 +52,7 @@ public class JdbcTokenUserPairDao implements TokenUserPairDao {
     public Optional<TokenUserPair> findByUser(User user) {
         List<TokenUserPair> tokenUserPairs =
                 jdbcTemplate.query(
-                        "select * from connection_table where member_fk = ?", new ConnectionRowMapper(), user.getUserId());
+                        "select * from connection_table where user_fk = ?", new ConnectionRowMapper(), user.getUserId());
         if (tokenUserPairs.size() == 1) {
             return Optional.of(tokenUserPairs.get(0));
         }
