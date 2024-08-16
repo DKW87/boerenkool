@@ -16,6 +16,10 @@ public class PictureDTO {
         this.description = description;
     }
 
+    public PictureDTO(String description) {
+        this.description = description;
+    }
+
     public Integer getHouseId() {
         return houseId;
     }
