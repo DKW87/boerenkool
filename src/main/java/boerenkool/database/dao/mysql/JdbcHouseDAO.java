@@ -7,6 +7,7 @@ import boerenkool.business.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -79,8 +80,12 @@ public class JdbcHouseDAO implements HouseDAO {
     @Override
     public Optional<House> getOneById(int id) {
         String sql = "SELECT * FROM House WHERE houseId = ?";
-        House house = jdbcTemplate.queryForObject(sql, new HouseMapper(), id);
-        return house == null ? Optional.empty() : Optional.of(house);
+        try {
+            House house = jdbcTemplate.queryForObject(sql, new HouseMapper(), id);
+            return Optional.ofNullable(house);
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
     }
 
     @Override

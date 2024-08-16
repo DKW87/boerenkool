@@ -29,19 +29,21 @@ public class HouseRepository {
     private final ExtraFeatureDAO extraFeatureDAO;
     private final UserDAO userDAO;
     private final HouseTypeDAO houseTypeDAO;
+    private final ReservationDAO reservationDAO;
 
     @Autowired
     public HouseRepository(HouseDAO houseDAO, PictureDAO pictureDAO, ExtraFeatureDAO extraFeatureDAO,
-                           UserDAO userDAO, HouseTypeDAO houseTypeDAO) {
+                           UserDAO userDAO, HouseTypeDAO houseTypeDAO, ReservationDAO reservationDAO) {
         logger.info("New HouseRepository");
         this.houseDAO = houseDAO;
         this.pictureDAO = pictureDAO;
         this.extraFeatureDAO = extraFeatureDAO;
         this.userDAO = userDAO;
         this.houseTypeDAO = houseTypeDAO;
+        this.reservationDAO = reservationDAO;
     }
 
-    private List<House> setAllEntityDependencies(List<House> allHouses) {
+    private List<House> setAllHousesEntityDependencies(List<House> allHouses) {
         for (House house : allHouses) {
             house.setHouseOwner(userDAO.getOneById(house.accessOtherEntityIds().getHouseOwnerId())
                     .orElseThrow(() -> new NoSuchElementException("houseOwner not found")));
@@ -55,9 +57,21 @@ public class HouseRepository {
         return allHouses;
     }
 
+    private Optional<House> setSingleHouseEntityDependencies(Optional<House> optionalHouse) {
+        if (optionalHouse.isPresent()) {
+            optionalHouse.get()
+                    .setHouseType(houseTypeDAO.getOneById(optionalHouse.get().accessOtherEntityIds().getHouseTypeId())
+                            .orElseThrow(() -> new NoSuchElementException("houseOwner not found")));
+            optionalHouse.get()
+                    .setHouseOwner(userDAO.getOneById(optionalHouse.get().accessOtherEntityIds().getHouseOwnerId())
+                            .orElseThrow(() -> new NoSuchElementException("houseOwner not found")));
+        }
+        return optionalHouse;
+    }
+
     public List<House> getListOfAllHouses() {
         List<House> allHouses = houseDAO.getAll();
-        setAllEntityDependencies(allHouses);
+        setAllHousesEntityDependencies(allHouses);
         return allHouses;
     }
 
@@ -70,26 +84,28 @@ public class HouseRepository {
     public List<House> getListOfAllHousesByOwner(int ownerId) {
         List<House> allHouses = houseDAO.getAllHousesByOwner(ownerId);
         // currently gets all pictures
-        setAllEntityDependencies(allHouses);
+        setAllHousesEntityDependencies(allHouses);
         return allHouses;
     }
 
     public List<House> getLimitedListOfHouses(int limit, int offset) {
         List<House> allHouses = houseDAO.getLimitedList(limit, offset);
         // currently gets all pictures
-        setAllEntityDependencies(allHouses);
+        setAllHousesEntityDependencies(allHouses);
         return allHouses;
     }
 
     public List<House> getHousesWithFilter(HouseFilter filter) {
         List<House> allHouses = houseDAO.getHousesWithFilter(filter);
         // currently gets all pictures
-        setAllEntityDependencies(allHouses);
+        setAllHousesEntityDependencies(allHouses);
         return allHouses;
     }
 
-    public Optional<House> getHouse(int houseId) {
-        return houseDAO.getOneById(houseId);
+    public Optional<House> getHouseById(int houseId) {
+        Optional<House> optionalHouse = houseDAO.getOneById(houseId);
+        setSingleHouseEntityDependencies(optionalHouse);
+        return optionalHouse;
     }
 
     public boolean saveHouse(House house) {
