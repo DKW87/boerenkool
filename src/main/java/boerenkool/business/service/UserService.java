@@ -27,7 +27,7 @@ public class UserService {
     public boolean removeOneById(int id) {
         boolean removed = userRepository.removeOneById(id);
         if (!removed) {
-            throw new UserNotFoundException();
+            throw new UserNotFoundException("User with id " + id + " not found.");
         }
         return true;
     }
@@ -37,23 +37,26 @@ public class UserService {
     }
 
     public Optional<User> getOneById(int id) {
-        return userRepository.getOneById(id);
+        Optional<User> user = userRepository.getOneById(id);
+        if (user.isEmpty()) {
+            throw new UserNotFoundException("User with id " + id + " not found.");
+        }
+        return user;
     }
 
     public boolean updateOne(User user) {
         boolean updated = userRepository.updateOne(user);
         if (!updated) {
-            throw new UserUpdateFailedException();
+            throw new UserUpdateFailedException("Failed to update user with id " + user.getUserId());
         }
         return true;
     }
 
     public Optional<User> findByUsername(String username) {
         Optional<User> user = userRepository.findByUsername(username);
-        if (user.isPresent()) {
-            return user;
-        } else {
-            throw new UserNotFoundException();
+        if (user.isEmpty()) {
+            throw new UserNotFoundException("User with username '" + username + "' not found.");
         }
+        return user;
     }
 }

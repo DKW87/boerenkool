@@ -39,7 +39,7 @@ public class MessageService {
             return messageRepository.saveMessage(convertDtoToMessage(messageDTO));
         } else {
             logger.info("MessageDTO's senderId and / or userId not linked to existing users");
-            throw new UserNotFoundException();
+            throw new UserNotFoundException(null);
         }
     }
 
