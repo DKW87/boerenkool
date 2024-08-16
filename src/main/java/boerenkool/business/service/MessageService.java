@@ -79,8 +79,8 @@ public class MessageService {
     }
 
     private Message convertDTOToMessage(MessageDTO dto) {
-        User sender = userRepository.getOneById(dto.getSenderId()).orElse(null); // TODO verplaats check naar controller
-        User receiver = userRepository.getOneById(dto.getReceiverId()).orElse(null); // TODO verplaats check naar controller
+        User sender = userRepository.getOneById(dto.getSenderId()).orElse(null);
+        User receiver = userRepository.getOneById(dto.getReceiverId()).orElse(null);
         if (sender != null & receiver != null) {
             return new Message(
                     dto.getMessageId(),
