@@ -83,7 +83,7 @@ public class MessageRepository {
     }
 
     public List<Message> getAllByUserId(int userId) {
-        List<Message> listOfMessages = messageDAO.getAllFromSenderId(userId);
+        List<Message> listOfMessages = messageDAO.getAllByUserId(userId);
         addUsersToMessages(listOfMessages);
         return listOfMessages;
     }

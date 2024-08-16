@@ -32,14 +32,11 @@ public class MessageService {
         this.userRepository = userRepository;
     }
 
-    public boolean saveMessage(MessageDTO messageDTO) throws UserNotFoundException {
-        if (userRepository.getOneById(messageDTO.getReceiverId()).isPresent()  // TODO verplaats check naar controller
-                && userRepository.getOneById(messageDTO.getSenderId()).isPresent()) {
-            messageDTO.setDateTimeSent(LocalDateTime.now());
-            return messageRepository.saveMessage(convertDTOToMessage(messageDTO));
-        } else {
-            throw new UserNotFoundException("SenderId and / or userId not linked to existing user(s)");
-        }
+    public MessageDTO saveMessage(MessageDTO messageDTO) {
+        messageDTO.setDateTimeSent(LocalDateTime.now());
+        Message newMessage = convertDTOToMessage(messageDTO);
+        messageRepository.saveMessage(newMessage);
+        return convertMessageToDTO(newMessage);
     }
 
     public MessageDTO getByMessageId(int messageId) throws MessageDoesNotExistException {

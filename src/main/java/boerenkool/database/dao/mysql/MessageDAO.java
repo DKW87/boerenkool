@@ -18,6 +18,7 @@ public interface MessageDAO extends GenericDAO<Message> {
     @Override
     List<Message> getAll();
 
+    List<Message> getAllByUserId(int senderId);
     List<Message> getAllFromSenderId(int senderId);
     List<Message> getAllToReceiverId(int receiverId);
 
