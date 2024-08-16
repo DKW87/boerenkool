@@ -35,32 +35,33 @@ public class UserController {
     @GetMapping(value = "/{id}")
     public ResponseEntity<User> getOneById(@PathVariable("id") int id) {
         User user = userService.getOneById(id)
-                .orElseThrow(UserNotFoundException::new);
+                .orElseThrow(() -> new UserNotFoundException("User with id " + id + " not found."));
         return ResponseEntity.ok(user);
     }
 
     @PutMapping(value = "/{id}")
     public ResponseEntity<Void> updateOne(@RequestBody User user, @PathVariable("id") int id) {
-        userService.getOneById(id).orElseThrow(UserNotFoundException::new);
+        userService.getOneById(id)
+                .orElseThrow(() -> new UserNotFoundException("User with id " + id + " not found."));
         try {
             user.setUserId(id);
             userService.updateOne(user);
         } catch (Exception e) {
-            throw new UserUpdateFailedException();
+            throw new UserUpdateFailedException("User update failed");
         }
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping
+  /*  @PostMapping
     public ResponseEntity<Void> createOne(@RequestBody User user) {
         userService.storeOne(user);
         return ResponseEntity.status(HttpStatus.CREATED).build();
-    }
+    }*/
 
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<Void> deleteOne(@PathVariable("id") int id) {
-        //zelfde als: () -> new UserNotFoundException().
-        userService.getOneById(id).orElseThrow(UserNotFoundException::new);
+        userService.getOneById(id)
+                .orElseThrow(() -> new UserNotFoundException("User with id " + id + " not found."));
         userService.removeOneById(id);
         return ResponseEntity.noContent().build();
     }
@@ -68,8 +69,7 @@ public class UserController {
     @GetMapping(value = "/username/{username}")
     public ResponseEntity<User> findOneByUsername(@PathVariable("username") String name) {
         User user = userService.findByUsername(name)
-                //zelfde als: () -> new UserNotFoundException().
-                .orElseThrow(UserNotFoundException::new);
+                .orElseThrow(() -> new UserNotFoundException("User with username '" + name + "' not found."));
         return ResponseEntity.ok(user);
     }
 }
