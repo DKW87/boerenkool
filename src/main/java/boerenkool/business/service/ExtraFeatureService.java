@@ -27,17 +27,27 @@ public class ExtraFeatureService {
     }
 
     public ExtraFeature saveExtraFeature(ExtraFeature extraFeature) {
+        if (extraFeatureRepository.findByName(extraFeature.getExtraFeatureName()).isPresent()) {
+            throw new IllegalArgumentException("Een Extra Feature met deze naam bestaat al.");
+        }
         validateExtraFeature(extraFeature);
         extraFeatureRepository.storeOne(extraFeature);
         return extraFeature;
     }
 
     public boolean deleteExtraFeatureById(int id) {
+        // Controleer of de te verwijderen ExtraFeature bestaat
+        if (!extraFeatureRepository.getOneById(id).isPresent()) {
+            throw new IllegalArgumentException("Een ExtraFeature met ID " + id + " bestaat niet.");
+        }
         extraFeatureRepository.removeOneById(id);
         return true;
     }
 
     public boolean updateExtraFeature(ExtraFeature extraFeature) {
+        if (!extraFeatureRepository.getOneById(extraFeature.getExtraFeatureId()).isPresent()) {
+            throw new IllegalArgumentException("Een ExtraFeature met ID " + extraFeature.getExtraFeatureId() + " bestaat niet.");
+        }
         validateExtraFeature(extraFeature);
         return extraFeatureRepository.updateOne(extraFeature);
     }
@@ -48,7 +58,7 @@ public class ExtraFeatureService {
 
     private void validateExtraFeature(ExtraFeature extraFeature) {
         if (extraFeature.getExtraFeatureName() == null || extraFeature.getExtraFeatureName().isEmpty()) {
-            throw new IllegalArgumentException("Feature name cannot be null or empty.");
+            throw new IllegalArgumentException("Feature naam mag niet leeg zijn.");
         }
     }
 }
