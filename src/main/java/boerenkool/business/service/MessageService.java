@@ -38,8 +38,7 @@ public class MessageService {
             messageDTO.setDateTimeSent(LocalDateTime.now());
             return messageRepository.saveMessage(convertDtoToMessage(messageDTO));
         } else {
-            logger.info("MessageDTO's senderId and / or userId not linked to existing users");
-            throw new UserNotFoundException(null);
+            throw new UserNotFoundException("SenderId and / or userId not linked to existing user(s)");
         }
     }
 

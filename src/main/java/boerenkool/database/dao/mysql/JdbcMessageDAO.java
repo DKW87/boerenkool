@@ -50,7 +50,6 @@ public class JdbcMessageDAO implements MessageDAO {
 
     private PreparedStatement buildInsertMessageStatement(
             Message message, Connection connection) throws SQLException {
-        System.out.println(message);
         PreparedStatement ps = connection.prepareStatement(
                 "Insert into Message(senderId, receiverId, dateTimeSent, subject, body, archivedBySender, " +
                         "readByReceiver, archivedByReceiver) values (?,?,?,?,?,?,?,?);",
