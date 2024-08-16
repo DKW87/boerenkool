@@ -110,11 +110,20 @@ public class JdbcMessageDAO implements MessageDAO {
         return jdbcTemplate.query("Select * From Message", new MessageRowMapper());
     }
 
-    public List<Message> getAllByReceiverId(int receiverId) {
+    @Override
+    public List<Message> getAllToReceiverId(int receiverId) {
         return jdbcTemplate.query(
                 "Select * From Message where receiverId = ?;",
                 new MessageRowMapper(),
                 receiverId);
+    }
+
+    @Override
+    public List<Message> getAllFromSenderId(int senderId) {
+        return jdbcTemplate.query(
+                "Select * From Message where senderId = ?;",
+                new MessageRowMapper(),
+                senderId);
     }
 
     public List<Message> getAllByUserId(int userId) {
@@ -134,7 +143,7 @@ public class JdbcMessageDAO implements MessageDAO {
         int returnvalue = jdbcTemplate.update(connection ->
                 buildUpdateMessageStatement(message, connection));
         System.out.println(returnvalue);
-        return (returnvalue > 0) ;
+        return (returnvalue > 0);
     }
 
     public boolean archiveMessageForSender(Message message) {

@@ -57,9 +57,39 @@ public class MessageController {
     }
 
     @GetMapping("/users/{userid}/messages")
-    ResponseEntity<?> getAllByUserId(@PathVariable("userid") int userId) throws MessageDoesNotExistException {
+    ResponseEntity<?> getAllByUserId(@PathVariable("userid") int userId,
+                                     @RequestParam(name = "box", required = false) String box) throws MessageDoesNotExistException {
         // TODO user authentication (user can only request his/her OWN messages)
-        List<MessageDTO> listOfUsersMessages = messageService.getAllByUserId(userId);
+        List<MessageDTO> listOfUsersMessages;
+        if (box == "in") {
+            listOfUsersMessages = messageService.getAllFromSenderId(userId);
+        } else if (box == "out") {
+            listOfUsersMessages = messageService.getAllToReceiverId(userId);
+        } else {
+            listOfUsersMessages = messageService.getAllByUserId(userId);
+        }
+        if (!listOfUsersMessages.isEmpty()) {
+            return ResponseEntity.ok().body(listOfUsersMessages);
+        } else {
+            throw new MessageDoesNotExistException();
+        }
+    }
+
+    @GetMapping("/users/{userid}/messages/inbox")
+    ResponseEntity<?> getAllToReceiverId(@PathVariable("userid") int userId) throws MessageDoesNotExistException {
+        // TODO user authentication (user can only request his/her OWN messages)
+        List<MessageDTO> listOfUsersMessages = messageService.getAllToReceiverId(userId);
+        if (!listOfUsersMessages.isEmpty()) {
+            return ResponseEntity.ok().body(listOfUsersMessages);
+        } else {
+            throw new MessageDoesNotExistException();
+        }
+    }
+
+    @GetMapping("/users/{userid}/messages/outbox")
+    ResponseEntity<?> getAllFromSenderId(@PathVariable("userid") int userId) throws MessageDoesNotExistException {
+        // TODO user authentication (user can only request his/her OWN messages)
+        List<MessageDTO> listOfUsersMessages = messageService.getAllFromSenderId(userId);
         if (!listOfUsersMessages.isEmpty()) {
             return ResponseEntity.ok().body(listOfUsersMessages);
         } else {
