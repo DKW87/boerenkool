@@ -39,7 +39,7 @@ public class HouseService {
     }
 
     public List<House> getListOfHousesByOwnerId(int houseOwnerId) {
-       return houseRepository.getListOfAllHousesByOwner(houseOwnerId);
+        return houseRepository.getListOfAllHousesByOwner(houseOwnerId);
     }
 
     public List<House> getFilteredListOfHouses(HouseFilter filter) {

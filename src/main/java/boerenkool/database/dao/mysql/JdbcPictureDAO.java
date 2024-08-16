@@ -112,21 +112,12 @@ public class JdbcPictureDAO implements PictureDAO {
         return ps;
     }
 
-
+    // set CommonParameters eruit gehaald ivm dat je alleen de picture description wilt updaten.
     private PreparedStatement updatePictureStatement(Picture picture, Connection connection) throws SQLException {
-        PreparedStatement ps;
-        ps = connection.prepareStatement(
-                """
-         UPDATE Picture 
-         SET 
-            houseId=?,
-            picture=?,
-            pictureDescription=?
-         WHERE id=?
-      """
-        );
-        setCommonParameters(ps, picture);
-        ps.setInt(4, picture.getPictureId());
+        String sql = "UPDATE Picture SET pictureDescription=? WHERE pictureId=?";
+        PreparedStatement ps = connection.prepareStatement(sql);
+        ps.setString(1, picture.getDescription());
+        ps.setInt(2, picture.getPictureId());
         return ps;
     }
 
