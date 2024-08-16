@@ -1,19 +1,25 @@
 package boerenkool.communication.controller;
 
-import boerenkool.business.model.Message;
 import boerenkool.business.service.MessageService;
 import boerenkool.business.service.UserService;
 import boerenkool.communication.dto.MessageDTO;
+import boerenkool.utilities.exceptions.MessageDoesNotExistException;
+import boerenkool.utilities.exceptions.MessageNotSavedException;
+import boerenkool.utilities.exceptions.UserIsNotSenderOfMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * @author Bart Notelaers
+ */
 @RestController
-@RequestMapping(value = "/api")
+@RequestMapping("/api")
 public class MessageController {
     private final Logger logger = LoggerFactory.getLogger(MessageController.class);
     private final UserService userService;
@@ -29,61 +35,71 @@ public class MessageController {
 
     // save ("send") a new message
     @PostMapping("/messages")
-    ResponseEntity<?> saveMessage(@RequestBody MessageDTO messageDTO) {
-        logger.info("MessageController.sendMessage is called");
+    ResponseEntity<?> saveMessage(@RequestBody MessageDTO messageDTO) throws MessageNotSavedException {
+        // TODO check user is authenticated as sender of this message
+        // eventuele verbetering; geef de messageId terug van de bewaarde Messsage
+        // (save methode in MessageDAO moet daarvoor een int teruggeven; genericDAO moet weer aangepast... gedoe!)
         if (messageService.saveMessage(messageDTO)) {
-            return ResponseEntity.ok().body(messageDTO);
+            return new ResponseEntity<>(HttpStatus.CREATED);
         } else {
-            logger.info("sendMessage failed");
-            return ResponseEntity.internalServerError().body("Message not saved");
+            throw new MessageNotSavedException();
         }
     }
 
-    @GetMapping("user/{userId}/messages")
-    ResponseEntity<?> getAllMessagesforUserId(@PathVariable int userId) {
-        // TODO the user can only request his/her OWN messages.
-        //  where to check for authorisation? in MessageService?
-        // TODO return only a list of 'stripped' Message objects (sender, date, subject)
-        //  without body text?
-        logger.info("getAllMessagesforUserId is called");
-        List<MessageDTO> listOfUsersMessages = messageService.findMessagesForReceiverId(userId);
+    @GetMapping("/messages")
+    ResponseEntity<?> getAllMessages() throws MessageDoesNotExistException {
+        List<MessageDTO> listOfUsersMessages = messageService.getAllMessages();
         if (!listOfUsersMessages.isEmpty()) {
             return ResponseEntity.ok().body(listOfUsersMessages);
         } else {
-            logger.info("getAllMessagesforUserId list is EMPTY");
-            return ResponseEntity.notFound().build();
+            throw new MessageDoesNotExistException();
         }
     }
 
-    @GetMapping("user/{userId}/messages/{messageId}")
-    ResponseEntity<?> getMessageforUserById(@PathVariable int userId, @PathVariable int messageId) {
-        logger.info("getMessageforUserById is called");
-        // TODO check user validated
-        messageService.findMessageById(messageId);
-        if (messageService.findMessageById(messageId) != null) {
-            return ResponseEntity.ok().body(messageService.findMessageById(messageId));
+    @GetMapping("/users/{userid}/messages")
+    ResponseEntity<?> getAllByUserId(@PathVariable("userid") int userId) throws MessageDoesNotExistException {
+        // TODO user authentication (user can only request his/her OWN messages)
+        List<MessageDTO> listOfUsersMessages = messageService.getAllByUserId(userId);
+        if (!listOfUsersMessages.isEmpty()) {
+            return ResponseEntity.ok().body(listOfUsersMessages);
         } else {
-            logger.info("getMessageforUserById message not found");
-            return ResponseEntity.notFound().build();
+            throw new MessageDoesNotExistException();
         }
     }
 
-    @PutMapping("/messages")
-    ResponseEntity<?> updateMessage(@RequestBody MessageDTO messageDTO) {
-        logger.info("updateMessage is called");
-        if (messageService.updateMessage(messageDTO)) {
-            return ResponseEntity.ok().body(messageService.updateMessage(messageDTO));
+    @GetMapping("/messages/{messageid}")
+    ResponseEntity<?> getById(@PathVariable("messageid") int messageId) throws MessageDoesNotExistException {
+        // TODO user authentication  (user is receiver of this message)
+        MessageDTO messageDTO = messageService.getByMessageId(messageId);
+        if (messageDTO != null) {
+            return new ResponseEntity<>(messageDTO, HttpStatus.OK);
+        } else throw new MessageDoesNotExistException();
+    }
+
+    @PutMapping("/users/{userid}/messages")
+    ResponseEntity<?> updateMessage(@PathVariable("userid") int userId,
+                                    @RequestBody MessageDTO messageDTO)
+            throws MessageDoesNotExistException, MessageNotSavedException, UserIsNotSenderOfMessage {
+        // TODO user authentication (user is sender of this message)
+        if (userId == messageDTO.getSenderId()) {
+            if (messageService.updateMessage(messageDTO)) {
+                return new ResponseEntity<>("Message updated", HttpStatus.OK);
+            } else {
+                throw new MessageNotSavedException();
+            }
         } else {
-            logger.info("updateMessage results in FALSE");
-            return ResponseEntity.internalServerError().body("Message not updated");
+            throw new UserIsNotSenderOfMessage();
         }
     }
 
-    @DeleteMapping("/messages")
-    ResponseEntity<?> deleteMessage() {
-        // if logged in user = senderId, call archivedBySender method
-        // if logged in user = receiverId, call archivedByReceiver method
-        return ResponseEntity.ok("deleteMessage called");
+    @DeleteMapping("/messages/{messageid}")
+    ResponseEntity<?> deleteMessage(@PathVariable("messageid") int messageId)
+            throws MessageDoesNotExistException {
+        // TODO user authentication (user must be sender to delete a message)
+        if (messageService.deleteMessage(messageId)) {
+            return ResponseEntity.ok("Message deleted");
+        } else {
+            throw new MessageDoesNotExistException();
+        }
     }
-
 }
