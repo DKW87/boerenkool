@@ -9,7 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.view.RedirectView;
 
+import java.net.URI;
 import java.util.List;
 
 /**
@@ -38,8 +40,30 @@ public class HouseApiController {
                 : new ResponseEntity<>(allHouses, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/vind-een-op")
-    public ResponseEntity<?> getOneHouseById(@RequestParam(name = "huisId") int houseId) {
+    @GetMapping("/{houseId}")
+    public RedirectView redirectToHouseName(@PathVariable int houseId) {
+        if (houseId <= 0) {
+            return new RedirectView("/e/huis-id-incorrect");
+        }
+
+        House house = houseService.getOneById(houseId);
+        if (house == null) {
+            return new RedirectView("/e/huis-bestaat-niet");
+        }
+
+        String houseName = house.getHouseName();
+        String seoFriendlyName = houseName.toLowerCase().replace(" ", "-")
+                .replaceAll("[^a-z0-9\\-]", "");
+
+        return new RedirectView("/api/huizen/" + houseId + "/" + seoFriendlyName);
+    }
+
+
+    @GetMapping(value = "/{houseId}/{houseName}")
+    public ResponseEntity<?> getOneHouseByIdAndName(
+            @PathVariable int houseId,
+            @PathVariable String houseName) {
+
         if (houseId <= 0) {
             return new ResponseEntity<>("House ID is invalid and cannot be 0 or negative", HttpStatus.BAD_REQUEST);
         }
@@ -50,27 +74,49 @@ public class HouseApiController {
         return new ResponseEntity<>(house, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/vind-lijst-op")
-    public ResponseEntity<?> getListOfHousesByHouseOwnerId(@RequestParam(name = "eigenaarId") int id) {
+    @GetMapping("/l/{id}")
+    public RedirectView getListOfHousesByOwnerId(@PathVariable int id) {
         if (id <= 0) {
-            return new ResponseEntity<>("Owner ID cannot not be 0 or negative", HttpStatus.BAD_REQUEST);
+            return new RedirectView("/e/huis-eigenaar-id-incorrect");
         }
+
         List<House> listOfHousesByOwner = houseService.getListOfHousesByOwnerId(id);
-        return listOfHousesByOwner.isEmpty()
-                ? new ResponseEntity<>("No houses belong to this owner", HttpStatus.NO_CONTENT)
-                : new ResponseEntity<>(listOfHousesByOwner, HttpStatus.OK);
+
+        String ownerName = houseService.getHouseOwnerName(id);
+        String seoFriendlyName = ownerName.toLowerCase().replace(" ", "-").replaceAll("[^a-z0-9\\-]", "");
+
+        URI location = URI.create(String.format("/api/huizen/%d/%s", id, seoFriendlyName));
+        return new RedirectView("/api/huizen/l/" + id + "/" + seoFriendlyName);
     }
+
+    @GetMapping("/l/{id}/{houseOwnerName}")
+    public ResponseEntity<?> getListOfHousesByOwnerIdAndName(
+            @PathVariable int id,
+            @PathVariable String houseOwnerName) {
+
+        if (id <= 0) {
+            return new ResponseEntity<>("Owner ID cannot be 0 or negative", HttpStatus.BAD_REQUEST);
+        }
+
+        List<House> listOfHousesByOwner = houseService.getListOfHousesByOwnerId(id);
+        if (listOfHousesByOwner.isEmpty()) {
+            return new ResponseEntity<>("No houses belong to this owner", HttpStatus.NO_CONTENT);
+        }
+
+        return new ResponseEntity<>(listOfHousesByOwner, HttpStatus.OK);
+    }
+
 
     @GetMapping(value = "/filter")
     public ResponseEntity<?> getListOfHousesByFilter(
             @RequestParam(name = "provincies", required = false, defaultValue = "") List<String> provinces,
             @RequestParam(name = "steden", required = false, defaultValue = "") List<String> cities,
-            @RequestParam(name = "typen", required = false, defaultValue = "") List<Integer> houseTypeIds,
-            @RequestParam(name = "eigenaar", required = false, defaultValue = "0") int houseOwnerId,
+            @RequestParam(name = "huis-typen", required = false, defaultValue = "") List<Integer> houseTypeIds,
+            @RequestParam(name = "huis-eigenaar", required = false, defaultValue = "0") int houseOwnerId,
             @RequestParam(name = "aantal-gasten", required = false, defaultValue = "0") int amountOfGuests,
             @RequestParam(name = "aantal-kamers", required = false, defaultValue = "0") int desiredRoomCount,
-            @RequestParam(name = "minimum-prijs-per-persoon-per-dag", required = false, defaultValue = "0") int minPricePPPD,
-            @RequestParam(name = "maximum-prijs-per-persoon-per-dag", required = false, defaultValue = "0") int maxPricePPPD,
+            @RequestParam(name = "minimum-prijs-per-persoon-per-nacht", required = false, defaultValue = "0") int minPricePPPD,
+            @RequestParam(name = "maximum-prijs-per-persoon-per-nacht", required = false, defaultValue = "0") int maxPricePPPD,
             @RequestParam(name = "sorteer-op", required = false, defaultValue = "") String sortBy,
             @RequestParam(name = "sorteer-orde", required = false, defaultValue = "ASC") String sortOrder,
             @RequestParam(required = false, defaultValue = "10") int limit,
@@ -110,8 +156,8 @@ public class HouseApiController {
         }
     }
 
-    @PutMapping(value = "/bewerk-waar")
-    public ResponseEntity<?> updateHouse(@RequestParam(name = "huisId") int houseId,
+    @PutMapping(value = "/{houseId}")
+    public ResponseEntity<?> updateHouse(@PathVariable int houseId,
                                          @RequestParam(name = "huis-eigenaarId") int houseOwnerId,
                                          @RequestBody House house) {
         if (houseId <= 0 || houseOwnerId <= 0) {
@@ -130,8 +176,8 @@ public class HouseApiController {
         }
     }
 
-    @DeleteMapping(value = "/verwijder-waar")
-    public ResponseEntity<?> deleteHouse(@RequestParam(name = "huisId") int houseId,
+    @DeleteMapping(value = "/{houseId}")
+    public ResponseEntity<?> deleteHouse(@PathVariable int houseId,
                                          @RequestParam(name = "huis-eigenaarId") int houseOwnerId) {
         if (houseId <= 0 || houseOwnerId <= 0) {
             return new ResponseEntity<>("ID's cannot not be 0 or negative", HttpStatus.BAD_REQUEST);
