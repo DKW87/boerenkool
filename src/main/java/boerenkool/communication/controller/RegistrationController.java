@@ -103,4 +103,4 @@ public class RegistrationController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token or email");
     }
     }
-}
+
