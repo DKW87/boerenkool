@@ -78,7 +78,7 @@ public class RegistrationController {
 
     @PostMapping("reset-password")
     public ResponseEntity<?> requestPasswordReset (@RequestBody String email) {
-        User user = userService.findByEmail(email);
+        Optional<User> user = userService.findByEmail(email);
         if (user != null) {
             TokenUserPair tokenUserPair = authorizationService.generateTokenForUser(user);
             passwordService.sendPasswordResetEmail(email, tokenUserPair.getKey().toString());
