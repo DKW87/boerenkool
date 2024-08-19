@@ -46,10 +46,15 @@ public class MessageRepository {
      * @param message
      * @return
      */
-    private Message addUsersToMessage(Message message) {
+    private void addUsersToMessage(Message message) {
         message.setSender(userDAO.getSenderByMessageId(message.getMessageId()).orElse(null));
         message.setReceiver(userDAO.getReceiverByMessageId(message.getMessageId()).orElse(null));
-        return message;
+    }
+
+    private void addUsersToMessages(List<Message> listOfMessages) {
+        for (Message message : listOfMessages) {
+            addUsersToMessage(message);
+        }
     }
 
     public boolean saveMessage(Message message) {
@@ -59,25 +64,33 @@ public class MessageRepository {
     public Message getMessageById(int messageId) throws MessageDoesNotExistException {
         Optional<Message> message = messageDAO.getOneById(messageId);
         if (message.isPresent()) {
-            addUsersToMessage(message);
+            addUsersToMessage(message.get());
             return message.get();
         }
         throw new MessageDoesNotExistException();
     }
 
+    public List<Message> getAllToReceiverId(int receiverId) {
+        List<Message> listOfMessages = messageDAO.getAllToReceiverId(receiverId);
+        addUsersToMessages(listOfMessages);
+        return listOfMessages;
+    }
+
+    public List<Message> getAllFromSenderId(int senderId) {
+        List<Message> listOfMessages = messageDAO.getAllFromSenderId(senderId);
+        addUsersToMessages(listOfMessages);
+        return listOfMessages;
+    }
+
     public List<Message> getAllByUserId(int userId) {
         List<Message> listOfMessages = messageDAO.getAllByUserId(userId);
-        for (Message message : listOfMessages) {
-            addUsersToMessage(message);
-        }
+        addUsersToMessages(listOfMessages);
         return listOfMessages;
     }
 
     public List<Message> getAll() {
         List<Message> listOfMessages = messageDAO.getAll();
-        for (Message message : listOfMessages) {
-            addUsersToMessage(message);
-        }
+        addUsersToMessages(listOfMessages);
         return listOfMessages;
     }
 
