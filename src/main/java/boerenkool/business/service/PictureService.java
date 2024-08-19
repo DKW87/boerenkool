@@ -1,6 +1,7 @@
 package boerenkool.business.service;
 
 import boerenkool.business.model.Picture;
+import boerenkool.communication.dto.PictureDTO;
 import boerenkool.database.repository.PictureRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,17 +27,11 @@ public class PictureService {
         logger.info("New PictureService");
     }
 
+    // save includes store and update
     public boolean savePicture(Picture picture) {
         return pictureRepository.savePicture(picture);
     }
 
-    public boolean storeOne(Picture picture) {
-        return pictureRepository.storeOne(picture);
-    }
-
-    boolean updateOne(Picture picture) {
-        return pictureRepository.updateOne(picture);
-    }
 
     public boolean removeOneById(int pictureId) {
         return pictureRepository.removeOneById(pictureId);
@@ -89,6 +84,8 @@ public class PictureService {
         }
         return null;
     }
+
+
 
 
 
