@@ -7,6 +7,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Base64;
+import java.util.UUID;
 
 @Service
 public class PasswordService {
@@ -37,4 +38,17 @@ public class PasswordService {
         random.nextBytes(salt);
         return Base64.getEncoder().encodeToString(salt);
     }
+
+    public String generateResetToken() {
+        return UUID.randomUUID().toString();
+    }
+
+    public boolean verifyResetToken(String token, String storedToken) {
+        return storedToken.equals(token);
+    }
+
+    public void sendPasswordResetEmail(String email, String token) {
+
+    }
+
 }
