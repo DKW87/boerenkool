@@ -1,5 +1,9 @@
 package boerenkool.utilities.authorization;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
@@ -12,7 +16,12 @@ import java.util.UUID;
 @Service
 public class PasswordService {
 
+    @Autowired
+    private JavaMailSender javaMailSender;
+
     private static final String PEPPER = "TheWholeWorldHatesBoerenkool";
+    @Autowired
+    private JavaMailSenderImpl mailSender;
 
     public static String hashPassword(String password, String salt) {
         try {
@@ -48,6 +57,12 @@ public class PasswordService {
     }
 
     public void sendPasswordResetEmail(String email, String token) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("huisjeboompjeboerenkool@gmail.com");
+        message.setTo(email);
+        message.setSubject("Wachtwoord resetten");
+        message.setText("Om je wachtwoord te resetten, gebruik deze token: " + token);
+        mailSender.send(message);
 
     }
 
