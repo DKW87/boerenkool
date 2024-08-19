@@ -77,13 +77,15 @@ public class RegistrationController {
     }
 
     @PostMapping("reset-password")
-    public ResponseEntity<?> requestPasswordReset (@RequestBody String email) {
-        Optional<User> user = userService.findByEmail(email);
-        if (user != null) {
-            TokenUserPair tokenUserPair = authorizationService.generateTokenForUser(user);
+    public ResponseEntity<?> requestPasswordReset(@RequestBody String email) {
+        Optional<User> userOpt = userService.findByEmail(email);
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            TokenUserPair tokenUserPair = authorizationService.authorize(user);
             passwordService.sendPasswordResetEmail(email, tokenUserPair.getKey().toString());
+            return ResponseEntity.ok("Password reset email sent");
         }
-        return ResponseEntity.ok("Password reset email sent");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
     }
 
     @PostMapping("reset-password/confirm")
