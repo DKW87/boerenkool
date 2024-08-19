@@ -4,6 +4,7 @@ import boerenkool.business.model.User;
 import boerenkool.business.service.RegistrationService;
 import boerenkool.business.service.UserService;
 import boerenkool.communication.dto.LoginDTO;
+import boerenkool.communication.dto.PasswordResetDto;
 import boerenkool.communication.dto.UserDto;
 import boerenkool.utilities.authorization.AuthorizationService;
 import boerenkool.utilities.authorization.PasswordService;
@@ -86,16 +87,20 @@ public class RegistrationController {
     }
 
     @PostMapping("reset-password/confirm")
-    public ResponseEntity<?> confirmPasswordReset (@RequestBody PasswordResetDto passwordResetDto) {
-        Optional<TokenUserPair> tokenUserPairOptional = authorizationService.validate(UUID.fromString(passwordResetDto.getToken()));
-        if (tokenUserPairOptional.isPresent()) {
-            User user = tokenUserPairOptional.get().getUser();
-            String salt = passwordService.generateSalt();
-            String hashedPassword = passwordService.hashPassword(passwordResetDto.getNewPassword(), salt);
-            user.setHashedPassword(hashedPassword);
-            user.setSalt(salt);
-            userService.updateOne(user);
-            return ResponseEntity.ok("Password reset succesfully");
+    public ResponseEntity<?> confirmPasswordReset(@RequestBody PasswordResetDto passwordResetDto) {
+        Optional<User> userOpt = authorizationService.validate(UUID.fromString(passwordResetDto.getToken()));
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            if (user.getEmail().equals(passwordResetDto.getEmail())) {
+                String salt = passwordService.generateSalt();
+                String hashedPassword = passwordService.hashPassword(passwordResetDto.getNewPassword(), salt);
+                user.setHashedPassword(hashedPassword);
+                user.setSalt(salt);
+                userService.updateOne(user);
+                return ResponseEntity.ok("Password reset successfully");
+            }
         }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token or email");
+    }
     }
 }

@@ -38,7 +38,7 @@ public class UserRepository {
         return userDAO.updateOne(user);
     }
 
-    public User findByEmail(String email) {
+    public Optional<User> findByEmail(String email) {
         return userDAO.findByEmail(email);
     }
 
