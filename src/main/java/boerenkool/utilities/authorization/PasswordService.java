@@ -23,7 +23,7 @@ public class PasswordService {
     @Autowired
     private JavaMailSenderImpl mailSender;
 
-    public String hashPassword(String password, String salt) {
+    public static String hashPassword(String password, String salt) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             String saltedPassword = salt + password + PEPPER;
