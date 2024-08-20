@@ -70,6 +70,27 @@ public class ReservationRepository {
         return isDeleted;
     }
 
+    public List<Reservation> getAllReservationsByLandlord(int landlordId) {
+        List<Reservation> reservations = reservationDAO.getAllReservationsByLandlord(landlordId);
+        reservations.forEach(this::loadRelatedEntities);
+        logger.debug("Fetched reservations for landlord with ID: {}", landlordId);
+        return reservations;
+    }
+
+    public List<Reservation> getAllReservationsByTenant(int tenantId) {
+        List<Reservation> reservations = reservationDAO.getAllReservationsByTenant(tenantId);
+        reservations.forEach(this::loadRelatedEntities);
+        logger.debug("Fetched reservations for tenant with ID: {}", tenantId);
+        return reservations;
+    }
+
+    public List<Reservation> getAllReservationsByHouseId(int houseId) {
+        List<Reservation> reservations = reservationDAO.getAllReservationsByHouseId(houseId);
+        reservations.forEach(this::loadRelatedEntities);
+        logger.debug("Fetched reservations for house with ID: {}", houseId);
+        return reservations;
+    }
+
     private void loadRelatedEntities(Reservation reservation) {
         int userId = reservation.getReservedByUser().getUserId();
         int houseId = reservation.getHouse().getHouseId();
