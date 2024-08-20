@@ -83,21 +83,5 @@ public class Reservation {
                 ", guestCount=" + guestCount +
                 '}';
     }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Reservation that = (Reservation) o;
-        return reservationId == that.reservationId &&
-                Objects.equals(house, that.house) &&
-                Objects.equals(reservedByUser, that.reservedByUser);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(reservationId, house, reservedByUser);
-    }
-
 }
 
