@@ -36,10 +36,19 @@ public class RegistrationController {
         this.userService = userService;
     }
 
+    @GetMapping("/register")
+    public String showRegistrationPage() {
+        return "register";
+    }
+
     @PostMapping("register")
-    public ResponseEntity<User> registerUserHandler(@RequestBody UserDto userDto) throws RegistrationFailedException {
-        User user = registrationService.register(userDto);
-        return ResponseEntity.ok().body(user);
+    public ResponseEntity<String> registerUserHandler(@RequestBody UserDto userDto) {
+        try {
+            User user = registrationService.register(userDto);
+            return ResponseEntity.ok("Registratie succesvol!");
+        } catch (RegistrationFailedException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 
     @GetMapping("/login")
