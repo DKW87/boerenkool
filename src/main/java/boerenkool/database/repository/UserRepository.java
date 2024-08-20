@@ -38,6 +38,10 @@ public class UserRepository {
         return userDAO.updateOne(user);
     }
 
+    public Optional<User> findByEmail(String email) {
+        return userDAO.findByEmail(email);
+    }
+
     public List<User> getBlockedUsers(User user) {
         return userDAO.getBlockedUsers(user);
     }

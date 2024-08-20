@@ -129,6 +129,16 @@ public class JdbcUserDAO implements UserDAO {
     }
 
     @Override
+    public Optional<User> findByEmail(String email) {
+        List<User> users = jdbcTemplate.query("SELECT * FROM `User` WHERE emailaddress = ?", new UserRowMapper(), email);
+        if (users.size() != 1) {
+            return Optional.empty();
+        } else {
+            return Optional.of(users.get(0));
+        }
+    }
+
+    @Override
     public void addBlockedUser(User blockedUser, User user) {
         String sql = "INSERT INTO BlockedList (blockedUser, userId) VALUES (?, ?)";
         jdbcTemplate.update(sql, blockedUser.getUserId(), user.getUserId());

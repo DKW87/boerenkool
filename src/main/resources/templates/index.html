@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <!-- Koppeling van het hoofd JavaScript-bestand dat de loginfunctionaliteit regelt -->
+</head>
+<body>
+<!-- Container voor het loginformulier -->
+<div class="login-container">
+    <h2>Login</h2>
+    <!-- Label en invoerveld voor de gebruikersnaam -->
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username">
+    <br>
+    <!-- Label en invoerveld voor het wachtwoord -->
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password">
+    <br>
+    <!-- Knop om het inlogproces te starten -->
+    <button id="loginBtn">Login</button>
+    <!-- Gebied om meldingen weer te geven, zoals successen of fouten -->
+    <div id="notification"></div>
+</div>
+</body>
+</html>
