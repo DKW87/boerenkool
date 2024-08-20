@@ -1,6 +1,9 @@
 package boerenkool.business.service;
 
+import boerenkool.business.model.House;
 import boerenkool.business.model.Reservation;
+import boerenkool.business.model.User;
+import boerenkool.communication.dto.ReservationDTO;
 import boerenkool.database.repository.ReservationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -48,6 +51,30 @@ public class ReservationService {
         return reservationRepository.getAllReservationsByHouseId(houseId);
     }
 
+    public ReservationDTO convertToDto(Reservation reservation) {
+        ReservationDTO reservationDTO = new ReservationDTO();
+        reservationDTO.setReservationId(reservation.getReservationId());
+        reservationDTO.setStartDate(reservation.getStartDate());
+        reservationDTO.setEndDate(reservation.getEndDate());
+        reservationDTO.setGuestCount(reservation.getGuestCount());
+        reservationDTO.setHouseId(reservation.getHouse().getHouseId());
+        reservationDTO.setUserId(reservation.getReservedByUser().getUserId());
+        return reservationDTO;
+    }
+
+    public Reservation convertToEntity(ReservationDTO reservationDTO, House house, User user) {
+        Reservation reservation = new Reservation();
+        reservation.setReservationId(reservationDTO.getReservationId());
+        reservation.setStartDate(reservationDTO.getStartDate());
+        reservation.setEndDate(reservationDTO.getEndDate());
+        reservation.setGuestCount(reservationDTO.getGuestCount());
+        reservation.setHouse(house);
+        reservation.setReservedByUser(user);
+        return reservation;
+    }
+
+
+
     private void validateReservation(Reservation reservation) {
         if (reservation.getGuestCount() < 0) {
             throw new IllegalArgumentException("Guest count cannot be negative.");
@@ -56,7 +83,11 @@ public class ReservationService {
         LocalDate startDate = reservation.getStartDate();
         LocalDate endDate = reservation.getEndDate();
 
-        if (startDate != null && endDate != null && endDate.isBefore(startDate)) {
+        if (startDate == null || endDate == null) {
+            throw new IllegalArgumentException("Start date and end date cannot be null.");
+        }
+
+        if (endDate.isBefore(startDate)) {
             throw new IllegalArgumentException("End date cannot be before start date.");
         }
     }
