@@ -14,15 +14,13 @@ import boerenkool.utilities.exceptions.RegistrationFailedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 import java.util.UUID;
 
-@RestController
+@Controller
 public class RegistrationController {
 
     private final RegistrationService registrationService;
@@ -42,6 +40,11 @@ public class RegistrationController {
     public ResponseEntity<User> registerUserHandler(@RequestBody UserDto userDto) throws RegistrationFailedException {
         User user = registrationService.register(userDto);
         return ResponseEntity.ok().body(user);
+    }
+
+    @GetMapping("/login")
+    public String showLoginPage() {
+        return "index"; // Dit verwijst naar index.html in src/main/resources/templates/
     }
 
     @PostMapping("login")
