@@ -46,4 +46,11 @@ public class AuthorizationService {
         }
         return Optional.empty();
     }
+
+    public TokenUserPair generateTokenForUser(User user) {
+        UUID token = UUID.randomUUID();
+        TokenUserPair tokenUserPair = new TokenUserPair(token, user);
+        tokenUserPairDao.save(tokenUserPair);
+        return tokenUserPair;
+    }
 }
