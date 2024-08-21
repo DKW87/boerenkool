@@ -11,7 +11,6 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -113,7 +112,7 @@ public class JdbcReservationDAO implements ReservationDAO {
     private PreparedStatement updateReservationStatement(Reservation reservation, Connection connection) throws SQLException {
         PreparedStatement preparedStatement;
         String sql = "UPDATE Reservation SET reservedByUserId=?, houseId=?, startDate=?, endDate=?, guestCount=? WHERE reservationId = ?";
-        preparedStatement = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
+        preparedStatement = connection.prepareStatement(sql);
         extracted(reservation, preparedStatement);
         preparedStatement.setInt(6, reservation.getReservationId());
         return preparedStatement;
