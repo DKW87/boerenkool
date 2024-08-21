@@ -26,15 +26,24 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
         // Controleer of de login succesvol was door de HTTP-statuscode te controleren
         if (!response.ok) {
             // Als de login mislukt, gooi dan een fout met een bericht
-            throw new Error('Login failed. Please check your credentials.');
+            throw new Error('Login mislukt. Controleer je inloggegevens.');
         }
+
+        // Verkrijg de token uit de response header
+        const token = response.headers.get('Authorization');
+        if (!token) {
+            throw new Error('Geen token ontvangen van de server.');
+        }
+
+        // Sla de token op in localStorage zodat deze kan worden gebruikt voor vervolgacties
+        localStorage.setItem('authToken', token);
 
         // Parse de JSON-response van de server, die de UserDto bevat bij succesvolle login
         const result = await response.json();
-        console.log('User logged in:', result); // Log de details van de ingelogde gebruiker voor debugging
+        console.log('Gebruiker ingelogd:', result); // Log de details van de ingelogde gebruiker voor debugging
 
         // Toon een succesmelding aan de gebruiker
-        showNotification('Login successful!', 'success');
+        showNotification('Login succesvol!', 'success');
 
         // Optioneel: Redirect de gebruiker naar een andere pagina na een succesvolle login
         // window.location.href = '/home'; // Vervang '/home' door de gewenste URL
