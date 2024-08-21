@@ -78,4 +78,45 @@ public class UserController {
                 .orElseThrow(() -> new UserNotFoundException("User with username '" + name + "' not found."));
         return ResponseEntity.ok(user);
     }
+
+    @GetMapping("/profile")
+    public ResponseEntity<UserDto> getProfile(@RequestHeader("Authorization") String token) {
+        Optional<User> userOpt = authorizationService.validate(UUID.fromString(token));
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            UserDto userDto = new UserDto(user); // Verondersteld dat je een UserDto hebt die deze gegevens bevat
+            return ResponseEntity.ok(userDto);
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+    }
+
+    @PutMapping("/profile")
+    public ResponseEntity<String> updateProfile(@RequestBody UserDto userDto, @RequestHeader("Authorization") String token) {
+        Optional<User> userOpt = authorizationService.validate(UUID.fromString(token));
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            if (user.getUsername().equals(userDto.getUsername())) {
+                user.setEmail(userDto.getEmail());
+                user.setPhone(userDto.getPhone());
+                user.setFirstName(userDto.getFirstName());
+                user.setInfix(userDto.getInfix());
+                user.setLastName(userDto.getLastName());
+                userService.updateOne(user);
+                return ResponseEntity.ok("User updated successfully");
+            }
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token or username mismatch");
+    }
+
+    @DeleteMapping("/profile")
+    public ResponseEntity<String> deleteProfile(@RequestHeader("Authorization") String token) {
+        Optional<User> userOpt = authorizationService.validate(UUID.fromString(token));
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            userService.removeOneById(user.getUserId());
+            return ResponseEntity.ok("User profile deleted successfully");
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
+    }
 }
+
