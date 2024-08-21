@@ -36,6 +36,18 @@ public class ReservationService {
         return reservationRepository.deleteReservationById(id);
     }
 
+    public List<Reservation> getAllReservationsByLandlord(int landlordId) {
+        return reservationRepository.getAllReservationsByLandlord(landlordId);
+    }
+
+    public List<Reservation> getAllReservationsByTenant(int tenantId) {
+        return reservationRepository.getAllReservationsByTenant(tenantId);
+    }
+
+    public List<Reservation> getAllReservationsByHouseId(int houseId) {
+        return reservationRepository.getAllReservationsByHouseId(houseId);
+    }
+
     private void validateReservation(Reservation reservation) {
         if (reservation.getGuestCount() < 0) {
             throw new IllegalArgumentException("Guest count cannot be negative.");

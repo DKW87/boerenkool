@@ -27,4 +27,10 @@ public interface ReservationDAO extends GenericDAO<Reservation> {
 
     @Override
     boolean removeOneById (int id);
+
+    List<Reservation> getAllReservationsByLandlord(int landlordId);
+
+    List<Reservation> getAllReservationsByTenant(int tenantId);
+
+    List<Reservation> getAllReservationsByHouseId(int houseId);
 }

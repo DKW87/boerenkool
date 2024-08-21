@@ -77,6 +77,24 @@ public class JdbcReservationDAO implements ReservationDAO {
         return rowsAffected > 0;
     }
 
+    @Override
+    public List<Reservation> getAllReservationsByLandlord(int landlordId) {
+        String sql = "SELECT r.* FROM Reservation r JOIN House h ON r.houseId = h.houseId WHERE h.houseOwnerId = ?";
+        return jdbcTemplate.query(sql, new ReservationMapper(), landlordId);
+    }
+
+    @Override
+    public List<Reservation> getAllReservationsByTenant(int tenantId) {
+        String sql = "SELECT * FROM Reservation WHERE reservedByUserId = ?";
+        return jdbcTemplate.query(sql, new ReservationMapper(), tenantId);
+    }
+
+    @Override
+    public List<Reservation> getAllReservationsByHouseId(int houseId) {
+        String sql = "SELECT * FROM Reservation WHERE houseId = ?";
+        return jdbcTemplate.query(sql, new ReservationMapper(), houseId);
+    }
+
     private void extracted(Reservation reservation, PreparedStatement preparedStatement) throws SQLException {
         preparedStatement.setInt(1, reservation.getReservedByUser().getUserId());
         preparedStatement.setInt(2, reservation.getHouse().getHouseId());

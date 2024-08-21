@@ -152,5 +152,41 @@ public class ReservationController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    // Get reservations by landlord
+    @GetMapping("/landlord/{landlordId}")
+    public ResponseEntity<List<Reservation>> getAllReservationsByLandlord(@PathVariable int landlordId) {
+        List<Reservation> reservations = reservationService.getAllReservationsByLandlord(landlordId);
+        if (reservations.isEmpty()) {
+            logger.warn("Landlord with ID: {} not found.", landlordId);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        logger.info("Found {} reservations.", reservations.size());
+        return new ResponseEntity<>(reservations, HttpStatus.OK);
+    }
+
+    // Get reservations by tenant ID
+    @GetMapping("/tenant/{tenantId}")
+    public ResponseEntity<List<Reservation>> getAllReservationsByTenant(@PathVariable int tenantId) {
+        List<Reservation> reservations = reservationService.getAllReservationsByTenant(tenantId);
+        if (reservations.isEmpty()) {
+            logger.warn("Tenant with ID: {} not found.", tenantId);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        logger.info("Found {} reservations.", reservations.size());
+        return new ResponseEntity<>(reservations, HttpStatus.OK);
+    }
+
+    // Get reservations by house ID
+    @GetMapping("/house/{houseId}")
+    public ResponseEntity<List<Reservation>> getAllReservationsByHouseId(@PathVariable int houseId) {
+        List<Reservation> reservations = reservationService.getAllReservationsByHouseId(houseId);
+        if (reservations.isEmpty()) {
+            logger.warn("House with ID: {} not found.", houseId);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        logger.info("Found {} reservations.", reservations.size());
+        return new ResponseEntity<>(reservations, HttpStatus.OK);
+    }
 }
 
