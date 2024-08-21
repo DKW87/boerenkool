@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    const token = localStorage.getItem('token'); // Verondersteld dat het token is opgeslagen in localStorage
+    const token = localStorage.getItem('authToken'); // Verondersteld dat het token is opgeslagen in localStorage
 
     if (!token) {
         showNotification('Je bent niet ingelogd.', 'error');
@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             showNotification('Profiel succesvol verwijderd!', 'success');
-            localStorage.removeItem('token');
+            localStorage.removeItem('authToken');
             window.location.href = '/register';
 
         } catch (error) {

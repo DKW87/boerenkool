@@ -42,11 +42,8 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
         const result = await response.json();
         console.log('Gebruiker ingelogd:', result); // Log de details van de ingelogde gebruiker voor debugging
 
-        // Toon een succesmelding aan de gebruiker
-        showNotification('Login succesvol!', 'success');
+        window.location.href = '/profile';
 
-        // Optioneel: Redirect de gebruiker naar een andere pagina na een succesvolle login
-        // window.location.href = '/home'; // Vervang '/home' door de gewenste URL
 
     } catch (error) {
         // Als er een fout optreedt (bijvoorbeeld verkeerde inloggegevens), toon een foutmelding aan de gebruiker
