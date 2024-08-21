@@ -14,13 +14,13 @@ import boerenkool.utilities.exceptions.RegistrationFailedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 import java.util.UUID;
 
-@Controller
+@RestController
+@RequestMapping("/api/registration")
 public class RegistrationController {
 
     private final RegistrationService registrationService;
@@ -36,12 +36,7 @@ public class RegistrationController {
         this.userService = userService;
     }
 
-    @GetMapping("/register")
-    public String showRegistrationPage() {
-        return "register";
-    }
-
-    @PostMapping("register")
+    @PostMapping
     public ResponseEntity<String> registerUserHandler(@RequestBody UserDto userDto) {
         try {
             User user = registrationService.register(userDto);
@@ -51,12 +46,7 @@ public class RegistrationController {
         }
     }
 
-    @GetMapping("/login")
-    public String showLoginPage() {
-        return "index"; // Dit verwijst naar index.html in src/main/resources/templates/
-    }
-
-    @PostMapping("login")
+    @PostMapping("/login")
     public ResponseEntity<UserDto> loginHandler(@RequestBody LoginDTO loginDTO) throws LoginException {
         User user = registrationService.validateLogin(
                 loginDTO.getUsername(), loginDTO.getPassword());
@@ -67,12 +57,10 @@ public class RegistrationController {
                     .body(new UserDto(user));
         } else {
             throw new LoginException("Login failed");
-
         }
     }
 
-
-    @PostMapping("validate")
+    @PostMapping("/validate")
     public ResponseEntity<String> validationHandler(@RequestHeader String authorization) throws LoginException {
         try {
             UUID uuid = UUID.fromString(authorization);
@@ -85,10 +73,9 @@ public class RegistrationController {
         } catch (IllegalArgumentException e) {
             throw new LoginException("Login failed");
         }
-
     }
 
-    @PostMapping("reset-password")
+    @PostMapping("/reset-password")
     public ResponseEntity<?> requestPasswordReset(@RequestBody String email) {
         Optional<User> userOpt = userService.findByEmail(email);
         if (userOpt.isPresent()) {
@@ -100,7 +87,7 @@ public class RegistrationController {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
     }
 
-    @PostMapping("reset-password/confirm")
+    @PostMapping("/reset-password/confirm")
     public ResponseEntity<?> confirmPasswordReset(@RequestBody PasswordResetDto passwordResetDto) {
         Optional<User> userOpt = authorizationService.validate(UUID.fromString(passwordResetDto.getToken()));
         if (userOpt.isPresent()) {
@@ -116,5 +103,4 @@ public class RegistrationController {
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token or email");
     }
-    }
-
+}

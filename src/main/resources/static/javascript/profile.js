@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    const token = localStorage.getItem('authToken'); // Verondersteld dat het token is opgeslagen in localStorage
+    const token = localStorage.getItem('authToken');
 
     if (!token) {
         showNotification('Je bent niet ingelogd.', 'error');
@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
-    // Haal het profiel op bij het laden van de pagina
     try {
         const response = await fetch('/api/users/profile', {
             method: 'GET',
@@ -32,7 +31,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         showNotification(error.message, 'error');
     }
 
-    // Update profiel
     document.getElementById('profileForm').addEventListener('submit', async (event) => {
         event.preventDefault();
 
@@ -45,20 +43,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             lastName: document.getElementById('lastName').value
         };
 
-        // Email validatie
-        if (!validateEmail(email)) {
+        if (!validateEmail(profileData.email)) {
             showNotification("Voer een geldig e-mailadres in.", 'error');
             return;
         }
 
-        // Voornaam en achternaam validatie
-        if (!validateName(firstName) || !validateName(lastName)) {
+        if (!validateName(profileData.firstName) || !validateName(profileData.lastName)) {
             showNotification("Voornaam en achternaam mogen alleen letters bevatten.", 'error');
             return;
         }
 
-        // Telefoonnummer validatie
-        if (!validatePhoneNumber(phone)) {
+        if (!validatePhoneNumber(profileData.phone)) {
             showNotification("Telefoonnummer moet beginnen met 06 en precies 8 cijfers bevatten.", 'error');
             return;
         }
@@ -73,8 +68,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 body: JSON.stringify(profileData),
             });
 
-
-
             if (!response.ok) {
                 throw new Error('Kon profiel niet updaten.');
             }
@@ -86,7 +79,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // Verwijder profiel
     document.getElementById('deleteProfileBtn').addEventListener('click', async () => {
         if (!confirm('Weet je zeker dat je je profiel wilt verwijderen? Dit kan niet ongedaan worden gemaakt.')) {
             return;
@@ -114,28 +106,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 });
 
-// Functie om notificaties te tonen
-function showNotification(message, type) {
-    const notificationDiv = document.getElementById('notification');
-    notificationDiv.textContent = message;
-    notificationDiv.className = type;
-    setTimeout(() => notificationDiv.textContent = '', 3000);
-}
-
-// Functie om namen te valideren (alleen letters toegestaan)
 function validateName(name) {
     const nameRegex = /^[A-Za-z]+$/;
     return nameRegex.test(name);
 }
 
-// Functie om telefoonnummers te valideren (begint met 06 en precies 8 cijfers)
 function validatePhoneNumber(phone) {
     const phoneRegex = /^06\d{8}$/;
     return phoneRegex.test(phone);
 }
 
-// Functie om e-mailadressen te valideren
 function validateEmail(email) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
+}
+
+function showNotification(message, type) {
+    const notificationDiv = document.getElementById('notification');
+    notificationDiv.textContent = message;
+    notificationDiv.className = type;
+    setTimeout(() => notificationDiv.textContent = '', 3000);
 }
