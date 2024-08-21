@@ -45,6 +45,24 @@ document.addEventListener('DOMContentLoaded', async () => {
             lastName: document.getElementById('lastName').value
         };
 
+        // Email validatie
+        if (!validateEmail(email)) {
+            showNotification("Voer een geldig e-mailadres in.", 'error');
+            return;
+        }
+
+        // Voornaam en achternaam validatie
+        if (!validateName(firstName) || !validateName(lastName)) {
+            showNotification("Voornaam en achternaam mogen alleen letters bevatten.", 'error');
+            return;
+        }
+
+        // Telefoonnummer validatie
+        if (!validatePhoneNumber(phone)) {
+            showNotification("Telefoonnummer moet beginnen met 06 en precies 8 cijfers bevatten.", 'error');
+            return;
+        }
+
         try {
             const response = await fetch('/api/users/profile', {
                 method: 'PUT',
@@ -54,6 +72,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 },
                 body: JSON.stringify(profileData),
             });
+
+
 
             if (!response.ok) {
                 throw new Error('Kon profiel niet updaten.');
@@ -100,4 +120,22 @@ function showNotification(message, type) {
     notificationDiv.textContent = message;
     notificationDiv.className = type;
     setTimeout(() => notificationDiv.textContent = '', 3000);
+}
+
+// Functie om namen te valideren (alleen letters toegestaan)
+function validateName(name) {
+    const nameRegex = /^[A-Za-z]+$/;
+    return nameRegex.test(name);
+}
+
+// Functie om telefoonnummers te valideren (begint met 06 en precies 8 cijfers)
+function validatePhoneNumber(phone) {
+    const phoneRegex = /^06\d{8}$/;
+    return phoneRegex.test(phone);
+}
+
+// Functie om e-mailadressen te valideren
+function validateEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
 }
