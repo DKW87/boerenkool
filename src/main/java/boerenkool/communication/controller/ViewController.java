@@ -20,4 +20,9 @@ public class ViewController {
     public String showProfilePage() {
         return "profile"; // Dit verwijst naar profile.html
     }
+
+    @GetMapping("/forgot-password")
+    public String showForgotPasswordPage() {
+        return "forgot-password"; // Dit verwijst naar forgot-password.html
+    }
 }
