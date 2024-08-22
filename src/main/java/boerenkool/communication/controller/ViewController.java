@@ -25,4 +25,9 @@ public class ViewController {
     public String showForgotPasswordPage() {
         return "forgot-password"; // Dit verwijst naar forgot-password.html
     }
+
+    @GetMapping("/reset-password-confirm")
+    public String showResetPasswordConfirmPage() {
+        return "reset-password-confirm"; // Dit verwijst naar forgot-password.html
+    }
 }

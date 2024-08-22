@@ -112,20 +112,33 @@ public class RegistrationController {
     @PostMapping("/reset-password/confirm")
     // zet json body van post verzoek automatisch om in passwordresetdto, dat gegevens bevat voor resetten van password
     public ResponseEntity<String> confirmPasswordReset(@RequestBody PasswordResetDto passwordResetDto) {
+        logger.debug("Starting password reset confirmation process for email: {}", passwordResetDto.getEmail());
+
         //zet token om naar een uuid object. retourneer user terug als token geldig is.
         Optional<User> userOpt = authorizationService.validate(UUID.fromString(passwordResetDto.getToken()));
         if (userOpt.isPresent()) {
             //haal user object uit optional
+
             User user = userOpt.get();
             //extra beveiligings maatregel om te kijken of email van gebruiker is gekoppeld aan token
             if (user.getEmail().equals(passwordResetDto.getEmail())) {
                 String salt = passwordService.generateSalt();
                 String hashedPassword = passwordService.hashPassword(passwordResetDto.getNewPassword(), salt);
+                logger.debug("New salt: {}", salt);
+                logger.debug("Hashed new password: {}", hashedPassword);
                 user.setHashedPassword(hashedPassword);
                 user.setSalt(salt);
-                //stel nieuw wachtwoord in
-                userService.updateOne(user);
-                return ResponseEntity.ok("Password reset successfully");
+
+                boolean updateSuccess = userService.updateOne(user);
+                if (updateSuccess) {
+                    logger.debug("User password updated successfully.");
+                    return ResponseEntity.ok("Password reset successfully");
+                } else {
+                    logger.warn("Failed to update user password.");
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update password");
+                }
+            } else {
+                logger.warn("Email in request does not match user's email.");
             }
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token or email");
