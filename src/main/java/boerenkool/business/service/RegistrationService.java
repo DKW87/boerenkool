@@ -52,7 +52,12 @@ public class RegistrationService {
             throw new RegistrationFailedException("Wachtwoord moet minstens 6 tekens lang zijn en minstens één hoofdletter, één cijfer en één speciaal teken bevatten.");
         }
 
-        User user = new User(userDto, passwordService);
+        // Genereer salt en hash het wachtwoord hier in de service
+        String salt = passwordService.generateSalt();
+        String hashedPassword = passwordService.hashPassword(userDto.getPassword(), salt);
+
+        // Maak een nieuw User-object met het gehashte wachtwoord en salt
+        User user = new User(userDto, hashedPassword, salt);
         logger.info("Saving new user to database: {}", user.getUsername());
         userRepository.storeOne(user);
 
@@ -70,11 +75,11 @@ public class RegistrationService {
             // Re-hash the input password using the stored salt
             String hashedInputPassword = passwordService.hashPassword(plainPassword, storedSalt);
 
-            logger.debug("Login attempt: Stored salt = {}, Stored hashed password = {}", storedSalt, storedHashedPassword);
-            logger.debug("Login attempt: Hashed input password = {}", hashedInputPassword);
+            logger.info("Login attempt: Stored salt = {}, Stored hashed password = {}", storedSalt, storedHashedPassword);
+            logger.info("Login attempt: Hashed input password = {}", hashedInputPassword);
 
             if (storedHashedPassword.equals(hashedInputPassword)) {
-                logger.debug("Login successful for user: {}", username);
+                logger.info("Login successful for user: {}", username);
                 return user;
             } else {
                 logger.warn("Login failed for user: {}. Passwords do not match.", username);
@@ -86,40 +91,61 @@ public class RegistrationService {
     }
 
     public boolean resetPassword(PasswordResetDto passwordResetDto) {
-        logger.debug("Starting password reset confirmation process for email: {}", passwordResetDto.getEmail());
+        logger.info("Starting password reset for email: {}", passwordResetDto.getEmail());
 
-        Optional<User> userOpt = authorizationService.validate(UUID.fromString(passwordResetDto.getToken()));
-        if (userOpt.isPresent()) {
-            User user = userOpt.get();
-            logger.debug("User found for token: {} with email: {}", passwordResetDto.getToken(), user.getEmail());
-
-            if (user.getEmail().equals(passwordResetDto.getEmail())) {
-                String salt = passwordService.generateSalt();
-                String hashedPassword = passwordService.hashPassword(passwordResetDto.getNewPassword(), salt);
-                logger.debug("New salt: {}", salt);
-                logger.debug("Hashed new password: {}", hashedPassword);
-                user.setHashedPassword(hashedPassword);
-                user.setSalt(salt);
-
-                boolean updateSuccess = userRepository.updateOne(user);
-                if (updateSuccess) {
-                    logger.debug("User password updated successfully.");
-                    return true;
-                } else {
-                    logger.warn("Failed to update user password.");
-                }
-            } else {
-                logger.warn("Email in request does not match user's email.");
+        // Stap 1: Valideer de reset token en haal de gebruiker op
+        try {
+            UUID token = UUID.fromString(passwordResetDto.getToken());
+            Optional<User> userOpt = authorizationService.validate(token);
+            if (!userOpt.isPresent()) {
+                logger.warn("Invalid token or user not found for token: {}", passwordResetDto.getToken());
+                return false;
             }
+
+            User user = userOpt.get();
+
+            // Stap 2: Controleer of de e-mail in het resetverzoek overeenkomt met de gebruiker
+            if (!user.getEmail().equals(passwordResetDto.getEmail())) {
+                logger.warn("Email in reset request does not match the user's email.");
+                return false;
+            }
+
+            // Stap 3: Genereer een nieuwe salt en hash het nieuwe wachtwoord
+            String newSalt = passwordService.generateSalt();
+            String hashedNewPassword = passwordService.hashPassword(passwordResetDto.getNewPassword(), newSalt);
+
+            // Debug: Log de details voor verificatie
+            logger.info("Generated new salt: {}", newSalt);
+            logger.info("Hashed new password: {}", hashedNewPassword);
+
+            // Stap 4: Update de gebruiker met het nieuwe gehashte wachtwoord en de nieuwe salt
+            user.setHashedPassword(hashedNewPassword);
+            user.setSalt(newSalt);
+
+            logger.info("About to update user: HashedPassword={}, Salt={}", user.getHashedPassword(), user.getSalt());
+
+
+            boolean updateSuccess = userRepository.updateOne(user);
+            if (!updateSuccess) {
+                logger.error("Failed to update password for user: {}", user.getUsername());
+                return false;
+            }
+
+            // Debug: Bevestig succesvolle update
+            logger.info("Password successfully reset for user: {}", user.getUsername());
+            return true;
+        } catch (IllegalArgumentException e) {
+            logger.error("Invalid UUID format for token: {}", passwordResetDto.getToken(), e);
+            return false;
         }
-        return false;
     }
+
 
     public void sendPasswordResetEmail(String email) {
         Optional<User> userOpt = userRepository.findByEmail(email);
         if (userOpt.isPresent()) {
             User user = userOpt.get();
-            logger.debug("User found: {}", user.getUsername());
+            logger.info("User found: {}", user.getUsername());
 
             TokenUserPair tokenUserPair = authorizationService.authorize(user);
             passwordService.sendPasswordResetEmail(email, tokenUserPair.getKey().toString());
