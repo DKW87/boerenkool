@@ -11,17 +11,25 @@ import boerenkool.utilities.authorization.PasswordService;
 import boerenkool.utilities.authorization.TokenUserPair;
 import boerenkool.utilities.exceptions.LoginException;
 import boerenkool.utilities.exceptions.RegistrationFailedException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+
+
 
 @RestController
 @RequestMapping("/api/registration")
 public class RegistrationController {
+
+    private final Logger logger = LoggerFactory.getLogger(RegistrationController.class);
+
 
     private final RegistrationService registrationService;
     private final AuthorizationService authorizationService;
@@ -85,14 +93,19 @@ public class RegistrationController {
     }
 
     @PostMapping("/reset-password")
-    public ResponseEntity<String> requestPasswordReset(@RequestBody String email) {
+    public ResponseEntity<String> requestPasswordReset(@RequestBody Map<String, String> emailMap) {
+        String email = emailMap.get("email");
+        logger.debug("Received password reset request for email: {}", email);
         Optional<User> userOpt = userService.findByEmail(email);
         if (userOpt.isPresent()) {
             User user = userOpt.get();
+            logger.debug("User found: {}", user.getUsername());
+
             TokenUserPair tokenUserPair = authorizationService.authorize(user);
             passwordService.sendPasswordResetEmail(email, tokenUserPair.getKey().toString());
             return ResponseEntity.ok("Password reset email sent");
         }
+        logger.warn("User not found for email: {}", email);
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
     }
 

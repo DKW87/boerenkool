@@ -16,15 +16,13 @@ import java.util.UUID;
 @Service
 public class PasswordService {
 
-    private JavaMailSenderImpl mailSender;
     private JavaMailSender javaMailSender;
 
     private static final String PEPPER = "TheWholeWorldHatesBoerenkool";
 
     @Autowired
-    public PasswordService(JavaMailSender javaMailSender, JavaMailSenderImpl mailSender) {
+    public PasswordService(JavaMailSender javaMailSender) {
         this.javaMailSender = javaMailSender;
-        this.mailSender = mailSender;
     }
 
 
@@ -76,8 +74,7 @@ public class PasswordService {
         message.setTo(email);
         message.setSubject("Wachtwoord resetten");
         message.setText("Om je wachtwoord te resetten, gebruik deze token: " + token);
-        mailSender.send(message);
-
+        javaMailSender.send(message);
     }
 
 }
