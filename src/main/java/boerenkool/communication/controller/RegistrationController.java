@@ -2,12 +2,10 @@ package boerenkool.communication.controller;
 
 import boerenkool.business.model.User;
 import boerenkool.business.service.RegistrationService;
-import boerenkool.business.service.UserService;
 import boerenkool.communication.dto.LoginDTO;
 import boerenkool.communication.dto.PasswordResetDto;
 import boerenkool.communication.dto.UserDto;
 import boerenkool.utilities.authorization.AuthorizationService;
-import boerenkool.utilities.authorization.PasswordService;
 import boerenkool.utilities.authorization.TokenUserPair;
 import boerenkool.utilities.exceptions.LoginException;
 import boerenkool.utilities.exceptions.RegistrationFailedException;
@@ -22,26 +20,19 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-
-
 @RestController
 @RequestMapping("/api/registration")
 public class RegistrationController {
 
     private final Logger logger = LoggerFactory.getLogger(RegistrationController.class);
 
-
     private final RegistrationService registrationService;
     private final AuthorizationService authorizationService;
-    private final PasswordService passwordService;
-    private final UserService userService;
 
     @Autowired
-    public RegistrationController(RegistrationService registrationService, AuthorizationService authorizationService, PasswordService passwordService, UserService userService) {
+    public RegistrationController(RegistrationService registrationService, AuthorizationService authorizationService) {
         this.registrationService = registrationService;
         this.authorizationService = authorizationService;
-        this.passwordService = passwordService;
-        this.userService = userService;
     }
 
     @PostMapping
@@ -55,39 +46,15 @@ public class RegistrationController {
     }
 
     @PostMapping("/login")
-    //geef een http respons terug met statuscode, headers en body. in dit geval bevat het een login dto object
-    // de jsonbody wordt automatisch omgezet in een login dto
     public ResponseEntity<UserDto> loginHandler(@RequestBody LoginDTO loginDTO) throws LoginException {
         User user = registrationService.validateLogin(
                 loginDTO.getUsername(), loginDTO.getPassword());
         if (user != null) {
             TokenUserPair tokenUserPair = authorizationService.authorize(user);
             return ResponseEntity.ok()
-                    //haal de waarde van het token op die als key in het pair zit
                     .header("Authorization", tokenUserPair.getKey().toString())
                     .body(new UserDto(user));
         } else {
-            throw new LoginException("Login failed");
-        }
-    }
-
-    //valideer het reeds verkregen autorisatie token
-//methode aanroepen wanneer er een post verzoek wordt gestuurd naar deze url
-    @PostMapping("/validate")
-    //haal waarde uit de oauthorization header en wijs het toe aan authorization paramater (de token)
-    public ResponseEntity<String> validationHandler(@RequestHeader String authorization) throws LoginException {
-        try {
-            //zet header om naar een uuid.
-            UUID uuid = UUID.fromString(authorization);
-            //roep methode aan om te kijken of het uuid token overeenkomt met bestaande gebruiker.
-            Optional<User> user = authorizationService.validate(uuid);
-            if (user.isPresent()) {
-                //als gebruiker aanwezig is(en dus het token geldig is) retourneer een 200 respons met gebruikersnaam van betrefende gebruiker
-                return ResponseEntity.ok().body(user.get().getUsername());
-            } else {
-                throw new LoginException("Login failed");
-            }
-        } catch (IllegalArgumentException e) {
             throw new LoginException("Login failed");
         }
     }
@@ -96,51 +63,32 @@ public class RegistrationController {
     public ResponseEntity<String> requestPasswordReset(@RequestBody Map<String, String> emailMap) {
         String email = emailMap.get("email");
         logger.debug("Received password reset request for email: {}", email);
-        Optional<User> userOpt = userService.findByEmail(email);
-        if (userOpt.isPresent()) {
-            User user = userOpt.get();
-            logger.debug("User found: {}", user.getUsername());
-
-            TokenUserPair tokenUserPair = authorizationService.authorize(user);
-            passwordService.sendPasswordResetEmail(email, tokenUserPair.getKey().toString());
-            return ResponseEntity.ok("Password reset email sent");
-        }
-        logger.warn("User not found for email: {}", email);
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        registrationService.sendPasswordResetEmail(email);
+        return ResponseEntity.ok("Password reset email sent");
     }
 
     @PostMapping("/reset-password/confirm")
-    // zet json body van post verzoek automatisch om in passwordresetdto, dat gegevens bevat voor resetten van password
     public ResponseEntity<String> confirmPasswordReset(@RequestBody PasswordResetDto passwordResetDto) {
-        logger.debug("Starting password reset confirmation process for email: {}", passwordResetDto.getEmail());
-
-        //zet token om naar een uuid object. retourneer user terug als token geldig is.
-        Optional<User> userOpt = authorizationService.validate(UUID.fromString(passwordResetDto.getToken()));
-        if (userOpt.isPresent()) {
-            //haal user object uit optional
-
-            User user = userOpt.get();
-            //extra beveiligings maatregel om te kijken of email van gebruiker is gekoppeld aan token
-            if (user.getEmail().equals(passwordResetDto.getEmail())) {
-                String salt = passwordService.generateSalt();
-                String hashedPassword = passwordService.hashPassword(passwordResetDto.getNewPassword(), salt);
-                logger.debug("New salt: {}", salt);
-                logger.debug("Hashed new password: {}", hashedPassword);
-                user.setHashedPassword(hashedPassword);
-                user.setSalt(salt);
-
-                boolean updateSuccess = userService.updateOne(user);
-                if (updateSuccess) {
-                    logger.debug("User password updated successfully.");
-                    return ResponseEntity.ok("Password reset successfully");
-                } else {
-                    logger.warn("Failed to update user password.");
-                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update password");
-                }
-            } else {
-                logger.warn("Email in request does not match user's email.");
-            }
+        boolean success = registrationService.resetPassword(passwordResetDto);
+        if (success) {
+            return ResponseEntity.ok("Password reset successfully");
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token or email");
         }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token or email");
+    }
+
+    @PostMapping("/validate")
+    public ResponseEntity<String> validationHandler(@RequestHeader String authorization) throws LoginException {
+        try {
+            UUID uuid = UUID.fromString(authorization);
+            Optional<User> user = authorizationService.validate(uuid);
+            if (user.isPresent()) {
+                return ResponseEntity.ok().body(user.get().getUsername());
+            } else {
+                throw new LoginException("Login failed");
+            }
+        } catch (IllegalArgumentException e) {
+            throw new LoginException("Login failed");
+        }
     }
 }
