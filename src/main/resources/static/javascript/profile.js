@@ -32,6 +32,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     document.getElementById('profileForm').addEventListener('submit', async (event) => {
+        //zorg dat het formulier niet verzonden wordt en je eigen js code kan uitvoeren
         event.preventDefault();
 
         const profileData = {

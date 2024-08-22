@@ -16,22 +16,34 @@ import java.util.UUID;
 @Service
 public class PasswordService {
 
-    @Autowired
+    private JavaMailSenderImpl mailSender;
     private JavaMailSender javaMailSender;
 
     private static final String PEPPER = "TheWholeWorldHatesBoerenkool";
+
     @Autowired
-    private JavaMailSenderImpl mailSender;
+    public PasswordService(JavaMailSender javaMailSender, JavaMailSenderImpl mailSender) {
+        this.javaMailSender = javaMailSender;
+        this.mailSender = mailSender;
+    }
+
+
 
     public static String hashPassword(String password, String salt) {
         try {
+            //initialiseer een sha-256 hash algoritme
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             String saltedPassword = salt + password + PEPPER;
 
+            //hash het gecombineerde wachtwoord met sha 256 en zet om naar een byte array met hulp van utf8
+            //een algoritme als sha 256 produceert bytes en niet een string.
             byte[] hashBytes = md.digest(saltedPassword.getBytes(StandardCharsets.UTF_8));
 
+            //bytes worden weergegeven in hexadecimaal formaat. elke byte wordt omgezet naar een string van 2 hexadecimale cijdfers
             StringBuilder hexString = new StringBuilder();
             for (byte b : hashBytes) {
+                //x = bytewaarde als hexadecimaal
+                //02 = byte heeft altijd twee cijfers
                 hexString.append(String.format("%02x", b));
             }
 
@@ -42,9 +54,11 @@ public class PasswordService {
     }
 
     public String generateSalt() {
+        //initialiseer een cryptografisch veilige random generator
         SecureRandom random = new SecureRandom();
         byte[] salt = new byte[16];
         random.nextBytes(salt);
+        //zet om naar base64 gecodeerde string die eenvoudig in database kan worden ogpeslagen
         return Base64.getEncoder().encodeToString(salt);
     }
 
