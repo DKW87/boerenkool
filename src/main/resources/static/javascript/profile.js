@@ -145,20 +145,29 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
+        //stuur een get verzoek naar endpoint
         fetch(`/api/blocked-users/${userId}`)
+            //then wordt uitgevoerd als fetch succesvol is uitgevoerd en converteert het json response naar een js object
             .then(response => response.json())
+            //response.json wordt meegeegeven als argument 'data'. data bevat de lijst van de geblokkeerde gebruikkers
             .then(data => {
+                //maak de lijst leeg zodat er niet dubbele gebruikers worden weergegeven
                 blockedUsersList.innerHTML = '';
+                //controleer of de data een array is
                 if (Array.isArray(data)) {
+                    //itereer door elke user en maak een list item aan
                     data.forEach(user => {
                         const listItem = document.createElement('li');
                         listItem.textContent = user.username;
 
                         const unblockButton = document.createElement('button');
                         unblockButton.textContent = 'Deblokkeer';
+                        //wanneer er op de knop wordt gedrukt roep unblockuser methode aan
                         unblockButton.addEventListener('click', () => unblockUser(user.userId));
 
+                        //zorg dat de unblock button naast de listitem verschijnt
                         listItem.appendChild(unblockButton);
+                        //voeg het complete element toe aan de lijst
                         blockedUsersList.appendChild(listItem);
                     });
                 } else {
@@ -171,7 +180,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Functie om een gebruiker te blokkeren
     function blockUser() {
         const usernameToBlock = userToBlockInput.value;
-
+//coontroleer op of er geen leeg veld is
         if (!usernameToBlock) {
             alert('Voer een geldige gebruikersnaam in.');
             return;
@@ -180,8 +189,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         fetch(`/api/users/username/${usernameToBlock}`)
             .then(response => response.json())
             .then(data => {
+                //haal de userid uit de data
                 const userToBlockId = data.userId;
-
+//controloleer beide user ids
                 if (!userToBlockId || !userId) {
                     console.error('Gebruikers-ID is niet gedefinieerd.');
                     return;
@@ -197,6 +207,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     body: `userToBlockId=${userToBlockId}&userBlockingId=${userId}`
                 })
                     .then(response => {
+                        //controleer of de server response van het post verzoek succesvol is
                         if (response.ok) {
                             alert(`${usernameToBlock} is geblokkeerd.`);
                             loadBlockedUsers();  // Refresh de lijst van geblokkeerde gebruikers
