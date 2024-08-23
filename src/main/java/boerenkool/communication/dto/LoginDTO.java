@@ -7,6 +7,8 @@ public class LoginDTO {
 
     private String username;
     private String password;
+    private int userId;
+
 
     private final Logger logger = LoggerFactory.getLogger(LoginDTO.class);
 
@@ -32,5 +34,13 @@ public class LoginDTO {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 }

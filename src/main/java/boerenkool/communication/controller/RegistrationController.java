@@ -59,6 +59,7 @@ public class RegistrationController {
         }
     }
 
+
     @PostMapping("/reset-password")
     public ResponseEntity<String> requestPasswordReset(@RequestBody Map<String, String> emailMap) {
         String email = emailMap.get("email");

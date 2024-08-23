@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 
 public class UserDto {
 
+    private int userId;
     private String typeOfUser;
     private String username;
     private String password;
@@ -28,9 +29,18 @@ public class UserDto {
         this(user, false);
     }
 
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
     // Constructor that initializes UserDto from User entity, with optional password inclusion
     public UserDto(User user, boolean includePassword) {
         super();
+        this.userId = user.getUserId();
         this.typeOfUser = user.getTypeOfUser();
         this.username = user.getUsername();
         // If includePassword is true, set the password field to the actual hashed password from the User entity.
