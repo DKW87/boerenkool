@@ -68,8 +68,6 @@ public class User {
         );
     }
 
-
-
     // Constructor zonder geblokkeerde gebruikers
     public User(int userId, String typeOfUser, String username, String hashedPassword, String salt, String email, String phone,
                 String firstName, String infix, String lastName, int coinBalance) {
@@ -121,7 +119,6 @@ public class User {
     }
 
     public void setHashedPassword(String password) {
-        logger.info("Setting hashed password: {}", password);
         this.hashedPassword = password;
     }
 
@@ -215,7 +212,6 @@ public class User {
     }
 
     public void setSalt(String salt) {
-        logger.info("Setting salt: {}", salt);
         this.salt = salt;
     }
 }
