@@ -16,10 +16,14 @@ import java.util.Optional;
 public class ReservationService {
 
     private final ReservationRepository reservationRepository;
+    private final HouseService houseService;
+    private final UserService userService;
 
     @Autowired
-    public ReservationService(ReservationRepository reservationRepository) {
+    public ReservationService(ReservationRepository reservationRepository, HouseService houseService, UserService userService) {
         this.reservationRepository = reservationRepository;
+        this.houseService = houseService;
+        this.userService = userService;
     }
 
     public List<Reservation> getAllReservations() {
@@ -36,6 +40,9 @@ public class ReservationService {
     }
 
     public boolean deleteReservationById(int id) {
+        if (reservationRepository.getReservationById(id).isEmpty()) {
+            throw new IllegalArgumentException("Reservation not found");
+        }
         return reservationRepository.deleteReservationById(id);
     }
 
@@ -72,8 +79,6 @@ public class ReservationService {
         reservation.setReservedByUser(user);
         return reservation;
     }
-
-
 
     private void validateReservation(Reservation reservation) {
         if (reservation.getGuestCount() < 0) {
