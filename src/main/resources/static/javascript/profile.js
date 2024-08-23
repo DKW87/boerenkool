@@ -7,6 +7,32 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
+    let userId;
+
+    try {
+        const response = await fetch('/api/users/profile', {
+            method: 'GET',
+            headers: {
+                'Authorization': token,
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Kon gebruikersinformatie niet ophalen.');
+        }
+
+        const user = await response.json();
+        userId = user.userId;  // Haal userId op uit de API respons
+
+        if (!userId) {
+            throw new Error('Gebruikers-ID niet gevonden.');
+        }
+
+    } catch (error) {
+        showNotification('Kon gebruikersinformatie niet ophalen.', 'error');
+        return;
+    }
+
     try {
         const response = await fetch('/api/users/profile', {
             method: 'GET',
@@ -32,7 +58,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     document.getElementById('profileForm').addEventListener('submit', async (event) => {
-        //zorg dat het formulier niet verzonden wordt en je eigen js code kan uitvoeren
         event.preventDefault();
 
         const profileData = {
@@ -105,20 +130,26 @@ document.addEventListener('DOMContentLoaded', async () => {
             showNotification(error.message, 'error');
         }
     });
-    document.addEventListener('DOMContentLoaded', function() {
-        const userId = getLoggedInUserId();  // Deze functie zou het ingelogde gebruikers-ID moeten ophalen
 
-        // HTML-elementen ophalen
-        const blockUserBtn = document.getElementById('block-user-btn');
-        const userToBlockInput = document.getElementById('user-to-block');
-        const blockedUsersList = document.getElementById('blocked-users-list');
+    // Functionaliteit voor het blokkeren en deblokkeren van gebruikers
 
-        // Functie om geblokkeerde gebruikers op te halen en de lijst te updaten
-        function loadBlockedUsers() {
-            fetch(`/api/blocked-users/${userId}`)
-                .then(response => response.json())
-                .then(data => {
-                    blockedUsersList.innerHTML = '';
+    // HTML-elementen ophalen
+    const blockUserBtn = document.getElementById('block-user-btn');
+    const userToBlockInput = document.getElementById('user-to-block');
+    const blockedUsersList = document.getElementById('blocked-users-list');
+
+    // Functie om geblokkeerde gebruikers op te halen en de lijst te updaten
+    function loadBlockedUsers() {
+        if (!userId) {
+            console.error('Gebruikers-ID is niet gedefinieerd.');
+            return;
+        }
+
+        fetch(`/api/blocked-users/${userId}`)
+            .then(response => response.json())
+            .then(data => {
+                blockedUsersList.innerHTML = '';
+                if (Array.isArray(data)) {
                     data.forEach(user => {
                         const listItem = document.createElement('li');
                         listItem.textContent = user.username;
@@ -130,75 +161,88 @@ document.addEventListener('DOMContentLoaded', async () => {
                         listItem.appendChild(unblockButton);
                         blockedUsersList.appendChild(listItem);
                     });
-                })
-                .catch(error => console.error('Error loading blocked users:', error));
-        }
-
-        // Functie om een gebruiker te blokkeren
-        function blockUser() {
-            const usernameToBlock = userToBlockInput.value;
-
-            if (!usernameToBlock) {
-                alert('Voer een geldige gebruikersnaam in.');
-                return;
-            }
-
-            // Optioneel: zoek de userId van de gebruikersnaam via een API-call
-            fetch(`/api/users/username/${usernameToBlock}`)
-                .then(response => response.json())
-                .then(data => {
-                    const userToBlockId = data.userId;
-
-                    // Block de gebruiker
-                    fetch(`/api/blocked-users/block`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded'
-                        },
-                        body: `userToBlockId=${userToBlockId}&userBlockingId=${userId}`
-                    })
-                        .then(response => {
-                            if (response.ok) {
-                                alert(`${usernameToBlock} is geblokkeerd.`);
-                                loadBlockedUsers();  // Refresh de lijst van geblokkeerde gebruikers
-                            } else {
-                                throw new Error('Fout bij het blokkeren van de gebruiker.');
-                            }
-                        })
-                        .catch(error => console.error('Error blocking user:', error));
-                })
-                .catch(error => console.error('Error fetching user by username:', error));
-        }
-
-        // Functie om een gebruiker te deblokkeren
-        function unblockUser(userToUnblockId) {
-            fetch(`/api/blocked-users/unblock`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: `userToUnblockId=${userToUnblockId}&userBlockingId=${userId}`
+                } else {
+                    blockedUsersList.innerHTML = '<li>Geen geblokkeerde gebruikers gevonden.</li>';
+                }
             })
-                .then(response => {
-                    if (response.ok) {
-                        alert('Gebruiker is gedeblokkeerd.');
-                        loadBlockedUsers();  // Refresh de lijst van geblokkeerde gebruikers
-                    } else {
-                        throw new Error('Fout bij het deblokkeren van de gebruiker.');
-                    }
-                })
-                .catch(error => console.error('Error unblocking user:', error));
+            .catch(error => console.error('Error loading blocked users:', error));
+    }
+
+    // Functie om een gebruiker te blokkeren
+    function blockUser() {
+        const usernameToBlock = userToBlockInput.value;
+
+        if (!usernameToBlock) {
+            alert('Voer een geldige gebruikersnaam in.');
+            return;
         }
 
-        // Event listener voor de "Blokkeer Gebruiker" knop
-        blockUserBtn.addEventListener('click', blockUser);
+        fetch(`/api/users/username/${usernameToBlock}`)
+            .then(response => response.json())
+            .then(data => {
+                const userToBlockId = data.userId;
 
-        // Initial load van geblokkeerde gebruikers
-        loadBlockedUsers();
-    });
+                if (!userToBlockId || !userId) {
+                    console.error('Gebruikers-ID is niet gedefinieerd.');
+                    return;
+                }
 
+                // Block de gebruiker
+                fetch(`/api/blocked-users/block`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'Authorization': token
+                    },
+                    body: `userToBlockId=${userToBlockId}&userBlockingId=${userId}`
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            alert(`${usernameToBlock} is geblokkeerd.`);
+                            loadBlockedUsers();  // Refresh de lijst van geblokkeerde gebruikers
+                        } else {
+                            throw new Error('Fout bij het blokkeren van de gebruiker.');
+                        }
+                    })
+                    .catch(error => console.error('Error blocking user:', error));
+            })
+            .catch(error => console.error('Error fetching user by username:', error));
+    }
+
+    // Functie om een gebruiker te deblokkeren
+    function unblockUser(userToUnblockId) {
+        if (!userToUnblockId || !userId) {
+            console.error('Gebruikers-ID is niet gedefinieerd.');
+            return;
+        }
+
+        fetch(`/api/blocked-users/unblock`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Authorization': token
+            },
+            body: `userToUnblockId=${userToUnblockId}&userBlockingId=${userId}`
+        })
+            .then(response => {
+                if (response.ok) {
+                    alert('Gebruiker is gedeblokkeerd.');
+                    loadBlockedUsers();  // Refresh de lijst van geblokkeerde gebruikers
+                } else {
+                    throw new Error('Fout bij het deblokkeren van de gebruiker.');
+                }
+            })
+            .catch(error => console.error('Error unblocking user:', error));
+    }
+
+    // Event listener voor de "Blokkeer Gebruiker" knop
+    blockUserBtn.addEventListener('click', blockUser);
+
+    // Initial load van geblokkeerde gebruikers
+    loadBlockedUsers();
 });
 
+// Validatie functies en notificatie helper functie
 function validateName(name) {
     const nameRegex = /^[A-Za-z]+$/;
     return nameRegex.test(name);
