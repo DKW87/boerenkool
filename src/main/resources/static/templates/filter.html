@@ -1,0 +1,86 @@
+<div class="filter-menu">
+    <h3>Filters</h3>
+
+    <div class="filter-group">
+        <label for="sortOrder">Sorteerorde:</label>
+        <select class="dropdown" id="sortOrder" name="sortOrder">
+            <option class="dropdown-option" value="ASC">Oplopend</option>
+            <option value="DESC">Aflopend</option>
+        </select>
+    </div>
+
+    <div class="filter-group">
+        <label for="sortBy">Sorteer op:</label>
+        <select class="dropdown" id="sortBy" name="sortBy">
+            <option value=""></option>
+            <option value="province">Provincie</option>
+            <option value="province">Stad</option>
+            <option value="province">Type</option>
+            <option value="province">Aantal gasten</option>
+            <option value="province">Aantal kamers</option>
+            <option value="province">Prijs</option>
+        </select>
+    </div>
+
+    <div class="filter-group">
+        <label for="province">Provincie:</label>
+        <select id="province" name="province" multiple>
+            <option value="Drenthe">Drenthe</option>
+            <option value="Flevoland">Flevoland</option>
+            <option value="Friesland">Friesland</option>
+            <option value="Gelderland">Gelderland</option>
+            <option value="Groningen">Groningen</option>
+            <option value="Limburg">Limburg</option>
+            <option value="Noord-Brabant">Noord-Brabant</option>
+            <option value="Noord-Holland">Noord-Holland</option>
+            <option value="Overijssel">Overijssel</option>
+            <option value="Utrecht">Utrecht</option>
+            <option value="Zeeland">Zeeland</option>
+            <option value="Zuid-Holland">Zuid-Holland</option>
+        </select>
+    </div>
+
+    <div class="filter-group">
+        <label for="city">Stad:</label>
+        <select id="city" name="city" multiple>
+            <option value="amsterdam">Amsterdam</option>
+            <option value="rotterdam">Rotterdam</option>
+            <option value="utrecht">Utrecht</option>
+            <!-- Voeg meer steden toe indien nodig -->
+        </select>
+    </div>
+
+    <div class="filter-group">
+        <label for="type">Type:</label>
+        <select id="type" name="type" multiple>
+            <option value="house">Woning</option>
+            <option value="apartment">Appartement</option>
+            <option value="barn">Schuur</option>
+            <!-- Voeg meer types toe indien nodig -->
+        </select>
+    </div>
+
+    <div class="filter-group">
+        <label for="guests">Aantal Gasten:</label>
+        <input type="number" id="guests" name="guests" min="1" placeholder="bv. 4">
+    </div>
+
+    <div class="filter-group">
+        <label for="rooms">Aantal Kamers:</label>
+        <input type="number" id="rooms" name="rooms" min="1" placeholder="bv. 2">
+    </div>
+
+    <div class="filter-group">
+        <label for="min-price">Minimale Prijs:</label>
+        <input type="number" id="min-price" name="min-price" placeholder="€ Min">
+    </div>
+
+    <div class="filter-group">
+        <label for="max-price">Maximale Prijs:</label>
+        <input type="number" id="max-price" name="max-price" placeholder="€ Max">
+    </div>
+
+    <div class="filter-group">
+        <button type="button">Filters Toepassen</button>
+    </div>
+</div>
