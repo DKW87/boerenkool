@@ -41,22 +41,16 @@
     </div>
 
     <div class="filter-group">
-        <label for="city">Stad:</label>
-        <select id="city" name="city" multiple>
-            <option value="amsterdam">Amsterdam</option>
-            <option value="rotterdam">Rotterdam</option>
-            <option value="utrecht">Utrecht</option>
-            <!-- Voeg meer steden toe indien nodig -->
+        <label for="city">Plaats:</label>
+        <select id="uniqueCities" name="city" multiple>
+            <!-- loads in from DB -->
         </select>
     </div>
 
     <div class="filter-group">
         <label for="type">Type:</label>
-        <select id="type" name="type" multiple>
-            <option value="house">Woning</option>
-            <option value="apartment">Appartement</option>
-            <option value="barn">Schuur</option>
-            <!-- Voeg meer types toe indien nodig -->
+        <select id="houseTypes" name="type" multiple>
+            <!-- loads in from DB -->
         </select>
     </div>
 

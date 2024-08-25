@@ -23,6 +23,8 @@ public interface HouseDAO extends GenericDAO<House> {
 
     List<House> getHousesWithFilter(HouseFilter filter);
 
+    List<String> getUniqueCities();
+
     @Override
     Optional<House> getOneById(int id);
 

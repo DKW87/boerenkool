@@ -1,6 +1,8 @@
 "use strict"
 
 /* imports */
+import * as Filter from './modules/filter.mjs'
+import * as Houses from './modules/listOfHouses.mjs'
 
 
 /* load all page elements of index.html */
@@ -8,6 +10,8 @@ loadHeader();
 loadLeftSidebar();
 loadBody();
 loadFooter();
+
+
 
 function loadHeader() {
     const header = document.getElementById("header");
@@ -42,7 +46,8 @@ function loadLeftSidebar() {
             })
             .then(data => {
                 leftSidebar.innerHTML = data;
-                initializePriceFilter();
+                Filter.getUniqueCities();
+                Filter.getHouseTypes();
             })
             .catch(error => {
                 console.error('Er is een probleem opgetreden met fetch:', error);
@@ -64,6 +69,7 @@ function loadBody() {
             })
             .then(data => {
                 body.innerHTML = data;
+                Houses.getList();
             })
             .catch(error => {
                 console.error('Er is een probleem opgetreden met fetch:', error);

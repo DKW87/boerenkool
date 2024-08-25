@@ -2,6 +2,7 @@ package boerenkool.database.repository;
 
 import boerenkool.business.model.House;
 import boerenkool.business.model.HouseFilter;
+import boerenkool.business.model.HouseType;
 import boerenkool.database.dao.mysql.*;
 import boerenkool.database.dao.mysql.PictureDAO;
 import org.slf4j.Logger;
@@ -100,6 +101,14 @@ public class HouseRepository {
         // currently gets all pictures
         setAllHousesEntityDependencies(allHouses);
         return allHouses;
+    }
+
+    public List<String> getUniqueCities() {
+        return houseDAO.getUniqueCities();
+    }
+
+    public List<HouseType> getAllHouseTypes() {
+        return houseTypeDAO.getAll();
     }
 
     public Optional<House> getHouseById(int houseId) {

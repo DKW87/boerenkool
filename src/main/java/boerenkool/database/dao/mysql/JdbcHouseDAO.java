@@ -41,8 +41,7 @@ public class JdbcHouseDAO implements HouseDAO {
     @Override
     public List<House> getAll() {
         String sql = "SELECT * FROM House";
-        List<House> allHouses = jdbcTemplate.query(sql, new HouseMapper());
-        return allHouses;
+        return jdbcTemplate.query(sql, new HouseMapper());
     }
 
     @Override
@@ -87,6 +86,12 @@ public class JdbcHouseDAO implements HouseDAO {
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
         }
+    }
+
+    @Override
+    public List<String> getUniqueCities(){
+        String sql = "SELECT DISTINCT city FROM House ORDER BY city ASC";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> rs.getString("city"));
     }
 
     @Override

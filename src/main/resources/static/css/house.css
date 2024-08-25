@@ -21,6 +21,9 @@
 
 .huisje-details {
     padding: 15px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
 }
 
 .huisje-details h2 {
