@@ -1,12 +1,18 @@
 package boerenkool.business.model;
 
+import boerenkool.business.service.RegistrationService;
 import boerenkool.communication.dto.UserDto;
 import boerenkool.utilities.authorization.PasswordService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class User {
+
+    private static final Logger logger = LoggerFactory.getLogger(User.class);
+
     private int userId;
     private String typeOfUser;
     private String username;
@@ -45,28 +51,13 @@ public class User {
 // omgezet naar een User object, wat het domeinmodel is dat de kernlogica van je applicatie bevat.
     //Constructor dto
 // Constructor voor het aanmaken van een nieuwe gebruiker vanuit UserDto
-public User(UserDto dto) {
-    this(DEFAULT_USER_ID,
-            dto.getTypeOfUser(),
-            dto.getUsername(),
-            null,  // Pass null for hashedPassword, which will be set later
-            null,  // Pass null for salt, which will be set later
-            dto.getEmail(),
-            dto.getPhone(),
-            dto.getFirstName(),
-            dto.getInfix(),
-            dto.getLastName(),
-            dto.getCoinBalance(),
-            new ArrayList<>() // Create an empty list for blockedUser
-    );
-}
 
-    public User(UserDto dto, PasswordService passwordService) {
+    public User(UserDto dto, String hashedPassword, String salt) {
         this(DEFAULT_USER_ID,
                 dto.getTypeOfUser(),
                 dto.getUsername(),
-                null,  // Salt en hashed password worden later ingesteld
-                null,
+                hashedPassword,  // Passeer hier de gehashte waarde
+                salt,
                 dto.getEmail(),
                 dto.getPhone(),
                 dto.getFirstName(),
@@ -75,11 +66,7 @@ public User(UserDto dto) {
                 dto.getCoinBalance(),
                 new ArrayList<>()
         );
-        this.salt = passwordService.generateSalt();
-        this.hashedPassword = passwordService.hashPassword(dto.getPassword(), this.salt);
     }
-
-
 
     // Constructor zonder geblokkeerde gebruikers
     public User(int userId, String typeOfUser, String username, String hashedPassword, String salt, String email, String phone,
@@ -132,7 +119,7 @@ public User(UserDto dto) {
     }
 
     public void setHashedPassword(String password) {
-        this.hashedPassword = PasswordService.hashPassword(password, this.salt);
+        this.hashedPassword = password;
     }
 
     public String getSalt() {

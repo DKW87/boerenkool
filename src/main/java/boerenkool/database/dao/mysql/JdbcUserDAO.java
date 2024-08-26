@@ -62,17 +62,16 @@ public class JdbcUserDAO implements UserDAO {
 
 
     private PreparedStatement updateUserStatement(User user, Connection connection) throws SQLException {
-        PreparedStatement ps;
-        ps = connection.prepareStatement(
+        PreparedStatement ps = connection.prepareStatement(
                 "UPDATE `User` " +
                         "SET typeOfUser=?, username=?, hashedPassword=?, salt=?, firstName=?, infix=?, lastName=?," +
                         " coinBalance=?, phoneNumber=?, emailaddress=?" +
                         " WHERE userId=?");
+
         setCommonParameters(ps, user);
-        ps.setInt(11, user.getUserId()); // Adjust index for userId
+        ps.setInt(11, user.getUserId()); // Zorg ervoor dat de userId correct wordt ingesteld als de laatste parameter.
         return ps;
     }
-
 
 
     @Override
@@ -115,8 +114,20 @@ public class JdbcUserDAO implements UserDAO {
 
     @Override
     public boolean updateOne(User user) {
-        return jdbcTemplate.update(connection -> updateUserStatement(user, connection)) != 0;
+        logger.info("Attempting to update user with ID: {}", user.getUserId());
+        logger.info("Hashed password to be saved: {}", user.getHashedPassword());
+        logger.info("Salt to be saved: {}", user.getSalt());
+
+        boolean isUpdated = jdbcTemplate.update(connection -> updateUserStatement(user, connection)) != 0;
+
+        if (isUpdated) {
+            logger.info("User with ID {} successfully updated.", user.getUserId());
+        } else {
+            logger.warn("No user was updated for ID {}. Check if the user ID exists.", user.getUserId());
+        }
+        return isUpdated;
     }
+
 
     @Override
     public Optional<User> findByUsername(String username) {

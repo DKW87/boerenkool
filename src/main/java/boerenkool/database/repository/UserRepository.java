@@ -39,6 +39,7 @@ public class UserRepository {
     }
 
     public Optional<User> findByEmail(String email) {
+        logger.debug("Searching for user with email: {}", email);
         return userDAO.findByEmail(email);
     }
 

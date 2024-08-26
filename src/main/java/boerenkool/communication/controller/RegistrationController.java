@@ -2,20 +2,21 @@ package boerenkool.communication.controller;
 
 import boerenkool.business.model.User;
 import boerenkool.business.service.RegistrationService;
-import boerenkool.business.service.UserService;
 import boerenkool.communication.dto.LoginDTO;
 import boerenkool.communication.dto.PasswordResetDto;
 import boerenkool.communication.dto.UserDto;
 import boerenkool.utilities.authorization.AuthorizationService;
-import boerenkool.utilities.authorization.PasswordService;
 import boerenkool.utilities.authorization.TokenUserPair;
 import boerenkool.utilities.exceptions.LoginException;
 import boerenkool.utilities.exceptions.RegistrationFailedException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -23,17 +24,15 @@ import java.util.UUID;
 @RequestMapping("/api/registration")
 public class RegistrationController {
 
+    private final Logger logger = LoggerFactory.getLogger(RegistrationController.class);
+
     private final RegistrationService registrationService;
     private final AuthorizationService authorizationService;
-    private final PasswordService passwordService;
-    private final UserService userService;
 
     @Autowired
-    public RegistrationController(RegistrationService registrationService, AuthorizationService authorizationService, PasswordService passwordService, UserService userService) {
+    public RegistrationController(RegistrationService registrationService, AuthorizationService authorizationService) {
         this.registrationService = registrationService;
         this.authorizationService = authorizationService;
-        this.passwordService = passwordService;
-        this.userService = userService;
     }
 
     @PostMapping
@@ -60,6 +59,24 @@ public class RegistrationController {
         }
     }
 
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> requestPasswordReset(@RequestBody Map<String, String> emailMap) {
+        String email = emailMap.get("email");
+        logger.debug("Received password reset request for email: {}", email);
+        registrationService.sendPasswordResetEmail(email);
+        return ResponseEntity.ok("Password reset email sent");
+    }
+
+    @PostMapping("/reset-password/confirm")
+    public ResponseEntity<String> confirmPasswordReset(@RequestBody PasswordResetDto passwordResetDto) {
+        boolean success = registrationService.resetPassword(passwordResetDto);
+        if (success) {
+            return ResponseEntity.ok("Password reset successfully");
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token or email");
+        }
+    }
+
     @PostMapping("/validate")
     public ResponseEntity<String> validationHandler(@RequestHeader String authorization) throws LoginException {
         try {
@@ -73,34 +90,5 @@ public class RegistrationController {
         } catch (IllegalArgumentException e) {
             throw new LoginException("Login failed");
         }
-    }
-
-    @PostMapping("/reset-password")
-    public ResponseEntity<?> requestPasswordReset(@RequestBody String email) {
-        Optional<User> userOpt = userService.findByEmail(email);
-        if (userOpt.isPresent()) {
-            User user = userOpt.get();
-            TokenUserPair tokenUserPair = authorizationService.authorize(user);
-            passwordService.sendPasswordResetEmail(email, tokenUserPair.getKey().toString());
-            return ResponseEntity.ok("Password reset email sent");
-        }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-    }
-
-    @PostMapping("/reset-password/confirm")
-    public ResponseEntity<?> confirmPasswordReset(@RequestBody PasswordResetDto passwordResetDto) {
-        Optional<User> userOpt = authorizationService.validate(UUID.fromString(passwordResetDto.getToken()));
-        if (userOpt.isPresent()) {
-            User user = userOpt.get();
-            if (user.getEmail().equals(passwordResetDto.getEmail())) {
-                String salt = passwordService.generateSalt();
-                String hashedPassword = passwordService.hashPassword(passwordResetDto.getNewPassword(), salt);
-                user.setHashedPassword(hashedPassword);
-                user.setSalt(salt);
-                userService.updateOne(user);
-                return ResponseEntity.ok("Password reset successfully");
-            }
-        }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token or email");
     }
 }
