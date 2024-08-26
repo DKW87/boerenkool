@@ -30,7 +30,7 @@ export function getList() {
             // type.innerHTML = house.houseType;
 
             let location = document.createElement('p');
-            location.innerHTML = house.houseType + ', ' + house.province + ', ' + house.city;
+            location.innerHTML = house.houseType + ' in ' + house.province + ', ' + house.city;
 
             let price = document.createElement('p');
             price.innerHTML = house.price + 'bkC per nacht';
