@@ -59,6 +59,7 @@ public class RegistrationController {
         }
     }
 
+
     @PostMapping("/reset-password")
     public ResponseEntity<String> requestPasswordReset(@RequestBody Map<String, String> emailMap) {
         String email = emailMap.get("email");
@@ -68,7 +69,7 @@ public class RegistrationController {
     }
 
     @PostMapping("/reset-password/confirm")
-    public ResponseEntity<String> confirmPasswordReset(@RequestBody PasswordResetDto passwordResetDto) {
+    public ResponseEntity<String> confirmPasswordReset(@RequestBody PasswordResetDto passwordResetDto) throws RegistrationFailedException {
         boolean success = registrationService.resetPassword(passwordResetDto);
         if (success) {
             return ResponseEntity.ok("Password reset successfully");

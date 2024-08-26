@@ -3,35 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Profile</title>
+    <title>Gebruikersprofiel</title>
     <script src="/javascript/profile.js" type="module" defer></script>
 </head>
 <body>
 <div class="profile-container">
     <h2>Mijn Profiel</h2>
     <form id="profileForm">
-        <label for="username">Username:</label>
+        <label for="username">Gebruikersnaam:</label>
         <input type="text" id="username" name="username" readonly>
         <br>
-        <label for="email">Email:</label>
+        <label for="email">E-mail:</label>
         <input type="email" id="email" name="email">
         <br>
-        <label for="phone">Phone:</label>
+        <label for="phone">Telefoonnummer:</label>
         <input type="text" id="phone" name="phone">
         <br>
-        <label for="firstName">First Name:</label>
+        <label for="firstName">Voornaam:</label>
         <input type="text" id="firstName" name="firstName">
         <br>
-        <label for="infix">Infix:</label>
+        <label for="infix">Tussenvoegsel:</label>
         <input type="text" id="infix" name="infix">
         <br>
-        <label for="lastName">Last Name:</label>
+        <label for="lastName">Achternaam:</label>
         <input type="text" id="lastName" name="lastName">
         <br>
-        <button type="submit">Update Profile</button>
-        <button id="deleteProfileBtn" type="button">Delete Profile</button>
+        <button type="submit">Profiel Bijwerken</button>
+        <button id="deleteProfileBtn" type="button">Verwijder Profiel</button>
     </form>
     <div id="notification"></div>
+</div>
+<div id="blocked-users-container">
+    <h2>Geblokkeerde Gebruikers</h2>
+    <ul id="blocked-users-list">
+        <!-- Geblokkeerde gebruikers worden hier weergegeven -->
+    </ul>
+</div>
+
+<!-- Voeg een gebruiker blokkeren functie toe -->
+<div id="block-user-section">
+    <h3>Blokkeer een Gebruiker</h3>
+    <input type="text" id="user-to-block" placeholder="Gebruikersnaam om te blokkeren">
+    <button id="block-user-btn">Blokkeer Gebruiker</button>
 </div>
 </body>
 </html>

@@ -171,7 +171,7 @@ public class JdbcUserDAO implements UserDAO {
 
     @Override
     public List<User> getBlockedUsers(User user) {
-        String sql = "SELECT u.* FROM users u INNER JOIN BlockedList b ON u.userId = b.blockedUser WHERE b.userId = ?";
+        String sql = "SELECT u.* FROM `User` u INNER JOIN BlockedList b ON u.userId = b.blockedUser WHERE b.userId = ?";
         return jdbcTemplate.query(sql, new UserRowMapper(), user.getUserId());
     }
 
