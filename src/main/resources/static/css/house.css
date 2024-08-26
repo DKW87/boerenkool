@@ -1,0 +1,66 @@
+.huisje {
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin: 20px;
+    height: 300px;
+    overflow: hidden;
+    width: calc(25% - 40px);
+    transition: transform 0.1s ease-in-out;
+}
+
+.huisje:hover {
+    transform: translateY(-5px);
+}
+
+.huisje img {
+    width: 400px;
+    height: 200px;
+    object-fit: cover;
+}
+
+.huisje-details {
+    padding: 15px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.huisje-details h2 {
+    margin: 0 0 10px;
+    font-size: 18px;
+    color: #333;
+}
+
+.huisje-details p {
+    margin: 5px 0;
+    font-size: 14px;
+    color: #777;
+}
+
+.prijs {
+    margin-top: 10px;
+    font-size: 16px;
+    color: #b8161c;
+    font-weight: bold;
+}
+
+.page-numbers {
+    margin: auto;
+    margin-bottom: 25px;
+    margin-top: 10px;
+}
+
+.individual-page-number {
+    margin: 5px;
+    color: var(--boerenkool-paars);
+    text-decoration: underline;
+}
+
+.amount-of-houses {
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin-top: 20px;
+    margin-left: 20px;
+}

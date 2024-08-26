@@ -3,6 +3,7 @@ package boerenkool.communication.controller;
 import boerenkool.business.model.House;
 import boerenkool.business.model.HouseFilter;
 import boerenkool.business.service.HouseService;
+import boerenkool.communication.dto.HouseListDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -106,6 +107,23 @@ public class HouseApiController {
         return new ResponseEntity<>(listOfHousesByOwner, HttpStatus.OK);
     }
 
+    @GetMapping("/steden")
+    public ResponseEntity<?> getUniquesCities() {
+        List<String> uniqueCities = houseService.getUniqueCities();
+        if (uniqueCities.isEmpty()) {
+            return new ResponseEntity<>("No cities found", HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(uniqueCities, HttpStatus.OK);
+    }
+
+    @GetMapping("/typen")
+    public ResponseEntity<?> getHouseTypes() {
+        List<String> houseTypes = houseService.getAllHouseTypes();
+        if (houseTypes.isEmpty()) {
+            return new ResponseEntity<>("No types found", HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(houseTypes, HttpStatus.OK);
+    }
 
     @GetMapping(value = "/filter")
     public ResponseEntity<?> getListOfHousesByFilter(
@@ -117,9 +135,9 @@ public class HouseApiController {
             @RequestParam(name = "aantal-kamers", required = false, defaultValue = "0") int desiredRoomCount,
             @RequestParam(name = "minimum-prijs-per-persoon-per-nacht", required = false, defaultValue = "0") int minPricePPPD,
             @RequestParam(name = "maximum-prijs-per-persoon-per-nacht", required = false, defaultValue = "0") int maxPricePPPD,
-            @RequestParam(name = "sorteer-op", required = false, defaultValue = "") String sortBy,
-            @RequestParam(name = "sorteer-orde", required = false, defaultValue = "ASC") String sortOrder,
-            @RequestParam(required = false, defaultValue = "10") int limit,
+            @RequestParam(name = "sorteer-op", required = false, defaultValue = "houseId") String sortBy,
+            @RequestParam(name = "sorteer-orde", required = false, defaultValue = "DESC") String sortOrder,
+            @RequestParam(required = false, defaultValue = "16") int limit,
             @RequestParam(required = false, defaultValue = "0") int offset) {
 
         HouseFilter filter = new HouseFilter.Builder()
@@ -137,7 +155,7 @@ public class HouseApiController {
                 .setOffset(offset)
                 .build();
 
-        List<House> filteredHouses = houseService.getFilteredListOfHouses(filter);
+        List<HouseListDTO> filteredHouses = houseService.getFilteredListOfHouses(filter);
         return filteredHouses.isEmpty()
                 ? new ResponseEntity<>("No houses match your criteria", HttpStatus.NO_CONTENT)
                 : new ResponseEntity<>(filteredHouses, HttpStatus.OK);
@@ -189,9 +207,9 @@ public class HouseApiController {
             return new ResponseEntity<>("Not authorized to delete this house", HttpStatus.FORBIDDEN);
         } else {
             // TODO check of huis gereserveerd is
-                return houseService.deleteHouse(houseId)
-                        ? new ResponseEntity<>("Successfully deleted house", HttpStatus.OK)
-                        : new ResponseEntity<>("Unable to delete house", HttpStatus.CONFLICT);
+            return houseService.deleteHouse(houseId)
+                    ? new ResponseEntity<>("Successfully deleted house", HttpStatus.OK)
+                    : new ResponseEntity<>("Unable to delete house", HttpStatus.CONFLICT);
         }
     }
 

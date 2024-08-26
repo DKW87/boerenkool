@@ -2,6 +2,8 @@ package boerenkool.business.service;
 
 import boerenkool.business.model.House;
 import boerenkool.business.model.HouseFilter;
+import boerenkool.business.model.HouseType;
+import boerenkool.communication.dto.HouseListDTO;
 import boerenkool.database.repository.HouseRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +15,7 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -48,7 +51,6 @@ public class HouseService {
         return houseRepository.getListOfAllHouses();
     }
 
-    @Cacheable(value = "housesByOwner", key = "#houseOwnerId")
     public List<House> getListOfHousesByOwnerId(int houseOwnerId) {
         return houseRepository.getListOfAllHousesByOwner(houseOwnerId);
     }
@@ -57,8 +59,40 @@ public class HouseService {
         return userService.getOneById(houseOwnerId).get().getUsername();
     }
 
-    public List<House> getFilteredListOfHouses(HouseFilter filter) {
-        return houseRepository.getHousesWithFilter(filter);
+    public List<HouseListDTO> getFilteredListOfHouses(HouseFilter filter) {
+        List<House> filteredHouses = houseRepository.getHousesWithFilter(filter);
+        List<HouseListDTO> strippedFilteredHouses = new ArrayList<>();
+        for (House fullHouse : filteredHouses) {
+            HouseListDTO strippedHouse = new HouseListDTO();
+            strippedHouse.setHouseId(fullHouse.getHouseId());
+            if (!fullHouse.getPictures().isEmpty()) {
+                // TODO need Base64 String and MIME-Type (e.g. png/jpeg)
+//                strippedHouse.setPicture(fullHouse.getPictures().get(0).getPicture());
+            }
+            strippedHouse.setHouseName(fullHouse.getHouseName());
+            strippedHouse.setHouseType(fullHouse.getHouseType().getHouseTypeName());
+            strippedHouse.setProvince(fullHouse.getProvince());
+            strippedHouse.setCity(fullHouse.getCity());
+            strippedHouse.setPrice(fullHouse.getPricePPPD());
+            strippedFilteredHouses.add(strippedHouse);
+        }
+//        for (HouseListDTO strippedHouseDTO : strippedFilteredHouses) {
+//            System.out.println(strippedHouseDTO.getHouseName());
+//        }
+        return strippedFilteredHouses;
+    }
+
+    public List<String> getUniqueCities() {
+        return houseRepository.getUniqueCities();
+    }
+
+    public List<String> getAllHouseTypes() {
+        List<HouseType> allHouseTypes = houseRepository.getAllHouseTypes();
+        List<String> allHouseTypesNames = new ArrayList<>();
+        for (HouseType houseType : allHouseTypes) {
+            allHouseTypesNames.add(houseType.getHouseTypeName());
+        }
+        return allHouseTypesNames;
     }
 
     public boolean saveHouse(House house) {
