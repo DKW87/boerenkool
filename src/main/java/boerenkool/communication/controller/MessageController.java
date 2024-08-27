@@ -21,6 +21,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api")
+@CrossOrigin(origins = {"http://localhost:5500", "http://localhost:8080"})
 public class MessageController {
     private final Logger logger = LoggerFactory.getLogger(MessageController.class);
     private final UserService userService;
@@ -59,6 +60,7 @@ public class MessageController {
 
     @GetMapping("/users/{userid}/messages")
     ResponseEntity<?> getAllByUserId(@PathVariable("userid") int userId,
+                                     // hier zou de defaultValue misschien "in" kunnen worden; standaard inbox tonen
                                      @RequestParam(name = "box", required = false, defaultValue = "") String box)
             throws MessageDoesNotExistException {
         // TODO user authentication (user can only request his/her OWN messages)
