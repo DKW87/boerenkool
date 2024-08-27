@@ -1,12 +1,24 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://thymeleaf.org">
+<html lang="nl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gebruikersprofiel</title>
-    <script src="/javascript/profile.js" type="module" defer></script>
+
+    <!-- Import stylesheets -->
+    <link rel="stylesheet" href="/css/global.css">
+    <link rel="stylesheet" href="/css/header.css">
+    <link rel="stylesheet" href="/css/footer.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playwrite+BE+VLG:wght@100..400&family=Playwrite+PE:wght@100..400&display=swap" rel="stylesheet">
+
+    <!-- Load the profile.js script -->
+    <script src="/js/profile.js" defer></script>
 </head>
 <body>
+<div id="header"></div>
+
 <div class="profile-container">
     <h2>Mijn Profiel</h2>
     <form id="profileForm">
@@ -33,6 +45,7 @@
     </form>
     <div id="notification"></div>
 </div>
+
 <div id="blocked-users-container">
     <h2>Geblokkeerde Gebruikers</h2>
     <ul id="blocked-users-list">
@@ -40,11 +53,12 @@
     </ul>
 </div>
 
-<!-- Voeg een gebruiker blokkeren functie toe -->
 <div id="block-user-section">
     <h3>Blokkeer een Gebruiker</h3>
     <input type="text" id="user-to-block" placeholder="Gebruikersnaam om te blokkeren">
     <button id="block-user-btn">Blokkeer Gebruiker</button>
 </div>
+
+<div id="footer"></div>
 </body>
 </html>
