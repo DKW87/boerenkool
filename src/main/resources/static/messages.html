@@ -4,178 +4,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <script defer>
-        const URL_BASE = `http://localhost:8080`
-        let messageArray = {};
+    <title>Messages</title>
+    <script src="js/messages.js" defer></script>
 
-        // Welke eigenschappen van de timestamp van een message
-        // worden weergegeven? Nodig voor formatDateTime()
-        const DATE_TIME_OPTIONS = {
-            weekday: `long`,
-            year: `numeric`,
-            month: `long`,
-            day: `numeric`,
-            hour: `numeric`,
-            minute: `numeric`
-        }
-
-        // format date syntax according to browser's language setting
-        function formatDateTime(dateTimeSent) {
-            let dateTime = new Date(dateTimeSent)
-            return dateTime.toLocaleDateString(undefined, DATE_TIME_OPTIONS)
-        }
-
-        async function getAllMessages() {
-            const url = URL_BASE + "/api/messages";
-            try {
-                const response = await fetch(url);
-                if (!response.ok) {
-                    throw new Error(`Response status: ${response.status}`);
-                }
-
-                const json = await response.json();
-                console.log(json);
-            } catch (error) {
-                console.error(error.message);
-            }
-        }
-
-        async function getMessageById() {
-            var messageId = document.getElementById("messageIdInput").value;
-            const url = URL_BASE + `/api/messages/${messageId}`;
-            try {
-                const response = await fetch(url);
-                if (!response.ok) {
-                    throw new Error(`Response status: ${response.status}`);
-                }
-                const json = await response.json();
-                console.log(json);
-            } catch (error) {
-                console.error(error.message);
-            }
-        }
-
-        async function getAllByUserId(box) {
-            if (box != null) {
-                box = `?box=` + box
-            } else box = ``
-            const userid = document.getElementById("userIdInput").value;
-            const url = URL_BASE + `/api/users/${userid}/messages${box}`;
-            try {
-                const response = await fetch(url);
-                if (!response.ok) {
-                    throw new Error(`Response status: ${response.status}`);
-                }
-                // const json = await response.json();
-                messageArray = await response.json();
-                fillListView(messageArray)
-            } catch (error) {
-                console.error(error.message);
-            }
-        }
-
-        // shows the messages in inbox or outbox inside the `messageListView` container
-        function fillListView(listOfMessages) {
-            // create new unordered list for listview
-            const newListView = document.createElement("ul");
-            newListView.setAttribute("id", "listview")
-            // for every message, add a new list item
-            // and create children with the data
-            
-            
-            // sort the listOfMessages according to date (newest on top)
-            // homes.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
-            console.dir(listOfMessages[0].dateTimeSent)
-            console.dir(listOfMessages[2].dateTimeSent)
-            // listOfMessages.sort((a, b) => b - a)
-            listOfMessages.sort((a,b)=>b.dateTimeSent-a.dateTimeSent);
-            console.dir(listOfMessages)
-            
-            
-            listOfMessages.forEach(element => {
-                let message = document.createElement("ul");
-                message.textContent = "new message element : "
-                // add senderId
-                senderId = document.createElement(`li`)
-                senderId.textContent = element.senderId
-                message.appendChild(senderId)
-                // add subject
-                subject = document.createElement(`li`)
-                subject.textContent = element.subject
-                message.appendChild(subject)
-                // add dateTimeSent
-                dateTimeSent = document.createElement(`li`)
-                dateTimeSent.textContent = formatDateTime(element.dateTimeSent)
-                message.appendChild(dateTimeSent)
-                // add new message to the new overview list
-                newListView.appendChild(message)
-            });
-            document.getElementById(`listview`).replaceWith(newListView)
-        }
-
-        function getMessageIdFromInputField() {
-            // console.log(messageId)
-            return document.getElementById("messageIdInput").value;
-        }
-
-        async function getMessageById(messageId) {
-            const url = URL_BASE + `/api/messages/${messageId}`;
-            try {
-                const response = await fetch(url);
-                if (!response.ok) {
-                    throw new Error(`Response status: ${response.status}`);
-                }
-                // const json = await response.json()
-                // console.log("getMessageById json : " + json)
-                // return json
-                return await response.json()
-            } catch (error) {
-                console.error(error.message);
-            }
-        }
-
-        // shows the message content inside the `messageSingleView` container
-        async function showMessageContent() {
-            const messageId = getMessageIdFromInputField()
-            const messageJson = await getMessageById(messageId)
-            document.querySelector(`#senderid`).textContent = messageJson.senderId
-            const messageDateTime = new Date(messageJson.dateTimeSent)
-            document.querySelector(`#datetimesent`).textContent = formatDateTime(messageDateTime)
-            document.querySelector(`#subject`).textContent = messageJson.subject
-            document.querySelector(`#body`).textContent = messageJson.body
-        }
-    </script>
+    <!-- stylesheets -->
+    <link rel="stylesheet" href="css/header.css">
 </head>
 
 <body>
+    <div class="header-div" id="header"></div>
 
     <form action="">
         <label for="">MessageId :</label>
-        <input type="text" name="" id="messageIdInput">
+        <input type="text" name="" id="messageIdInput" value="1">
         <label for="">UserId :</label>
-        <input type="text" name="" id="userIdInput">
+        <input type="text" name="" id="userIdInput" value="1">
     </form>
 
-    <ul>
-        <li><button onclick="showMessageContent()">showMessageContent</button> voor 'full view', vervangt HTML
-            elementen - > methode gesplitst in <strong>getId / fetch / show</strong></li>
-        <li><button onclick="getAllByUserId()">getAllByUserId (only userid)</button> JSON array in console</li>
-        <li><button onclick="getAllByUserId(`in`)">Inbox [getAllByUserId (userid + ?box=in)]</button> replace HTML ul</li>
-        <li><button onclick="getAllByUserId(`out`)">Outbox [getAllByUserId (userid + ?box=out)]</button> replace HTML ul</li>
-        <li><button onclick="showListAppendChildren(`in`)">showListAppendChildren</button></li>
+    <button onclick="reverseMessageTableView()" id="sortOverviewButton">Sortering</button>
 
-        <li>List of messages used for overview (grouped by sender / receiver)
-            <!-- using only messageId, senderId, receiverId, subject, dateTime.
-                 Additional message properties will be retrieved when a message is selected for viewing. -->
-            <ul>
-                <li><button onclick="getOverviewList(`in`)">getOverviewList inbox</button></li>
-                <li><button onclick="getOverviewList(`out`)">getOverviewList outbox</button></li>
-                <li><button onclick="sortOverviewList()">sortOverviewList</button></li>
-                <li><button onclick="fillOverviewList()">fillOverviewList</button></li>
-            </ul>
-        </li>
-    </ul>
+    <p>
+        <button onclick="showMessageContent()">showMessageContent</button> op basis van messageId input veld
+    </p>
+
+    <p>
+        <button onclick="refreshInbox()">refreshInbox()</button>
+    </p>
+    <p>
+        <button onclick="refreshOutbox()">refreshOutbox()</button>
+    </p>
+
     <h3>messageSingleView</h3>
     <p>senderId :
         <span id="senderid">senderid</span>
@@ -189,10 +47,27 @@
     <p>body:
         <span id="body">Message body</span>
     </p>
-    <h3>messageListView</h3>
-    <ul id="listview">
-        <li id="listitem">First item in overview list - append below!</li>
-    </ul>
+
+    <h3>messageTableView</h3>
+    <table id="messageTableView">
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Subject</th>
+                <th>Date & time</th>
+            </tr>
+
+        </thead>
+        <tr id="tableViewRow">
+            No messages loaded.
+        </tr>
+        <tr>
+            <td>data</td>
+            <td><a href="http://www.freedom.nl">freedom.nl</a></td>
+            <td>data</td>
+        </tr>
+
+    </table>
 
 </body>
 
