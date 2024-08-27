@@ -13,7 +13,7 @@ public class ViewController {
 
     @GetMapping("/login")
     public String showLoginPage() {
-        return "index"; // Dit verwijst naar index.html
+        return "login"; // Dit verwijst naar login.html
     }
 
     @GetMapping("/profile")

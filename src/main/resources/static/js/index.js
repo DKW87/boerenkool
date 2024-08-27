@@ -5,7 +5,7 @@ import * as Filter from './modules/filter.mjs';
 import * as Houses from './modules/listOfHouses.mjs';
 import * as Main from './modules/main.mjs';
 
-/* load all page elements of index.html */
+/* load all page elements of login.html */
 Main.loadHeader();
 loadLeftSidebar();
 loadBody();
