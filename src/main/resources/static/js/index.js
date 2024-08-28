@@ -3,7 +3,6 @@
 /* imports */
 import * as Main from './modules/main.mjs';
 import * as Filter from './modules/filter.mjs';
-import * as Houses from './modules/listOfHouses.mjs';
 
 /* load all page elements of index.html */
 Main.loadHeader();
@@ -28,7 +27,8 @@ function loadLeftSidebar() {
                     Filter.applyFiltersFromUrl();
                 }
                 else {
-                    Houses.getList();
+                    const defaultList = '/api/huizen/filter';
+                    Filter.getListOfHousesByURL(defaultList);
                 }
                 Filter.listenToFilter();
             })

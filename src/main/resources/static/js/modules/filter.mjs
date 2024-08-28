@@ -66,11 +66,11 @@ export function listenToFilter() {
 
         window.history.pushState({}, '', `?${params.toString()}`);
 
-        getHousesByFilter(finalUrl);
-        });
+        getListOfHousesByURL(finalUrl);
+    });
 }
 
-function getHousesByFilter(url) {
+export function getListOfHousesByURL(url) {
 
     const parentElement = document.getElementById('body');
     parentElement.innerHTML = '';
@@ -79,20 +79,8 @@ function getHousesByFilter(url) {
         .then(response => response.json())
         .then(houses => {
 
-            // counter
-            let amountOfHousesDiv = document.createElement('div');
-            amountOfHousesDiv.className = 'amount-of-houses';
-
-            if (houses.length === 0) {
-                amountOfHousesDiv.innerHTML = 'Helaas geen geurige huisjes beschikbaar om te boeken! Verbreed je zoekcriteria en probeer het opnieuw.';
-            } if (houses.length === 1) {
-                amountOfHousesDiv.innerHTML = '<b>' + houses.length + '</b> geurig huisje gevonden om te boeken. Wees er snel bij!';
-            } else {
-                amountOfHousesDiv.innerHTML = '<b>' + houses.length + '</b> geurige huisjes gevonden om te boeken!';
-            }
-
-
-            parentElement.appendChild(amountOfHousesDiv);
+            const amountOfHouses = houses.length;
+            showAmountOfHousesString(parentElement, amountOfHouses);
 
             houses.forEach(house => {
                 // console.log(house.houseName)
@@ -133,13 +121,7 @@ function getHousesByFilter(url) {
                 innerDiv.appendChild(price);
             });
 
-            let pageNumbersSpan = document.createElement('div');
-            pageNumbersSpan.className = 'page-numbers';
-
-
-            pageNumbersSpan.innerHTML = '<span class="individual-page-number">1</span><span class="individual-page-number">2</span><span class="individual-page-number">3</span>...<span class="individual-page-number">8</span><span class="individual-page-number">9</span><span class="individual-page-number">10</span>';
-
-            parentElement.appendChild(pageNumbersSpan);
+            createPageNumbers(parentElement);
 
         })
         .catch(error => console.error('Error:', error));
@@ -170,13 +152,10 @@ export function applyFiltersFromUrl() {
     if (minPrice) document.getElementById('min-price').value = minPrice;
     if (maxPrice) document.getElementById('max-price').value = maxPrice;
 
-    console.log('Cities:', cities);
-    console.log('Types:', types);
-
     const api = '/api/huizen/filter';
     const finalUrl = `${api}?${params.toString()}`;
 
-    getHousesByFilter(finalUrl);
+    getListOfHousesByURL(finalUrl);
 }
 
 export function hasUrlParameters() {
@@ -189,8 +168,31 @@ function setSelectedOptions(elementId, values) {
     const valueArray = values.split(',');
 
     Array.from(element.options).forEach(option => {
+
         if (valueArray.includes(option.value)) {
             option.selected = true;
         }
     });
+}
+
+function createPageNumbers(parentElement) {
+    let pageNumbersDiv = document.createElement('div');
+    pageNumbersDiv.className = 'page-numbers';
+    pageNumbersDiv.innerHTML = '<span class="individual-page-number">1</span><span class="individual-page-number">2</span><span class="individual-page-number">3</span>...<span class="individual-page-number">8</span><span class="individual-page-number">9</span><span class="individual-page-number">10</span>';
+    parentElement.appendChild(pageNumbersDiv);
+}
+
+function showAmountOfHousesString(parentElement, amountOfHouses) {
+    let amountOfHousesDiv = document.createElement('div');
+    amountOfHousesDiv.className = 'amount-of-houses';
+
+    if (amountOfHouses === 0) {
+        amountOfHousesDiv.innerHTML = 'Helaas geen geurige huisjes beschikbaar om te boeken! Verbreed je zoekcriteria en probeer het opnieuw.';
+    } if (amountOfHouses === 1) {
+        amountOfHousesDiv.innerHTML = '<b>' + amountOfHouses + '</b> geurig huisje gevonden om te boeken. Wees er snel bij!';
+    } else {
+        amountOfHousesDiv.innerHTML = '<b>' + amountOfHouses + '</b> geurige huisjes gevonden om te boeken!';
+    }
+
+    parentElement.appendChild(amountOfHousesDiv);
 }
