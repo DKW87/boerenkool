@@ -1,7 +1,6 @@
 "use strict";
 
 import * as Main from './modules/main.mjs';
-import { showNotification } from './modules/notification.mjs';
 import { validatePassword } from './modules/validation.mjs';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -17,12 +16,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const confirmPassword = document.getElementById('confirmPassword').value;
 
         if (!validatePassword(newPassword)) {
-            showNotification("Wachtwoord moet minstens 6 tekens lang zijn en minstens één hoofdletter, één cijfer en één speciaal teken bevatten.", 'error');
+            alert("Wachtwoord moet minstens 6 tekens lang zijn en minstens één hoofdletter, één cijfer en één speciaal teken bevatten.");  // Vervangt showNotification
             return;
         }
 
         if (newPassword !== confirmPassword) {
-            showNotification('Wachtwoorden komen niet overeen', 'error');
+            alert('Wachtwoorden komen niet overeen');  // Vervangt showNotification
             return;
         }
 
@@ -36,15 +35,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const message = await response.text();
 
             if (response.ok) {
-                showNotification('Wachtwoord succesvol hersteld!', 'success');
+                alert('Wachtwoord succesvol hersteld!');  // Vervangt showNotification
                 setTimeout(() => {
                     window.location.href = '/login.html';
                 }, 3000);
             } else {
-                showNotification(message, 'error');
+                alert(message);  // Vervangt showNotification
             }
         } catch (error) {
-            showNotification('Er is een fout opgetreden tijdens het herstellen van het wachtwoord. Probeer het later opnieuw.', 'error');
+            alert('Er is een fout opgetreden tijdens het herstellen van het wachtwoord. Probeer het later opnieuw.');  // Vervangt showNotification
         }
     });
 });

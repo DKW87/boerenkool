@@ -1,7 +1,6 @@
 "use strict";
 
 import * as Main from './modules/main.mjs';
-import { showNotification } from './modules/notification.mjs';
 
 document.addEventListener('DOMContentLoaded', () => {
     Main.loadHeader();
@@ -22,9 +21,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const message = await response.text();
-            showNotification(message, 'success');
+            alert(message);  // Vervangt showNotification
         } catch (error) {
-            showNotification(error.message, 'error');
+            alert(error.message);  // Vervangt showNotification
         }
     });
 });

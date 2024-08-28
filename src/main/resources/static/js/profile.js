@@ -3,8 +3,8 @@
 // Import necessary modules
 import * as Main from './modules/main.mjs';
 import * as Auth from './modules/auth.mjs';
-import { showNotification } from './modules/notification.mjs';
 import { loadBlockedUsers, blockUser } from './blockedUsers.js';
+import { validateName, validatePhoneNumber, validateEmail } from './modules/validation.mjs';
 
 document.addEventListener('DOMContentLoaded', async () => {
     // Load the header and footer
@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Get the authentication token
     const token = Auth.getToken();
     if (!token) {
-        showNotification('Je bent niet ingelogd.', 'error');
+        alert('Je bent niet ingelogd.');  // Vervangt showNotification
         window.location.href = '/login.html';
         return;
     }
@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     } catch (error) {
         console.error('Fout bij het ophalen van gebruikersinformatie:', error);
-        showNotification('Kon gebruikersinformatie niet ophalen.', 'error');
+        alert('Kon gebruikersinformatie niet ophalen.');  // Vervangt showNotification
         return;
     }
 
@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     } catch (error) {
         console.error('Fout bij het laden van profielgegevens:', error);
-        showNotification('Kon profiel niet laden.', 'error');
+        alert('Kon profiel niet laden.');  // Vervangt showNotification
     }
 
     // Event listener for blocking users
@@ -87,19 +87,3 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Initial load of blocked users
     loadBlockedUsers(userId, token);
 });
-
-// Validation functions
-function validateName(name) {
-    const nameRegex = /^[A-Za-z]+$/;
-    return nameRegex.test(name);
-}
-
-function validatePhoneNumber(phone) {
-    const phoneRegex = /^06\d{8}$/;
-    return phoneRegex.test(phone);
-}
-
-function validateEmail(email) {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-}

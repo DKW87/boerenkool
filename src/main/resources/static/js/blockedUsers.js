@@ -1,7 +1,5 @@
 "use strict";
 
-import { showNotification } from './modules/notification.mjs';
-
 // Function to load blocked users
 export function loadBlockedUsers(userId, token) {
     if (!userId) {
@@ -47,7 +45,6 @@ export function loadBlockedUsers(userId, token) {
         .catch(error => console.error('Fout bij het laden van geblokkeerde gebruikers:', error));
 }
 
-
 // Function to block a user
 export function blockUser(userId, token) {
     const usernameToBlock = document.getElementById('user-to-block').value;
@@ -65,7 +62,7 @@ export function blockUser(userId, token) {
             console.log('Status bij het ophalen van gebruiker:', response.status);
             if (!response.ok) {
                 if (response.status === 404) {
-                    showNotification(`Gebruiker met gebruikersnaam ${usernameToBlock} bestaat niet.`, 'error');
+                    alert(`Gebruiker met gebruikersnaam ${usernameToBlock} bestaat niet.`);
                 } else {
                     throw new Error(`Fout bij het ophalen van gebruiker met gebruikersnaam ${usernameToBlock}.`);
                 }
@@ -107,7 +104,6 @@ export function blockUser(userId, token) {
         .catch(error => console.error('Fout bij het blokkeren van gebruiker:', error));
 }
 
-
 // Function to unblock a user
 function unblockUser(userToUnblockId, userId, token) {
     console.log('Deblokkeren van gebruiker met userToUnblockId:', userToUnblockId);
@@ -123,7 +119,7 @@ function unblockUser(userToUnblockId, userId, token) {
         .then(response => {
             console.log('Status bij het deblokkeren van gebruiker:', response.status);
             if (response.ok) {
-                showNotification('Gebruiker is gedeblokkeerd.', 'success');
+                alert('Gebruiker is gedeblokkeerd.');
                 loadBlockedUsers(userId, token);
             } else {
                 throw new Error('Fout bij het deblokkeren van de gebruiker.');

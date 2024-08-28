@@ -1,7 +1,6 @@
 "use strict";
 
 import * as Main from './modules/main.mjs';
-import { showNotification } from './modules/notification.mjs';
 import { validateName, validatePhoneNumber, validateEmail, validatePassword } from './modules/validation.mjs';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -20,22 +19,22 @@ document.addEventListener('DOMContentLoaded', () => {
         const password = document.getElementById('password').value;
 
         if (!validateEmail(email)) {
-            showNotification("Voer een geldig e-mailadres in.", 'error');
+            alert("Voer een geldig e-mailadres in.");  // Vervangt showNotification
             return;
         }
 
         if (!validateName(firstName) || !validateName(lastName)) {
-            showNotification("Voornaam en achternaam mogen alleen letters bevatten.", 'error');
+            alert("Voornaam en achternaam mogen alleen letters bevatten.");  // Vervangt showNotification
             return;
         }
 
         if (!validatePhoneNumber(phone)) {
-            showNotification("Telefoonnummer moet beginnen met 06 en precies 8 cijfers bevatten.", 'error');
+            alert("Telefoonnummer moet beginnen met 06 en precies 8 cijfers bevatten.");  // Vervangt showNotification
             return;
         }
 
         if (!validatePassword(password)) {
-            showNotification("Wachtwoord moet minstens 6 tekens lang zijn en minstens één hoofdletter, één cijfer en één speciaal teken bevatten.", 'error');
+            alert("Wachtwoord moet minstens 6 tekens lang zijn en minstens één hoofdletter, één cijfer en één speciaal teken bevatten.");  // Vervangt showNotification
             return;
         }
 
@@ -64,11 +63,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error(resultText);
             }
 
-            showNotification(resultText, 'success');
+            alert(resultText);  // Vervangt showNotification
             window.location.href = '/login.html';
 
         } catch (error) {
-            showNotification(error.message, 'error');
+            alert(error.message);  // Vervangt showNotification
         }
     });
 });
