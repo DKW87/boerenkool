@@ -25,6 +25,7 @@ function loadLeftSidebar() {
                 leftSidebar.innerHTML = data;
                 Filter.getUniqueCities();
                 Filter.getHouseTypes();
+                Filter.listenToFilter();
             })
             .catch(error => {
                 console.error('Er is een probleem opgetreden met fetch:', error);
@@ -33,3 +34,6 @@ function loadLeftSidebar() {
         console.error('Element met ID "left-sidebar" niet gevonden.');
     }
 }
+
+
+

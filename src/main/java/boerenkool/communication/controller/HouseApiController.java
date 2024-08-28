@@ -2,6 +2,7 @@ package boerenkool.communication.controller;
 
 import boerenkool.business.model.House;
 import boerenkool.business.model.HouseFilter;
+import boerenkool.business.model.HouseType;
 import boerenkool.business.service.HouseService;
 import boerenkool.communication.dto.HouseListDTO;
 import org.slf4j.Logger;
@@ -118,9 +119,9 @@ public class HouseApiController {
 
     @GetMapping("/typen")
     public ResponseEntity<?> getHouseTypes() {
-        List<String> houseTypes = houseService.getAllHouseTypes();
+        List<HouseType> houseTypes = houseService.getAllHouseTypes();
         if (houseTypes.isEmpty()) {
-            return new ResponseEntity<>("No types found", HttpStatus.NO_CONTENT);
+            return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
         }
         return new ResponseEntity<>(houseTypes, HttpStatus.OK);
     }
@@ -156,8 +157,9 @@ public class HouseApiController {
                 .build();
 
         List<HouseListDTO> filteredHouses = houseService.getFilteredListOfHouses(filter);
+
         return filteredHouses.isEmpty()
-                ? new ResponseEntity<>("No houses match your criteria", HttpStatus.NO_CONTENT)
+                ? new ResponseEntity<>(filteredHouses, HttpStatus.NO_CONTENT)
                 : new ResponseEntity<>(filteredHouses, HttpStatus.OK);
     }
 

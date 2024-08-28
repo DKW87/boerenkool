@@ -24,10 +24,123 @@ export function getHouseTypes() {
     .then(data => {
         data.forEach(houseType => {
             let option = document.createElement('option');
-            option.value = houseType;
-            option.textContent = houseType;
+            option.value = houseType.houseTypeId;
+            option.textContent = houseType.houseTypeName;
             parentElement.appendChild(option);
         });
     })
     .catch(error => console.error('Error:', error));
 }
+
+export function listenToFilter() {
+    document.querySelector('button').addEventListener('click', function () {
+        const api = '/api/huizen/filter';
+
+        const sortOrder = document.getElementById('sortOrder').value;
+        const sortBy = document.getElementById('sortBy').value;
+
+        const province = Array.from(document.getElementById('province').selectedOptions).map(option => option.value).join(',');
+        const city = Array.from(document.getElementById('uniqueCities').selectedOptions).map(option => option.value).join(',');
+        const type = Array.from(document.getElementById('houseTypes').selectedOptions).map(option => option.value).join(',');
+
+        const guests = document.getElementById('guests').value;
+        const rooms = document.getElementById('rooms').value;
+        const minPrice = document.getElementById('min-price').value;
+        const maxPrice = document.getElementById('max-price').value;
+
+        // Bouw de query string op
+        const params = new URLSearchParams();
+
+        if (sortOrder) params.append('sorteer-orde', sortOrder);
+        if (sortBy) params.append('sorteer-op', sortBy);
+
+        if (province) params.append('provincies', province);
+        if (city) params.append('steden', city);
+        if (type) params.append('huis-typen', type);
+
+        if (guests) params.append('aantal-gasten', guests);
+        if (rooms) params.append('aantal-kamers', rooms);
+        if (minPrice) params.append('minimum-prijs-per-persoon-per-nacht', minPrice);
+        if (maxPrice) params.append('maximum-prijs-per-persoon-per-nacht', maxPrice);
+
+        const finalUrl = `${api}?${params.toString()}`;
+
+        getHousesByFilter(finalUrl);
+
+        console.log(finalUrl); // Doe hier iets met de URL, bijvoorbeeld een redirect of fetch request
+    });
+}
+
+function getHousesByFilter(url) {
+
+const parentElement = document.getElementById('body');
+parentElement.innerHTML = '';
+
+    fetch(url)
+        .then(response => response.json())
+        .then(houses => {
+
+            // counter
+            let amountOfHousesDiv = document.createElement('div');
+            amountOfHousesDiv.className = 'amount-of-houses';
+            
+            if (houses.length === 0) {
+                amountOfHousesDiv.innerHTML = 'Helaas geen geurige huisjes beschikbaar om te boeken! Verbreed je zoekcriteria en probeer het opnieuw.';    
+            } if (houses.length === 1) {
+                amountOfHousesDiv.innerHTML = '<b>' + houses.length + '</b> geurig huisje gevonden om te boeken. Wees er snel bij!';
+            } else {
+                amountOfHousesDiv.innerHTML = '<b>' + houses.length + '</b> geurige huisjes gevonden om te boeken!';
+            }
+            
+
+            parentElement.appendChild(amountOfHousesDiv);
+
+            houses.forEach(house => {
+                // console.log(house.houseName)
+                let outerDiv = document.createElement('div');
+                outerDiv.className = 'huisje';
+
+                let thumbnail = document.createElement('img');
+                thumbnail.alt = house.houseName;
+                thumbnail.src = './images/notAvailable.png'
+                // console.log(thumbnail.src)
+
+                /* TODO:
+                thumbnail.src = `data:image/jpeg;base64,${house.picture}`; */
+
+
+                let innerDiv = document.createElement('div');
+                innerDiv.className = 'huisje-details';
+
+                let title = document.createElement('h2');
+                title.innerHTML = house.houseName;
+
+                // let type = document.createElement('p');
+                // type.innerHTML = house.houseType;
+
+                let location = document.createElement('p');
+                location.innerHTML = house.houseType + ' in ' + house.province + ', ' + house.city;
+
+                let price = document.createElement('p');
+                price.innerHTML = house.price + 'bkC per nacht';
+                price.className = 'prijs';
+
+                parentElement.appendChild(outerDiv);
+                outerDiv.appendChild(thumbnail);
+                outerDiv.appendChild(innerDiv);
+                innerDiv.appendChild(title);
+                // innerDiv.appendChild(type);
+                innerDiv.appendChild(location);
+                innerDiv.appendChild(price);
+            });
+
+            let pageNumbersSpan = document.createElement('div');
+            pageNumbersSpan.className = 'page-numbers';
+
+            pageNumbersSpan.innerHTML = '<span class="individual-page-number">1</span><span class="individual-page-number">2</span><span class="individual-page-number">3</span>...<span class="individual-page-number">8</span><span class="individual-page-number">9</span><span class="individual-page-number">10</span>';
+
+            parentElement.appendChild(pageNumbersSpan);
+
+        })
+        .catch(error => console.error('Error:', error));
+    }
