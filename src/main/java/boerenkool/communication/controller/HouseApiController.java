@@ -137,7 +137,7 @@ public class HouseApiController {
             @RequestParam(name = "maximum-prijs-per-persoon-per-nacht", required = false, defaultValue = "0") int maxPricePPPD,
             @RequestParam(name = "sorteer-op", required = false, defaultValue = "houseId") String sortBy,
             @RequestParam(name = "sorteer-orde", required = false, defaultValue = "DESC") String sortOrder,
-            @RequestParam(required = false, defaultValue = "16") int limit,
+            @RequestParam(required = false, defaultValue = "12") int limit,
             @RequestParam(required = false, defaultValue = "0") int offset) {
 
         HouseFilter filter = new HouseFilter.Builder()

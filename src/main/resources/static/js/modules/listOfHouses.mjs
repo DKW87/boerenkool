@@ -6,6 +6,13 @@ export function getList() {
     fetch('/api/huizen/filter')
     .then(response => response.json())
     .then(houses => {
+        // counter
+        let amountOfHousesDiv = document.createElement('div');
+        amountOfHousesDiv.className = 'amount-of-houses';
+        amountOfHousesDiv.innerHTML = '<b>' + houses.length + '</b> geurige huisjes om te boeken!';
+        
+        parentElement.appendChild(amountOfHousesDiv);
+        
         houses.forEach(house => {
             console.log(house.houseName)
             let outerDiv = document.createElement('div');
@@ -44,6 +51,14 @@ export function getList() {
             innerDiv.appendChild(location);
             innerDiv.appendChild(price);
         });
+
+        let pageNumbersSpan = document.createElement('div');
+        pageNumbersSpan.className = 'page-numbers';
+
+        pageNumbersSpan.innerHTML =  '<span class="individual-page-number">1</span><span class="individual-page-number">2</span><span class="individual-page-number">3</span>...<span class="individual-page-number">8</span><span class="individual-page-number">9</span><span class="individual-page-number">10</span>';
+
+        parentElement.appendChild(pageNumbersSpan);
+
     })
     .catch(error => console.error('Error:', error));
 }

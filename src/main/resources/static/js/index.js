@@ -5,10 +5,10 @@ import * as Filter from './modules/filter.mjs';
 import * as Houses from './modules/listOfHouses.mjs';
 import * as Main from './modules/main.mjs';
 
-/* load all page elements of login.html */
+/* load all page elements of index.html */
 Main.loadHeader();
 loadLeftSidebar();
-loadBody();
+Houses.getList();
 Main.loadFooter();
 
 function loadLeftSidebar() {
@@ -33,26 +33,3 @@ function loadLeftSidebar() {
         console.error('Element met ID "left-sidebar" niet gevonden.');
     }
 }
-
-function loadBody() {
-    const body = document.getElementById("body");
-    if (body) {
-        fetch('templates/listOfHouses.html')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Netwerkreactie was niet ok.');
-                }
-                return response.text();
-            })
-            .then(data => {
-                body.innerHTML = data;
-                Houses.getList();
-            })
-            .catch(error => {
-                console.error('Er is een probleem opgetreden met fetch:', error);
-            });
-    } else {
-        console.error('Element met ID "body" niet gevonden.');
-    }
-}
-

@@ -5,7 +5,7 @@
     margin: 20px;
     height: 300px;
     overflow: hidden;
-    width: 375px;
+    width: 370px;
     transition: transform 0.1s ease-in-out;
 }
 
@@ -46,6 +46,8 @@
 }
 
 .page-numbers {
+    text-align: center;
+    width: 100%;
     margin: auto;
     margin-bottom: 25px;
     margin-top: 10px;
