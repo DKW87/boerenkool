@@ -4,32 +4,32 @@ export function getUniqueCities() {
     const parentElement = document.getElementById('uniqueCities');
 
     fetch('/api/huizen/steden')
-    .then(response => response.json())
-    .then(data => {
-        data.forEach(city => {
-            let option = document.createElement('option');
-            option.value = city;
-            option.textContent = city;
-            parentElement.appendChild(option);
-        });
-    })
-    .catch(error => console.error('Error:', error));
+        .then(response => response.json())
+        .then(data => {
+            data.forEach(city => {
+                let option = document.createElement('option');
+                option.value = city;
+                option.textContent = city;
+                parentElement.appendChild(option);
+            });
+        })
+        .catch(error => console.error('Error:', error));
 }
 
 export function getHouseTypes() {
     const parentElement = document.getElementById('houseTypes');
 
     fetch('/api/huizen/typen')
-    .then(response => response.json())
-    .then(data => {
-        data.forEach(houseType => {
-            let option = document.createElement('option');
-            option.value = houseType.houseTypeId;
-            option.textContent = houseType.houseTypeName;
-            parentElement.appendChild(option);
-        });
-    })
-    .catch(error => console.error('Error:', error));
+        .then(response => response.json())
+        .then(data => {
+            data.forEach(houseType => {
+                let option = document.createElement('option');
+                option.value = houseType.houseTypeId;
+                option.textContent = houseType.houseTypeName;
+                parentElement.appendChild(option);
+            });
+        })
+        .catch(error => console.error('Error:', error));
 }
 
 export function listenToFilter() {
@@ -48,7 +48,6 @@ export function listenToFilter() {
         const minPrice = document.getElementById('min-price').value;
         const maxPrice = document.getElementById('max-price').value;
 
-        // Bouw de query string op
         const params = new URLSearchParams();
 
         if (sortOrder) params.append('sorteer-orde', sortOrder);
@@ -65,16 +64,16 @@ export function listenToFilter() {
 
         const finalUrl = `${api}?${params.toString()}`;
 
-        getHousesByFilter(finalUrl);
+        window.history.pushState({}, '', `?${params.toString()}`);
 
-        console.log(finalUrl); // Doe hier iets met de URL, bijvoorbeeld een redirect of fetch request
-    });
+        getHousesByFilter(finalUrl);
+        });
 }
 
 function getHousesByFilter(url) {
 
-const parentElement = document.getElementById('body');
-parentElement.innerHTML = '';
+    const parentElement = document.getElementById('body');
+    parentElement.innerHTML = '';
 
     fetch(url)
         .then(response => response.json())
@@ -83,15 +82,15 @@ parentElement.innerHTML = '';
             // counter
             let amountOfHousesDiv = document.createElement('div');
             amountOfHousesDiv.className = 'amount-of-houses';
-            
+
             if (houses.length === 0) {
-                amountOfHousesDiv.innerHTML = 'Helaas geen geurige huisjes beschikbaar om te boeken! Verbreed je zoekcriteria en probeer het opnieuw.';    
+                amountOfHousesDiv.innerHTML = 'Helaas geen geurige huisjes beschikbaar om te boeken! Verbreed je zoekcriteria en probeer het opnieuw.';
             } if (houses.length === 1) {
                 amountOfHousesDiv.innerHTML = '<b>' + houses.length + '</b> geurig huisje gevonden om te boeken. Wees er snel bij!';
             } else {
                 amountOfHousesDiv.innerHTML = '<b>' + houses.length + '</b> geurige huisjes gevonden om te boeken!';
             }
-            
+
 
             parentElement.appendChild(amountOfHousesDiv);
 
@@ -137,10 +136,61 @@ parentElement.innerHTML = '';
             let pageNumbersSpan = document.createElement('div');
             pageNumbersSpan.className = 'page-numbers';
 
+
             pageNumbersSpan.innerHTML = '<span class="individual-page-number">1</span><span class="individual-page-number">2</span><span class="individual-page-number">3</span>...<span class="individual-page-number">8</span><span class="individual-page-number">9</span><span class="individual-page-number">10</span>';
 
             parentElement.appendChild(pageNumbersSpan);
 
         })
         .catch(error => console.error('Error:', error));
-    }
+}
+
+export function applyFiltersFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+
+    const sortOrder = params.get('sorteer-orde');
+    const sortBy = params.get('sorteer-op');
+    const provinces = params.get('provincies');
+    const cities = params.get('steden');
+    const types = params.get('huis-typen');
+    const guests = params.get('aantal-gasten');
+    const rooms = params.get('aantal-kamers');
+    const minPrice = params.get('minimum-prijs-per-persoon-per-nacht');
+    const maxPrice = params.get('maximum-prijs-per-persoon-per-nacht');
+
+    if (sortOrder) document.getElementById('sortOrder').value = sortOrder;
+    if (sortBy) document.getElementById('sortBy').value = sortBy;
+
+    if (provinces) setSelectedOptions('province', provinces);
+    if (cities) setSelectedOptions('uniqueCities', cities);
+    if (types) setSelectedOptions('houseTypes', types);
+
+    if (guests) document.getElementById('guests').value = guests;
+    if (rooms) document.getElementById('rooms').value = rooms;
+    if (minPrice) document.getElementById('min-price').value = minPrice;
+    if (maxPrice) document.getElementById('max-price').value = maxPrice;
+
+    console.log('Cities:', cities);
+    console.log('Types:', types);
+
+    const api = '/api/huizen/filter';
+    const finalUrl = `${api}?${params.toString()}`;
+
+    getHousesByFilter(finalUrl);
+}
+
+export function hasUrlParameters() {
+    const params = new URLSearchParams(window.location.search);
+    return params.toString() !== '';
+}
+
+function setSelectedOptions(elementId, values) {
+    const element = document.getElementById(elementId);
+    const valueArray = values.split(',');
+
+    Array.from(element.options).forEach(option => {
+        if (valueArray.includes(option.value)) {
+            option.selected = true;
+        }
+    });
+}

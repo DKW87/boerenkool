@@ -1,14 +1,13 @@
 "use strict"
 
 /* imports */
+import * as Main from './modules/main.mjs';
 import * as Filter from './modules/filter.mjs';
 import * as Houses from './modules/listOfHouses.mjs';
-import * as Main from './modules/main.mjs';
 
 /* load all page elements of index.html */
 Main.loadHeader();
 loadLeftSidebar();
-Houses.getList();
 Main.loadFooter();
 
 function loadLeftSidebar() {
@@ -25,6 +24,12 @@ function loadLeftSidebar() {
                 leftSidebar.innerHTML = data;
                 Filter.getUniqueCities();
                 Filter.getHouseTypes();
+                if (Filter.hasUrlParameters()) {
+                    Filter.applyFiltersFromUrl();
+                }
+                else {
+                    Houses.getList();
+                }
                 Filter.listenToFilter();
             })
             .catch(error => {
@@ -34,6 +39,5 @@ function loadLeftSidebar() {
         console.error('Element met ID "left-sidebar" niet gevonden.');
     }
 }
-
 
 
