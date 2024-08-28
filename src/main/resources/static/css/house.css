@@ -46,12 +46,17 @@
 }
 
 .page-numbers {
-    text-align: center;
+    display: flex;
+    justify-content: center;  
+    align-items: flex-start;  
     width: 100%;
-    margin: auto;
-    margin-bottom: 25px;
-    margin-top: 10px;
+    margin: 10px auto 25px auto; 
+    text-align: center;
+    position: relative; 
+    top: 0;  
 }
+
+
 
 .individual-page-number {
     margin: 5px;

@@ -182,7 +182,15 @@ function setSelectedOptions(elementId, values) {
 function createPageNumbers(parentElement) {
     let pageNumbersDiv = document.createElement('div');
     pageNumbersDiv.className = 'page-numbers';
-    pageNumbersDiv.innerHTML = '<span class="individual-page-number">1</span><span class="individual-page-number">2</span><span class="individual-page-number">3</span>...<span class="individual-page-number">8</span><span class="individual-page-number">9</span><span class="individual-page-number">10</span>';
+    pageNumbersDiv.innerHTML = `
+    <span class="individual-page-number">1</span>
+    <span class="individual-page-number">2</span>
+    <span class="individual-page-number">3</span>
+    ...
+    <span class="individual-page-number">8</span>
+    <span class="individual-page-number">9</span>
+    <span class="individual-page-number">10</span>
+    `;
     parentElement.appendChild(pageNumbersDiv);
 }
 
