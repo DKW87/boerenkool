@@ -65,6 +65,7 @@ public class ReservationService {
         reservationDTO.setEndDate(reservation.getEndDate());
         reservationDTO.setGuestCount(reservation.getGuestCount());
         reservationDTO.setHouseId(reservation.getHouse().getHouseId());
+        reservationDTO.setHouseName(reservation.getHouse().getHouseName());
         reservationDTO.setUserId(reservation.getReservedByUser().getUserId());
         return reservationDTO;
     }
@@ -95,6 +96,10 @@ public class ReservationService {
         if (endDate.isBefore(startDate)) {
             throw new IllegalArgumentException("End date cannot be before start date.");
         }
+    }
+
+    public List<Reservation> getAllReservationsByUserId(int userId) {
+        return reservationRepository.getAllReservationsByUserId(userId);
     }
 }
 
