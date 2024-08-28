@@ -2,7 +2,6 @@
 
 import * as Main from './modules/main.mjs';
 import * as Auth from './modules/auth.mjs';
-import { showNotification } from './modules/notification.mjs';
 
 document.addEventListener('DOMContentLoaded', () => {
     Main.loadHeader();
@@ -16,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (success) {
             window.location.href = '/profile.html';
         } else {
-            showNotification('Login mislukt. Controleer je inloggegevens.', 'error');
+            alert('Login mislukt. Controleer je inloggegevens.');  // Vervangt showNotification
         }
     });
 });
