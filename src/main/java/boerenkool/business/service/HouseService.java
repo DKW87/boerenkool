@@ -62,6 +62,7 @@ public class HouseService {
     public List<HouseListDTO> getFilteredListOfHouses(HouseFilter filter) {
         List<House> filteredHouses = houseRepository.getHousesWithFilter(filter);
         List<HouseListDTO> strippedFilteredHouses = new ArrayList<>();
+
         for (House fullHouse : filteredHouses) {
             HouseListDTO strippedHouse = new HouseListDTO();
             strippedHouse.setHouseId(fullHouse.getHouseId());
@@ -76,9 +77,6 @@ public class HouseService {
             strippedHouse.setPrice(fullHouse.getPricePPPD());
             strippedFilteredHouses.add(strippedHouse);
         }
-//        for (HouseListDTO strippedHouseDTO : strippedFilteredHouses) {
-//            System.out.println(strippedHouseDTO.getHouseName());
-//        }
         return strippedFilteredHouses;
     }
 
@@ -86,13 +84,8 @@ public class HouseService {
         return houseRepository.getUniqueCities();
     }
 
-    public List<String> getAllHouseTypes() {
-        List<HouseType> allHouseTypes = houseRepository.getAllHouseTypes();
-        List<String> allHouseTypesNames = new ArrayList<>();
-        for (HouseType houseType : allHouseTypes) {
-            allHouseTypesNames.add(houseType.getHouseTypeName());
-        }
-        return allHouseTypesNames;
+    public List<HouseType> getAllHouseTypes() {
+        return houseRepository.getAllHouseTypes();
     }
 
     public boolean saveHouse(House house) {

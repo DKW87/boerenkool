@@ -2,6 +2,7 @@ package boerenkool.communication.controller;
 
 import boerenkool.business.model.House;
 import boerenkool.business.model.HouseFilter;
+import boerenkool.business.model.HouseType;
 import boerenkool.business.service.HouseService;
 import boerenkool.communication.dto.HouseListDTO;
 import org.slf4j.Logger;
@@ -118,9 +119,9 @@ public class HouseApiController {
 
     @GetMapping("/typen")
     public ResponseEntity<?> getHouseTypes() {
-        List<String> houseTypes = houseService.getAllHouseTypes();
+        List<HouseType> houseTypes = houseService.getAllHouseTypes();
         if (houseTypes.isEmpty()) {
-            return new ResponseEntity<>("No types found", HttpStatus.NO_CONTENT);
+            return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
         }
         return new ResponseEntity<>(houseTypes, HttpStatus.OK);
     }
@@ -137,7 +138,7 @@ public class HouseApiController {
             @RequestParam(name = "maximum-prijs-per-persoon-per-nacht", required = false, defaultValue = "0") int maxPricePPPD,
             @RequestParam(name = "sorteer-op", required = false, defaultValue = "houseId") String sortBy,
             @RequestParam(name = "sorteer-orde", required = false, defaultValue = "DESC") String sortOrder,
-            @RequestParam(required = false, defaultValue = "16") int limit,
+            @RequestParam(required = false, defaultValue = "12") int limit,
             @RequestParam(required = false, defaultValue = "0") int offset) {
 
         HouseFilter filter = new HouseFilter.Builder()
@@ -156,8 +157,9 @@ public class HouseApiController {
                 .build();
 
         List<HouseListDTO> filteredHouses = houseService.getFilteredListOfHouses(filter);
+
         return filteredHouses.isEmpty()
-                ? new ResponseEntity<>("No houses match your criteria", HttpStatus.NO_CONTENT)
+                ? new ResponseEntity<>(filteredHouses, HttpStatus.NO_CONTENT)
                 : new ResponseEntity<>(filteredHouses, HttpStatus.OK);
     }
 

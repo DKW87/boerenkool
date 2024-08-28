@@ -2,27 +2,6 @@
     <h3>Filters</h3>
 
     <div class="filter-group">
-        <label for="sortOrder">Sorteerorde:</label>
-        <select class="dropdown" id="sortOrder" name="sortOrder">
-            <option class="dropdown-option" value="ASC">Oplopend</option>
-            <option value="DESC">Aflopend</option>
-        </select>
-    </div>
-
-    <div class="filter-group">
-        <label for="sortBy">Sorteer op:</label>
-        <select class="dropdown" id="sortBy" name="sortBy">
-            <option value=""></option>
-            <option value="province">Provincie</option>
-            <option value="province">Stad</option>
-            <option value="province">Type</option>
-            <option value="province">Aantal gasten</option>
-            <option value="province">Aantal kamers</option>
-            <option value="province">Prijs</option>
-        </select>
-    </div>
-
-    <div class="filter-group">
         <label for="province">Provincie:</label>
         <select id="province" name="province" multiple>
             <option value="Drenthe">Drenthe</option>
@@ -72,6 +51,29 @@
     <div class="filter-group">
         <label for="max-price">Maximale Prijs:</label>
         <input type="number" id="max-price" name="max-price" placeholder="€ Max">
+    </div>
+
+
+    <div class="filter-group">
+        <label for="sortOrder">Sorteerorde:</label>
+        <select class="dropdown" id="sortOrder" name="sortOrder">
+            <option class="dropdown-option" value="ASC">Oplopend</option>
+            <option value="DESC">Aflopend</option>
+        </select>
+    </div>
+
+    <div class="filter-group">
+        <label for="sortBy">Sorteer op:</label>
+        <select class="dropdown" id="sortBy" name="sortBy">
+            <option value=""></option>
+            <option value="houseName">Naam</option>
+            <option value="province">Provincie</option>
+            <option value="city">Plaats</option>
+            <option value="houseTypeId">Type</option>
+            <option value="maxGuest">Aantal gasten</option>
+            <option value="roomCount">Aantal kamers</option>
+            <option value="pricePPPD">Prijs</option>
+        </select>
     </div>
 
     <div class="filter-group">
