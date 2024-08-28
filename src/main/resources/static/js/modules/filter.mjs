@@ -192,7 +192,7 @@ function amountOfHousesStringSwitch(parentElement, amountOfHouses) {
 
     switch (amountOfHouses) {
         case 0:
-            amountOfHousesDiv.innerHTML = 'Helaas geen geurige huisjes beschikbaar om te boeken! Verbreed je zoekcriteria en probeer het opnieuw.';
+            amountOfHousesDiv.innerHTML = 'Geen huisjes gevonden. Verbreed je zoekcriteria en probeer het opnieuw.';
             parentElement.appendChild(amountOfHousesDiv);
             break;
         case 1:
