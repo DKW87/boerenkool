@@ -6,6 +6,9 @@ import * as Auth from './modules/auth.mjs';
 import { loadBlockedUsers, blockUser } from './blockedUsers.js';
 import { validateName, validatePhoneNumber, validateEmail } from './modules/validation.mjs';
 
+//listener die luistert naar domcontentloaded event, om te kijken of de volledige dom is opgebouwd
+//async zodat je later gebruik kan maken voor await. promise void betekent dat er geen waarde wordt gerourtneerd
+//met succesvolle voltooing
 document.addEventListener('DOMContentLoaded', async () => {
     // Load the header and footer
     Main.loadHeader();
@@ -22,7 +25,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let userId;
 
     try {
-        // Fetch user details to get the userId
+        // Fetch user details to get the userId. await pauzeert functie totdat de promise van de fetch is vervuld
         const response = await fetch('/api/users/profile', {
             method: 'GET',
             headers: { 'Authorization': token }
