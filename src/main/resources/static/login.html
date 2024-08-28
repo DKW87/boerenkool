@@ -6,33 +6,40 @@
     <title>Login Pagina</title>
 
     <!-- Import stylesheets -->
-    <link rel="stylesheet" href="/css/global.css">
-    <link rel="stylesheet" href="/css/header.css">
-    <link rel="stylesheet" href="/css/footer.css">
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/header.css">
+    <link rel="stylesheet" href="css/footer.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playwrite+BE+VLG:wght@100..400&family=Playwrite+PE:wght@100..400&display=swap" rel="stylesheet">
 
-    <!-- Load the login.js script as a module -->
+    <!-- Laad het login.js script als een module -->
     <script src="/js/login.js" type="module" defer></script>
 </head>
-</head>
 <body>
-<div id="header"></div>
 
-<div class="login-container">
-    <h2>Login</h2>
-    <label for="username">Username:</label>
-    <input type="text" id="username" name="username" required>
-    <br>
-    <label for="password">Password:</label>
-    <input type="password" id="password" name="password" required>
-    <br>
-    <button id="loginBtn">Login</button>
-    <div id="notification"></div>
-    <p><a href="/forgot-password.html">Wachtwoord vergeten?</a></p>
+<div class="main-grid-area">
+
+    <div class="header-div" id="header"></div>
+
+    <div class="body-div" id="body">
+        <div class="login-container">
+            <h2>Login</h2>
+            <label for="username">Gebruikersnaam:</label>
+            <input type="text" id="username" name="username" required>
+            <br>
+            <label for="password">Wachtwoord:</label>
+            <input type="password" id="password" name="password" required>
+            <br>
+            <button id="loginBtn">Login</button>
+            <div id="notification"></div>
+            <p><a href="/forgot-password.html">Wachtwoord vergeten?</a></p>
+        </div>
+    </div>
+
+    <div class="footer-div" id="footer"></div>
+
 </div>
 
-<div id="footer"></div>
 </body>
 </html>
