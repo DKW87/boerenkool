@@ -2,6 +2,7 @@
 
 import * as Main from './modules/main.mjs';
 import { showNotification } from './modules/notification.mjs';
+import { validatePassword } from './modules/validation.mjs';
 
 document.addEventListener('DOMContentLoaded', () => {
     Main.loadHeader();
@@ -14,6 +15,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const token = document.getElementById('token').value;
         const newPassword = document.getElementById('newPassword').value;
         const confirmPassword = document.getElementById('confirmPassword').value;
+
+        if (!validatePassword(newPassword)) {
+            showNotification("Wachtwoord moet minstens 6 tekens lang zijn en minstens één hoofdletter, één cijfer en één speciaal teken bevatten.", 'error');
+            return;
+        }
 
         if (newPassword !== confirmPassword) {
             showNotification('Wachtwoorden komen niet overeen', 'error');

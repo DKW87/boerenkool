@@ -2,6 +2,7 @@
 
 import * as Main from './modules/main.mjs';
 import { showNotification } from './modules/notification.mjs';
+import { validateName, validatePhoneNumber, validateEmail, validatePassword } from './modules/validation.mjs';
 
 document.addEventListener('DOMContentLoaded', () => {
     Main.loadHeader();
@@ -70,24 +71,4 @@ document.addEventListener('DOMContentLoaded', () => {
             showNotification(error.message, 'error');
         }
     });
-
-    function validateName(name) {
-        const nameRegex = /^[A-Za-z]+$/;
-        return nameRegex.test(name);
-    }
-
-    function validatePhoneNumber(phone) {
-        const phoneRegex = /^06\d{8}$/;
-        return phoneRegex.test(phone);
-    }
-
-    function validateEmail(email) {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(email);
-    }
-
-    function validatePassword(password) {
-        const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
-        return passwordRegex.test(password);
-    }
 });
