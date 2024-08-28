@@ -1,0 +1,60 @@
+
+.messageGridArea {
+    display: grid;
+    grid-template-columns: 2fr 4fr;
+    border: 2px;
+    border-style: solid;
+}
+
+
+#messageSingleView {
+    background-color: lightcyan;
+    min-height: 60vh;
+}
+
+#messageSingleView div {
+    border: 2px;
+    border-style: solid;
+    border-color: var(--boerenkool-groen);
+    padding: 10px;
+}
+
+#messageOverview {
+    display: flex;
+    flex-wrap: nowrap;
+    text-wrap: nowrap;
+    overflow: hidden;
+    background-color: var(--boerenkool-groen);
+} 
+
+#overviewRow {
+    /* grid-template-columns: 2fr 4fr; */
+    border: 2px;
+    border-style: solid;
+    border-color: red;
+    margin: 3px;
+}
+
+#overviewRow div {
+    /* grid-template-columns: 2fr 4fr; */
+    border: 2px;
+    text-overflow:ellipsis;
+    overflow:hidden;
+    border-style: solid;
+    border-color: magenta
+}
+
+/* #messageOverviewHeader {
+    background-color: lightseagreen;
+
+    padding: 10px;
+
+} */
+
+#messageOverview {
+    display: flex;
+    flex-direction: column;
+    border: 2px;
+    border-style: solid;
+    border-color: aqua;
+}

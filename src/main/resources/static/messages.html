@@ -1,21 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="nl">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Messages</title>
+    <title>HuisjeBoompjeBoerenkool - Berichten</title>
 
     <!-- stylesheets -->
     <link rel="stylesheet" href="css/global.css">
     <link rel="stylesheet" href="css/header.css">
-    <!-- <link rel="stylesheet" href="css/messages.css"> -->
+    <link rel="stylesheet" href="css/messages.css">
     <link rel="stylesheet" href="css/footer.css">
-    <!-- probeer even hoe het er uit ziet -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playwrite+BE+VLG:wght@100..400&family=Playwrite+PE:wght@100..400&display=swap" rel="stylesheet">
-    
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playwrite+BE+VLG:wght@100..400&family=Playwrite+PE:wght@100..400&display=swap"
+        rel="stylesheet">
+
     <script src="js/messages.js" type="module"></script>
 </head>
 
@@ -23,58 +24,48 @@
     <div class="header-div" id="header"></div>
 
     <div class="messageGridArea">
-
-        <form action="">
-            <label for="">MessageId :</label>
-            <input type="text" name="" id="messageIdInput" value="1">
-            <label for="">UserId :</label>
-            <input type="text" name="" id="userIdInput" value="1">
-        </form>
-
-        <p>
-            <button id="reverseMessageTableView">reverseMessageTableView</button>
-        </p>
-        <p>
-            <button id="showMessageContent">showMessageContent (gebruikt input field)</button> op basis van messageId
-            input veld
-        </p>
-        <p>
-            <button id="refreshInbox">refreshInbox()</button>
-        </p>
-        <p>
-            <button id="refreshOutbox">refreshOutbox()</button>
-        </p>
-
-        <!-- <h3>messageSingleView</h3> -->
-        <section id="messageSingleView">
+        <div>
             <div>
-                <p>User : <span id="singleViewSenderid">{{user field}}</span>,
-                    <span id="singleViewDatetimesent">{{dateTimeSent field}}</span>
-                </p>
-                <p>Subject : <span id="singleViewSubject">{{subject field}}</p>
-                <p id="singleViewBody">{{body field}}</p>
+                <label for="messageIdInput">MessageId :</label>
+                <input type="text" name="" id="messageIdInput" value="1">
             </div>
+            <div>
+                <label for="userIdInput">UserId :</label>
+                <input type="text" name="" id="userIdInput" value="1">
+            </div>
+
+            <button id="showMessageContentButton">showMessageContent (dmv input field)</button>
+
+            <button id="reverseMessageOverviewButton">Sorteer op datum</button>
+        </div>
+
+        <div>
+            <button id="refreshInboxButton">Inbox</button>
+
+            <button id="refreshOutboxButton">Outbox</button>
+
+            <button id="writeMessageButton">Schrijf een bericht (werkt nog niet)</button>
+
+            <button id="overviewVisibilityButton">Overzicht tonen/verbergen (werkt nog niet)</button>
+        </div>
+
+        <div id="messageOverview">
+            <div id="overviewRow">
+                <div>subject</div>
+                <div>messageid, userid, datetime</div>
+            </div>
+        </div>
+
+        <section id="messageSingleView">
+            <div>User : <span id="singleViewSenderid">{{user field}}</span>,
+                <span id="singleViewDatetimesent">{{dateTimeSent field}}</span>
+            </div>
+            <div>Subject : <span id="singleViewSubject">{{subject field}}</div>
+            <div id="singleViewBody">{{body field}}</>
+
         </section>
-
-        <!-- <h3>messageTableView</h3> -->
-        <table id="messageTableView">
-            <thead>
-                <tr>
-                    <th>MessageId</th>
-                    <th>User</th>
-                    <th>Subject</th>
-                    <th>Date & time</th>
-                </tr>
-            </thead>
-            <tr id="tableViewRow">
-                <td>-</td>
-                <td>-</td>
-                <td>-</td>
-                <td>-</td>
-            </tr>
-
-        </table>
     </div>
+
     <div class="footer-div" id="footer"></div>
 </body>
 

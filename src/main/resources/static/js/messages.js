@@ -20,32 +20,35 @@ const DATE_TIME_OPTIONS = {
 let inboxArray = {}
 let outboxArray = {}
 let sortAscending = false
+let overviewShowsInbox = true
 
 
-document.querySelector('#reverseMessageTableView').addEventListener('click', () => {
-    reverseMessageTableView()
+document.querySelector('#reverseMessageOverviewButton').addEventListener('click', () => {
+    reverseMessageOverview()
 })
-document.querySelector('#showMessageContent').addEventListener('click', () => {
+document.querySelector('#showMessageContentButton').addEventListener('click', () => {
     showMessageContent()
 })
-document.querySelector('#refreshInbox').addEventListener('click', () => {
+document.querySelector('#refreshInboxButton').addEventListener('click', () => {
     refreshInbox()
 })
-document.querySelector('#refreshOutbox').addEventListener('click', () => {
+document.querySelector('#refreshOutboxButton').addEventListener('click', () => {
     refreshOutbox()
 })
 
 
 async function refreshInbox() {
+    overviewShowsInbox = true
     await getMessages('in')
     sortMessageArray(inboxArray)
-    fillMessageTableView(inboxArray)
+    fillMessageOverview(inboxArray)
 }
 
 async function refreshOutbox() {
+    overviewShowsInbox = false
     await getMessages('out')
     sortMessageArray(outboxArray)
-    fillMessageTableView(outboxArray)
+    fillMessageOverview(outboxArray)
 }
 
 // puts fetched messages into messageArray
@@ -84,49 +87,43 @@ function sortMessageArray(array) {
     }
 }
 
-function fillMessageTableView(listOfMessages) {
+function fillMessageOverview(listOfMessages) {
     // remove old tableviewrows
-    document.querySelectorAll(`#tableViewRow`).forEach(e => e.remove())
-    // create new tableViewRows and add them messageTableView
+    document.querySelectorAll(`#overviewRow`).forEach(e => e.remove())
+    // create new rows with data in the list, and add them to messageOverview
     listOfMessages.forEach(element => {
-        // create new table row
-        const newTableRow = document.createElement("tr");
-        newTableRow.setAttribute("id", "tableViewRow")
-
-        // add messageId
-        const messageIdElement = document.createElement(`td`)
-        messageIdElement.textContent = element.messageId
-        newTableRow.appendChild(messageIdElement)
-        // add senderId
-        const senderId = document.createElement(`td`)
-        senderId.textContent = element.senderId
-        newTableRow.appendChild(senderId)
-
-        // add subject with eventhandler
-        const subject = document.createElement(`td`)
-        // let messageId = element.messageId
-        subject.setAttribute("id", `${element.messageId}`) // probeer element.messageId
-        subject.addEventListener('click', () => {
-            console.log(element.messageId)
+        // create new row
+        const newOverviewRow = document.createElement("div");
+        newOverviewRow.setAttribute("id", "overviewRow")
+        newOverviewRow.setAttribute("messageId", `${element.messageId}`)
+        // add eventhandler to entire element
+        newOverviewRow.addEventListener('click', () => {
             showMessageContent(`${element.messageId}`)
         })
+        // add subject element
+        const subject = document.createElement(`div`)
+        subject.setAttribute("id", `${element.messageId}`)
         subject.textContent = element.subject
-        newTableRow.appendChild(subject)
+        newOverviewRow.appendChild(subject)
 
-        // add dateTimeSent
-        const dateTimeSent = document.createElement(`td`)
-        dateTimeSent.textContent = formatDateTime(element.dateTimeSent)
-        newTableRow.appendChild(dateTimeSent)
-        // add newTableRow to the overview
-        document.getElementById(`messageTableView`).appendChild(newTableRow)
-        // console.log(newTableRow)
+        // add senderId, dateTimeSent and messageId element
+        const senderAndDateTime = document.createElement(`div`)
+        const senderId = element.senderId
+        const dateTimeSent = formatDateTime(element.dateTimeSent)
+        const messageIdElement = element.messageId
+        senderAndDateTime.textContent = `${senderId}, ${dateTimeSent}, ${messageIdElement}`
+        newOverviewRow.appendChild(senderAndDateTime)
+
+        // add newOverviewRow to the overview
+        document.getElementById(`messageOverview`).appendChild(newOverviewRow)
+
     })
 }
 
-function reverseMessageTableView() {
+function reverseMessageOverview() {
     // flip boolean value of sortAscending
     sortAscending = !sortAscending
-    let listview = document.querySelector("#messageTableView")
+    let listview = document.querySelector("#messageOverview")
     for (let i = 1; i < listview.childNodes.length; i++) {
         listview.insertBefore(listview.childNodes[i], listview.firstChild)
     }
@@ -144,11 +141,14 @@ function reverseMessageTableView() {
 // }
 
 function showMessageContent(messageId) {
-    // if inbox is selected, 
-    // go through inboxArray to find the message using its messageId,
+    // check what overview is showing
+    let searchArray = overviewShowsInbox ? inboxArray : outboxArray
+
+    // go through searchArray to find the message using its messageId,
+    let foundMessage = searchArray.find((e) => e.messageId == messageId)
+    // if not found (quite impossible) console.log it
+
     // and show the message values in the relevant HTML elements
-    let foundMessage = inboxArray.find((e) => e.messageId == messageId)
-    console.log(foundMessage)
     document.querySelector(`#singleViewSenderid`).textContent = foundMessage.senderId
     const messageDateTime = new Date(foundMessage.dateTimeSent)
     document.querySelector(`#singleViewDatetimesent`).textContent = formatDateTime(messageDateTime)
