@@ -82,7 +82,18 @@ export function getListOfHousesByURL(url) {
             amountOfHousesStringSwitch(parentElement, houses.length);
 
             houses.forEach(house => {
-                // console.log(house.houseName)
+                let seoFriendlyName = house.houseName.toLowerCase()
+                .replace(/ /g, "-")
+                .replace(/[^a-z0-9\-]/g, "");
+                
+
+                let linkToDetails = document.createElement('a');
+                linkToDetails.className = 'house-link';
+                linkToDetails.href = 'huisje?id=' + house.houseId + '&naam=' + seoFriendlyName;
+                
+                
+
+
                 let outerDiv = document.createElement('div');
                 outerDiv.className = 'huisje';
 
@@ -111,7 +122,9 @@ export function getListOfHousesByURL(url) {
                 price.innerHTML = house.price + 'bkC per nacht';
                 price.className = 'prijs';
 
-                parentElement.appendChild(outerDiv);
+
+                parentElement.appendChild(linkToDetails);
+                linkToDetails.appendChild(outerDiv);
                 outerDiv.appendChild(thumbnail);
                 outerDiv.appendChild(innerDiv);
                 innerDiv.appendChild(title);
