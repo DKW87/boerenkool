@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Get the authentication token
     const token = Auth.getToken();
     if (!token) {
-        alert('Je bent niet ingelogd.');  // Vervangt showNotification
+        alert('Je bent niet ingelogd.');
         window.location.href = '/login.html';
         return;
     }
@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     } catch (error) {
         console.error('Fout bij het ophalen van gebruikersinformatie:', error);
-        alert('Kon gebruikersinformatie niet ophalen.');  // Vervangt showNotification
+        alert('Kon gebruikersinformatie niet ophalen.');
         return;
     }
 
@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     } catch (error) {
         console.error('Fout bij het laden van profielgegevens:', error);
-        alert('Kon profiel niet laden.');  // Vervangt showNotification
+        alert('Kon profiel niet laden.');
     }
 
     // Event listener for blocking users
@@ -86,4 +86,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Initial load of blocked users
     loadBlockedUsers(userId, token);
+
+    // Event listener for logout button
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+        Auth.logout();
+    });
 });
