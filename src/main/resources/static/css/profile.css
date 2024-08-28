@@ -159,3 +159,19 @@ body {
     font-size: 16px;
     cursor: pointer;
 }
+
+.unblock-button {
+    background-color: #FF6347; /* Tomato color */
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 10px;
+    font-size: 14px;
+}
+
+.unblock-button:hover {
+    background-color: #FF4500; /* Darker shade of tomato */
+}
+
