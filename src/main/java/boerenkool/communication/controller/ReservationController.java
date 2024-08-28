@@ -34,10 +34,28 @@ public class ReservationController {
         logger.info("Reservation Controller created");
     }
 
+    @GetMapping("/reservation")
+    public String getReservationPage() {
+        return "reservation"; 
+    }
+
     // 1. GET /api/reservations - Get all reservations
     @GetMapping
     public ResponseEntity<List<ReservationDTO>> getAllReservations() {
         List<Reservation> reservations = reservationService.getAllReservations();
+        if (reservations.isEmpty()) {
+            logger.warn("No reservations found.");
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        List<ReservationDTO> reservationDTOs = reservations.stream()
+                .map(reservationService::convertToDto)
+                .toList();
+        logger.info("Fetched all reservations.");
+        return new ResponseEntity<>(reservationDTOs, HttpStatus.OK);
+    }
+    @GetMapping("/reservations-by-userId/{userId}")
+    public ResponseEntity<List<ReservationDTO>> getAllReservationByUserId(@PathVariable int userId) {
+        List<Reservation> reservations = reservationService.getAllReservationsByUserId(userId);
         if (reservations.isEmpty()) {
             logger.warn("No reservations found.");
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

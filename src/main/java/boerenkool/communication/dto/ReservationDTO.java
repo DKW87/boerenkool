@@ -9,17 +9,19 @@ public class ReservationDTO {
     private LocalDate endDate;
     private int guestCount;
     private int houseId;
+    private String houseName;
     private int userId;
 
     public ReservationDTO() {
     }
 
-    public ReservationDTO(int reservationId, LocalDate startDate, LocalDate endDate, int guestCount, int houseId, int userId) {
+    public ReservationDTO(int reservationId, LocalDate startDate, LocalDate endDate, int guestCount, int houseId, String houseName, int userId) {
         this.reservationId = reservationId;
         this.startDate = startDate;
         this.endDate = endDate;
         this.guestCount = guestCount;
         this.houseId = houseId;
+        this.houseName = houseName;
         this.userId = userId;
     }
 
@@ -63,6 +65,14 @@ public class ReservationDTO {
 
     public void setHouseId(int houseId) {
         this.houseId = houseId;
+    }
+
+    public String getHouseName() {
+        return houseName;
+    }
+
+    public void setHouseName(String houseName) {
+        this.houseName = houseName;
     }
 
     public int getUserId() {
