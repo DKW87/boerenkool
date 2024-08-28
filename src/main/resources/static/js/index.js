@@ -23,14 +23,14 @@ function loadLeftSidebar() {
                 leftSidebar.innerHTML = data;
                 Filter.getUniqueCities();
                 Filter.getHouseTypes();
-                if (Filter.hasUrlParameters()) {
+                if (Filter.urlHasParameters()) {
                     Filter.applyFiltersFromUrl();
                 }
                 else {
                     const defaultList = '/api/huizen/filter';
                     Filter.getListOfHousesByURL(defaultList);
                 }
-                Filter.listenToFilter();
+                Filter.applyFilterListener();
             })
             .catch(error => {
                 console.error('Er is een probleem opgetreden met fetch:', error);

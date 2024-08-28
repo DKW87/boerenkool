@@ -32,7 +32,7 @@ export function getHouseTypes() {
         .catch(error => console.error('Error:', error));
 }
 
-export function listenToFilter() {
+export function applyFilterListener() {
     document.querySelector('button').addEventListener('click', function () {
         const api = '/api/huizen/filter';
 
@@ -79,8 +79,7 @@ export function getListOfHousesByURL(url) {
         .then(response => response.json())
         .then(houses => {
 
-            const amountOfHouses = houses.length;
-            showAmountOfHousesString(parentElement, amountOfHouses);
+            amountOfHousesStringSwitch(parentElement, houses.length);
 
             houses.forEach(house => {
                 // console.log(house.houseName)
@@ -124,7 +123,10 @@ export function getListOfHousesByURL(url) {
             createPageNumbers(parentElement);
 
         })
-        .catch(error => console.error('Error:', error));
+        .catch(error => {
+            console.error('Error:', error)
+            amountOfHousesStringSwitch(parentElement, 0);
+        });
 }
 
 export function applyFiltersFromUrl() {
@@ -158,11 +160,12 @@ export function applyFiltersFromUrl() {
     getListOfHousesByURL(finalUrl);
 }
 
-export function hasUrlParameters() {
+export function urlHasParameters() {
     const params = new URLSearchParams(window.location.search);
     return params.toString() !== '';
 }
 
+// TODO works on province but not plaats and type :/
 function setSelectedOptions(elementId, values) {
     const element = document.getElementById(elementId);
     const valueArray = values.split(',');
@@ -175,6 +178,7 @@ function setSelectedOptions(elementId, values) {
     });
 }
 
+// TODO make dynamic
 function createPageNumbers(parentElement) {
     let pageNumbersDiv = document.createElement('div');
     pageNumbersDiv.className = 'page-numbers';
@@ -182,17 +186,20 @@ function createPageNumbers(parentElement) {
     parentElement.appendChild(pageNumbersDiv);
 }
 
-function showAmountOfHousesString(parentElement, amountOfHouses) {
+function amountOfHousesStringSwitch(parentElement, amountOfHouses) {
     let amountOfHousesDiv = document.createElement('div');
     amountOfHousesDiv.className = 'amount-of-houses';
 
-    if (amountOfHouses === 0) {
-        amountOfHousesDiv.innerHTML = 'Helaas geen geurige huisjes beschikbaar om te boeken! Verbreed je zoekcriteria en probeer het opnieuw.';
-    } if (amountOfHouses === 1) {
-        amountOfHousesDiv.innerHTML = '<b>' + amountOfHouses + '</b> geurig huisje gevonden om te boeken. Wees er snel bij!';
-    } else {
-        amountOfHousesDiv.innerHTML = '<b>' + amountOfHouses + '</b> geurige huisjes gevonden om te boeken!';
+    switch (amountOfHouses) {
+        case 0:
+            amountOfHousesDiv.innerHTML = 'Helaas geen geurige huisjes beschikbaar om te boeken! Verbreed je zoekcriteria en probeer het opnieuw.';
+            parentElement.appendChild(amountOfHousesDiv);
+            break;
+        case 1:
+            amountOfHousesDiv.innerHTML = '<b>' + amountOfHouses + '</b> geurig huisje gevonden om te boeken. Wees er snel bij!';
+            parentElement.appendChild(amountOfHousesDiv);
+        default:
+            amountOfHousesDiv.innerHTML = '<b>' + amountOfHouses + '</b> geurige huisjes gevonden om te boeken!';
+            parentElement.appendChild(amountOfHousesDiv);
     }
-
-    parentElement.appendChild(amountOfHousesDiv);
 }
