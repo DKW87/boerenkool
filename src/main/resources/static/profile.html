@@ -20,6 +20,79 @@
 <body>
 
 <div class="main-grid-area">
+    <!DOCTYPE html>
+    <html lang="nl">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Gebruikersprofiel</title>
+
+        <!-- Import stylesheets -->
+        <link rel="stylesheet" href="/css/global.css">
+        <link rel="stylesheet" href="/css/header.css">
+        <link rel="stylesheet" href="/css/footer.css">
+        <link rel="stylesheet" href="/css/profile.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Playwrite+BE+VLG:wght@100..400&family=Playwrite+PE:wght@100..400&display=swap" rel="stylesheet">
+
+        <!-- Laad het profile.js script als een module -->
+        <script src="/js/profile.js" type="module" defer></script>
+    </head>
+    <body>
+
+    <div class="main-grid-area">
+
+        <div class="header-div" id="header"></div>
+
+        <div class="body-div" id="body">
+            <div class="profile-container">
+                <h2>Mijn Profiel</h2>
+                <form id="profileForm">
+                    <label for="username">Gebruikersnaam:</label>
+                    <input type="text" id="username" name="username" readonly>
+                    <br>
+                    <label for="email">E-mail:</label>
+                    <input type="email" id="email" name="email">
+                    <br>
+                    <label for="phone">Telefoonnummer:</label>
+                    <input type="text" id="phone" name="phone">
+                    <br>
+                    <label for="firstName">Voornaam:</label>
+                    <input type="text" id="firstName" name="firstName">
+                    <br>
+                    <label for="infix">Tussenvoegsel:</label>
+                    <input type="text" id="infix" name="infix">
+                    <br>
+                    <label for="lastName">Achternaam:</label>
+                    <input type="text" id="lastName" name="lastName">
+                    <br>
+                    <button type="submit">Profiel Bijwerken</button>
+                    <button id="deleteProfileBtn" type="button">Verwijder Profiel</button>
+                </form>
+                <div id="notification"></div>
+            </div>
+
+            <div id="blocked-users-container">
+                <h2>Geblokkeerde Gebruikers</h2>
+                <ul id="blocked-users-list">
+                    <!-- Geblokkeerde gebruikers worden hier weergegeven -->
+                </ul>
+            </div>
+
+            <div id="block-user-section">
+                <h3>Blokkeer een Gebruiker</h3>
+                <input type="text" id="user-to-block" placeholder="Gebruikersnaam om te blokkeren">
+                <button id="block-user-btn">Blokkeer Gebruiker</button>
+            </div>
+        </div>
+
+        <div class="footer-div" id="footer"></div>
+
+    </div>
+
+    </body>
+    </html>
 
     <div class="header-div" id="header"></div>
 
