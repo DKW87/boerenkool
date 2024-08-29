@@ -203,6 +203,13 @@ public class JdbcUserDAO implements UserDAO {
         }
     }
 
+    @Override
+    public boolean updateBoerenkoolCoins(int userId, int newCoins) {
+        String sql = "UPDATE `User` SET coinBalance =? WHERE userId = ?";
+        int rowsAffected = jdbcTemplate.update(sql, newCoins, userId);
+        return rowsAffected > 0;
+    }
+
     private static class UserRowMapper implements RowMapper<User> {
         @Override
         public User mapRow(ResultSet rs, int rowNum) throws SQLException {
