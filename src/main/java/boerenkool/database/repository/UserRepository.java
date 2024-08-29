@@ -75,4 +75,9 @@ public class UserRepository {
     public boolean updateBoerenkoolcoins(User user, int newCoins) {
         return userDAO.updateBoerenkoolCoins(user.getUserId(), newCoins);
     }
+
+    public Optional<String> getUsernameById(int id) {
+        return userDAO.getUsernameById(id);
+    }
+
 }

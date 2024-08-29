@@ -70,4 +70,8 @@ public class UserService {
         return userRepository.updateBoerenkoolcoins(user, newCoins);
     }
 
+    public Optional<String> getUsernameById(int id) {
+        return userRepository.getUsernameById(id);
+    }
+
 }
