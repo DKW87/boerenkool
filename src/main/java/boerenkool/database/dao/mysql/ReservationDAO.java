@@ -33,4 +33,6 @@ public interface ReservationDAO extends GenericDAO<Reservation> {
     List<Reservation> getAllReservationsByTenant(int tenantId);
 
     List<Reservation> getAllReservationsByHouseId(int houseId);
+
+    List<Reservation> getAllReservationsByUserId(int userId);
 }
