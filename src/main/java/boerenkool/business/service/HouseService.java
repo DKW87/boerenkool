@@ -3,6 +3,7 @@ package boerenkool.business.service;
 import boerenkool.business.model.House;
 import boerenkool.business.model.HouseFilter;
 import boerenkool.business.model.HouseType;
+import boerenkool.communication.dto.HouseDetailsDTO;
 import boerenkool.communication.dto.HouseListDTO;
 import boerenkool.database.repository.HouseRepository;
 import org.slf4j.Logger;
@@ -11,14 +12,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
 
 
 /**
@@ -47,6 +45,34 @@ public class HouseService {
         return houseRepository.getHouseById(houseId).orElse(null);
     }
 
+    public HouseDetailsDTO getOneByIdAndConvertToDTO(int houseId) {
+        House house = getOneById(houseId);
+        return house == null
+                ? null
+                : convertHouseToHouseDetailsDTO(house);
+    }
+
+    private HouseDetailsDTO convertHouseToHouseDetailsDTO(House house) {
+        HouseDetailsDTO houseDetailsDTO = new HouseDetailsDTO();
+        houseDetailsDTO.setHouseId(house.getHouseId());
+        houseDetailsDTO.setHouseName(house.getHouseName());
+        houseDetailsDTO.setHouseType(house.getHouseType());
+        houseDetailsDTO.setHouseOwnerId(house.getHouseOwner().getUserId());
+        houseDetailsDTO.setHouseOwnerUsername(house.getHouseOwner().getUsername());
+        houseDetailsDTO.setProvince(house.getProvince());
+        houseDetailsDTO.setCity(house.getCity());
+        houseDetailsDTO.setStreetAndNumber(house.getStreetAndNumber());
+        houseDetailsDTO.setZipcode(house.getZipcode());
+        houseDetailsDTO.setMaxGuest(house.getMaxGuest());
+        houseDetailsDTO.setRoomCount(house.getRoomCount());
+        houseDetailsDTO.setPricePPPD(house.getPricePPPD());
+        houseDetailsDTO.setDescription(house.getDescription());
+        houseDetailsDTO.setIsNotAvailable(house.getIsNotAvailable());
+//        houseDetailsDTO.setPictures(); // get pictures
+        houseDetailsDTO.setExtraFeatures(house.getExtraFeatures());
+        return houseDetailsDTO;
+    }
+
     public List<House> getAllHouses() {
         return houseRepository.getListOfAllHouses();
     }
@@ -61,9 +87,14 @@ public class HouseService {
 
     public List<HouseListDTO> getFilteredListOfHouses(HouseFilter filter) {
         List<House> filteredHouses = houseRepository.getHousesWithFilter(filter);
-        List<HouseListDTO> strippedFilteredHouses = new ArrayList<>();
+        return filteredHouses.isEmpty()
+                ? null
+                : convertListToHouseListDTO(filteredHouses);
+    }
 
-        for (House fullHouse : filteredHouses) {
+    private List<HouseListDTO> convertListToHouseListDTO(List<House> houses) {
+        List<HouseListDTO> strippedFilteredHouses = new ArrayList<>();
+        for (House fullHouse : houses) {
             HouseListDTO strippedHouse = new HouseListDTO();
             strippedHouse.setHouseId(fullHouse.getHouseId());
             if (!fullHouse.getPictures().isEmpty()) {
@@ -96,7 +127,7 @@ public class HouseService {
         return result;
     }
 
-    public void updateCache(House house) {
+    private void updateCache(House house) {
         Cache cache = cacheManager.getCache("houses");
         if (cache != null) {
             cache.put(house.getHouseId(), house);

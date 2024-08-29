@@ -16,6 +16,8 @@ public class HouseListDTO {
     String city;
     int price;
 
+    public HouseListDTO() { /* empty constructor for jackson, use setters */ }
+
     // setters
     public void setHouseId(int houseId) {
         this.houseId = houseId;
@@ -73,4 +75,5 @@ public class HouseListDTO {
     public int getPrice() {
         return price;
     }
-}
+
+} // class

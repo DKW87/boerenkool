@@ -27,7 +27,7 @@ function loadLeftSidebar() {
                     Filter.applyFiltersFromUrl();
                 }
                 else {
-                    const defaultList = '/api/huizen/filter';
+                    const defaultList = '/api/houses/l/filter';
                     Filter.getListOfHousesByURL(defaultList);
                 }
                 Filter.applyFilterListener();
