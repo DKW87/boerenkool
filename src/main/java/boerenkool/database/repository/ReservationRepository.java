@@ -36,6 +36,12 @@ public class ReservationRepository {
         logger.debug("Fetched all reservations, count: {}", reservations.size());
         return reservations;
     }
+    public List<Reservation> getAllReservationsByUserId(int userId) {
+        List<Reservation> reservations = reservationDAO.getAllReservationsByUserId(userId);
+        reservations.forEach(this::loadRelatedEntities);
+        logger.debug("Fetched reservations for userId with ID: {}", userId);
+        return reservations;
+    }
 
     public Optional<Reservation> getReservationById(int id) {
         Optional<Reservation> reservationOpt = reservationDAO.getOneById(id);

@@ -2,10 +2,9 @@
     background-color: white;
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    margin: 20px;
     height: 300px;
     overflow: hidden;
-    width: 375px;
+    width: 370px;
     transition: transform 0.1s ease-in-out;
 }
 
@@ -46,9 +45,18 @@
 }
 
 .page-numbers {
-    margin: auto;
-    margin-bottom: 25px;
-    margin-top: 10px;
+    display: flex;
+    justify-content: center;  
+    align-items: flex-start;  
+    width: 100%;
+    margin: 10px auto 25px auto; 
+    text-align: center;
+    position: relative; 
+    top: 0;  
+}
+
+.house-link {
+    text-decoration: none;
 }
 
 .individual-page-number {
@@ -58,9 +66,5 @@
 }
 
 .amount-of-houses {
-    position: absolute;
-    top: 0;
-    left: 0;
-    margin-top: 20px;
-    margin-left: 20px;
+    width: 100%;
 }
