@@ -21,52 +21,55 @@
 </head>
 
 <body>
-    <div class="header-div" id="header"></div>
 
-    <div class="messageGridArea">
-        <div>
-            <div>
-                <label for="messageIdInput">MessageId :</label>
-                <input type="text" name="" id="messageIdInput" value="1">
-            </div>
-            <div>
-                <label for="userIdInput">UserId :</label>
-                <input type="text" name="" id="userIdInput" value="1">
-            </div>
+    <div class="main-grid-area">
 
-            <button id="showMessageContentButton">showMessageContent (dmv input field)</button>
+        <div class="header-div" id="header"></div>
 
-            <button id="reverseMessageOverviewButton">Sorteer op datum</button>
+        <div class="messageGridArea">
+
+            <menu>
+                <button id="refreshInboxButton">Inbox</button>
+                <button id="refreshOutboxButton">Outbox</button>
+                <button id="reverseMessageOverviewButton">Sorteer op datum</button>
+            </menu>
+
+            <menu>
+                <button id="writeMessageButton">Schrijf een bericht</button>
+                <button id="deleteMessageButton">Verwijder een bericht</button>
+                <button id="overviewVisibilityButton">Overzicht tonen/verbergen</button>
+            </menu>
+
+            <section id="messageOverview">
+                <div id="messageInOverview">Er zijn geen berichten voor u.</div>
+            </section>
+
+            <section class="messageSingleView" id="messageSingleView">
+                <div>User : <span id="singleViewUserId">{{user field}}</span>,
+                    <span id="singleViewDatetimesent">{{dateTimeSent field}}</span>
+                </div>
+                <div>Subject : <span id="singleViewSubject" class="subject">{{subject field}}</span></div>
+                <div id="singleViewBody">{{body field}}</div>
+
+                <div id="floatingCheatMenu">
+                    <h3>floatingCheatMenu</h3>
+                    <div>
+                        <label for="messageIdInput">MessageId :</label>
+                        <input type="text" name="" id="messageIdInput" value="1">
+                    </div>
+                    <div>
+                        <label for="userIdInput">UserId :</label>
+                        <input type="text" name="" id="userIdInput" value="1">
+                    </div>
+                </div>
+
+            </section>
+
         </div>
 
-        <div>
-            <button id="refreshInboxButton">Inbox</button>
+        <div class="footer-div" id="footer"></div>
 
-            <button id="refreshOutboxButton">Outbox</button>
-
-            <button id="writeMessageButton">Schrijf een bericht (werkt nog niet)</button>
-
-            <button id="overviewVisibilityButton">Overzicht tonen/verbergen (werkt nog niet)</button>
-        </div>
-
-        <div id="messageOverview">
-            <div id="overviewRow">
-                <div>subject</div>
-                <div>messageid, userid, datetime</div>
-            </div>
-        </div>
-
-        <section id="messageSingleView">
-            <div>User : <span id="singleViewSenderid">{{user field}}</span>,
-                <span id="singleViewDatetimesent">{{dateTimeSent field}}</span>
-            </div>
-            <div>Subject : <span id="singleViewSubject">{{subject field}}</div>
-            <div id="singleViewBody">{{body field}}</>
-
-        </section>
     </div>
-
-    <div class="footer-div" id="footer"></div>
 </body>
 
 </html>

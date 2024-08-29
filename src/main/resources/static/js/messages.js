@@ -1,5 +1,4 @@
 "use strict"
-// import and load header and footer
 import * as main from "./modules/main.mjs"
 main.loadHeader()
 main.loadFooter()
@@ -22,33 +21,42 @@ let outboxArray = {}
 let sortAscending = false
 let overviewShowsInbox = true
 
-
 document.querySelector('#reverseMessageOverviewButton').addEventListener('click', () => {
     reverseMessageOverview()
 })
-document.querySelector('#showMessageContentButton').addEventListener('click', () => {
-    showMessageContent()
-})
+// document.querySelector('#showMessageContentButton').addEventListener('click', () => {
+//     showMessageContent()
+// })
 document.querySelector('#refreshInboxButton').addEventListener('click', () => {
     refreshInbox()
 })
 document.querySelector('#refreshOutboxButton').addEventListener('click', () => {
     refreshOutbox()
 })
-
+document.querySelector('#writeMessageButton').addEventListener('click', () => {
+    window.location.href = "send-a-message.html"
+})
 
 async function refreshInbox() {
     overviewShowsInbox = true
-    await getMessages('in')
-    sortMessageArray(inboxArray)
-    fillMessageOverview(inboxArray)
+    inboxArray = await getMessages('in')
+    if (inboxArray === undefined) {
+        noMessages()
+    } else {
+        sortMessageArray(inboxArray)
+        fillMessageOverview(inboxArray)
+    }
 }
 
 async function refreshOutbox() {
     overviewShowsInbox = false
-    await getMessages('out')
-    sortMessageArray(outboxArray)
-    fillMessageOverview(outboxArray)
+    outboxArray = await getMessages('out')
+    if (outboxArray === undefined) {
+        noMessages()
+    } else {
+        sortMessageArray(outboxArray)
+        fillMessageOverview(outboxArray)
+    }
 }
 
 // puts fetched messages into messageArray
@@ -63,23 +71,17 @@ async function getMessages(box) {
         const response = await fetch(url)
         if (!response.ok) {
             throw new Error(`Response status: ${response.status}`)
-        }
-        let messageArray = await response.json()
-        // fill in- or outboxArray with response
-        if (box === "in") {
-            inboxArray = messageArray
-        } else if (box === "out") {
-            outboxArray = messageArray
+        } else {
+            let messageArray = await response.json()
+            return messageArray
         }
     } catch (error) {
         console.error(error.message);
     }
 }
 
-
 // sort the array according to sortAscending value (newest on top, or oldest on top)
 function sortMessageArray(array) {
-    console.log(array)
     if (sortAscending) {
         array.sort((a, b) => a.dateTimeSent.localeCompare(b.dateTimeSent))
     } else {
@@ -89,22 +91,22 @@ function sortMessageArray(array) {
 
 function fillMessageOverview(listOfMessages) {
     // remove old tableviewrows
-    document.querySelectorAll(`#overviewRow`).forEach(e => e.remove())
+    document.querySelectorAll(`#messageInOverview`).forEach(e => e.remove())
     // create new rows with data in the list, and add them to messageOverview
     listOfMessages.forEach(element => {
         // create new row
-        const newOverviewRow = document.createElement("div");
-        newOverviewRow.setAttribute("id", "overviewRow")
-        newOverviewRow.setAttribute("messageId", `${element.messageId}`)
+        const newOverviewMessage = document.createElement("div");
+        newOverviewMessage.setAttribute("id", "messageInOverview")
+        newOverviewMessage.setAttribute("data-messageid", `${element.messageId}`)
         // add eventhandler to entire element
-        newOverviewRow.addEventListener('click', () => {
+        newOverviewMessage.addEventListener('click', () => {
             showMessageContent(`${element.messageId}`)
         })
         // add subject element
         const subject = document.createElement(`div`)
-        subject.setAttribute("id", `${element.messageId}`)
+        subject.setAttribute("class", "subject")
         subject.textContent = element.subject
-        newOverviewRow.appendChild(subject)
+        newOverviewMessage.appendChild(subject)
 
         // add senderId, dateTimeSent and messageId element
         const senderAndDateTime = document.createElement(`div`)
@@ -112,12 +114,20 @@ function fillMessageOverview(listOfMessages) {
         const dateTimeSent = formatDateTime(element.dateTimeSent)
         const messageIdElement = element.messageId
         senderAndDateTime.textContent = `${senderId}, ${dateTimeSent}, ${messageIdElement}`
-        newOverviewRow.appendChild(senderAndDateTime)
+        newOverviewMessage.appendChild(senderAndDateTime)
 
         // add newOverviewRow to the overview
-        document.getElementById(`messageOverview`).appendChild(newOverviewRow)
-
+        document.getElementById(`messageOverview`).appendChild(newOverviewMessage)
     })
+}
+
+function noMessages() {
+    document.querySelectorAll(`#messageInOverview`).forEach(e => e.remove())
+    let noMessages = document.createElement(`div`)
+    noMessages.setAttribute("id", "messageInOverview")
+    noMessages.setAttribute("text", "messageInOverview")
+    noMessages.innerHTML = "Geen berichten."
+    document.getElementById(`messageOverview`).appendChild(noMessages)
 }
 
 function reverseMessageOverview() {
@@ -129,27 +139,17 @@ function reverseMessageOverview() {
     }
 }
 
-// old version using input field and a fetch
-// async function showMessageContent() {
-//     const messageId = getMessageIdFromInputField()
-//     const messageJson = await getMessageById(messageId)
-//     document.querySelector(`#senderid`).textContent = messageJson.senderId
-//     const messageDateTime = new Date(messageJson.dateTimeSent)
-//     document.querySelector(`#datetimesent`).textContent = formatDateTime(messageDateTime)
-//     document.querySelector(`#subject`).textContent = messageJson.subject
-//     document.querySelector(`#body`).textContent = messageJson.body
-// }
-
 function showMessageContent(messageId) {
     // check what overview is showing
     let searchArray = overviewShowsInbox ? inboxArray : outboxArray
 
     // go through searchArray to find the message using its messageId,
     let foundMessage = searchArray.find((e) => e.messageId == messageId)
+ 
     // if not found (quite impossible) console.log it
 
-    // and show the message values in the relevant HTML elements
-    document.querySelector(`#singleViewSenderid`).textContent = foundMessage.senderId
+    // show the message values in the relevant HTML elements
+    document.querySelector(`#singleViewUserId`).textContent = foundMessage.senderId
     const messageDateTime = new Date(foundMessage.dateTimeSent)
     document.querySelector(`#singleViewDatetimesent`).textContent = formatDateTime(messageDateTime)
     document.querySelector(`#singleViewSubject`).textContent = foundMessage.subject
@@ -163,9 +163,6 @@ async function getMessageById(messageId) {
         if (!response.ok) {
             throw new Error(`Response status: ${response.status}`)
         }
-        // const json = await response.json()
-        // console.log("getMessageById json : " + json)
-        // return json
         return await response.json()
     } catch (error) {
         console.error(error.message)
@@ -173,7 +170,6 @@ async function getMessageById(messageId) {
 }
 
 function getMessageIdFromInputField() {
-    // console.log(messageId)
     return document.getElementById("messageIdInput").value
 }
 
@@ -182,18 +178,3 @@ function formatDateTime(dateTimeSent) {
     let dateTime = new Date(dateTimeSent)
     return dateTime.toLocaleDateString(undefined, DATE_TIME_OPTIONS)
 }
-
-// niet nodig voor project, bewaren voor portfolio?
-// async function getAllMessages() {
-//     const url = URL_BASE + "/api/messages"
-//     try {
-//         const response = await fetch(url)
-//         if (!response.ok) {
-//             throw new Error(`Response status: ${response.status}`)
-//         }
-//         const json = await response.json()
-//         console.log(json)
-//     } catch (error) {
-//         console.error(error.message)
-//     }
-// }
