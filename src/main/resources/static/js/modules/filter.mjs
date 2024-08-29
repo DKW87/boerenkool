@@ -3,7 +3,7 @@
 export function getUniqueCities() {
     const parentElement = document.getElementById('uniqueCities');
 
-    fetch('/api/huizen/steden')
+    fetch('/api/houses/cities')
         .then(response => response.json())
         .then(data => {
             data.forEach(city => {
@@ -19,7 +19,7 @@ export function getUniqueCities() {
 export function getHouseTypes() {
     const parentElement = document.getElementById('houseTypes');
 
-    fetch('/api/huizen/typen')
+    fetch('/api/houses/types')
         .then(response => response.json())
         .then(data => {
             data.forEach(houseType => {
@@ -34,7 +34,7 @@ export function getHouseTypes() {
 
 export function applyFilterListener() {
     document.querySelector('button').addEventListener('click', function () {
-        const api = '/api/huizen/filter';
+        const api = '/api/houses/l/filter';
 
         const sortOrder = document.getElementById('sortOrder').value;
         const sortBy = document.getElementById('sortBy').value;
@@ -167,7 +167,7 @@ export function applyFiltersFromUrl() {
     if (minPrice) document.getElementById('min-price').value = minPrice;
     if (maxPrice) document.getElementById('max-price').value = maxPrice;
 
-    const api = '/api/huizen/filter';
+    const api = '/api/houses/l/filter';
     const finalUrl = `${api}?${params.toString()}`;
 
     getListOfHousesByURL(finalUrl);

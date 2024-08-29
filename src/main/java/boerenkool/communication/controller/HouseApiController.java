@@ -4,6 +4,7 @@ import boerenkool.business.model.House;
 import boerenkool.business.model.HouseFilter;
 import boerenkool.business.model.HouseType;
 import boerenkool.business.service.HouseService;
+import boerenkool.communication.dto.HouseDetailsDTO;
 import boerenkool.communication.dto.HouseListDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +23,7 @@ import java.util.List;
  * @created 13/08/2024 - 12:30
  */
 @RestController
-@RequestMapping(value = "/api/huizen")
+@RequestMapping(value = "/api/houses")
 public class HouseApiController {
 
     private final Logger logger = LoggerFactory.getLogger(HouseApiController.class);
@@ -42,65 +43,31 @@ public class HouseApiController {
                 : new ResponseEntity<>(allHouses, HttpStatus.OK);
     }
 
-    @GetMapping("/{houseId}")
-    public RedirectView redirectToHouseName(@PathVariable int houseId) {
-        if (houseId <= 0) {
-            return new RedirectView("/e/huis-id-incorrect");
-        }
-
-        House house = houseService.getOneById(houseId);
-        if (house == null) {
-            return new RedirectView("/e/huis-bestaat-niet");
-        }
-
-        String houseName = house.getHouseName();
-        String seoFriendlyName = houseName.toLowerCase().replace(" ", "-")
-                .replaceAll("[^a-z0-9\\-]", "");
-
-        return new RedirectView("/api/huizen/" + houseId + "/" + seoFriendlyName);
-    }
-
-
-    @GetMapping(value = "/{houseId}/{houseName}")
-    public ResponseEntity<?> getOneHouseByIdAndName(
-            @PathVariable int houseId,
-            @PathVariable String houseName) {
+    @GetMapping(value = "/{houseId}")
+    public ResponseEntity<?> getOneHouseById(@PathVariable int houseId) {
 
         if (houseId <= 0) {
             return new ResponseEntity<>("House ID is invalid and cannot be 0 or negative", HttpStatus.BAD_REQUEST);
         }
-        House house = houseService.getOneById(houseId);
-        if (house == null) {
+
+        HouseDetailsDTO houseDetailsDTO = houseService.getOneByIdAndConvertToDTO(houseId);
+
+        if (houseDetailsDTO == null) {
             return new ResponseEntity<>("House was not found", HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(house, HttpStatus.OK);
+
+        return new ResponseEntity<>(houseDetailsDTO, HttpStatus.OK);
     }
 
     @GetMapping("/l/{id}")
-    public RedirectView getListOfHousesByOwnerId(@PathVariable int id) {
-        if (id <= 0) {
-            return new RedirectView("/e/huis-eigenaar-id-incorrect");
-        }
-
-        List<House> listOfHousesByOwner = houseService.getListOfHousesByOwnerId(id);
-
-        String ownerName = houseService.getHouseOwnerName(id);
-        String seoFriendlyName = ownerName.toLowerCase().replace(" ", "-").replaceAll("[^a-z0-9\\-]", "");
-
-        URI location = URI.create(String.format("/api/huizen/%d/%s", id, seoFriendlyName));
-        return new RedirectView("/api/huizen/l/" + id + "/" + seoFriendlyName);
-    }
-
-    @GetMapping("/l/{id}/{houseOwnerName}")
-    public ResponseEntity<?> getListOfHousesByOwnerIdAndName(
-            @PathVariable int id,
-            @PathVariable String houseOwnerName) {
+    public ResponseEntity<?> getListOfHousesByOwnerId(@PathVariable int id) {
 
         if (id <= 0) {
             return new ResponseEntity<>("Owner ID cannot be 0 or negative", HttpStatus.BAD_REQUEST);
         }
 
         List<House> listOfHousesByOwner = houseService.getListOfHousesByOwnerId(id);
+
         if (listOfHousesByOwner.isEmpty()) {
             return new ResponseEntity<>("No houses belong to this owner", HttpStatus.NO_CONTENT);
         }
@@ -108,7 +75,7 @@ public class HouseApiController {
         return new ResponseEntity<>(listOfHousesByOwner, HttpStatus.OK);
     }
 
-    @GetMapping("/steden")
+    @GetMapping("/cities")
     public ResponseEntity<?> getUniquesCities() {
         List<String> uniqueCities = houseService.getUniqueCities();
         if (uniqueCities.isEmpty()) {
@@ -117,7 +84,7 @@ public class HouseApiController {
         return new ResponseEntity<>(uniqueCities, HttpStatus.OK);
     }
 
-    @GetMapping("/typen")
+    @GetMapping("/types")
     public ResponseEntity<?> getHouseTypes() {
         List<HouseType> houseTypes = houseService.getAllHouseTypes();
         if (houseTypes.isEmpty()) {
@@ -126,7 +93,7 @@ public class HouseApiController {
         return new ResponseEntity<>(houseTypes, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/filter")
+    @GetMapping(value = "/l/filter")
     public ResponseEntity<?> getListOfHousesByFilter(
             @RequestParam(name = "provincies", required = false, defaultValue = "") List<String> provinces,
             @RequestParam(name = "steden", required = false, defaultValue = "") List<String> cities,
@@ -163,7 +130,7 @@ public class HouseApiController {
                 : new ResponseEntity<>(filteredHouses, HttpStatus.OK);
     }
 
-    @PostMapping(value = "/nieuw")
+    @PostMapping(value = "/new")
     public ResponseEntity<?> saveNewHouse(@RequestBody House house) {
         if (house == null) {
             return new ResponseEntity<>("House cannot be null", HttpStatus.BAD_REQUEST);
