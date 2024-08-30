@@ -62,17 +62,16 @@ public class JdbcUserDAO implements UserDAO {
 
 
     private PreparedStatement updateUserStatement(User user, Connection connection) throws SQLException {
-        PreparedStatement ps;
-        ps = connection.prepareStatement(
+        PreparedStatement ps = connection.prepareStatement(
                 "UPDATE `User` " +
                         "SET typeOfUser=?, username=?, hashedPassword=?, salt=?, firstName=?, infix=?, lastName=?," +
                         " coinBalance=?, phoneNumber=?, emailaddress=?" +
                         " WHERE userId=?");
+
         setCommonParameters(ps, user);
-        ps.setInt(11, user.getUserId()); // Adjust index for userId
+        ps.setInt(11, user.getUserId()); // Zorg ervoor dat de userId correct wordt ingesteld als de laatste parameter.
         return ps;
     }
-
 
 
     @Override
@@ -115,12 +114,30 @@ public class JdbcUserDAO implements UserDAO {
 
     @Override
     public boolean updateOne(User user) {
-        return jdbcTemplate.update(connection -> updateUserStatement(user, connection)) != 0;
+        boolean isUpdated = jdbcTemplate.update(connection -> updateUserStatement(user, connection)) != 0;
+
+        if (isUpdated) {
+            logger.info("User with ID {} successfully updated.", user.getUserId());
+        } else {
+            logger.warn("No user was updated for ID {}. Check if the user ID exists.", user.getUserId());
+        }
+        return isUpdated;
     }
+
 
     @Override
     public Optional<User> findByUsername(String username) {
         List<User> users = jdbcTemplate.query("SELECT * FROM `User` WHERE username = ?", new UserRowMapper(), username);
+        if (users.size() != 1) {
+            return Optional.empty();
+        } else {
+            return Optional.of(users.get(0));
+        }
+    }
+
+    @Override
+    public Optional<User> findByEmail(String email) {
+        List<User> users = jdbcTemplate.query("SELECT * FROM `User` WHERE emailaddress = ?", new UserRowMapper(), email);
         if (users.size() != 1) {
             return Optional.empty();
         } else {
@@ -150,7 +167,7 @@ public class JdbcUserDAO implements UserDAO {
 
     @Override
     public List<User> getBlockedUsers(User user) {
-        String sql = "SELECT u.* FROM users u INNER JOIN BlockedList b ON u.userId = b.blockedUser WHERE b.userId = ?";
+        String sql = "SELECT u.* FROM `User` u INNER JOIN BlockedList b ON u.userId = b.blockedUser WHERE b.userId = ?";
         return jdbcTemplate.query(sql, new UserRowMapper(), user.getUserId());
     }
 
@@ -181,6 +198,26 @@ public class JdbcUserDAO implements UserDAO {
             return Optional.of(users.get(0));
         }
     }
+
+    @Override
+    public boolean updateBoerenkoolCoins(int userId, int newCoins) {
+        String sql = "UPDATE `User` SET coinBalance =? WHERE userId = ?";
+        int rowsAffected = jdbcTemplate.update(sql, newCoins, userId);
+        return rowsAffected > 0;
+    }
+
+    @Override
+    public Optional<String> getUsernameById(int userId) {
+        String sql = "SELECT username FROM `User` WHERE userId = ?";
+        List<String> usernames = jdbcTemplate.query(sql, (rs, rowNum) -> rs.getString("username"), userId);
+
+        if (usernames.size() != 1) {
+            return Optional.empty();
+        } else {
+            return Optional.of(usernames.get(0));
+        }
+    }
+
 
     private static class UserRowMapper implements RowMapper<User> {
         @Override

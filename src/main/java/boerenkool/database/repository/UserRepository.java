@@ -38,6 +38,11 @@ public class UserRepository {
         return userDAO.updateOne(user);
     }
 
+    public Optional<User> findByEmail(String email) {
+        logger.debug("Searching for user with email: {}", email);
+        return userDAO.findByEmail(email);
+    }
+
     public List<User> getBlockedUsers(User user) {
         return userDAO.getBlockedUsers(user);
     }
@@ -66,4 +71,13 @@ public class UserRepository {
     public Optional<User> getReceiverByMessageId(int messageId) {
         return userDAO.getReceiverByMessageId(messageId);
     }
+
+    public boolean updateBoerenkoolcoins(User user, int newCoins) {
+        return userDAO.updateBoerenkoolCoins(user.getUserId(), newCoins);
+    }
+
+    public Optional<String> getUsernameById(int id) {
+        return userDAO.getUsernameById(id);
+    }
+
 }

@@ -32,15 +32,11 @@ public class MessageService {
         this.userRepository = userRepository;
     }
 
-    public boolean saveMessage(MessageDTO messageDTO) throws UserNotFoundException {
-        if (userRepository.getOneById(messageDTO.getReceiverId()).isPresent()
-                && userRepository.getOneById(messageDTO.getSenderId()).isPresent()) {
-            messageDTO.setDateTimeSent(LocalDateTime.now());
-            return messageRepository.saveMessage(convertDtoToMessage(messageDTO));
-        } else {
-            logger.info("MessageDTO's senderId and / or userId not linked to existing users");
-            throw new UserNotFoundException(null);
-        }
+    public MessageDTO saveMessage(MessageDTO messageDTO) {
+        messageDTO.setDateTimeSent(LocalDateTime.now());
+        Message newMessage = convertDTOToMessage(messageDTO);
+        messageRepository.saveMessage(newMessage);
+        return convertMessageToDTO(newMessage);
     }
 
     public MessageDTO getByMessageId(int messageId) throws MessageDoesNotExistException {
@@ -50,6 +46,8 @@ public class MessageService {
     public List<MessageDTO> getAllMessages() {
         List<MessageDTO> listOfAllMessageDTOs = new ArrayList<>();
         List<Message> listOfMessages = messageRepository.getAll();
+        // convert Messages to MessageDTOs aparte methode maken
+
         for (Message message : listOfMessages) {
             listOfAllMessageDTOs.add(convertMessageToDTO(message));
         }
@@ -58,27 +56,29 @@ public class MessageService {
     }
 
     public List<MessageDTO> getAllByUserId(int userId) {
-        List<MessageDTO> listOfMessageDTOsForUser = new ArrayList<>();
-        if (userRepository.getOneById(userId).isPresent()) {
-            List<Message> listOfMessages = messageRepository.getAllByUserId(userId);
-            // convert Messages to MessageDTOs
-            for (Message message : listOfMessages) {
-                listOfMessageDTOsForUser.add(convertMessageToDTO(message));
-            }
-//            Collections.sort(listOfMessages); // perhaps not necessary
-            return listOfMessageDTOsForUser;
-        } else return null;
+        List<Message> listOfMessages = messageRepository.getAllByUserId(userId);
+        return convertMessagesToDTOs(listOfMessages);
+    }
+
+    public List<MessageDTO> getAllFromSenderId(int senderId) {
+        List<Message> listOfMessages = messageRepository.getAllFromSenderId(senderId);
+        return convertMessagesToDTOs(listOfMessages);
+    }
+
+    public List<MessageDTO> getAllToReceiverId(int receiverId) {
+        List<Message> listOfMessages = messageRepository.getAllToReceiverId(receiverId);
+        return convertMessagesToDTOs(listOfMessages);
     }
 
     public boolean updateMessage(MessageDTO messageDTO) throws MessageDoesNotExistException {
-        return messageRepository.updateMessage(convertDtoToMessage(messageDTO));
+        return messageRepository.updateMessage(convertDTOToMessage(messageDTO));
     }
 
     public boolean deleteMessage(int messageId) {
         return messageRepository.deleteMessage(messageId);
     }
 
-    private Message convertDtoToMessage(MessageDTO dto) {
+    private Message convertDTOToMessage(MessageDTO dto) {
         User sender = userRepository.getOneById(dto.getSenderId()).orElse(null);
         User receiver = userRepository.getOneById(dto.getReceiverId()).orElse(null);
         if (sender != null & receiver != null) {
@@ -110,5 +110,13 @@ public class MessageService {
                 message.isReadByReceiver(),
                 message.isArchivedBySender(),
                 message.isArchivedByReceiver());
+    }
+
+    private List<MessageDTO> convertMessagesToDTOs(List<Message> listOfMessages) {
+        List<MessageDTO> listOfDTOs = new ArrayList<>();
+        for (Message message : listOfMessages) {
+            listOfDTOs.add(convertMessageToDTO(message));
+        }
+        return listOfDTOs;
     }
 }

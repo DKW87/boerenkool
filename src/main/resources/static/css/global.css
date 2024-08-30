@@ -1,0 +1,46 @@
+:root {
+    --boerenkool-groen: darkolivegreen;
+    --boerenkool-paars: rgb(169, 117, 222);
+    --font-size-large: 18px;
+    --font-size-small: 12px;
+}
+
+* {
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: normal;
+    margin: 0;
+    padding: 0;
+    border-width: 0;
+}
+
+.main-grid-area {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr auto; /* Zorg ervoor dat de body-div het midden vult */
+}
+
+.header-div {
+    grid-column: 1 / 2;
+    background-color: var(--boerenkool-groen);
+    height: fit-content;
+}
+
+
+.footer-div {
+    grid-column: 1 / 2;
+    background-color: var(--boerenkool-groen);
+    height: 50px;
+    display: flex;
+    align-items: center;
+}
+
+.body-div {
+    grid-column: 1 / 2;
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0;
+    height: 100%; /* Zorgt ervoor dat de body-div de resterende ruimte inneemt */
+}

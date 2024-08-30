@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messages</title>
+    <script src="js/messages.js" defer></script>
+
+    <!-- stylesheets -->
+    <link rel="stylesheet" href="css/header.css">
+</head>
+
+<body>
+    <div class="header-div" id="header"></div>
+
+    <form action="">
+        <label for="">MessageId :</label>
+        <input type="text" name="" id="messageIdInput" value="1">
+        <label for="">UserId :</label>
+        <input type="text" name="" id="userIdInput" value="1">
+    </form>
+
+    <button onclick="reverseMessageTableView()" id="sortOverviewButton">Sortering</button>
+
+    <p>
+        <button onclick="showMessageContent()">showMessageContent</button> op basis van messageId input veld
+    </p>
+
+    <p>
+        <button onclick="refreshInbox()">refreshInbox()</button>
+    </p>
+    <p>
+        <button onclick="refreshOutbox()">refreshOutbox()</button>
+    </p>
+
+    <h3>messageSingleView</h3>
+    <p>senderId :
+        <span id="senderid">senderid</span>
+    </p>
+    <p>dateTimeSent:
+        <span id="datetimesent">datetime</span>
+    </p>
+    <p>subject:
+        <span id="subject">Message subject</span>
+    </p>
+    <p>body:
+        <span id="body">Message body</span>
+    </p>
+
+    <h3>messageTableView</h3>
+    <table id="messageTableView">
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Subject</th>
+                <th>Date & time</th>
+            </tr>
+
+        </thead>
+        <tr id="tableViewRow">
+            No messages loaded.
+        </tr>
+        <tr>
+            <td>data</td>
+            <td><a href="http://www.freedom.nl">freedom.nl</a></td>
+            <td>data</td>
+        </tr>
+
+    </table>
+
+</body>
+
+</html>

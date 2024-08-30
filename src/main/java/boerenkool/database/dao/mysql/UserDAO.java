@@ -65,6 +65,8 @@ public interface UserDAO extends GenericDAO<User> {
      */
     Optional<User> findByUsername(String username);
 
+    Optional<User> findByEmail(String email);
+
 
     void addBlockedUser(User blockedUser, User user);
 
@@ -76,6 +78,10 @@ public interface UserDAO extends GenericDAO<User> {
 
     Optional<User> getSenderByMessageId(int messageId);
     Optional<User> getReceiverByMessageId(int messageId);
+
+    boolean updateBoerenkoolCoins (int userId, int newCoins);
+
+    Optional<String> getUsernameById(int userId);
 }
 
 

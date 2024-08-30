@@ -6,6 +6,7 @@ import boerenkool.communication.dto.MessageDTO;
 import boerenkool.utilities.exceptions.MessageDoesNotExistException;
 import boerenkool.utilities.exceptions.MessageNotSavedException;
 import boerenkool.utilities.exceptions.UserIsNotSenderOfMessage;
+import boerenkool.utilities.exceptions.UserNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api")
+@CrossOrigin(origins = {"http://localhost:5500", "http://localhost:8080", "http://localhost:63342/", "http://127.0.0.1:5500/"})
 public class MessageController {
     private final Logger logger = LoggerFactory.getLogger(MessageController.class);
     private final UserService userService;
@@ -35,15 +37,15 @@ public class MessageController {
 
     // save ("send") a new message
     @PostMapping("/messages")
-    ResponseEntity<?> saveMessage(@RequestBody MessageDTO messageDTO) throws MessageNotSavedException {
+    ResponseEntity<?> saveMessage(@RequestBody MessageDTO messageDTO)
+            throws UserNotFoundException {
         // TODO check user is authenticated as sender of this message
         // eventuele verbetering; geef de messageId terug van de bewaarde Messsage
         // (save methode in MessageDAO moet daarvoor een int teruggeven; genericDAO moet weer aangepast... gedoe!)
-        if (messageService.saveMessage(messageDTO)) {
-            return new ResponseEntity<>(HttpStatus.CREATED);
-        } else {
-            throw new MessageNotSavedException();
-        }
+        if (userService.getOneById(messageDTO.getReceiverId()).isPresent()
+                && userService.getOneById(messageDTO.getSenderId()).isPresent()) {
+            return new ResponseEntity<>(messageService.saveMessage(messageDTO), HttpStatus.CREATED);
+        } else  throw new UserNotFoundException("SenderId and / or userId not linked to existing user(s)");
     }
 
     @GetMapping("/messages")
@@ -57,15 +59,48 @@ public class MessageController {
     }
 
     @GetMapping("/users/{userid}/messages")
-    ResponseEntity<?> getAllByUserId(@PathVariable("userid") int userId) throws MessageDoesNotExistException {
+    ResponseEntity<?> getAllByUserId(@PathVariable("userid") int userId,
+                                     // hier zou de defaultValue misschien "in" kunnen worden; standaard inbox tonen
+                                     @RequestParam(name = "box", required = false, defaultValue = "") String box)
+            throws MessageDoesNotExistException {
         // TODO user authentication (user can only request his/her OWN messages)
-        List<MessageDTO> listOfUsersMessages = messageService.getAllByUserId(userId);
+        List<MessageDTO> listOfUsersMessages;
+        if (box.equals("in")) {
+            listOfUsersMessages = messageService.getAllToReceiverId(userId);
+        } else if (box.equals("out")) {
+            listOfUsersMessages = messageService.getAllFromSenderId(userId);
+        } else {
+            logger.info("box parameter : value is not null, but invalid value");
+            listOfUsersMessages = messageService.getAllByUserId(userId);
+        }
         if (!listOfUsersMessages.isEmpty()) {
             return ResponseEntity.ok().body(listOfUsersMessages);
         } else {
             throw new MessageDoesNotExistException();
         }
     }
+
+//    @GetMapping("/users/{userid}/messages/inbox")
+//    ResponseEntity<?> getAllToReceiverId(@PathVariable("userid") int userId) throws MessageDoesNotExistException {
+//        // TODO user authentication (user can only request his/her OWN messages)
+//        List<MessageDTO> listOfUsersMessages = messageService.getAllToReceiverId(userId);
+//        if (!listOfUsersMessages.isEmpty()) {
+//            return ResponseEntity.ok().body(listOfUsersMessages);
+//        } else {
+//            throw new MessageDoesNotExistException();
+//        }
+//    }
+
+//    @GetMapping("/users/{userid}/messages/outbox")
+//    ResponseEntity<?> getAllFromSenderId(@PathVariable("userid") int userId) throws MessageDoesNotExistException {
+//        // TODO user authentication (user can only request his/her OWN messages)
+//        List<MessageDTO> listOfUsersMessages = messageService.getAllFromSenderId(userId);
+//        if (!listOfUsersMessages.isEmpty()) {
+//            return ResponseEntity.ok().body(listOfUsersMessages);
+//        } else {
+//            throw new MessageDoesNotExistException();
+//        }
+//    }
 
     @GetMapping("/messages/{messageid}")
     ResponseEntity<?> getById(@PathVariable("messageid") int messageId) throws MessageDoesNotExistException {

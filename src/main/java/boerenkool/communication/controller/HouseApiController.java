@@ -2,14 +2,19 @@ package boerenkool.communication.controller;
 
 import boerenkool.business.model.House;
 import boerenkool.business.model.HouseFilter;
+import boerenkool.business.model.HouseType;
 import boerenkool.business.service.HouseService;
+import boerenkool.communication.dto.HouseDetailsDTO;
+import boerenkool.communication.dto.HouseListDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.view.RedirectView;
 
+import java.net.URI;
 import java.util.List;
 
 /**
@@ -18,7 +23,7 @@ import java.util.List;
  * @created 13/08/2024 - 12:30
  */
 @RestController
-@RequestMapping(value = "/api/huizen")
+@RequestMapping(value = "/api/houses")
 public class HouseApiController {
 
     private final Logger logger = LoggerFactory.getLogger(HouseApiController.class);
@@ -38,42 +43,69 @@ public class HouseApiController {
                 : new ResponseEntity<>(allHouses, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/vind-een-op")
-    public ResponseEntity<?> getOneHouseById(@RequestParam(name = "huisId") int houseId) {
+    @GetMapping(value = "/{houseId}")
+    public ResponseEntity<?> getOneHouseById(@PathVariable int houseId) {
+
         if (houseId <= 0) {
             return new ResponseEntity<>("House ID is invalid and cannot be 0 or negative", HttpStatus.BAD_REQUEST);
         }
-        House house = houseService.getOneById(houseId);
-        if (house == null) {
+
+        HouseDetailsDTO houseDetailsDTO = houseService.getOneByIdAndConvertToDTO(houseId);
+
+        if (houseDetailsDTO == null) {
             return new ResponseEntity<>("House was not found", HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(house, HttpStatus.OK);
+
+        return new ResponseEntity<>(houseDetailsDTO, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/vind-lijst-op")
-    public ResponseEntity<?> getListOfHousesByHouseOwnerId(@RequestParam(name = "eigenaarId") int id) {
+    @GetMapping("/l/{id}")
+    public ResponseEntity<?> getListOfHousesByOwnerId(@PathVariable int id) {
+
         if (id <= 0) {
-            return new ResponseEntity<>("Owner ID cannot not be 0 or negative", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("Owner ID cannot be 0 or negative", HttpStatus.BAD_REQUEST);
         }
+
         List<House> listOfHousesByOwner = houseService.getListOfHousesByOwnerId(id);
-        return listOfHousesByOwner.isEmpty()
-                ? new ResponseEntity<>("No houses belong to this owner", HttpStatus.NO_CONTENT)
-                : new ResponseEntity<>(listOfHousesByOwner, HttpStatus.OK);
+
+        if (listOfHousesByOwner.isEmpty()) {
+            return new ResponseEntity<>("No houses belong to this owner", HttpStatus.NO_CONTENT);
+        }
+
+        return new ResponseEntity<>(listOfHousesByOwner, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/filter")
+    @GetMapping("/cities")
+    public ResponseEntity<?> getUniquesCities() {
+        List<String> uniqueCities = houseService.getUniqueCities();
+        if (uniqueCities.isEmpty()) {
+            return new ResponseEntity<>("No cities found", HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(uniqueCities, HttpStatus.OK);
+    }
+
+    @GetMapping("/types")
+    public ResponseEntity<?> getHouseTypes() {
+        List<HouseType> houseTypes = houseService.getAllHouseTypes();
+        if (houseTypes.isEmpty()) {
+            return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(houseTypes, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/l/filter")
     public ResponseEntity<?> getListOfHousesByFilter(
             @RequestParam(name = "provincies", required = false, defaultValue = "") List<String> provinces,
             @RequestParam(name = "steden", required = false, defaultValue = "") List<String> cities,
-            @RequestParam(name = "typen", required = false, defaultValue = "") List<Integer> houseTypeIds,
-            @RequestParam(name = "eigenaar", required = false, defaultValue = "0") int houseOwnerId,
+            @RequestParam(name = "huis-typen", required = false, defaultValue = "") List<Integer> houseTypeIds,
+            @RequestParam(name = "huis-eigenaar", required = false, defaultValue = "0") int houseOwnerId,
             @RequestParam(name = "aantal-gasten", required = false, defaultValue = "0") int amountOfGuests,
             @RequestParam(name = "aantal-kamers", required = false, defaultValue = "0") int desiredRoomCount,
-            @RequestParam(name = "minimum-prijs-per-persoon-per-dag", required = false, defaultValue = "0") int minPricePPPD,
-            @RequestParam(name = "maximum-prijs-per-persoon-per-dag", required = false, defaultValue = "0") int maxPricePPPD,
-            @RequestParam(name = "sorteer-op", required = false, defaultValue = "") String sortBy,
-            @RequestParam(name = "sorteer-orde", required = false, defaultValue = "ASC") String sortOrder,
-            @RequestParam(required = false, defaultValue = "10") int limit,
+            @RequestParam(name = "minimum-prijs-per-persoon-per-nacht", required = false, defaultValue = "0") int minPricePPPD,
+            @RequestParam(name = "maximum-prijs-per-persoon-per-nacht", required = false, defaultValue = "0") int maxPricePPPD,
+            @RequestParam(name = "sorteer-op", required = false, defaultValue = "houseId") String sortBy,
+            @RequestParam(name = "sorteer-orde", required = false, defaultValue = "DESC") String sortOrder,
+            @RequestParam(required = false, defaultValue = "12") int limit,
             @RequestParam(required = false, defaultValue = "0") int offset) {
 
         HouseFilter filter = new HouseFilter.Builder()
@@ -91,13 +123,14 @@ public class HouseApiController {
                 .setOffset(offset)
                 .build();
 
-        List<House> filteredHouses = houseService.getFilteredListOfHouses(filter);
+        List<HouseListDTO> filteredHouses = houseService.getFilteredListOfHouses(filter);
+
         return filteredHouses.isEmpty()
-                ? new ResponseEntity<>("No houses match your criteria", HttpStatus.NO_CONTENT)
+                ? new ResponseEntity<>(filteredHouses, HttpStatus.NO_CONTENT)
                 : new ResponseEntity<>(filteredHouses, HttpStatus.OK);
     }
 
-    @PostMapping(value = "/nieuw")
+    @PostMapping(value = "/new")
     public ResponseEntity<?> saveNewHouse(@RequestBody House house) {
         if (house == null) {
             return new ResponseEntity<>("House cannot be null", HttpStatus.BAD_REQUEST);
@@ -110,8 +143,8 @@ public class HouseApiController {
         }
     }
 
-    @PutMapping(value = "/bewerk-waar")
-    public ResponseEntity<?> updateHouse(@RequestParam(name = "huisId") int houseId,
+    @PutMapping(value = "/{houseId}")
+    public ResponseEntity<?> updateHouse(@PathVariable int houseId,
                                          @RequestParam(name = "huis-eigenaarId") int houseOwnerId,
                                          @RequestBody House house) {
         if (houseId <= 0 || houseOwnerId <= 0) {
@@ -130,8 +163,8 @@ public class HouseApiController {
         }
     }
 
-    @DeleteMapping(value = "/verwijder-waar")
-    public ResponseEntity<?> deleteHouse(@RequestParam(name = "huisId") int houseId,
+    @DeleteMapping(value = "/{houseId}")
+    public ResponseEntity<?> deleteHouse(@PathVariable int houseId,
                                          @RequestParam(name = "huis-eigenaarId") int houseOwnerId) {
         if (houseId <= 0 || houseOwnerId <= 0) {
             return new ResponseEntity<>("ID's cannot not be 0 or negative", HttpStatus.BAD_REQUEST);
@@ -143,9 +176,9 @@ public class HouseApiController {
             return new ResponseEntity<>("Not authorized to delete this house", HttpStatus.FORBIDDEN);
         } else {
             // TODO check of huis gereserveerd is
-                return houseService.deleteHouse(houseId)
-                        ? new ResponseEntity<>("Successfully deleted house", HttpStatus.OK)
-                        : new ResponseEntity<>("Unable to delete house", HttpStatus.CONFLICT);
+            return houseService.deleteHouse(houseId)
+                    ? new ResponseEntity<>("Successfully deleted house", HttpStatus.OK)
+                    : new ResponseEntity<>("Unable to delete house", HttpStatus.CONFLICT);
         }
     }
 

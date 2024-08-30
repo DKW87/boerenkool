@@ -27,11 +27,19 @@ public class HouseExtraFeatureService {
     }
 
     public HouseExtraFeature saveHouseExtraFeature(HouseExtraFeature houseExtraFeature) {
+        if (houseExtraFeatureRepository.getOneByIds(houseExtraFeature.getHouseId(), houseExtraFeature.getFeatureId()).isPresent()) {
+            throw new IllegalArgumentException("Een HouseExtraFeature met deze houseId en featureId bestaat al.");
+        }
+        validateHouseExtraFeature(houseExtraFeature);
         houseExtraFeatureRepository.storeOne(houseExtraFeature);
         return houseExtraFeature;
     }
 
     public boolean deleteHouseExtraFeatureByIds(int houseId, int featureId) {
+        // Controleer of de te verwijderen HouseExtraFeature bestaat
+        if (!houseExtraFeatureRepository.getOneByIds(houseId, featureId).isPresent()) {
+            throw new IllegalArgumentException("Een HouseExtraFeature met houseId " + houseId + " en featureId " + featureId + " bestaat niet.");
+        }
         houseExtraFeatureRepository.removeOneByIds(houseId, featureId);
         return true;
     }
@@ -39,5 +47,10 @@ public class HouseExtraFeatureService {
     public List<HouseExtraFeature> getAllFeaturesByHouseId(int houseId) {
         return houseExtraFeatureRepository.getAllFeaturesByHouseId(houseId);
     }
-}
 
+    private void validateHouseExtraFeature(HouseExtraFeature houseExtraFeature) {
+        if (houseExtraFeature.getHouseId() <= 0 || houseExtraFeature.getFeatureId() <= 0) {
+            throw new IllegalArgumentException("Zowel houseId als featureId moeten geldig zijn (groter dan 0).");
+        }
+    }
+}
