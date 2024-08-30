@@ -41,10 +41,12 @@ public class PictureController {
     }
 
     //todo onderstaande methode nog formatten
+    //todo array of strings
     @GetMapping("/houses/{houseId}")
     public ResponseEntity<?> getPicturesByHouseId(@PathVariable("houseId") int houseId) {
         Optional<List<Picture>> optionalPictures = Optional.ofNullable(pictureService.getAllByHouseId(houseId));
 
+        //todo deze methode moet 2 strings ( de mime + de byte[] samenvoegen als een DTO en meegeven als een object )
         if (optionalPictures.isPresent() && !optionalPictures.get().isEmpty()) {
             StringBuilder htmlResponse = new StringBuilder();
             htmlResponse.append("<html><body>");
@@ -72,31 +74,6 @@ public class PictureController {
         }
     }
 
-//    @GetMapping("/houses/{houseId}")
-//    public ResponseEntity<List<PictureDTO>> getPicturesByHouseId(@PathVariable("houseId") int houseId) {
-//        Optional<List<Picture>> optionalPictures = Optional.ofNullable(jdbcPictureDAO.getAllByHouseId(houseId));
-//
-//        if (optionalPictures.isPresent() && !optionalPictures.get().isEmpty()) {
-//            List<PictureDTO> pictureResponses = optionalPictures.get().stream()
-//                    .map(picture -> {
-//                        byte[] imageBytes = picture.getPicture();
-//                        String imageFormat = pictureService.detectImageFormat(imageBytes);
-//
-//                        if (imageFormat != null &&
-//                                ("png".equalsIgnoreCase(imageFormat) ||
-//                                        "jpeg".equalsIgnoreCase(imageFormat) ||
-//                                        "jpg".equalsIgnoreCase(imageFormat))) {
-//                            return new PictureDTO(picture.getPictureId(), picture.getHouseId(), imageFormat, Base64.getEncoder().encodeToString(imageBytes));
-//                        }
-//                        return null;
-//                    })
-//                    .filter(pictureResponse -> pictureResponse != null)
-//                    .collect(Collectors.toList());
-//            return new ResponseEntity<>(pictureResponses, HttpStatus.OK);
-//        } else {
-//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//        }
-//    }
 
     //todo werkt nu
     @GetMapping("/houses/first/{houseId}")
@@ -111,12 +88,13 @@ public class PictureController {
 
     //todo werkt nu
     @GetMapping("/{pictureId}")
-    public ResponseEntity<?> getPictureById(@PathVariable("pictureId") int pictureId) {
-        Optional<Picture> picture = pictureService.getOneById(pictureId);
-        if (picture.isPresent()) {
-            return pictureService.buildImageResponse(picture.get().getPicture());
+    public ResponseEntity<PictureDTO> getPictureById(@PathVariable("pictureId") int pictureId) {
+        Optional<Picture> pictureOptional = pictureService.getOneById(pictureId);
+        if (pictureOptional.isPresent()) {
+            PictureDTO pictureDTO = pictureService.convertToDTO(pictureOptional.get());
+            return ResponseEntity.ok(pictureDTO);
         } else {
-            return new ResponseEntity<>("Picture not found", HttpStatus.NOT_FOUND);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 
@@ -158,7 +136,7 @@ public class PictureController {
             byte[] pictureData = pictureFile.getBytes();
             House house = houseService.getOneById(houseId);
             Picture picture = new Picture(house, pictureData, description);
-            boolean isSaved = jdbcPictureDAO.storeOne(picture);
+            boolean isSaved = jdbcPictureDAO.storeOne(picture); // todo deze nog aanpassen naar service
             if (isSaved) {
                 return new ResponseEntity<>("Picture saved successfully with ID: " + picture.getPictureId(), HttpStatus.CREATED);
             } else {
@@ -180,21 +158,6 @@ public class PictureController {
         }
     }
 
-//    @PostMapping("/save")
-//    public ResponseEntity<?> savePicture(@RequestBody PictureDTO pictureDTO) {
-//        // Convert DTO to Picture entity
-//        byte[] pictureData = Base64.getDecoder().decode(pictureDTO.getBase64Picture());
-//        House house = houseService.getOneById(pictureDTO.getHouseId());  // Assuming this method exists
-//        Picture picture = new Picture(house, pictureData, pictureDTO.getDescription());
-//
-//        // Save Picture
-//        boolean isSaved = jdbcPictureDAO.storeOne(picture);
-//        if (isSaved) {
-//            return new ResponseEntity<>("Picture saved successfully with ID: " + picture.getPictureId(), HttpStatus.CREATED);
-//        } else {
-//            return new ResponseEntity<>("Failed to save picture", HttpStatus.INTERNAL_SERVER_ERROR);
-//        }
-//    }
 
 
 
