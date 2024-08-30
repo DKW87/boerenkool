@@ -175,3 +175,54 @@ body {
     background-color: #FF4500; /* Darker shade of tomato */
 }
 
+/* CSS for the BoerenkoolCoins section */
+#boerenkool-coins-section {
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    max-width: 600px;
+    width: 100%;
+    box-sizing: border-box;
+    text-align: center;
+    margin-bottom: 30px; /* Space below the container */
+}
+
+#boerenkool-coins-section h2 {
+    margin-bottom: 20px;
+    color: var(--boerenkool-paars);
+    font-size: 1.8em; /* Match the size with other headers */
+    font-weight: bold; /* Ensure the text is bold */
+}
+
+#boerenkool-coins-section label {
+    display: block;
+    margin-bottom: 10px;
+    font-size: var(--font-size-large);
+    color: #333;
+}
+
+#boerenkool-coins-section input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: var(--font-size-large);
+    margin-bottom: 20px;
+}
+
+#boerenkool-coins-section button {
+    width: 100%;
+    padding: 10px;
+    background-color: var(--boerenkool-groen);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+#boerenkool-coins-section button:hover {
+    background-color: #556B2F; /* Darker shade of boerenkool-groen for hover effect */
+}
+

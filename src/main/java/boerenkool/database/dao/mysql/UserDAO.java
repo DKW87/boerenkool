@@ -78,6 +78,10 @@ public interface UserDAO extends GenericDAO<User> {
 
     Optional<User> getSenderByMessageId(int messageId);
     Optional<User> getReceiverByMessageId(int messageId);
+
+    boolean updateBoerenkoolCoins (int userId, int newCoins);
+
+    Optional<String> getUsernameById(int userId);
 }
 
 

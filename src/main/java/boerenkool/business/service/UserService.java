@@ -64,4 +64,14 @@ public class UserService {
         return userRepository.findByEmail(email);
     }
 
+    public boolean updateBoerenkoolcoins(User user, int additionalCoins) {
+        int currentCoins = Optional.ofNullable(user.getCoinBalance()).orElse(0);
+        int newCoins = user.getCoinBalance() + additionalCoins;
+        return userRepository.updateBoerenkoolcoins(user, newCoins);
+    }
+
+    public Optional<String> getUsernameById(int id) {
+        return userRepository.getUsernameById(id);
+    }
+
 }

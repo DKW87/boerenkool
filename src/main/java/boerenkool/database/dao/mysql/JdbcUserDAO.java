@@ -114,10 +114,6 @@ public class JdbcUserDAO implements UserDAO {
 
     @Override
     public boolean updateOne(User user) {
-        logger.info("Attempting to update user with ID: {}", user.getUserId());
-        logger.info("Hashed password to be saved: {}", user.getHashedPassword());
-        logger.info("Salt to be saved: {}", user.getSalt());
-
         boolean isUpdated = jdbcTemplate.update(connection -> updateUserStatement(user, connection)) != 0;
 
         if (isUpdated) {
@@ -202,6 +198,26 @@ public class JdbcUserDAO implements UserDAO {
             return Optional.of(users.get(0));
         }
     }
+
+    @Override
+    public boolean updateBoerenkoolCoins(int userId, int newCoins) {
+        String sql = "UPDATE `User` SET coinBalance =? WHERE userId = ?";
+        int rowsAffected = jdbcTemplate.update(sql, newCoins, userId);
+        return rowsAffected > 0;
+    }
+
+    @Override
+    public Optional<String> getUsernameById(int userId) {
+        String sql = "SELECT username FROM `User` WHERE userId = ?";
+        List<String> usernames = jdbcTemplate.query(sql, (rs, rowNum) -> rs.getString("username"), userId);
+
+        if (usernames.size() != 1) {
+            return Optional.empty();
+        } else {
+            return Optional.of(usernames.get(0));
+        }
+    }
+
 
     private static class UserRowMapper implements RowMapper<User> {
         @Override
