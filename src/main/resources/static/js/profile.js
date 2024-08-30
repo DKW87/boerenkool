@@ -6,9 +6,6 @@ import * as Auth from './modules/auth.mjs';
 import { loadBlockedUsers, blockUser } from './blockedUsers.js';
 import { validateName, validatePhoneNumber, validateEmail } from './modules/validation.mjs';
 
-//listener die luistert naar domcontentloaded event, om te kijken of de volledige dom is opgebouwd
-//async zodat je later gebruik kan maken voor await. promise void betekent dat er geen waarde wordt gerourtneerd
-//met succesvolle voltooing
 document.addEventListener('DOMContentLoaded', async () => {
     // Load the header and footer
     Main.loadHeader();
@@ -25,7 +22,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let userId;
 
     try {
-        // Fetch user details to get the userId. await pauzeert functie totdat de promise van de fetch is vervuld
+        // Fetch user details to get the userId
         const response = await fetch('/api/users/profile', {
             method: 'GET',
             headers: { 'Authorization': token }
@@ -44,26 +41,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         console.log('Gebruikers-ID:', userId);
 
-    } catch (error) {
-        console.error('Fout bij het ophalen van gebruikersinformatie:', error);
-        alert('Kon gebruikersinformatie niet ophalen.');
-        return;
-    }
-
-    // Fetch profile details to populate the form
-    try {
-        const response = await fetch('/api/users/profile', {
-            method: 'GET',
-            headers: { 'Authorization': token }
-        });
-
-        if (!response.ok) {
-            throw new Error('Kon profiel niet laden.');
-        }
-
-        const user = await response.json();
-
-        // Populate the profile form
+        // Update the UI with the user's details, including the coin balance
         document.getElementById('username').value = user.username;
         document.getElementById('email').value = user.email;
         document.getElementById('phone').value = user.phone;
@@ -71,7 +49,37 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('infix').value = user.infix;
         document.getElementById('lastName').value = user.lastName;
 
+        const coins = user.coinBalance || 0;  // Use coinBalance instead of boerenkoolCoins
+        document.getElementById('boerenkoolCoins').value = coins;
+
         console.log('Gebruikersinformatie geladen:', user);
+
+        // Event listener for updating BoerenkoolCoins
+        document.getElementById('updateCoinsBtn').addEventListener('click', async () => {
+            try {
+                const currentCoins = parseInt(document.getElementById('boerenkoolCoins').value, 10) || 0;
+                const newCoins = currentCoins + 100;
+
+                const response = await fetch('/api/users/update-coins', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': token
+                    },
+                    body: JSON.stringify({ boerenkoolCoins: newCoins })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Kon BoerenkoolCoins niet updaten.');
+                }
+
+                document.getElementById('boerenkoolCoins').value = newCoins;
+                alert('BoerenkoolCoins succesvol bijgewerkt!');
+            } catch (error) {
+                console.error('Fout bij het updaten van BoerenkoolCoins:', error);
+                alert('Fout bij het updaten van BoerenkoolCoins');
+            }
+        });
 
         // Load blocked users
         loadBlockedUsers(userId, token);
