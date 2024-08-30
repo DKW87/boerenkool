@@ -1,92 +1,63 @@
 package boerenkool.communication.controller;
-
 import boerenkool.business.model.House;
 import boerenkool.business.model.Picture;
-import boerenkool.business.model.User;
 import boerenkool.business.service.HouseService;
 import boerenkool.business.service.PictureService;
 import boerenkool.communication.dto.PictureDTO;
-import boerenkool.database.dao.mysql.JdbcPictureDAO;
-import boerenkool.utilities.exceptions.UserNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/pictures")
 public class PictureController {
 
-    private final JdbcPictureDAO jdbcPictureDAO;
     private final PictureService pictureService;
     private final HouseService houseService;
 
-    public PictureController(JdbcPictureDAO jdbcPictureDAO, PictureService pictureService, HouseService houseService) {
-        this.jdbcPictureDAO = jdbcPictureDAO;
+    public PictureController(PictureService pictureService, HouseService houseService) {
         this.pictureService = pictureService;
         this.houseService = houseService;
     }
 
+    // Test mapping
     @GetMapping
     public String showPicturesMessage() {
         return "Hello user, if you see this everything is OK.";
     }
 
-    //todo onderstaande methode nog formatten
-    //todo array of strings
+
     @GetMapping("/houses/{houseId}")
     public ResponseEntity<?> getPicturesByHouseId(@PathVariable("houseId") int houseId) {
         Optional<List<Picture>> optionalPictures = Optional.ofNullable(pictureService.getAllByHouseId(houseId));
 
-        //todo deze methode moet 2 strings ( de mime + de byte[] samenvoegen als een DTO en meegeven als een object )
         if (optionalPictures.isPresent() && !optionalPictures.get().isEmpty()) {
-            StringBuilder htmlResponse = new StringBuilder();
-            htmlResponse.append("<html><body>");
+            List<PictureDTO> pictureDTOs = optionalPictures.get().stream()
+                    .map(pictureService::convertToDTO)
+                    .toList();
 
-            for (Picture picture : optionalPictures.get()) {
-                byte[] imageBytes = picture.getPicture();
-                String imageFormat = pictureService.detectImageFormat(imageBytes);
-
-                if (imageFormat != null &&
-                        ("png".equalsIgnoreCase(imageFormat) ||
-                                "jpeg".equalsIgnoreCase(imageFormat) ||
-                                "jpg".equalsIgnoreCase(imageFormat))) {
-                    String base64Image = Base64.getEncoder().encodeToString(imageBytes);
-                    htmlResponse.append("<img src='data:image/")
-                            .append(imageFormat)
-                            .append(";base64,")
-                            .append(base64Image)
-                            .append("' alt='House Image'/><br>");
-                }
-            }
-            htmlResponse.append("</body></html>");
-            return new ResponseEntity<>(htmlResponse.toString(), HttpStatus.OK);
+            return new ResponseEntity<>(pictureDTOs, HttpStatus.OK);
         } else {
             return new ResponseEntity<>("No images found for this house ID", HttpStatus.NOT_FOUND);
         }
     }
 
 
-    //todo werkt nu
     @GetMapping("/houses/first/{houseId}")
     public ResponseEntity<?> getFirstPictureOfHouse(@PathVariable("houseId") int houseId) {
         Optional<Picture> picture = pictureService.getFirstPictureByHouseId(houseId);
         if (picture.isPresent()) {
-            return pictureService.buildImageResponse(picture.get().getPicture());
+            PictureDTO pictureDTO = pictureService.convertToDTO(picture.get());
+            return ResponseEntity.ok(pictureDTO);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
-    //todo werkt nu
+
     @GetMapping("/{pictureId}")
     public ResponseEntity<PictureDTO> getPictureById(@PathVariable("pictureId") int pictureId) {
         Optional<Picture> pictureOptional = pictureService.getOneById(pictureId);
@@ -98,20 +69,15 @@ public class PictureController {
         }
     }
 
+
     @PutMapping("/update/{pictureId}")
     public ResponseEntity<?> updatePictureDescription(@PathVariable("pictureId") int pictureId,
                                                       @RequestParam("description") String description) {
         try {
-            // Fetch the picture by ID
             Optional<Picture> optionalPicture = pictureService.getOneById(pictureId);
-
             if (optionalPicture.isPresent()) {
                 Picture picture = optionalPicture.get();
-
-                // Update the description
                 picture.setDescription(description);
-
-                // Save the updated picture
                 boolean isUpdated = pictureService.savePicture(picture);
 
                 if (isUpdated) {
@@ -127,7 +93,7 @@ public class PictureController {
         }
     }
 
-    //todo werkt nu.
+
     @PostMapping("/save")
     public ResponseEntity<?> savePicture(@RequestParam("houseId") Integer houseId,
                                          @RequestParam("picture") MultipartFile pictureFile,
@@ -136,7 +102,7 @@ public class PictureController {
             byte[] pictureData = pictureFile.getBytes();
             House house = houseService.getOneById(houseId);
             Picture picture = new Picture(house, pictureData, description);
-            boolean isSaved = jdbcPictureDAO.storeOne(picture); // todo deze nog aanpassen naar service
+            boolean isSaved = pictureService.savePicture(picture);
             if (isSaved) {
                 return new ResponseEntity<>("Picture saved successfully with ID: " + picture.getPictureId(), HttpStatus.CREATED);
             } else {
@@ -147,7 +113,7 @@ public class PictureController {
         }
     }
 
-    //todo methode werkt
+
     @DeleteMapping("/delete/{pictureId}")
     public ResponseEntity<?> deletePictureById(@PathVariable("pictureId") int pictureId) {
         boolean isDeleted = pictureService.removeOneById(pictureId);
@@ -157,11 +123,6 @@ public class PictureController {
             return new ResponseEntity<>("Picture not found or deletion failed", HttpStatus.NOT_FOUND);
         }
     }
-
-
-
-
-
 
 
 }
