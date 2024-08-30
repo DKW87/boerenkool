@@ -1,37 +1,25 @@
-.messageGridArea {
-    display: grid;
-    grid-template-columns: 2fr 4fr;
-    /* zet deze kleuren nog in global.css */
-    --borderGrey: #ccc; 
+:root {
+    /* zet deze kleuren nog in global.css  ?*/
+    --borderGrey: #ccc;
     --backgroundLightGrey: #f5f5f5;
 }
 
-.messageGridArea menu {
+.messageMainArea {
+    display: grid;
+    grid-template-columns: 2fr 4fr;
     background-color: var(--backgroundLightGrey);
 }
 
-#messageSingleView {
-    background-color: var(--backgroundLightGrey);
-    min-height: 60vh;
+.messageMainArea menu {
 }
 
-#messageSingleView div {
-    background-color: white;
-    border: 1px;
-    border-style: solid;
-    border-color: var(--borderGrey);
-    border-radius: 4px;
-    padding: 10px;
-    margin: 3px;
-}
-
+/* messageOverview ; contains the list of inbox/outbox messages */
 #messageOverview {
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
-    overflow: hidden;    
-    background-color: var(--backgroundLightGrey);
-} 
+    overflow: hidden;
+}
 
 #messageInOverview {
     background-color: white;
@@ -44,8 +32,45 @@
 }
 
 #messageInOverview div {
-    text-overflow:ellipsis;
-    overflow:hidden;    
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+/* messageSingleView ; contains readMessageView or writeMessageView */
+.messageSingleView {
+    background-color: var(--backgroundLightGrey);
+    min-height: 60vh;
+}
+
+.messageSingleView div {
+    background-color: white;
+    border: 1px;
+    border-style: solid;
+    border-color: var(--borderGrey);
+    border-radius: 4px;
+    padding: 10px;
+    margin: 3px;
+}
+
+#readMessageView div {
+    /* background-color: white;
+    border: 1px;
+    border-style: solid;
+    border-color: var(--borderGrey);
+    border-radius: 4px;
+    padding: 10px;
+    margin: 3px; */
+}
+
+#writeMessageView {
+    display: flex;
+    flex-direction: column;
+}
+
+.inputField {
+    /*font-size: var(--font-size-large);*/
+    width: 300px;
+    height: 2em;
 }
 
 .subject {
@@ -65,7 +90,6 @@ button {
     position: absolute;
     bottom: 10px;
     right: 10px;
-    /* width: 300px; */
     background-color: aqua;
     border: 3px solid black;
     text-align: center;
