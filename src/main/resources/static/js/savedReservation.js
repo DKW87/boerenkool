@@ -25,7 +25,7 @@ function getAllSavedReservation() {
                                             <td>${d.startDate}</td>
                                             <td>${d.endDate}</td>
                                             <td>${d.guestCount}</td>
-                                            <td><button id=${d.reservationId} class="cancel-reservation">Cancel</button></td>
+                                            <td><button id=${d.reservationId} class="cancel-reservation">Annuleren</button></td>
                                         </tr>`
                 table.innerHTML += node;
 
@@ -45,13 +45,13 @@ function addCancelEventListener() {
 
             cancelButton.addEventListener('click', event => {
                 Swal.fire({
-                    title: "Are you sure?",
-                    text: "You won't be able to revert this!",
-                    icon: "warning",
+                    title: "Weet u het zeker?",
+                    text: "Dit kunt u niet meer ongedaan maken!",
+                    icon: "Waarschuwing",
                     showCancelButton: true,
                     confirmButtonColor: "#3085d6",
                     cancelButtonColor: "#d33",
-                    confirmButtonText: "Yes, delete it!"
+                    confirmButtonText: "Ja, verwijder het!"
                 }).then((result) => {
                     if (result.isConfirmed) {
                         cancelReservation(event.target.id);
@@ -77,9 +77,9 @@ function cancelReservation(id) {
             console.log("response",response);
                 if (response.ok) {
                     Swal.fire({
-                        title: "Deleted!",
-                        text: "Your file has been deleted.",
-                        icon: "success"
+                        title: "Verwijderd!",
+                        text: "Uw bestand is verwijderd.",
+                        icon: "succes"
                     });
                     setTimeout(()=>{
                         window.location.reload();
