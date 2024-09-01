@@ -27,26 +27,31 @@
     <div class="messageSingleView">
         <form id="writeMessageView" onsubmit="return false">
             <menu>
-                <button id="goToMessages">Mijn berichten</button>
+                <button id="goToMessagesButton">Mijn berichten</button>
                 <button id="sendMessageButton">Verstuur dit bericht</button>
+                <button id="getSenderIdButton">getSenderId</button>
+                <button id="getReceiverIdButton">getReceiverId</button>
             </menu>
 
-            <div>
-                <label for="senderIdField">senderId : </label>
-                <input type="text" class="inputField" id="senderIdField" name="senderId" required>
-            </div>
+<!--            <div>-->
+<!--                <label for="senderIdField">senderId : </label>-->
+<!--                <input type="text" class="inputField" id="senderIdField" name="senderId" required>-->
+<!--            </div>-->
 
+<!--            <div>-->
+<!--                <label for="receiverIdField">receiverId : </label>-->
+<!--                <input type="text" class="inputField" id="receiverIdField" name="receiverId" required>-->
+<!--            </div>-->
+
+<!--            <div>-->
+<!--                <label for="receiverNameField">Gebruikersnaam input veld: </label>-->
+<!--                <input type="text" class="inputField" id="receiverNameInputField" name="username" required-->
+<!--                       oninvalid="this.setCustomValidity('Voer de gebruikersnaam van de ontvanger in')"-->
+<!--                       oninput="this.setCustomValidity('')">-->
+<!--            </div>-->
 
             <div>
-                <label for="receiverIdField">receiverId : </label>
-                <input type="text" class="inputField" id="receiverIdField" name="receiverId" required>
-            </div>
-
-            <div>
-                <label for="usernameField">Gebruikersnaam : </label>
-                <input type="text" class="inputField" id="usernameField" name="username" required
-                       oninvalid="this.setCustomValidity('Voer de gebruikersnaam in')"
-                       oninput="this.setCustomValidity('')">
+               Aan : <span id="receiverNameField">....</span>
             </div>
 
             <div>

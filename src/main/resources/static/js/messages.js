@@ -1,4 +1,3 @@
-"use strict"
 import * as main from "./modules/main.mjs"
 main.loadHeader()
 main.loadFooter()
@@ -15,18 +14,21 @@ const DATE_TIME_OPTIONS = {
     hour: `numeric`,
     minute: `numeric`
 }
-// let messageArray = {}
+
 let inboxArray = {}
 let outboxArray = {}
 let sortAscending = false
 let overviewShowsInbox = true
+let listOfCorrespondents = []
+
+refreshInbox()
+refreshOutbox()
+fillListOfCorrespondents(document.getElementById("userIdInput").value) // later uit ingelogde user halen
+
 
 document.querySelector('#reverseMessageOverviewButton').addEventListener('click', () => {
     reverseMessageOverview()
 })
-// document.querySelector('#showMessageContentButton').addEventListener('click', () => {
-//     showMessageContent()
-// })
 document.querySelector('#refreshInboxButton').addEventListener('click', () => {
     refreshInbox()
 })
@@ -36,6 +38,50 @@ document.querySelector('#refreshOutboxButton').addEventListener('click', () => {
 document.querySelector('#writeMessageButton').addEventListener('click', () => {
     window.location.href = "send-a-message.html"
 })
+// for floatingCheatMenu
+document.querySelector('#fillListOfCorrespondentsButton').addEventListener('click', () => {
+    fillListOfCorrespondents(document.getElementById("userIdInput").value)
+})
+document.querySelector('#fillReceiverDropDown').addEventListener('click', () => {
+    fillReceiverDropDown()
+})
+
+function fillReceiverDropDown() {
+    const dropDownElement = document.getElementById('receiverDropDown')
+    listOfCorrespondents.forEach((pair) => {
+        let optionelement = document.createElement("option")
+        optionelement.value = pair.userId
+        optionelement.text = pair.username
+        dropDownElement.appendChild(optionelement)
+    })
+}
+
+async function fillListOfCorrespondents(userIdInput) {
+    const url = URL_BASE + `/api/users/correspondents/${userIdInput}`
+    try {
+        const response = await fetch(url)
+        if (!response.ok) {
+            throw new Error(`Response status: ${response.status}`)
+        }
+        listOfCorrespondents = await response.json()
+        fillReceiverDropDown()
+    } catch (error) {
+        console.error(error.message)
+    }
+}
+
+export async function getUserName(userId) {
+    const url = URL_BASE + `/api/users/username?userid=${userId}`
+    try {
+        const response = await fetch(url)
+        if (!response.ok) {
+            throw new Error(`Response status: ${response.status}`)
+        }
+        return await response.text()
+    } catch (error) {
+        console.error(error.message)
+    }
+}
 
 async function refreshInbox() {
     overviewShowsInbox = true
@@ -145,7 +191,7 @@ function showMessageContent(messageId) {
 
     // go through searchArray to find the message using its messageId,
     let foundMessage = searchArray.find((e) => e.messageId == messageId)
- 
+
     // if not found (quite impossible) console.log it
 
     // show the message values in the relevant HTML elements
