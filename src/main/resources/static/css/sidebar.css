@@ -18,14 +18,7 @@
 
 .body-div {
     grid-area: 2 / 2 / 3 / 4;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    align-items: flex-start;
-    row-gap: 30px;
-    column-gap: 40px;
     height: fit-content;
-    padding-top: 30px;
 }
 
 .footer-div {
