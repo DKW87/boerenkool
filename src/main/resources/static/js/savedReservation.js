@@ -4,12 +4,15 @@ import * as Main from './modules/main.mjs';
 Main.loadHeader();
 Main.loadFooter();
 
+
+
+var userId =5;
 getAllSavedReservation();
 
 function getAllSavedReservation() {
 
     console.log("getAllSavedReservation");
-    fetch('/api/reservations/reservations-by-userId/5', {
+    fetch(`/api/reservations/reservations-by-userId/${userId}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
@@ -64,9 +67,9 @@ function addCancelEventListener() {
 
 }
 
-function cancelReservation(id) {
+function cancelReservation(reservationId) {
 
-    fetch('/api/reservations/' + id, {
+    fetch(`/api/reservations/${userId}/reservations/${reservationId}`, {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json'
@@ -78,7 +81,7 @@ function cancelReservation(id) {
                 if (response.ok) {
                     Swal.fire({
                         title: "Verwijderd!",
-                        text: "Uw bestand is verwijderd.",
+                        text: "Uw reservering is verwijderd.",
                         icon: "succes"
                     });
                     setTimeout(()=>{
