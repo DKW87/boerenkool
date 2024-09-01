@@ -1,4 +1,6 @@
 "use strict"
+import * as Header from './header.mjs';
+
 
 export function loadHeader() {
     const header = document.getElementById("header");
@@ -12,6 +14,7 @@ export function loadHeader() {
             })
             .then(data => {
                 header.innerHTML = data;
+                Header.loadRightHeader();
             })
             .catch(error => {
                 console.error('Er is een probleem opgetreden met fetch:', error);
