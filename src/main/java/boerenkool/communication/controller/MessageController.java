@@ -1,8 +1,10 @@
 package boerenkool.communication.controller;
 
+import boerenkool.business.model.User;
 import boerenkool.business.service.MessageService;
 import boerenkool.business.service.UserService;
 import boerenkool.communication.dto.MessageDTO;
+import boerenkool.utilities.authorization.AuthorizationService;
 import boerenkool.utilities.exceptions.MessageDoesNotExistException;
 import boerenkool.utilities.exceptions.MessageNotSavedException;
 import boerenkool.utilities.exceptions.UserIsNotSenderOfMessage;
@@ -15,24 +17,29 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 /**
  * @author Bart Notelaers
  */
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = {"http://localhost:5500", "http://localhost:8080", "http://localhost:63342/", "http://127.0.0.1:5500/"})
+//@CrossOrigin(origins = {"http://localhost:5500", "http://localhost:8080", "http://localhost:63342/", "http://127.0.0.1:5500/"})
 public class MessageController {
     private final Logger logger = LoggerFactory.getLogger(MessageController.class);
+    private final MessageService messageService;
     private final UserService userService;
+    private final AuthorizationService authorizationService;
 
-    private MessageService messageService;
 
     @Autowired
-    public MessageController(MessageService messageService, UserService userService) {
+    public MessageController(MessageService messageService, UserService userService,
+                             AuthorizationService authorizationService) {
         this.messageService = messageService;
         logger.info("new MessageController");
         this.userService = userService;
+        this.authorizationService = authorizationService;
     }
 
     // save ("send") a new message
@@ -45,62 +52,44 @@ public class MessageController {
         if (userService.getOneById(messageDTO.getReceiverId()).isPresent()
                 && userService.getOneById(messageDTO.getSenderId()).isPresent()) {
             return new ResponseEntity<>(messageService.saveMessage(messageDTO), HttpStatus.CREATED);
-        } else  throw new UserNotFoundException("SenderId and / or userId not linked to existing user(s)");
+        } else throw new UserNotFoundException("SenderId and / or userId not linked to existing user(s)");
     }
-
-    @GetMapping("/messages")
-    ResponseEntity<?> getAllMessages() throws MessageDoesNotExistException {
-        List<MessageDTO> listOfUsersMessages = messageService.getAllMessages();
-        if (!listOfUsersMessages.isEmpty()) {
-            return ResponseEntity.ok().body(listOfUsersMessages);
-        } else {
-            throw new MessageDoesNotExistException();
-        }
-    }
+// not used in front end (security risk)
+//    @GetMapping("/messages")
+//    ResponseEntity<?> getAllMessages() throws MessageDoesNotExistException {
+//        List<MessageDTO> listOfUsersMessages = messageService.getAllMessages();
+//        if (!listOfUsersMessages.isEmpty()) {
+//            return ResponseEntity.ok().body(listOfUsersMessages);
+//        } else {
+//            throw new MessageDoesNotExistException();
+//        }
+//    }
 
     @GetMapping("/users/{userid}/messages")
     ResponseEntity<?> getAllByUserId(@PathVariable("userid") int userId,
                                      // hier zou de defaultValue misschien "in" kunnen worden; standaard inbox tonen
-                                     @RequestParam(name = "box", required = false, defaultValue = "") String box)
+                                     @RequestParam(name = "box", required = false, defaultValue = "") String box,
+                                     @RequestHeader("Authorization") String token)
             throws MessageDoesNotExistException {
-        // TODO user authentication (user can only request his/her OWN messages)
-        List<MessageDTO> listOfUsersMessages;
-        if (box.equals("in")) {
-            listOfUsersMessages = messageService.getAllToReceiverId(userId);
-        } else if (box.equals("out")) {
-            listOfUsersMessages = messageService.getAllFromSenderId(userId);
-        } else {
-            logger.info("box parameter : value is not null, but invalid value");
-            listOfUsersMessages = messageService.getAllByUserId(userId);
+        Optional<User> validatedUser = authorizationService.validate(UUID.fromString(token));
+        if (validatedUser.isPresent() && validatedUser.get().getUserId() == userId) {
+            List<MessageDTO> listOfUsersMessages;
+            if (box.equals("in")) {
+                listOfUsersMessages = messageService.getAllToReceiverId(userId);
+            } else if (box.equals("out")) {
+                listOfUsersMessages = messageService.getAllFromSenderId(userId);
+            } else {
+                logger.info("box parameter : value is not null, but invalid value");
+                listOfUsersMessages = messageService.getAllByUserId(userId);
+            }
+            if (listOfUsersMessages.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+            } else {
+                return ResponseEntity.ok().body(listOfUsersMessages);
+            }
         }
-        if (!listOfUsersMessages.isEmpty()) {
-            return ResponseEntity.ok().body(listOfUsersMessages);
-        } else {
-            throw new MessageDoesNotExistException();
-        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
     }
-
-//    @GetMapping("/users/{userid}/messages/inbox")
-//    ResponseEntity<?> getAllToReceiverId(@PathVariable("userid") int userId) throws MessageDoesNotExistException {
-//        // TODO user authentication (user can only request his/her OWN messages)
-//        List<MessageDTO> listOfUsersMessages = messageService.getAllToReceiverId(userId);
-//        if (!listOfUsersMessages.isEmpty()) {
-//            return ResponseEntity.ok().body(listOfUsersMessages);
-//        } else {
-//            throw new MessageDoesNotExistException();
-//        }
-//    }
-
-//    @GetMapping("/users/{userid}/messages/outbox")
-//    ResponseEntity<?> getAllFromSenderId(@PathVariable("userid") int userId) throws MessageDoesNotExistException {
-//        // TODO user authentication (user can only request his/her OWN messages)
-//        List<MessageDTO> listOfUsersMessages = messageService.getAllFromSenderId(userId);
-//        if (!listOfUsersMessages.isEmpty()) {
-//            return ResponseEntity.ok().body(listOfUsersMessages);
-//        } else {
-//            throw new MessageDoesNotExistException();
-//        }
-//    }
 
     @GetMapping("/messages/{messageid}")
     ResponseEntity<?> getById(@PathVariable("messageid") int messageId) throws MessageDoesNotExistException {
@@ -109,6 +98,18 @@ public class MessageController {
         if (messageDTO != null) {
             return new ResponseEntity<>(messageDTO, HttpStatus.OK);
         } else throw new MessageDoesNotExistException();
+    }
+
+    @GetMapping("/messages/unreadmessages")
+    ResponseEntity<?> checkForUnreadMessages(@RequestHeader("Authorization") String token) {
+        // TODO user authentication  (user is receiver of this message)
+        Optional<User> validatedUser = authorizationService.validate(UUID.fromString(token));
+        if (validatedUser.isPresent()) {
+            int numberOfUnread = messageService.checkForUnreadMessages(validatedUser.get().getUserId());
+            return new ResponseEntity<>(numberOfUnread, HttpStatus.OK);
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
     }
 
     @PutMapping("/users/{userid}/messages")

@@ -6,18 +6,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HuisjeBoompjeBoerenkool - Berichten</title>
 
-    <!-- stylesheets -->
+    <script src="js/messages.js" type="module"></script>
+
     <link rel="stylesheet" href="css/global.css">
     <link rel="stylesheet" href="css/header.css">
     <link rel="stylesheet" href="css/messages.css">
     <link rel="stylesheet" href="css/footer.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-            href="https://fonts.googleapis.com/css2?family=Playwrite+BE+VLG:wght@100..400&family=Playwrite+PE:wght@100..400&display=swap"
-            rel="stylesheet">
+<!--    <link rel="preconnect" href="https://fonts.googleapis.com">-->
+<!--    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>-->
+<!--    <link href="https://fonts.googleapis.com/css2?family=Playwrite+BE+VLG:wght@100..400&family=Playwrite+PE:wght@100..400&display=swap" rel="stylesheet">-->
 
-    <script src="js/messages.js" type="module"></script>
+
 </head>
 
 <body>
@@ -41,12 +40,11 @@
         </menu>
 
         <section id="messageOverview">
-            <div id="messageInOverview">Geen berichten.</div>
         </section>
 
         <section class="messageSingleView" id="messageSingleView">
             <div>User : <span id="singleViewUserId">{{user field}}</span>,
-                <span id="singleViewDatetimesent">{{dateTimeSent field}}</span>
+                <span id="singleViewDateTimeSent">{{dateTimeSent field}}</span>
             </div>
             <div>Subject : <span id="singleViewSubject" class="subject">{{subject field}}</span></div>
             <div id="singleViewBody">{{body field}}</div>
