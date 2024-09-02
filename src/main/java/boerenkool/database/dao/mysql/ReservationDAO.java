@@ -2,6 +2,8 @@ package boerenkool.database.dao.mysql;
 
 import boerenkool.business.model.Reservation;
 import boerenkool.database.dao.GenericDAO;
+
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,6 +29,8 @@ public interface ReservationDAO extends GenericDAO<Reservation> {
 
     @Override
     boolean removeOneById (int id);
+
+    boolean existsByHouseIdAndDatesOverlap (int houseId, LocalDate startDate, LocalDate endDate);
 
     List<Reservation> getAllReservationsByLandlord(int landlordId);
 

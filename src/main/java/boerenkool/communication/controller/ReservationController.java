@@ -38,7 +38,7 @@ public class ReservationController {
 
     @GetMapping("/reservation")
     public String getReservationPage() {
-        return "reservation"; 
+        return "reservation";
     }
 
     // 1. GET /api/reservations - Get all reservations
@@ -218,15 +218,21 @@ public class ReservationController {
         try {
             House house = houseService.getOneById(reservationDTO.getHouseId());
             User user = userService.getOneById(reservationDTO.getUserId())
-                    .orElseThrow(() -> new UserNotFoundException("User not found"));
+                    .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
             Reservation reservation = reservationService.convertToEntity(reservationDTO, house, user);
-
             Reservation savedReservation = reservationService.saveReservation(reservation);
 
             ReservationDTO savedReservationDTO = reservationService.convertToDto(savedReservation);
             logger.info("Created new reservation with ID: {}", savedReservation.getReservationId());
             return new ResponseEntity<>(savedReservationDTO, HttpStatus.CREATED);
+
+        } catch (IllegalArgumentException e) {
+            logger.warn("Failed to create reservation: {}", e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (IllegalStateException e) {
+            logger.warn("Failed to create reservation: {}", e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
         } catch (Exception e) {
             logger.error("Error creating reservation", e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
