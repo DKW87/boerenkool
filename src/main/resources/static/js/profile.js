@@ -1,105 +1,157 @@
 "use strict";
 
 // Import necessary modules
-import * as Main from './modules/main.mjs';
 import * as Auth from './modules/auth.mjs';
+import * as Main from './modules/main.mjs';
 import { loadBlockedUsers, blockUser } from './blockedUsers.js';
-import { validateName, validatePhoneNumber, validateEmail } from './modules/validation.mjs';
+import { fetchWalletDetails, handleUpdateCoins } from './modules/wallet.mjs';
 
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', () => {
+    initPage();
+});
+
+async function initPage() {
+    console.log("DOM volledig geladen en geparsed");
+
     // Load the header and footer
     Main.loadHeader();
     Main.loadFooter();
 
-    // Get the authentication token
-    const token = Auth.getToken();
-    if (!token) {
-        alert('Je bent niet ingelogd.');
-        window.location.href = '/login.html';
-        return;
+    try {
+        const user = await getUserProfile();
+        if (!user) return;
+
+        populateForm(user);
+        configureUserSpecificSettings(user);
+
+        loadBlockedUsers(user.userId, Auth.getToken());
+        console.log("Geblokkeerde gebruikers geladen");
+
+        // Fetch and display the wallet details
+        const coinBalance = await fetchWalletDetails();
+        if (coinBalance !== null) {
+            document.getElementById('boerenkoolCoins').value = coinBalance;
+        }
+
+    } catch (error) {
+        alert('Kon gebruikersinformatie niet ophalen.');
+        console.error("Fout bij het ophalen van gebruikersinformatie:", error);
     }
 
-    let userId;
+    setupEventListeners();
+}
+
+async function getUserProfile() {
+    try {
+        console.log("Auth object:", Auth);
+        console.log("Checken of gebruiker is ingelogd...");
+
+        if (typeof Auth.checkIfLoggedIn !== "function") {
+            console.error("Auth.checkIfLoggedIn is geen functie");
+            return null;
+        }
+
+        const user = await Auth.checkIfLoggedIn();
+        console.log("Gebruiker opgehaald:", user);
+        return user;
+    } catch (error) {
+        console.error("Fout bij het ophalen van gebruikersinformatie:", error);
+        return null;
+    }
+}
+
+function populateForm(user) {
+    document.getElementById('username').value = user.username;
+    document.getElementById('email').value = user.email;
+    document.getElementById('phone').value = user.phone;
+    document.getElementById('firstName').value = user.firstName;
+    document.getElementById('infix').value = user.infix;
+    document.getElementById('lastName').value = user.lastName;
+
+    console.log("Formulier gevuld met gebruikersdetails");
+
+    const typeOfUserSelect = document.getElementById('typeOfUser');
+    typeOfUserSelect.value = user.typeOfUser;
+
+    if (user.typeOfUser === "Verhuurder") {
+        typeOfUserSelect.disabled = true;
+        console.log("Gebruiker is 'Verhuurder', dropdown gedeactiveerd");
+    }
+}
+
+function configureUserSpecificSettings(user) {
+    // Eventuele andere configuraties gebaseerd op de gebruikersrol of instellingen
+}
+
+function setupEventListeners() {
+    // Event listeners voor verschillende knoppen en formulierelementen
+    document.getElementById('profileForm').addEventListener('submit', updateProfile);
+    document.getElementById('updateCoinsBtn').addEventListener('click', handleUpdateCoins);
+    document.getElementById('deleteProfileBtn').addEventListener('click', deleteProfile);
+    document.getElementById('block-user-btn').addEventListener('click', () => {
+        const userId = document.getElementById('userId').value;
+        blockUser(userId, Auth.getToken());
+    });
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+        Auth.logout();
+        window.location.href = '/login.html';
+    });
+}
+
+async function updateProfile(event) {
+    event.preventDefault();
+
+    const profileData = {
+        username: document.getElementById('username').value,
+        email: document.getElementById('email').value,
+        phone: document.getElementById('phone').value,
+        firstName: document.getElementById('firstName').value,
+        infix: document.getElementById('infix').value,
+        lastName: document.getElementById('lastName').value,
+        typeOfUser: document.getElementById('typeOfUser').value
+    };
 
     try {
-        // Fetch user details to get the userId
         const response = await fetch('/api/users/profile', {
-            method: 'GET',
-            headers: { 'Authorization': token }
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': Auth.getToken()
+            },
+            body: JSON.stringify(profileData)
         });
 
         if (!response.ok) {
-            throw new Error('Kon gebruikersinformatie niet ophalen.');
+            throw new Error('Kon profiel niet updaten.');
         }
 
-        const user = await response.json();
-        userId = user.userId;
-
-        if (!userId) {
-            throw new Error('Gebruikers-ID niet gevonden.');
-        }
-
-        console.log('Gebruikers-ID:', userId);
-
-        // Update the UI with the user's details, including the coin balance
-        document.getElementById('username').value = user.username;
-        document.getElementById('email').value = user.email;
-        document.getElementById('phone').value = user.phone;
-        document.getElementById('firstName').value = user.firstName;
-        document.getElementById('infix').value = user.infix;
-        document.getElementById('lastName').value = user.lastName;
-
-        const coins = user.coinBalance || 0;  // Use coinBalance instead of boerenkoolCoins
-        document.getElementById('boerenkoolCoins').value = coins;
-
-        console.log('Gebruikersinformatie geladen:', user);
-
-        // Event listener for updating BoerenkoolCoins
-        document.getElementById('updateCoinsBtn').addEventListener('click', async () => {
-            try {
-                const currentCoins = parseInt(document.getElementById('boerenkoolCoins').value, 10) || 0;
-                const newCoins = currentCoins + 100;
-
-                const response = await fetch('/api/users/update-coins', {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': token
-                    },
-                    body: JSON.stringify({ boerenkoolCoins: newCoins })
-                });
-
-                if (!response.ok) {
-                    throw new Error('Kon BoerenkoolCoins niet updaten.');
-                }
-
-                document.getElementById('boerenkoolCoins').value = newCoins;
-                alert('BoerenkoolCoins succesvol bijgewerkt!');
-            } catch (error) {
-                console.error('Fout bij het updaten van BoerenkoolCoins:', error);
-                alert('Fout bij het updaten van BoerenkoolCoins');
-            }
-        });
-
-        // Load blocked users
-        loadBlockedUsers(userId, token);
-
+        alert('Profiel succesvol bijgewerkt!');
     } catch (error) {
-        console.error('Fout bij het laden van profielgegevens:', error);
-        alert('Kon profiel niet laden.');
+        alert('Fout bij het bijwerken van profielgegevens.');
+        console.error(error);
+    }
+}
+
+async function deleteProfile() {
+    if (!confirm('Weet je zeker dat je je profiel wilt verwijderen? Dit kan niet ongedaan worden gemaakt.')) {
+        return;
     }
 
-    // Event listener for blocking users
-    document.getElementById('block-user-btn').addEventListener('click', () => {
-        console.log('Blokkeer Gebruiker knop ingedrukt.');
-        blockUser(userId, token);
-    });
+    try {
+        const response = await fetch('/api/users/profile', {
+            method: 'DELETE',
+            headers: { 'Authorization': Auth.getToken() }
+        });
 
-    // Initial load of blocked users
-    loadBlockedUsers(userId, token);
+        if (!response.ok) {
+            throw new Error('Kon profiel niet verwijderen.');
+        }
 
-    // Event listener for logout button
-    document.getElementById('logoutBtn').addEventListener('click', () => {
+        alert('Profiel succesvol verwijderd!');
         Auth.logout();
-    });
-});
+        window.location.href = '/register.html';
+    } catch (error) {
+        alert('Fout bij het verwijderen van profiel.');
+        console.error(error);
+    }
+}

@@ -1,6 +1,7 @@
 package boerenkool.communication.controller;
 
 import boerenkool.business.model.User;
+import boerenkool.business.service.LoginAttemptService;
 import boerenkool.business.service.RegistrationService;
 import boerenkool.communication.dto.LoginDTO;
 import boerenkool.communication.dto.PasswordResetDto;
@@ -28,11 +29,13 @@ public class RegistrationController {
 
     private final RegistrationService registrationService;
     private final AuthorizationService authorizationService;
+    private final LoginAttemptService loginAttemptService;
 
     @Autowired
-    public RegistrationController(RegistrationService registrationService, AuthorizationService authorizationService) {
+    public RegistrationController(RegistrationService registrationService, AuthorizationService authorizationService, LoginAttemptService loginAttemptService) {
         this.registrationService = registrationService;
         this.authorizationService = authorizationService;
+        this.loginAttemptService = loginAttemptService;
     }
 
     @PostMapping
@@ -47,17 +50,37 @@ public class RegistrationController {
 
     @PostMapping("/login")
     public ResponseEntity<UserDto> loginHandler(@RequestBody LoginDTO loginDTO) throws LoginException {
-        User user = registrationService.validateLogin(
-                loginDTO.getUsername(), loginDTO.getPassword());
-        if (user != null) {
-            TokenUserPair tokenUserPair = authorizationService.authorize(user);
-            return ResponseEntity.ok()
-                    .header("Authorization", tokenUserPair.getKey().toString())
-                    .body(new UserDto(user));
-        } else {
-            throw new LoginException("Login failed");
+        String username = loginDTO.getUsername();
+
+        // Check if the user is currently locked out
+        if (loginAttemptService.isBlocked(username)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(null); // Or return a custom message indicating the lockout
+        }
+
+        try {
+            User user = registrationService.validateLogin(username, loginDTO.getPassword());
+
+            if (user != null) {
+                // Reset the login attempts on successful login
+                loginAttemptService.loginSucceeded(username);
+
+                TokenUserPair tokenUserPair = authorizationService.authorize(user);
+                return ResponseEntity.ok()
+                        .header("Authorization", tokenUserPair.getKey().toString())
+                        .body(new UserDto(user));
+            } else {
+                // Increment the failed login attempts
+                loginAttemptService.loginFailed(username);
+                throw new LoginException("Login failed");
+            }
+        } catch (LoginException e) {
+            // Increment the failed login attempts on exception
+            loginAttemptService.loginFailed(username);
+            throw e;
         }
     }
+
 
 
     @PostMapping("/reset-password")
