@@ -89,22 +89,19 @@ export function getListOfHousesByURL(url) {
 
                 let linkToDetails = document.createElement('a');
                 linkToDetails.className = 'house-link';
-                linkToDetails.href = 'huisje?id=' + house.houseId + '&naam=' + seoFriendlyName;
+                linkToDetails.href = 'huisdetail?id=' + house.houseId + '&naam=' + seoFriendlyName;
                 
-                
-
-
                 let outerDiv = document.createElement('div');
                 outerDiv.className = 'huisje';
 
                 let thumbnail = document.createElement('img');
                 thumbnail.alt = house.houseName;
-                thumbnail.src = './images/notAvailable.png'
-                // console.log(thumbnail.src)
-
-                /* TODO:
-                thumbnail.src = `data:image/jpeg;base64,${house.picture}`; */
-
+                
+                if (house.picture !== null) {
+                    thumbnail.src = `data:${house.picture.mimeType};base64,${house.picture.base64Picture}`;    
+                } else {
+                    thumbnail.src = './images/notAvailable.png';
+                }
 
                 let innerDiv = document.createElement('div');
                 innerDiv.className = 'huisje-details';
