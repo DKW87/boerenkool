@@ -98,12 +98,18 @@ public class UserController {
         Optional<User> userOpt = authorizationService.validate(UUID.fromString(token));
         if (userOpt.isPresent()) {
             User user = userOpt.get();
+            // Prevent a "Verhuurder" from changing their type
+            if ("Verhuurder".equals(user.getTypeOfUser()) && !"Verhuurder".equals(userDto.getTypeOfUser())) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Verhuurder users cannot change their user type.");
+            }
             if (user.getUsername().equals(userDto.getUsername())) {
                 user.setEmail(userDto.getEmail());
                 user.setPhone(userDto.getPhone());
                 user.setFirstName(userDto.getFirstName());
                 user.setInfix(userDto.getInfix());
                 user.setLastName(userDto.getLastName());
+                user.setTypeOfUser(userDto.getTypeOfUser());
+
                 userService.updateOne(user);
                 return ResponseEntity.ok("User updated successfully");
             }
