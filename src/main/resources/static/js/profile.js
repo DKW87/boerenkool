@@ -3,43 +3,34 @@
 // Import necessary modules
 import * as Main from './modules/main.mjs';
 import * as Auth from './modules/auth.mjs';
-import { showNotification } from './modules/notification.mjs';
 import { loadBlockedUsers, blockUser } from './blockedUsers.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
+    console.log("DOM fully loaded and parsed"); // Debugging: Check if DOM is loaded
+
     // Load the header and footer
     Main.loadHeader();
     Main.loadFooter();
 
-    // Get the authentication token
-    const token = Auth.getToken();
-    if (!token) {
-        showNotification('Je bent niet ingelogd.', 'error');
-        window.location.href = '/login.html';
-        return;
-    }
-
-    let userId;
-
     try {
-        // Fetch and populate profile details
-        const response = await fetch('/api/users/profile', {
-            method: 'GET',
-            headers: { 'Authorization': token }
-        });
+        console.log("Auth object:", Auth); // Debugging: Check the Auth object contents
+        console.log("Checking if user is logged in..."); // Debugging
 
-        if (!response.ok) {
-            throw new Error('Kon gebruikersinformatie niet ophalen.');
+        // Check if the user is logged in and get their profile
+        if (typeof Auth.checkIfLoggedIn !== "function") {
+            console.error("Auth.checkIfLoggedIn is not a function"); // Debugging: Function not found
         }
 
-        const user = await response.json();
-        userId = user.userId;
+        const user = await Auth.checkIfLoggedIn(); // This line should work if the function exists
+        console.log("User fetched:", user); // Debugging: Display user details
 
-        if (!userId) {
-            throw new Error('Gebruikers-ID niet gevonden.');
+        if (!user) {
+            console.log("No user found, exiting..."); // Debugging: User not logged in
+            return; // If not logged in, exit
         }
 
-        console.log('Gebruikers-ID:', userId);
+        const userId = user.userId;
+        console.log("User ID:", userId); // Debugging: Display user ID
 
         // Populate the form with the user's details
         document.getElementById('username').value = user.username;
@@ -50,6 +41,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('lastName').value = user.lastName;
         document.getElementById('boerenkoolCoins').value = user.coinBalance || 0;
 
+        console.log("Form populated with user details"); // Debugging
+
         // Populate the typeOfUser dropdown
         const typeOfUserSelect = document.getElementById('typeOfUser');
         typeOfUserSelect.value = user.typeOfUser;
@@ -57,14 +50,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Disable the dropdown if the user is a "Verhuurder"
         if (user.typeOfUser === "Verhuurder") {
             typeOfUserSelect.disabled = true;
+            console.log("User is 'Verhuurder', disabling typeOfUser dropdown"); // Debugging
         }
 
         // Load blocked users
-        loadBlockedUsers(userId, token);
+        loadBlockedUsers(userId, Auth.getToken());
+        console.log("Blocked users loaded"); // Debugging
 
     } catch (error) {
-        showNotification('Kon gebruikersinformatie niet ophalen.', 'error');
-        console.error(error);
+        alert('Kon gebruikersinformatie niet ophalen.');
+        console.error("Error fetching user information:", error); // Debugging: Display error details
     }
 
     // Event listener for updating profile information
@@ -86,7 +81,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': token
+                    'Authorization': Auth.getToken()
                 },
                 body: JSON.stringify(profileData)
             });
@@ -95,7 +90,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 throw new Error('Kon profiel niet updaten.');
             }
 
-            showNotification('Profiel succesvol bijgewerkt!', 'success');
+            alert('Profiel succesvol bijgewerkt!');
         } catch (error) {
             alert('Fout bij het bijwerken van profielgegevens.');
             console.error(error);
@@ -112,7 +107,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': token
+                    'Authorization': Auth.getToken()
                 },
                 body: JSON.stringify({ boerenkoolCoins: newCoins })
             });
@@ -138,7 +133,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             const response = await fetch('/api/users/profile', {
                 method: 'DELETE',
-                headers: { 'Authorization': token }
+                headers: { 'Authorization': Auth.getToken() }
             });
 
             if (!response.ok) {
@@ -157,7 +152,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Event listener for blocking users
     document.getElementById('block-user-btn').addEventListener('click', () => {
         console.log('Blokkeer Gebruiker knop ingedrukt.');
-        blockUser(userId, token);
+        blockUser(userId, Auth.getToken());
     });
 
     // Event listener for logout button
