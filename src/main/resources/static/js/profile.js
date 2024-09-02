@@ -50,6 +50,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('lastName').value = user.lastName;
         document.getElementById('boerenkoolCoins').value = user.coinBalance || 0;
 
+        // Populate the typeOfUser dropdown
+        const typeOfUserSelect = document.getElementById('typeOfUser');
+        typeOfUserSelect.value = user.typeOfUser;
+
+        // Disable the dropdown if the user is a "Verhuurder"
+        if (user.typeOfUser === "Verhuurder") {
+            typeOfUserSelect.disabled = true;
+        }
+
         // Load blocked users
         loadBlockedUsers(userId, token);
 
@@ -68,7 +77,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             phone: document.getElementById('phone').value,
             firstName: document.getElementById('firstName').value,
             infix: document.getElementById('infix').value,
-            lastName: document.getElementById('lastName').value
+            lastName: document.getElementById('lastName').value,
+            typeOfUser: document.getElementById('typeOfUser').value // Include the typeOfUser
         };
 
         try {
