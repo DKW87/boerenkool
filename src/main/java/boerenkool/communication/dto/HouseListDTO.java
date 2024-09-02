@@ -9,7 +9,7 @@ public class HouseListDTO {
 
     // attributes
     int houseId;
-    byte[] picture;
+    PictureDTO picture;
     String houseName;
     String houseType;
     String province;
@@ -23,7 +23,7 @@ public class HouseListDTO {
         this.houseId = houseId;
     }
 
-    public void setPicture(byte[] picture) {
+    public void setPicture(PictureDTO picture) {
         this.picture = picture;
     }
 
@@ -52,7 +52,7 @@ public class HouseListDTO {
         return houseId;
     }
 
-    public byte[] getPicture() {
+    public PictureDTO getPicture() {
         return picture;
     }
 

@@ -1,6 +1,11 @@
 :root {
-    --boerenkool-groen: darkolivegreen;
-    --boerenkool-paars: rgb(169, 117, 222);
+    --boerenkool-groen: #556B2F; /* main color for header/footer, but also buttons or background color of a main element */
+    --boerenkool-paars: #a975de; /* secondary color for h1/h2/h3 or links on white/purple background */
+    --boerenkool-lichtgroen: #718E3F; /* lighter green accent for when main isn't enough */
+    --boerenkool-lichtpaars: #DAC4F1; /* lighter purple accent for when main isn't enough */
+    --boerenkool-zwart: black; /* regular text color, maybe as an outline/border color */
+    --boerenkool-wit: white; /* main background color, mostly as main background but for an element is ok */
+    --boerenkool-grijs: #f5f5f5; /* secondary background color, mostly for an element but as main background is ok */
     --font-size-large: 18px;
     --font-size-small: 12px;
 }
