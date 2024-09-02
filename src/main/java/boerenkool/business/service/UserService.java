@@ -2,12 +2,14 @@ package boerenkool.business.service;
 
 import boerenkool.business.model.User;
 import boerenkool.database.repository.UserRepository;
+import boerenkool.utilities.exceptions.MessageDoesNotExistException;
 import boerenkool.utilities.exceptions.UserNotFoundException;
 import boerenkool.utilities.exceptions.UserUpdateFailedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -74,4 +76,14 @@ public class UserService {
         return userRepository.getUsernameById(id);
     }
 
+
+    //code Bart
+    public List<Map<String, Object>> getMapOfCorrespondents(int userId) throws MessageDoesNotExistException {
+        Optional<List<Map<String, Object>>> mapOfCorrespondents = userRepository.getMapOfCorrespondents(userId);
+        if (mapOfCorrespondents.isEmpty()) {
+            throw new MessageDoesNotExistException();
+        } else {
+            return mapOfCorrespondents.get();
+        }
+    }
 }

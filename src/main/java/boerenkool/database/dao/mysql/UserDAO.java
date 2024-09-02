@@ -4,6 +4,7 @@ import boerenkool.business.model.User;
 import boerenkool.database.dao.GenericDAO;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -82,6 +83,9 @@ public interface UserDAO extends GenericDAO<User> {
     boolean updateBoerenkoolCoins (int userId, int newCoins);
 
     Optional<String> getUsernameById(int userId);
+
+    Optional<List<Map<String, Object>>> getMapOfCorrespondents(int userId);
+
 }
 
 

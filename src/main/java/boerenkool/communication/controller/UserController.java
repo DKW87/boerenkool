@@ -4,6 +4,7 @@ import boerenkool.business.model.User;
 import boerenkool.business.service.UserService;
 import boerenkool.communication.dto.UserDto;
 import boerenkool.utilities.authorization.AuthorizationService;
+import boerenkool.utilities.exceptions.MessageDoesNotExistException;
 import boerenkool.utilities.exceptions.UserNotFoundException;
 import boerenkool.utilities.exceptions.UserUpdateFailedException;
 import org.slf4j.Logger;
@@ -132,6 +133,25 @@ public class UserController {
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
     }
+
+    //code Bart
+    @GetMapping(value = "/correspondents")
+    public ResponseEntity<Object> getMapOfCorrespondents(@RequestHeader("Authorization") String token)
+            throws MessageDoesNotExistException {
+        Optional<User> userOpt = authorizationService.validate(UUID.fromString(token));
+        if (userOpt.isPresent()) {
+            return new ResponseEntity<>(userService.getMapOfCorrespondents(userOpt.get().getUserId()), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
+
+    @GetMapping(value = "/username{userid}")
+    public ResponseEntity<String> getUsernameById(@RequestParam("userid") int userId) {
+        String username = userService.getUsernameById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User with userId '" + userId + "' not found."));
+        return ResponseEntity.ok(username);
+    }
+
 
 }
 
