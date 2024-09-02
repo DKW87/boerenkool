@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="nl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HuisjeBoompjeBoerenkool - Stuur een bericht</title>
+
+    <!-- stylesheets -->
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/header.css">
+    <link rel="stylesheet" href="css/messages.css">
+    <link rel="stylesheet" href="css/footer.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playwrite+BE+VLG:wght@100..400&family=Playwrite+PE:wght@100..400&display=swap"
+        rel="stylesheet">
+    <script src="js/send-a-message.js" type="module"></script>
+</head>
+
+<body>
+    <div class="main-grid-area">
+
+        <div class="header-div" id="header"></div>
+
+        <div class="messageGridArea">
+
+            <form class="messageSingleView" id="writeMessageForm" onsubmit="return false">
+                <button id="sendMessageButton">Verstuur dit bericht</button>
+                <button id="goToMessages">Mijn berichten</button>
+
+                <div>
+                    <label for="senderIdField">senderId : </label>
+                    <input type="text" id="senderIdField" name="senderId" required>
+                </div>
+
+                <div>
+                    <label for="receiverIdField">receiverId : </label>
+                    <input type="text" id="receiverIdField" name="receiverId" required>
+                </div>
+
+                <div>
+                    <label for="usernameField">Gebruikersnaam : </label>
+                    <input type="text" id="usernameField" name="username" required
+                        oninvalid="this.setCustomValidity('Voer de gebruikersnaam in')"
+                        oninput="this.setCustomValidity('')">
+                </div>
+
+                <div>
+                    <label for="subjectField">Onderwerp : </label>
+                    <input type="text" id="subjectField" name="subject" required
+                        oninvalid="this.setCustomValidity('Voer een onderwerp in')"
+                        oninput="this.setCustomValidity('')">
+                </div>
+
+                <div>
+                    <label for="bodyField">Bericht : </label>
+                    <input type="text" id="bodyField" name="body" required
+                        oninvalid="this.setCustomValidity('Voer een bericht in')" 
+                        oninput="this.setCustomValidity('')">
+                </div>
+            </form>
+        </div>
+
+        <div class="footer-div" id="footer"></div>
+    </div>
+</body>
+
+</html>

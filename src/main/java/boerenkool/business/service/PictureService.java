@@ -12,8 +12,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
+
+import static org.springframework.http.MediaType.*;
 
 @Service
 public class PictureService {
@@ -54,43 +57,62 @@ public class PictureService {
         HttpHeaders headers = new HttpHeaders();
         String imageFormat = detectImageFormat(imageBytes);
 
-        if ("png".equalsIgnoreCase(imageFormat)) {
-            headers.setContentType(MediaType.IMAGE_PNG);
-        } else if ("jpeg".equalsIgnoreCase(imageFormat) || "jpg".equalsIgnoreCase(imageFormat)) {
-            headers.setContentType(MediaType.IMAGE_JPEG);
-        } else {
-            return new ResponseEntity<>(HttpStatus.UNSUPPORTED_MEDIA_TYPE);
+        switch (imageFormat) {
+            case IMAGE_PNG_VALUE:
+                headers.setContentType(MediaType.IMAGE_PNG);
+                break;
+            case IMAGE_JPEG_VALUE:
+                headers.setContentType(MediaType.IMAGE_JPEG);
+                break;
+            case IMAGE_GIF_VALUE:
+                headers.setContentType(MediaType.IMAGE_GIF);
+                break;
+            default:
+                return new ResponseEntity<>(HttpStatus.UNSUPPORTED_MEDIA_TYPE);
         }
         return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
     }
 
-
     public String detectImageFormat(byte[] imageBytes) {
-        if (imageBytes.length >= 4) {
-            // Check PNG signature
-            if ((imageBytes[0] & 0xFF) == 0x89 &&
-                    (imageBytes[1] & 0xFF) == 0x50 &&
-                    (imageBytes[2] & 0xFF) == 0x4E &&
-                    (imageBytes[3] & 0xFF) == 0x47) {
-                return "png";
-            }
-
-            // Check JPEG signature
-            if ((imageBytes[0] & 0xFF) == 0xFF &&
-                    (imageBytes[1] & 0xFF) == 0xD8 &&
-                    (imageBytes[2] & 0xFF) == 0xFF) {
-                return "jpeg";
-            }
+        if (imageBytes == null || imageBytes.length < 4) {
+            return "unknown"; // Return "unknown" if imageBytes is null or too short
         }
-        return null;
+
+        // Check PNG signature
+        if ((imageBytes[0] & 0xFF) == 0x89 &&
+                (imageBytes[1] & 0xFF) == 0x50 &&
+                (imageBytes[2] & 0xFF) == 0x4E &&
+                (imageBytes[3] & 0xFF) == 0x47) {
+            return IMAGE_PNG_VALUE;
+        }
+
+        // Check JPEG signature
+        if ((imageBytes[0] & 0xFF) == 0xFF &&
+                (imageBytes[1] & 0xFF) == 0xD8 &&
+                (imageBytes[2] & 0xFF) == 0xFF) {
+            return IMAGE_JPEG_VALUE;
+        }
+
+        // Check GIF signature
+        if ((imageBytes[0] & 0xFF) == 0x47 &&
+                (imageBytes[1] & 0xFF) == 0x49 &&
+                (imageBytes[2] & 0xFF) == 0x46 &&
+                (imageBytes[3] & 0xFF) == 0x38) {
+            return IMAGE_GIF_VALUE;
+        }
+        return "unknown";
     }
 
+    public PictureDTO convertToDTO(Picture picture) {
+        byte[] imageBytes = picture.getPicture();
+        String base64Picture = Base64.getEncoder().encodeToString(imageBytes);
+        String mimeType = detectImageFormat(imageBytes);
 
-
-
-
-
-
-
+        return new PictureDTO(
+                picture.getHouseId(),
+                base64Picture,
+                mimeType,
+                picture.getDescription());
+    }
 
 }
