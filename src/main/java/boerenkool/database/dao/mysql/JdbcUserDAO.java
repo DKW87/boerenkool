@@ -15,6 +15,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Repository
@@ -215,6 +216,20 @@ public class JdbcUserDAO implements UserDAO {
             return Optional.empty();
         } else {
             return Optional.of(usernames.get(0));
+        }
+    }
+
+    //code Bart
+    @Override
+    public Optional<List<Map<String, Object>>> getMapOfCorrespondents(int userId) {
+        String sql = "SELECT userId, username FROM `User` WHERE userId in " +
+                "(SELECT receiverId FROM Message WHERE senderId = ?) " +
+                "OR userId IN (SELECT senderId FROM Message WHERE receiverId = ?)";
+        List<Map<String, Object>> queryResults = jdbcTemplate.queryForList(sql, userId, userId);
+        if (queryResults.isEmpty()) {
+            return Optional.empty();
+        } else {
+            return Optional.of(queryResults);
         }
     }
 

@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,18 +55,24 @@ public class ReservationController {
         logger.info("Fetched all reservations.");
         return new ResponseEntity<>(reservationDTOs, HttpStatus.OK);
     }
+
     @GetMapping("/reservations-by-userId/{userId}")
     public ResponseEntity<List<ReservationDTO>> getAllReservationByUserId(@PathVariable int userId) {
-        List<Reservation> reservations = reservationService.getAllReservationsByUserId(userId);
-        if (reservations.isEmpty()) {
-            logger.warn("No reservations found.");
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        try {
+            List<ReservationDTO> reservationDTOs = reservationService.getReservationsByUserId(userId);
+
+            if (reservationDTOs.isEmpty()) {
+                logger.warn("No reservations found for user ID: {}", userId);
+                return ResponseEntity.notFound().build();
+            }
+
+            logger.info("Fetched reservations for user ID: {}", userId);
+            return ResponseEntity.ok(reservationDTOs);
+
+        } catch (RuntimeException e) {
+            logger.error("Error fetching reservations for user ID: {}", userId, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-        List<ReservationDTO> reservationDTOs = reservations.stream()
-                .map(reservationService::convertToDto)
-                .toList();
-        logger.info("Fetched all reservations.");
-        return new ResponseEntity<>(reservationDTOs, HttpStatus.OK);
     }
 
     // 2. GET /api/reservations/{id} - Get a specific reservation by ID
@@ -105,7 +113,7 @@ public class ReservationController {
     }
 
     // 4. DELETE /api/reservations/{id} - Cancel a reservation
-    @DeleteMapping("/{id}")
+   /* @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteReservationById(@PathVariable int id) {
         try {
             boolean isDeleted = reservationService.deleteReservationById(id);
@@ -120,10 +128,46 @@ public class ReservationController {
             logger.error("Error deleting reservation", e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }*/
+
+    @DeleteMapping("/{userId}/reservations/{reservationId}")
+    public ResponseEntity<Void> deleteReservationById(@PathVariable int userId, @PathVariable int reservationId) {
+        try {
+            Optional<Reservation> reservationOpt = reservationService.getReservationById(reservationId);
+            if (reservationOpt.isEmpty()) {
+                logger.warn("Reservation with ID: {} not found.", reservationId);
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+
+            User user = userService.getOneById(userId)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            Reservation reservation = reservationOpt.get();
+            boolean isAuthorized = reservationService.isUserAuthorizedToDeleteReservation(user, reservation);
+
+            if (!isAuthorized) {
+                logger.warn("User with ID: {} is not authorized to delete reservation with ID: {}", userId, reservationId);
+                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            }
+
+            boolean isDeleted = reservationService.deleteReservationById(reservationId);
+            if (isDeleted) {
+                logger.info("User with ID: {} deleted reservation with ID: {}", userId, reservationId);
+                return new ResponseEntity<>(HttpStatus.OK);
+            } else {
+                logger.warn("Failed to delete reservation with ID: {}", reservationId);
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+
+        } catch (Exception e) {
+            logger.error("Error deleting reservation", e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
+
     // 5. DELETE /api/user/{userId}/reservations?reservationId={reservationId} - Tenant or Landlord cancels reservation
-    @DeleteMapping("/users/{userId}/cancel")
+    /*@DeleteMapping("/users/{userId}/cancel")
     public ResponseEntity<?> cancelReservation(@PathVariable int userId, @RequestParam int reservationId) {
         Optional<Reservation> reservation = reservationService.getReservationById(reservationId);
 
@@ -166,7 +210,7 @@ public class ReservationController {
             logger.warn("Reservation with ID: {} not found.", reservationId);
             return new ResponseEntity<>("Reservation not found.", HttpStatus.NOT_FOUND);
         }
-    }
+    }*/
 
     // 7. CREATE
     @PostMapping
