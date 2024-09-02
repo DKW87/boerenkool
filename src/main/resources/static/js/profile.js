@@ -97,7 +97,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             showNotification('Profiel succesvol bijgewerkt!', 'success');
         } catch (error) {
-            showNotification('Fout bij het bijwerken van profielgegevens.', 'error');
+            alert('Fout bij het bijwerken van profielgegevens.');
             console.error(error);
         }
     });
@@ -122,9 +122,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             document.getElementById('boerenkoolCoins').value = currentCoins + newCoins; // Update the input field
-            showNotification('BoerenkoolCoins succesvol bijgewerkt!', 'success');
+            alert('BoerenkoolCoins succesvol bijgewerkt!');
         } catch (error) {
-            showNotification('Fout bij het updaten van BoerenkoolCoins.', 'error');
+            alert('Fout bij het updaten van BoerenkoolCoins.');
             console.error(error);
         }
     });
@@ -145,11 +145,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 throw new Error('Kon profiel niet verwijderen.');
             }
 
-            showNotification('Profiel succesvol verwijderd!', 'success');
+            alert('Profiel succesvol verwijderd!');
             Auth.logout();
             window.location.href = '/register.html';
         } catch (error) {
-            showNotification('Fout bij het verwijderen van profiel.', 'error');
+            alert('Fout bij het verwijderen van profiel.');
             console.error(error);
         }
     });
