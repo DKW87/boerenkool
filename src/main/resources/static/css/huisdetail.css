@@ -1,0 +1,26 @@
+#house-details {
+    font-family: Arial, sans-serif;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+#house-details h1 {
+    font-size: 2em;
+    margin-bottom: 0.5em;
+}
+
+#house-details p {
+    margin: 0.5em 0;
+}
+
+.house-picture {
+    width: 100%;
+    max-width: 300px;
+    margin: 10px 0;
+}
+
+#extraFeatures {
+    list-style-type: square;
+    padding-left: 20px;
+}
