@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/pictures")
@@ -30,16 +31,15 @@ public class PictureController {
     }
 
 
+
     @GetMapping("/houses/{houseId}")
     public ResponseEntity<?> getPicturesByHouseId(@PathVariable("houseId") int houseId) {
-        Optional<List<Picture>> optionalPictures = Optional.ofNullable(pictureService.getAllByHouseId(houseId));
+        List<Picture> pictureList = pictureService.getAllByHouseId(houseId);
+        if (pictureList != null && !pictureList.isEmpty()) {
+            List<PictureDTO> pictureDTOList = pictureList.stream().map(pictureService::convertToDTO).collect(Collectors.toList());
 
-        if (optionalPictures.isPresent() && !optionalPictures.get().isEmpty()) {
-            List<PictureDTO> pictureDTOs = optionalPictures.get().stream()
-                    .map(pictureService::convertToDTO)
-                    .toList();
+            return new ResponseEntity<>(pictureDTOList, HttpStatus.OK);
 
-            return new ResponseEntity<>(pictureDTOs, HttpStatus.OK);
         } else {
             return new ResponseEntity<>("No images found for this house ID", HttpStatus.NOT_FOUND);
         }
