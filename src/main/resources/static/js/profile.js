@@ -102,32 +102,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // Event listener for updating BoerenkoolCoins
-    document.getElementById('updateCoinsBtn').addEventListener('click', async () => {
-        try {
-            const currentCoins = parseInt(document.getElementById('boerenkoolCoins').value, 10) || 0;
-            const newCoins = 100; // Adding 100 to the current balance
 
-            const response = await fetch('/api/users/update-coins', {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': token
-                },
-                body: JSON.stringify({ boerenkoolCoins: newCoins })
-            });
-
-            if (!response.ok) {
-                throw new Error('Kon BoerenkoolCoins niet updaten.');
-            }
-
-            document.getElementById('boerenkoolCoins').value = currentCoins + newCoins; // Update the input field
-            alert('BoerenkoolCoins succesvol bijgewerkt!');
-        } catch (error) {
-            alert('Fout bij het updaten van BoerenkoolCoins.');
-            console.error(error);
-        }
-    });
 
     // Event listener for deleting profile
     document.getElementById('deleteProfileBtn').addEventListener('click', async () => {
