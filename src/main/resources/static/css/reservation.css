@@ -1,49 +1,73 @@
+/* reservation.css */
 body {
     font-family: Arial, sans-serif;
     margin: 0;
+    padding: 0;
+}
+
+.main-grid-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.header-div {
+    width: 100%;
+}
+
+.body-div {
+    width: 100%;
+    max-width: 800px;
     padding: 20px;
-    background-color: #f9f9f9;
-    color: #333;
 }
 
 h1 {
+    font-size: 2em;
     text-align: center;
+    margin-bottom: 10px;
 }
 
-section {
-    margin-bottom: 30px;
+#make-reservation {
+    margin-top: 20px;
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+#make-reservation h2 {
+    font-size: 1.5em;
+    margin-bottom: 10px;
 }
 
 form {
     display: flex;
     flex-direction: column;
-    max-width: 400px;
-    margin: auto;
 }
 
-label {
-    margin-bottom: 5px;
+form label {
+    margin-top: 10px;
+    font-weight: bold;
 }
 
-input {
-    margin-bottom: 15px;
+form input {
+    padding: 8px;
+    margin-top: 5px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+form button {
+    margin-top: 20px;
     padding: 10px;
-    font-size: 1em;
-}
-
-button {
-    padding: 10px;
-    background-color: #5c6bc0;
+    background-color: var(--boerenkool-paars);
     color: white;
     border: none;
+    border-radius: 4px;
     cursor: pointer;
 }
 
-button:hover {
-    background-color: #3949ab;
-}
-
-#reservation-result, #cancel-result {
-    margin-top: 15px;
-    font-weight: bold;
+form button:hover {
+    background-color: #4865c2;
 }

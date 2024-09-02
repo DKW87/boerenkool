@@ -31,7 +31,10 @@ document.addEventListener('DOMContentLoaded', function() {
         })
             .then(response => response.json())
             .then(data => {
-                document.getElementById('reservation-result').textContent = `Reservation successful: ID ${data.reservationId}`;
+                document.getElementById('reservation-result').textContent = `Reservering is aangemaakt: ID ${data.reservationId}`;
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
             })
             .catch(error => {
                 document.getElementById('reservation-result').textContent = `Error: ${error.message}`;

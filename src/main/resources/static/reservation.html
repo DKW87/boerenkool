@@ -1,45 +1,41 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="nl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reservation System</title>
+    <title>Nieuwe Reservering</title>
     <link rel="stylesheet" href="css/reservation.css">
     <link rel="stylesheet" href="css/global.css">
     <link rel="stylesheet" href="css/header.css">
     <link rel="stylesheet" href="css/footer.css">
-
-
 </head>
 <body>
 <div class="main-grid-area">
+    <header id="header" class="header-div"></header>
 
-    <div class="header-div" id="header"></div><!-- loads header here -->
+    <main id="body" class="body-div">
 
-    <div class="body-div" id="body"></div><!-- loads body here -->
+        <section id="make-reservation">
+            <h2>Maak een Reservering</h2>
+            <form id="reservation-form">
+                <label for="houseId">Huis ID:</label>
+                <input type="number" id="houseId" name="houseId" required>
+                <label for="userId">Gebruiker ID:</label>
+                <input type="number" id="userId" name="userId" required>
+                <label for="guestCount">Aantal Gasten:</label>
+                <input type="number" id="guestCount" name="guestCount" required>
+                <label for="startDate">Startdatum:</label>
+                <input type="date" id="startDate" name="startDate" required>
+                <label for="endDate">Einddatum:</label>
+                <input type="date" id="endDate" name="endDate" required>
+                <button type="submit">Verstuur Reservering</button>
+            </form>
+            <div id="reservation-result"></div>
+        </section>
+    </main>
 
+    <footer id="footer" class="footer-div"></footer>
 </div>
-<h1>Reservation System</h1>
-
-<section id="make-reservation">
-    <h2>Make a Reservation</h2>
-    <form id="reservation-form">
-        <label for="houseId">House ID:</label>
-        <input type="number" id="houseId" name="houseId" required>
-        <label for="userId">User ID:</label>
-        <input type="number" id="userId" name="userId" required>
-        <label for="guestCount">Guest Count:</label>
-        <input type="number" id="guestCount" name="guestCount" required>
-        <label for="startDate">Start Date:</label>
-        <input type="date" id="startDate" name="startDate" required>
-        <label for="endDate">End Date:</label>
-        <input type="date" id="endDate" name="endDate" required>
-        <button type="submit">Submit Reservation</button>
-    </form>
-    <div id="reservation-result"></div>
-</section>
-
-<div class="footer-div" id="footer"></div><!-- loads footer here -->
 
 <script src="/js/reservation.js" type="module" defer></script>
 </body>
