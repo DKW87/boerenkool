@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -56,6 +57,41 @@ public class ReservationService {
 
     public List<Reservation> getAllReservationsByHouseId(int houseId) {
         return reservationRepository.getAllReservationsByHouseId(houseId);
+    }
+
+    public List<ReservationDTO> getReservationsByUserId(int userId) {
+
+        User user = userService.getOneById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        List<Reservation> reservations = fetchReservationsByUserType(user);
+
+        return reservations.stream()
+                .map(this::convertToDto)
+                .toList();
+    }
+
+    private List<Reservation> fetchReservationsByUserType(User user) {
+        String userType = user.getTypeOfUser();
+
+        if ("Huurder".equalsIgnoreCase(userType)) {
+            return getAllReservationsByTenant(user.getUserId());
+        } else if ("Verhuurder".equalsIgnoreCase(userType)) {
+            return getAllReservationsByLandlord(user.getUserId());
+        } else {
+            return Collections.emptyList();
+        }
+    }
+
+    public boolean isUserAuthorizedToDeleteReservation(User user, Reservation reservation) {
+        boolean isTenant = "Huurder".equals(user.getTypeOfUser());
+
+        if (isTenant) {
+            return reservation.getReservedByUser().getUserId() == user.getUserId();
+        } else {
+            House house = houseService.getOneById(reservation.getHouse().getHouseId());
+            return house.getHouseOwner().getUserId() == user.getUserId();
+        }
     }
 
     public ReservationDTO convertToDto(Reservation reservation) {
