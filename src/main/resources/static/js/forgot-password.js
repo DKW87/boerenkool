@@ -6,24 +6,52 @@ document.addEventListener('DOMContentLoaded', () => {
     Main.loadHeader();
     Main.loadFooter();
 
-    document.getElementById('resetPasswordBtn').addEventListener('click', async () => {
-        const email = document.getElementById('email').value;
-
-        try {
-            const response = await fetch('/api/registration/reset-password', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email })
-            });
-
-            if (!response.ok) {
-                throw new Error('Er is een fout opgetreden. Probeer het later opnieuw.');
-            }
-
-            const message = await response.text();
-            alert(message);  // Vervangt showNotification
-        } catch (error) {
-            alert(error.message);  // Vervangt showNotification
-        }
-    });
+    // Voeg event listener toe aan de reset-knop
+    setupResetPasswordHandler();
 });
+
+// Functie om de event listener voor het resetten van het wachtwoord in te stellen
+function setupResetPasswordHandler() {
+    document.getElementById('resetPasswordBtn').addEventListener('click', handlePasswordReset);
+}
+
+// Functie om het resetten van het wachtwoord af te handelen
+async function handlePasswordReset() {
+    const email = getEmailInputValue();
+
+    try {
+        const response = await sendPasswordResetRequest(email);
+        handleResponse(response);
+    } catch (error) {
+        showNotification(error.message);
+    }
+}
+
+// Functie om de waarde van het e-mailveld op te halen
+function getEmailInputValue() {
+    return document.getElementById('email').value;
+}
+
+// Functie om de wachtwoord reset aanvraag te versturen
+async function sendPasswordResetRequest(email) {
+    return await fetch('/api/registration/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+    });
+}
+
+// Functie om de response van de server te verwerken
+async function handleResponse(response) {
+    if (!response.ok) {
+        throw new Error('Er is een fout opgetreden. Probeer het later opnieuw.');
+    }
+
+    const message = await response.text();
+    showNotification(message);
+}
+
+// Functie om een notificatie te tonen, zowel voor successen als fouten
+function showNotification(message) {
+    alert(message);  // Hier kan je ook een custom notificatie systeem aanroepen
+}
