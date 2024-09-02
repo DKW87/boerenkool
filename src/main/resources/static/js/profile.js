@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('updateCoinsBtn').addEventListener('click', async () => {
         try {
             const currentCoins = parseInt(document.getElementById('boerenkoolCoins').value, 10) || 0;
-            const newCoins = currentCoins + 100;
+            const newCoins = 100; // Adding 100 to the current balance
 
             const response = await fetch('/api/users/update-coins', {
                 method: 'PUT',
@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 throw new Error('Kon BoerenkoolCoins niet updaten.');
             }
 
-            document.getElementById('boerenkoolCoins').value = newCoins;
+            document.getElementById('boerenkoolCoins').value = currentCoins + newCoins; // Update the input field
             showNotification('BoerenkoolCoins succesvol bijgewerkt!', 'success');
         } catch (error) {
             showNotification('Fout bij het updaten van BoerenkoolCoins.', 'error');

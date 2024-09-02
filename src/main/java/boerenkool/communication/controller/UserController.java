@@ -125,12 +125,23 @@ public class UserController {
     @PutMapping("/update-coins")
     public ResponseEntity<String> updateBoerenkoolCoins(@RequestBody Map<String, Integer> updateData, @RequestHeader("Authorization") String token) {
         Optional<User> optionalUser = authorizationService.validate(UUID.fromString(token));
+
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
-            int newCoins = updateData.get("boerenkoolCoins");
-            userService.updateBoerenkoolcoins(user, newCoins);
-            return ResponseEntity.ok("Coin balance updated successfully.");
+
+            // Retrieve the additional coins from the request body
+            int additionalCoins = updateData.get("boerenkoolCoins");
+
+            // Update the coin balance using the service method
+            boolean success = userService.updateBoerenkoolcoins(user, additionalCoins);
+
+            if (success) {
+                return ResponseEntity.ok("Coin balance updated successfully.");
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update coin balance.");
+            }
         }
+
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
     }
 
