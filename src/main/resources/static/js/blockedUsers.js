@@ -41,7 +41,12 @@ function renderBlockedUsers(data, userId, token) {
     // Controleer of de data een array is en niet leeg is
     if (Array.isArray(data) && data.length > 0) {
         data.forEach(user => {
-            const listItem = createBlockedUserListItem(user, userId, token);
+            const listItem = document.createElement('li');
+            listItem.textContent = user.username;  // Toon alleen de gebruikersnaam in het lijstitem
+
+            const unblockButton = createUnblockButton(user.userId, userId, token);  // Maak een deblokkeerknop aan
+            listItem.appendChild(unblockButton);  // Voeg de deblokkeerknop toe aan het lijstitem
+
             blockedUsersList.appendChild(listItem);  // Voeg elke geblokkeerde gebruiker toe aan de lijst
         });
     } else {
