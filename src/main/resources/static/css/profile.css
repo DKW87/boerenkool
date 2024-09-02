@@ -73,6 +73,42 @@ body {
     margin-bottom: 20px;
 }
 
+/* Add styles for the dropdown menu in the profile form */
+.profile-container select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: var(--font-size-large);
+    margin-bottom: 20px;
+    background-color: white; /* Ensure the background is white */
+    color: #333; /* Text color */
+    appearance: none; /* Remove default dropdown arrow */
+    -webkit-appearance: none; /* Remove default dropdown arrow in WebKit browsers */
+    -moz-appearance: none; /* Remove default dropdown arrow in Firefox */
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%2710%27%20height%3D%2710%27%3E%3Cpath%20d%3D%27M0%200%20L5%205%20L10%200%20Z%27%20fill%3D%27%23333%27/%3E%3C/svg%3E'); /* Custom dropdown arrow */
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 10px;
+}
+
+.profile-container select:focus {
+    border-color: var(--boerenkool-paars); /* Focus border color */
+    outline: none;
+}
+
+.profile-container option {
+    background-color: white;
+    color: #333;
+}
+
+/* Additional styling for disabled dropdowns */
+.profile-container select[disabled] {
+    background-color: #f5f5f5;
+    color: #999;
+    cursor: not-allowed;
+}
+
 .profile-container button {
     width: 100%;
     padding: 10px;
@@ -225,4 +261,3 @@ body {
 #boerenkool-coins-section button:hover {
     background-color: #556B2F; /* Darker shade of boerenkool-groen for hover effect */
 }
-

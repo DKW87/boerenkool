@@ -17,6 +17,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const infix = document.getElementById('infix').value;
         const lastName = document.getElementById('lastName').value;
         const password = document.getElementById('password').value;
+        const typeOfUser = document.getElementById('typeOfUser').value;
+
 
         if (!validateEmail(email)) {
             alert("Voer een geldig e-mailadres in.");  // Vervangt showNotification
@@ -39,6 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const registrationData = {
+            typeOfUser: typeOfUser,
             username: username,
             email: email,
             phone: phone,
