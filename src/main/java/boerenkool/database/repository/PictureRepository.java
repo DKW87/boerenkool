@@ -54,7 +54,7 @@ public class PictureRepository {
         return pictureDAO.removeOneById(pictureId);
     }
 
-    public Optional getOneById(int pictureId) {
+    public Optional<Picture> getOneById(int pictureId) {
         return pictureDAO.getOneById(pictureId);
     }
 
@@ -62,7 +62,7 @@ public class PictureRepository {
         return pictureDAO.getAllByHouseId(houseId);
     }
 
-    public Optional getFirstPictureByHouseId(int houseId) {
+    public Optional<Picture> getFirstPictureByHouseId(int houseId) {
         return pictureDAO.getFirstPictureByHouseId(houseId);
     }
 

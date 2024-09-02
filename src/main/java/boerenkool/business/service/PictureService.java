@@ -44,11 +44,11 @@ public class PictureService {
         return pictureRepository.getAllByHouseId(houseId);
     }
 
-    public Optional getFirstPictureByHouseId(int houseId) {
+    public Optional<Picture> getFirstPictureByHouseId(int houseId) {
         return pictureRepository.getFirstPictureByHouseId(houseId);
     }
 
-    public Optional getOneById(int pictureId) {
+    public Optional<Picture> getOneById(int pictureId) {
         return pictureRepository.getOneById(pictureId);
     }
 
