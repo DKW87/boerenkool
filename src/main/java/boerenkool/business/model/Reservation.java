@@ -27,7 +27,7 @@ public class Reservation {
         this.reservedByUser = reservedByUser;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.guestCount = guestCount;
+        setGuestCount(guestCount);
     }
 
     public Reservation() {}
@@ -44,7 +44,14 @@ public class Reservation {
         return guestCount;
     }
 
-    public void setGuestCount(int guestCount) {this.guestCount = guestCount;}
+    public void setGuestCount(int guestCount) {
+        if (guestCount > 0) {
+            this.guestCount = guestCount;
+        }
+        else {
+            this.guestCount = 1;
+        }
+    }
 
     public LocalDate getEndDate() {return endDate;}
 

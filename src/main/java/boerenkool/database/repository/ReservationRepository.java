@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -96,6 +97,11 @@ public class ReservationRepository {
         logger.debug("Fetched reservations for house with ID: {}", houseId);
         return reservations;
     }
+
+    public boolean checkDateOverlap(int houseId, LocalDate startDate, LocalDate endDate) {
+        return reservationDAO.existsByHouseIdAndDatesOverlap(houseId, startDate, endDate);
+    }
+
 
     private void loadRelatedEntities(Reservation reservation) {
         int userId = reservation.getReservedByUser().getUserId();
