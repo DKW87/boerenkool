@@ -94,6 +94,10 @@ public class MessageRepository {
         return listOfMessages;
     }
 
+    public int checkForUnreadMessages(int receiverId) {
+        return messageDAO.checkForUnreadMessages(receiverId);
+    }
+
     public boolean updateMessage(Message message) throws MessageDoesNotExistException {
         return messageDAO.updateOne(message);
     }

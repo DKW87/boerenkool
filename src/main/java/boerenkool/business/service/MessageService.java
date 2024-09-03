@@ -43,6 +43,10 @@ public class MessageService {
         return convertMessageToDTO(messageRepository.getMessageById(messageId));
     }
 
+    public int checkForUnreadMessages(int receiverId) {
+        return messageRepository.checkForUnreadMessages(receiverId);
+    }
+
     public List<MessageDTO> getAllMessages() {
         List<MessageDTO> listOfAllMessageDTOs = new ArrayList<>();
         List<Message> listOfMessages = messageRepository.getAll();

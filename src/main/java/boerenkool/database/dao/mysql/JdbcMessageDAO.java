@@ -133,6 +133,22 @@ public class JdbcMessageDAO implements MessageDAO {
                 userId);
     }
 
+    public int checkForUnreadMessages(int receiverId) {
+        Integer numberOfUnread = jdbcTemplate.queryForObject(
+                "SELECT COUNT(readByReceiver = 1 ) FROM Message WHERE receiverId = ?;",
+                Integer.class,
+                receiverId);
+        return (numberOfUnread != null) ? numberOfUnread : 0;
+    }
+//    public int checkForUnreadMessages(int receiverId) {
+//        int numberOfUnread = jdbcTemplate.queryForObject(
+//                "SELECT COUNT(readByReceiver = 1 ) FROM Message WHERE receiverId = ?;",
+//                Integer.class,
+//                receiverId);
+//        return numberOfUnread;
+//    }
+
+
     /**
      * update existing message in database
      * @param message to be updated

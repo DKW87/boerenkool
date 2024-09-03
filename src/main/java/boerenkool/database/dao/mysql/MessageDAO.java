@@ -23,7 +23,9 @@ public interface MessageDAO extends GenericDAO<Message> {
     List<Message> getAllToReceiverId(int receiverId);
 
     @Override
-    Optional<Message> getOneById(int id);
+    Optional<Message> getOneById(int messageId);
+
+    int checkForUnreadMessages(int receiverId);
 
     @Override
     boolean updateOne(Message message);
