@@ -3,8 +3,10 @@ package boerenkool.business.service;
 import boerenkool.business.model.House;
 import boerenkool.business.model.HouseFilter;
 import boerenkool.business.model.HouseType;
+import boerenkool.business.model.Picture;
 import boerenkool.communication.dto.HouseDetailsDTO;
 import boerenkool.communication.dto.HouseListDTO;
+import boerenkool.communication.dto.PictureDTO;
 import boerenkool.database.repository.HouseRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,12 +33,15 @@ public class HouseService {
     private final Logger logger = LoggerFactory.getLogger(HouseService.class);
     private final HouseRepository houseRepository;
     private final UserService userService;
+    private final PictureService pictureService;
 
     @Autowired
-    public HouseService(HouseRepository houseRepository, CacheManager cacheManager, UserService userService) {
+    public HouseService(HouseRepository houseRepository, CacheManager cacheManager, UserService userService,
+                        PictureService pictureService) {
         this.houseRepository = houseRepository;
         this.cacheManager = cacheManager;
         this.userService = userService;
+        this.pictureService = pictureService;
         logger.info("New HouseService");
     }
 
@@ -68,9 +73,20 @@ public class HouseService {
         houseDetailsDTO.setPricePPPD(house.getPricePPPD());
         houseDetailsDTO.setDescription(house.getDescription());
         houseDetailsDTO.setIsNotAvailable(house.getIsNotAvailable());
-//        houseDetailsDTO.setPictures(); // get pictures
+        if (house.getPictures() != null) {
+            houseDetailsDTO.setPictures(convertListOfPicturesToDTO(house.getPictures()));
+        }
         houseDetailsDTO.setExtraFeatures(house.getExtraFeatures());
         return houseDetailsDTO;
+    }
+
+    private List<PictureDTO> convertListOfPicturesToDTO(List<Picture> pictures) {
+        List<PictureDTO> listPictureDTO = new ArrayList<>();
+        for (Picture picture : pictures) {
+            PictureDTO pictureDTO = pictureService.convertToDTO(picture);
+            listPictureDTO.add(pictureDTO);
+        }
+        return listPictureDTO;
     }
 
     public List<House> getAllHouses() {
@@ -98,8 +114,8 @@ public class HouseService {
             HouseListDTO strippedHouse = new HouseListDTO();
             strippedHouse.setHouseId(fullHouse.getHouseId());
             if (!fullHouse.getPictures().isEmpty()) {
-                // TODO need Base64 String and MIME-Type (e.g. png/jpeg)
-//                strippedHouse.setPicture(fullHouse.getPictures().get(0).getPicture());
+                PictureDTO pictureDTO = pictureService.convertToDTO(fullHouse.getPictures().getFirst());
+                strippedHouse.setPicture(pictureDTO);
             }
             strippedHouse.setHouseName(fullHouse.getHouseName());
             strippedHouse.setHouseType(fullHouse.getHouseType().getHouseTypeName());

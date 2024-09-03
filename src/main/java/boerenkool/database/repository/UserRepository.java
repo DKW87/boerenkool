@@ -73,8 +73,8 @@ public class UserRepository {
         return userDAO.getReceiverByMessageId(messageId);
     }
 
-    public boolean updateBoerenkoolcoins(User user, int newCoins) {
-        return userDAO.updateBoerenkoolCoins(user.getUserId(), newCoins);
+    public boolean updateBoerenkoolcoins(int userId, int newCoins) {
+        return userDAO.updateBoerenkoolCoins(userId, newCoins);
     }
 
     public Optional<String> getUsernameById(int id) {

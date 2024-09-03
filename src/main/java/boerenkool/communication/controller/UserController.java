@@ -98,12 +98,18 @@ public class UserController {
         Optional<User> userOpt = authorizationService.validate(UUID.fromString(token));
         if (userOpt.isPresent()) {
             User user = userOpt.get();
+            // Prevent a "Verhuurder" from changing their type
+            if ("Verhuurder".equals(user.getTypeOfUser()) && !"Verhuurder".equals(userDto.getTypeOfUser())) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Verhuurder users cannot change their user type.");
+            }
             if (user.getUsername().equals(userDto.getUsername())) {
                 user.setEmail(userDto.getEmail());
                 user.setPhone(userDto.getPhone());
                 user.setFirstName(userDto.getFirstName());
                 user.setInfix(userDto.getInfix());
                 user.setLastName(userDto.getLastName());
+                user.setTypeOfUser(userDto.getTypeOfUser());
+
                 userService.updateOne(user);
                 return ResponseEntity.ok("User updated successfully");
             }
@@ -125,12 +131,23 @@ public class UserController {
     @PutMapping("/update-coins")
     public ResponseEntity<String> updateBoerenkoolCoins(@RequestBody Map<String, Integer> updateData, @RequestHeader("Authorization") String token) {
         Optional<User> optionalUser = authorizationService.validate(UUID.fromString(token));
+
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
-            int newCoins = updateData.get("boerenkoolCoins");
-            userService.updateBoerenkoolcoins(user, newCoins);
-            return ResponseEntity.ok("Coin balance updated successfully.");
+
+            // Retrieve the additional coins from the request body
+            int additionalCoins = updateData.get("boerenkoolCoins");
+
+            // Update the coin balance using the service method
+            boolean success = userService.updateBoerenkoolcoins(user, additionalCoins);
+
+            if (success) {
+                return ResponseEntity.ok("Coin balance updated successfully.");
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update coin balance.");
+            }
         }
+
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
     }
 
