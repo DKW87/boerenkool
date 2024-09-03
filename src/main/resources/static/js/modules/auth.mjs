@@ -10,6 +10,12 @@ export async function login(username, password) {
             body: JSON.stringify({ username, password })
         });
 
+        if (response.status === 403) {  // Account is locked out
+            const responseBody = await response.json();
+            alert(responseBody.message || 'Je account is tijdelijk geblokkeerd wegens te veel mislukte inlogpogingen. Probeer het later opnieuw.');
+            return false;
+        }
+
         if (!response.ok) {
             throw new Error('Login mislukt. Controleer je inloggegevens.');
         }
@@ -23,6 +29,7 @@ export async function login(username, password) {
         return true;
     } catch (error) {
         console.error(error.message);
+        alert(error.message);  // Show a generic error message
         return false;
     }
 }

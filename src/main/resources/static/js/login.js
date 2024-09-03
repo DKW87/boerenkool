@@ -35,15 +35,15 @@ function getLoginInputValues() {
 // Functie om de response van de login poging te verwerken
 function handleLoginResponse(success) {
     if (success) {
-        redirectToProfile();
+        redirectToIndex();
     } else {
         showNotification('Login mislukt. Controleer je inloggegevens.');
     }
 }
 
 // Functie om door te sturen naar het profiel na succesvolle login
-function redirectToProfile() {
-    window.location.href = '/profile.html';
+function redirectToIndex() {
+    window.location.href = '/index.html';
 }
 
 // Functie om een notificatie te tonen
