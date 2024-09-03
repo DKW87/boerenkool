@@ -85,7 +85,7 @@ public class UserService {
 
 
     //code Bart
-    public List<Map<String, Object>> getMapOfCorrespondents(int userId) throws MessageDoesNotExistException {
+    public List<Map<String, Object>> getMapOfCorrespondents(int userId) {
         Optional<List<Map<String, Object>>> mapOfCorrespondents = userRepository.getMapOfCorrespondents(userId);
         if (mapOfCorrespondents.isEmpty()) {
             return new ArrayList<>();
