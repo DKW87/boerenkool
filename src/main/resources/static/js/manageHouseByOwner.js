@@ -38,7 +38,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function displayHouseDetails(house) {
-        document.getElementById('houseId').textContent = house.houseId
         document.getElementById('houseName').textContent = house.houseName
         document.getElementById('houseType').textContent = house.houseType ? house.houseType.houseTypeName : 'N/N'
         document.getElementById('houseOwner').textContent = house.houseOwner ? house.houseOwner.username : 'N/A'
