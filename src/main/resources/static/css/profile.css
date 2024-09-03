@@ -15,7 +15,7 @@ body {
     height: 100%;
     display: grid;
     grid-template-columns: 1fr;
-    grid-template-rows: auto 1fr auto; /* Zorg ervoor dat de body-div het midden vult */
+    grid-template-rows: auto 1fr auto; /* Ensure the body-div fills the middle space */
 }
 
 .header-div,
@@ -33,7 +33,7 @@ body {
     align-items: center;
     justify-content: center;
     padding: 0;
-    height: 100%; /* Zorgt ervoor dat de body-div de resterende ruimte inneemt */
+    height: 100%; /* Ensures the body-div takes up the remaining space */
 }
 
 .profile-container {
@@ -44,7 +44,7 @@ body {
     max-width: 600px;
     width: 100%;
     box-sizing: border-box;
-    margin-bottom: 30px; /* Ruimte onder de container */
+    margin-bottom: 30px; /* Space below the container */
     text-align: center;
 }
 
@@ -62,18 +62,33 @@ body {
     color: #333;
 }
 
+/* Styling for all input fields, including boerenkoolCoins */
 .profile-container input[type="text"],
 .profile-container input[type="email"],
-.profile-container input[type="password"] {
+.profile-container input[type="password"],
+.profile-container input[type="number"] {
     width: 100%;
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
     font-size: var(--font-size-large);
     margin-bottom: 20px;
+    background-color: white;
+    color: #333;
+    box-sizing: border-box; /* Ensure consistent box model */
 }
 
-/* Add styles for the dropdown menu in the profile form */
+/* Remove default number input spin buttons */
+.profile-container input[type="number"]::-webkit-outer-spin-button,
+.profile-container input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.profile-container input[type="number"] {
+    -moz-appearance: textfield; /* Remove spin buttons for Firefox */
+}
+
 .profile-container select {
     width: 100%;
     padding: 10px;
@@ -81,32 +96,20 @@ body {
     border-radius: 4px;
     font-size: var(--font-size-large);
     margin-bottom: 20px;
-    background-color: white; /* Ensure the background is white */
-    color: #333; /* Text color */
-    appearance: none; /* Remove default dropdown arrow */
-    -webkit-appearance: none; /* Remove default dropdown arrow in WebKit browsers */
-    -moz-appearance: none; /* Remove default dropdown arrow in Firefox */
-    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%2710%27%20height%3D%2710%27%3E%3Cpath%20d%3D%27M0%200%20L5%205%20L10%200%20Z%27%20fill%3D%27%23333%27/%3E%3C/svg%3E'); /* Custom dropdown arrow */
+    background-color: white;
+    color: #333;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%2710%27%20height%3D%2710%27%3E%3Cpath%20d%3D%27M0%200%20L5%205%20L10%200%20Z%27%20fill%3D%27%23333%27/%3E%3C/svg%3E');
     background-repeat: no-repeat;
     background-position: right 10px center;
     background-size: 10px;
 }
 
 .profile-container select:focus {
-    border-color: var(--boerenkool-paars); /* Focus border color */
+    border-color: var(--boerenkool-paars);
     outline: none;
-}
-
-.profile-container option {
-    background-color: white;
-    color: #333;
-}
-
-/* Additional styling for disabled dropdowns */
-.profile-container select[disabled] {
-    background-color: #f5f5f5;
-    color: #999;
-    cursor: not-allowed;
 }
 
 .profile-container button {
@@ -124,11 +127,10 @@ body {
 #notification {
     margin-top: 20px;
     font-size: var(--font-size-small);
-    color: red; /* Dit kan afhankelijk van de notificatie worden aangepast */
+    color: red;
     text-align: center;
 }
 
-/* Styling voor de geblokkeerde gebruikers sectie */
 #blocked-users-container {
     background-color: white;
     border-radius: 12px;
@@ -137,7 +139,7 @@ body {
     max-width: 600px;
     width: 100%;
     box-sizing: border-box;
-    margin-bottom: 30px; /* Ruimte onder de container */
+    margin-bottom: 30px;
     text-align: center;
 }
 
@@ -151,7 +153,7 @@ body {
     list-style-type: none;
     padding: 0;
     margin: 0;
-    text-align: left; /* Zorgt ervoor dat de gebruikerslijst links uitgelijnd is */
+    text-align: left;
 }
 
 #blocked-users-list li {
@@ -197,7 +199,7 @@ body {
 }
 
 .unblock-button {
-    background-color: #FF6347; /* Tomato color */
+    background-color: #FF6347;
     color: white;
     border: none;
     padding: 5px 10px;
@@ -208,56 +210,5 @@ body {
 }
 
 .unblock-button:hover {
-    background-color: #FF4500; /* Darker shade of tomato */
-}
-
-/* CSS for the BoerenkoolCoins section */
-#boerenkool-coins-section {
-    background-color: white;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-    max-width: 600px;
-    width: 100%;
-    box-sizing: border-box;
-    text-align: center;
-    margin-bottom: 30px; /* Space below the container */
-}
-
-#boerenkool-coins-section h2 {
-    margin-bottom: 20px;
-    color: var(--boerenkool-paars);
-    font-size: 1.8em; /* Match the size with other headers */
-    font-weight: bold; /* Ensure the text is bold */
-}
-
-#boerenkool-coins-section label {
-    display: block;
-    margin-bottom: 10px;
-    font-size: var(--font-size-large);
-    color: #333;
-}
-
-#boerenkool-coins-section input[type="text"] {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: var(--font-size-large);
-    margin-bottom: 20px;
-}
-
-#boerenkool-coins-section button {
-    width: 100%;
-    padding: 10px;
-    background-color: var(--boerenkool-groen);
-    color: white;
-    border: none;
-    border-radius: 4px;
-    font-size: 16px;
-    cursor: pointer;
-}
-
-#boerenkool-coins-section button:hover {
-    background-color: #556B2F; /* Darker shade of boerenkool-groen for hover effect */
+    background-color: #FF4500;
 }
