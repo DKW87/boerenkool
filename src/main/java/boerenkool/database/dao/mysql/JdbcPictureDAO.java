@@ -54,11 +54,10 @@ public class JdbcPictureDAO implements PictureDAO {
         if (resultList.isEmpty()) {
             return Optional.empty();
         } else {
-            return Optional.of(resultList.get(0));
+            return Optional.of(resultList.getFirst());
         }
     }
 
-    //todo waarom werken we met een lijst hier ?
     @Override
     public Optional<Picture> getOneById(int pictureId) {
         String sql = "SELECT * FROM Picture WHERE pictureId = ?;";
@@ -67,7 +66,7 @@ public class JdbcPictureDAO implements PictureDAO {
         if (resultList.isEmpty()) {
             return Optional.empty();
         } else {
-            return Optional.of(resultList.get(0));
+            return Optional.of(resultList.getFirst());
         }
     }
 

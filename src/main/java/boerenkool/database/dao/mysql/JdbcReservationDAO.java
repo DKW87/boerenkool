@@ -123,6 +123,17 @@ public class JdbcReservationDAO implements ReservationDAO {
         return preparedStatement;
     }
 
+    @Override
+    public boolean existsByHouseIdAndDatesOverlap(int houseId, LocalDate startDate, LocalDate endDate) {
+        String sql = "SELECT COUNT(*) FROM Reservation " +
+                "WHERE houseId = ? AND " +
+                "(startDate < ? AND endDate > ?)";
+
+        Integer count = jdbcTemplate.queryForObject(sql, new Object[]{houseId, endDate, startDate}, Integer.class);
+        return count != null && count > 0;
+    }
+
+
     private static class ReservationMapper implements RowMapper<Reservation> {
 
         @Override

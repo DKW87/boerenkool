@@ -35,10 +35,32 @@ public class ReservationService {
         return reservationRepository.getReservationById(id);
     }
 
+    /*public Reservation saveReservation(Reservation reservation) {
+        //validateReservation(reservation);
+        return reservationRepository.saveReservation(reservation);
+    }*/
+
     public Reservation saveReservation(Reservation reservation) {
-        validateReservation(reservation);
+        checkGuestCount(reservation.getHouse(), reservation.getGuestCount());
+        checkDateOverlap(reservation.getHouse().getHouseId(), reservation.getStartDate(), reservation.getEndDate());
+
         return reservationRepository.saveReservation(reservation);
     }
+
+    private void checkGuestCount(House house, int guestCount) {
+        if (guestCount > house.getMaxGuest()) {
+            throw new IllegalArgumentException("Guest count exceeds the maximum allowed ("
+                    + house.getMaxGuest() + ") for this house.");
+        }
+    }
+
+    private void checkDateOverlap(int houseId, LocalDate startDate, LocalDate endDate) {
+        boolean hasOverlap = reservationRepository.checkDateOverlap(houseId, startDate, endDate);
+        if (hasOverlap) {
+            throw new IllegalStateException("This reservation conflicts with an existing reservation for the same house and dates.");
+        }
+    }
+
 
     public boolean deleteReservationById(int id) {
         if (reservationRepository.getReservationById(id).isEmpty()) {
@@ -117,7 +139,7 @@ public class ReservationService {
         return reservation;
     }
 
-    private void validateReservation(Reservation reservation) {
+    /*private void validateReservation(Reservation reservation) {
         if (reservation.getGuestCount() < 0) {
             throw new IllegalArgumentException("Guest count cannot be negative.");
         }
@@ -132,7 +154,7 @@ public class ReservationService {
         if (endDate.isBefore(startDate)) {
             throw new IllegalArgumentException("End date cannot be before start date.");
         }
-    }
+    }*/
 
     public List<Reservation> getAllReservationsByUserId(int userId) {
         return reservationRepository.getAllReservationsByUserId(userId);

@@ -1,8 +1,6 @@
 package boerenkool.database.repository;
 
-import boerenkool.business.model.House;
-import boerenkool.business.model.HouseFilter;
-import boerenkool.business.model.HouseType;
+import boerenkool.business.model.*;
 import boerenkool.database.dao.mysql.*;
 import boerenkool.database.dao.mysql.PictureDAO;
 import org.slf4j.Logger;
@@ -10,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -51,7 +50,6 @@ public class HouseRepository {
             house.setHouseType(houseTypeDAO.getOneById(house.accessOtherEntityIds().getHouseTypeId())
                     .orElseThrow(() -> new NoSuchElementException("houseType not found")));
             // TODO @Emine > T for getAllFeaturesByHouseId = ExtraFeature
-//            house.setExtraFeatures(extraFeatureDAO.getAllFeaturesByHouseId(house.getHouseId()));
             house.setPictures(pictureDAO.getAllByHouseId(house.getHouseId()));
 
         }
@@ -66,8 +64,19 @@ public class HouseRepository {
             optionalHouse.get()
                     .setHouseOwner(userDAO.getOneById(optionalHouse.get().accessOtherEntityIds().getHouseOwnerId())
                             .orElseThrow(() -> new NoSuchElementException("houseOwner not found")));
+            // TODO @Emine > T for getAllFeaturesByHouseId = ExtraFeature
+            optionalHouse.get()
+                    .setPictures(pictureDAO.getAllByHouseId(optionalHouse.get().getHouseId()));
         }
         return optionalHouse;
+    }
+
+    private List<ExtraFeature> collectHouseExtraFeatures(List<HouseExtraFeature> houseExtraFeatures) {
+        List<ExtraFeature> extraFeatures = new ArrayList<>();
+        for (HouseExtraFeature houseExtraFeature : houseExtraFeatures) {
+
+        }
+        return extraFeatures;
     }
 
     public List<House> getListOfAllHouses() {
