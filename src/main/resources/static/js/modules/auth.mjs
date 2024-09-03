@@ -11,8 +11,7 @@ export async function login(username, password) {
         });
 
         if (response.status === 403) {  // Account is locked out
-            const responseBody = await response.json();
-            alert(responseBody.message || 'Je account is tijdelijk geblokkeerd wegens te veel mislukte inlogpogingen. Probeer het later opnieuw.');
+            alert('Je account is tijdelijk geblokkeerd wegens te veel mislukte inlogpogingen. Probeer het later opnieuw.');
             return false;
         }
 

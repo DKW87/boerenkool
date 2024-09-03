@@ -75,8 +75,6 @@ public class RegistrationController {
                 throw new LoginException("Login failed");
             }
         } catch (LoginException e) {
-            // Increment the failed login attempts on exception
-            loginAttemptService.loginFailed(username);
             throw e;
         }
     }
