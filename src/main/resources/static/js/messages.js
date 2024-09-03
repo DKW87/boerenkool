@@ -1,10 +1,8 @@
 import * as main from "./modules/main.mjs"
-import * as authutils from "./modules/authUtils.mjs";
 import * as auth from "./modules/auth.mjs";
 
 main.loadHeader()
 main.loadFooter()
-await authutils.checkIfLoggedIn()
 
 const NO_MESSAGES = "Geen berichten."
 
@@ -18,7 +16,6 @@ const DATE_TIME_OPTIONS = {
     hour: `numeric`,
     minute: `numeric`
 }
-let token = {}
 let loggedInUser = {}
 let inboxArray = {}
 let outboxArray = {}
@@ -27,11 +24,16 @@ let overviewShowsInbox = true
 let listOfCorrespondents = []
 let headerWithToken = new Headers()
 
+// authenticate user
+const token = auth.getToken()
+console.log(token)
+await auth.checkIfLoggedIn(token)
+
+
 setup()
 
 async function setup() {
-    loggedInUser = await authutils.getLoggedInUser()
-
+    loggedInUser = await auth.getLoggedInUser(token)
     headerWithToken.append("Authorization", localStorage.getItem('authToken'))
 
     inboxArray = await getInbox()

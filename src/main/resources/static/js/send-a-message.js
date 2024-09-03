@@ -1,6 +1,6 @@
 // import and load header and footer
 import * as main from "./modules/main.mjs";
-import * as auth from "./modules/authUtils.mjs";
+import * as auth from "./modules/auth.mjs";
 
 main.loadHeader()
 main.loadFooter()
