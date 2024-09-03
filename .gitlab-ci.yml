@@ -1,0 +1,39 @@
+stages:  
+- report
+
+sigridci:
+  tags:
+    - "hva"
+  stage: report
+  image:
+    name: softwareimprovementgroup/sigridci
+  script:
+    - sigridci.py --customer "makeitwork" --system HuisjeBoompjeBoerenkool --source . --targetquality 3.5
+  allow_failure: true
+  artifacts:
+    paths:
+      - "sigrid-ci-output/*"
+    reports:
+      junit: "sigrid-ci-output/sigridci-junit-format-report.xml"
+    expire_in: 1 week
+    when: always
+  rules:
+    - if: $CI_MERGE_REQUEST_ID
+    
+sigridpublish:
+  tags:
+    - "hva"
+  stage: report
+  image:
+    name: softwareimprovementgroup/sigridci
+  script:
+    - sigridci.py --customer "makeitwork" --system HuisjeBoompjeBoerenkool --source . --targetquality 3.5 --publish
+  allow_failure: true
+  artifacts:
+    paths:
+      - "sigrid-ci-output/*"
+    expire_in: 1 week
+    when: always
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="nl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HuisjeBoompjeBoerenkool - Huis Detail</title>
+
+    <!-- stylesheets -->
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/header.css">
+    <link rel="stylesheet" href="css/footer.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+            href="https://fonts.googleapis.com/css2?family=Playwrite+BE+VLG:wght@100..400&family=Playwrite+PE:wght@100..400&display=swap"
+            rel="stylesheet">
+
+    <script src="js/huisdetail.js" type="module"></script>
+</head>
+
+<body>
+
+<div class="main-grid-area">
+
+    <div class="header-div" id="header"></div>
+
+    <div id="huis-detail" class="container">
+        <div id="house-details">
+
+            <h1 id="houseName">Huisnaam</h1>
+            <p>Type: <span id="houseType"></span></p>
+            <p>Eigenaar: <span id="houseOwnerUsername"></span></p>
+            <p>Locatie: <span id="location"></span></p>
+            <p>Maximale Gasten: <span id="maxGuests"></span></p>
+            <p>Aantal Kamers: <span id="roomCount"></span></p>
+            <p>Prijs Per Persoon Per Dag: €<span id="pricePPPD"></span></p>
+            <p>Beschrijving: <span id="description"></span></p>
+            <p>Beschikbaarheid: <span id="availability"></span></p>
+
+            <h2>Foto's</h2>
+            <div id="pictures" class="pictures-gallery"></div>
+
+            <h2>Extra Kenmerken</h2>
+            <ul id="extraFeatures" class="extra-features-list"></ul>
+        </div>
+    </div>
+
+    <div class="footer-div" id="footer"></div>
+
+</div>
+</body>
+
+</html>
