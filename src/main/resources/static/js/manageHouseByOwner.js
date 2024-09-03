@@ -12,20 +12,20 @@ Main.loadFooter();
 
 document.addEventListener('DOMContentLoaded', function() {
 
-    // Creates houseId from URL parameters
+    // Creates id from URL parameters
     function getHouseIdFromURL() {
         const urlParams = new URLSearchParams(window.location.search);
-        return urlParams.get('houseId');
+        return urlParams.get('id');
     } //todo moet ik hier nog een check toevoegen als de search param geen nummer kan vinden ?
     //todo check 2 , controlleer of houseId gekoppeld is aan ownerId, anders kan iedereen wijzigen.
     //todo als owner is ingelogd en owner id matched met houseId dan wijziging beschikbaar.
 
     // Assings to a variable
-    const houseId = getHouseIdFromURL()
+    const id = getHouseIdFromURL()
 
-    // get house from houseId
-    async function getHouseById(houseId) {
-        const url = `/api/houses/${houseId}`;
+    // get house from id
+    async function getHouseById(id) {
+        const url = `/api/houses/${id}`;
         try {
             const response = await fetch(url);
             if (!response.ok) {
@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Calls all methods to give a complete overview of the mutable house
-    getHouseById(1) //todo maakt nu gebruik van search params in url, anders hardcoden naar wens
+    getHouseById(id) //todo werkt nu voeg aan pagina toe: ?id="vulhierIDin"
         .then(house => {
             if (house) {
                 displayHouseDetails(house);
