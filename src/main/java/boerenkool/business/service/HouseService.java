@@ -93,8 +93,12 @@ public class HouseService {
         return houseRepository.getListOfAllHouses();
     }
 
-    public List<House> getListOfHousesByOwnerId(int houseOwnerId) {
-        return houseRepository.getListOfAllHousesByOwner(houseOwnerId);
+    public List<HouseListDTO> getListOfHousesByOwnerId(int houseOwnerId) {
+        List<House> houses = houseRepository.getListOfAllHousesByOwner(houseOwnerId);
+
+        return houses.isEmpty()
+                ? null
+                : convertListToHouseListDTO(houses);
     }
 
     public String getHouseOwnerName(int houseOwnerId) {
