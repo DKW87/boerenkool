@@ -79,10 +79,6 @@ function populateForm(user) {
     }
 }
 
-function configureUserSpecificSettings(user) {
-    // Eventuele andere configuraties gebaseerd op de gebruikersrol of instellingen
-}
-
 function setupEventListeners() {
     // Event listeners voor verschillende knoppen en formulierelementen
     document.getElementById('profileForm').addEventListener('submit', updateProfile);
