@@ -86,7 +86,6 @@ function configureUserSpecificSettings(user) {
 function setupEventListeners() {
     // Event listeners voor verschillende knoppen en formulierelementen
     document.getElementById('profileForm').addEventListener('submit', updateProfile);
-    document.getElementById('updateCoinsBtn').addEventListener('click', handleUpdateCoins);
     document.getElementById('deleteProfileBtn').addEventListener('click', deleteProfile);
     document.getElementById('block-user-btn').addEventListener('click', () => {
         const userId = document.getElementById('userId').value;
