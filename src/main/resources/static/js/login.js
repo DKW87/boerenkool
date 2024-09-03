@@ -36,8 +36,6 @@ function getLoginInputValues() {
 function handleLoginResponse(success) {
     if (success) {
         redirectToIndex();
-    } else {
-        showNotification('Login mislukt. Controleer je inloggegevens.');
     }
 }
 

@@ -10,15 +10,17 @@ export async function login(username, password) {
             body: JSON.stringify({ username, password })
         });
 
-        if (response.status === 403) {  // Account is locked out
+        if (response.status === 403) {
+            console.log("403 error - lockout");
             alert('Je account is tijdelijk geblokkeerd wegens te veel mislukte inlogpogingen. Probeer het later opnieuw.');
             return false;
         }
 
         if (!response.ok) {
-            throw new Error('Login mislukt. Controleer je inloggegevens.');
+            console.log("Login error - incorrect credentials");
+            alert('Login mislukt. Controleer je inloggegevens.');
+            return false;
         }
-
         const token = response.headers.get('Authorization');
         if (!token) {
             throw new Error('Geen token ontvangen van de server.');
@@ -27,10 +29,11 @@ export async function login(username, password) {
         localStorage.setItem('authToken', token);
         return true;
     } catch (error) {
-        console.error(error.message);
-        alert(error.message);  // Show a generic error message
+        console.log("Unexpected error caught", error);
+        alert(error.message);  // Only show if needed
         return false;
     }
+
 }
 
 export function logout() {
