@@ -4,37 +4,71 @@
 
 export async function login(username, password) {
     try {
-        const response = await fetch('/api/registration/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password })
-        });
+        const response = await sendLoginRequest(username, password);
 
-        if (response.status === 403) {
-            console.log("403 error - lockout");
-            alert('Je account is tijdelijk geblokkeerd wegens te veel mislukte inlogpogingen. Probeer het later opnieuw.');
+        if (isAccountLocked(response)) {
+            handleAccountLockout();
             return false;
         }
 
-        if (!response.ok) {
-            console.log("Login error - incorrect credentials");
-            alert('Login mislukt. Controleer je inloggegevens.');
+        if (!isResponseOk(response)) {
+            handleLoginError();
             return false;
         }
-        const token = response.headers.get('Authorization');
+
+        const token = getTokenFromResponse(response);
         if (!token) {
             throw new Error('Geen token ontvangen van de server.');
         }
 
-        localStorage.setItem('authToken', token);
+        saveToken(token);
         return true;
     } catch (error) {
-        console.log("Unexpected error caught", error);
-        alert(error.message);  // Only show if needed
+        handleUnexpectedError(error);
         return false;
     }
-
 }
+
+// Smaller helper functions
+
+async function sendLoginRequest(username, password) {
+    return await fetch('/api/registration/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+    });
+}
+
+function isAccountLocked(response) {
+    return response.status === 403;
+}
+
+function handleAccountLockout() {
+    alert('Je account is tijdelijk geblokkeerd wegens te veel mislukte inlogpogingen. Probeer het later opnieuw.');
+}
+
+function isResponseOk(response) {
+    return response.ok;
+}
+
+function handleLoginError() {
+    alert('Login mislukt. Controleer je inloggegevens.');
+}
+
+function getTokenFromResponse(response) {
+    return response.headers.get('Authorization');
+}
+
+function saveToken(token) {
+    localStorage.setItem('authToken', token);
+}
+
+function handleUnexpectedError(error) {
+    console.error("Unexpected error caught", error);
+    alert(error.message);
+}
+
+// Other existing functions
 
 export function logout() {
     localStorage.removeItem('authToken');
