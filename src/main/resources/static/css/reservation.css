@@ -61,7 +61,7 @@ form input {
 form button {
     margin-top: 20px;
     padding: 10px;
-    background-color: var(--boerenkool-paars);
+    background-color: #556B2F;
     color: white;
     border: none;
     border-radius: 4px;
