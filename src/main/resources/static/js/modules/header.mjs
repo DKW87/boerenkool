@@ -79,11 +79,12 @@ function checkForUnreadMessages() {
                 if (!response.ok) {
                     throw new Error('Netwerkreactie was niet ok.');
                 }
-                return response.json();
+                return response.text();
             })
-            .then(data => {
+            .then(text => {
                 
-                const intValue = data.value;
+                const intValue = parseInt(text, 10);
+                console.log(intValue);
 
                 if (intValue > 0) {
                     messagesReadOrUnread.src = './images/message_unread.png';
