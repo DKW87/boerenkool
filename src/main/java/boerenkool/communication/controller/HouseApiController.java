@@ -66,10 +66,10 @@ public class HouseApiController {
             return new ResponseEntity<>("Owner ID cannot be 0 or negative", HttpStatus.BAD_REQUEST);
         }
 
-        List<House> listOfHousesByOwner = houseService.getListOfHousesByOwnerId(id);
+        List<HouseListDTO> listOfHousesByOwner = houseService.getListOfHousesByOwnerId(id);
 
-        if (listOfHousesByOwner.isEmpty()) {
-            return new ResponseEntity<>("No houses belong to this owner", HttpStatus.NO_CONTENT);
+        if (listOfHousesByOwner == null) {
+            return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
         }
 
         return new ResponseEntity<>(listOfHousesByOwner, HttpStatus.OK);

@@ -1,0 +1,51 @@
+a {
+    text-decoration: none; 
+    color: var(--boerenkool-paars);
+}
+
+.body-div {
+    background-color: var(--boerenkool-grijs);
+    display: flex;
+    align-items: top; 
+    justify-content: center;
+    height: 100vh; 
+}
+
+.huisjes-container {
+    background-color: var(--boerenkool-wit);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    width: 80vh;
+    max-width: 80vw;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    box-sizing: border-box;
+    text-align: left;
+}
+
+.huisjes-container h1 {
+    color: var(--boerenkool-paars);
+}
+
+.huisjes-container img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    object-position: center;
+    margin-right: 10px;
+}
+
+.inline-house {
+    margin-top: 10px;
+    display: flex;
+    align-items: flex-start; 
+    background-color: var(--boerenkool-grijs);
+}
+
+.inline-text {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: var(--boerenkool-paars);
+}

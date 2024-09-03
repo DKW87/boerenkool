@@ -1,7 +1,7 @@
 "use strict"
 import * as Auth from './auth.mjs';
 
-export function loadRightHeader() {
+export async function loadRightHeader() {
     const token = Auth.getToken();
     const rightHeader = document.getElementById("right-header");
 
@@ -25,6 +25,9 @@ export function loadRightHeader() {
         }
     } else {
         if (rightHeader) {
+
+            const user = await Auth.getLoggedInUser(token);
+
             fetch('templates/loggedInRightHeader.html')
                 .then(response => {
                     if (!response.ok) {
@@ -35,6 +38,8 @@ export function loadRightHeader() {
                 .then(data => {
                     rightHeader.innerHTML = data;
                     logoutListener();
+                    replaceUsername(user.username);
+                    checkForUnreadMessages(user.userId);
                 })
                 .catch(error => {
                     console.error('Er is een probleem opgetreden met fetch:', error);
@@ -46,9 +51,50 @@ export function loadRightHeader() {
 }
 
 function logoutListener() {
-document.getElementById('logoutLink').addEventListener('click', (event) => {
-    event.preventDefault(); 
-    Auth.logout();
-    window.location.replace("index.html");
-});
+    document.getElementById('logoutLink').addEventListener('click', (event) => {
+        event.preventDefault();
+        Auth.logout();
+        window.location.replace("index.html");
+    });
+}
+
+function replaceUsername(username) {
+    const usernameToReplace = document.getElementById('replaceUsername');
+    usernameToReplace.innerHTML = '';
+    usernameToReplace.innerHTML = username;
+}
+
+function checkForUnreadMessages() {
+    const messagesReadOrUnread = document.getElementById('messagesReadOrUnread');
+
+    if (messagesReadOrUnread) {
+        fetch('api/messages/unreadmessages', {
+            method: 'GET', 
+            headers: {
+                'Authorization': Auth.getToken(),
+                'Content-Type': 'application/json'
+            },
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Netwerkreactie was niet ok.');
+                }
+                return response.json();
+            })
+            .then(data => {
+                
+                const intValue = data.value;
+
+                if (intValue > 0) {
+                    messagesReadOrUnread.src = './images/message_unread.png';
+                    messagesReadOrUnread.alt = 'icoon van een bericht die aangeeft dat alle berichten van de gebruiker gelezen zijn';
+                }
+
+            })
+            .catch(error => {
+                console.error('Er is een probleem opgetreden met fetch:', error);
+            });
+    } else {
+        console.error('Element met ID "messagesReadOrUnread" niet gevonden.');
+    }
 }
