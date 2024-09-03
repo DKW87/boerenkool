@@ -110,3 +110,31 @@ export async function getLoggedInUser(token) {
         return null;
     }
 }
+
+//  functie om de gebruikersnaam op te halen op basis van de UUID
+
+export async function getUsernameByToken() {
+    const token = getToken();
+    if (!token) {
+        alert('Geen token gevonden.');
+        return null;
+    }
+
+    try {
+        const response = await fetch(`/api/authorization/username?token=${token}`, {
+            method: 'GET',
+            headers: { 'Authorization': token }
+        });
+
+        if (!response.ok) {
+            throw new Error('Kon gebruikersnaam niet ophalen.');
+        }
+
+        const data = await response.json();
+        return data.username;
+    } catch (error) {
+        console.error("Error fetching username:", error);
+        alert('Kon gebruikersnaam niet ophalen.');
+        return null;
+    }
+}

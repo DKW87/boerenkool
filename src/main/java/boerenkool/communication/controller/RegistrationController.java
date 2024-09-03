@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -79,6 +80,15 @@ public class RegistrationController {
         }
     }
 
+    @GetMapping("/username")
+    public ResponseEntity<?> getUsername(@RequestParam UUID token) {
+        Optional<String> username = authorizationService.getUsernameByToken(token);
+        if (username.isPresent()) {
+            return ResponseEntity.ok(Collections.singletonMap("username", username.get()));
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Token not found or expired");
+        }
+    }
 
 
     @PostMapping("/reset-password")

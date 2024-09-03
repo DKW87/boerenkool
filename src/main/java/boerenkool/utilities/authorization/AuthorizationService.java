@@ -29,6 +29,7 @@ public class AuthorizationService {
         return UUID.randomUUID();
     }
 
+
     public TokenUserPair authorize(User user) {
         //zoek of er al een tokenpair bestaat voor user
         Optional<TokenUserPair> pairOption = tokenUserPairDao.findByUser(user);
@@ -52,11 +53,11 @@ public class AuthorizationService {
         return Optional.empty();
     }
 
-    //kan waarschijnlijk verwijderd worden
-    /*public TokenUserPair generateTokenForUser(User user) {
-        UUID token = UUID.randomUUID();
-        TokenUserPair tokenUserPair = new TokenUserPair(token, user);
-        tokenUserPairDao.save(tokenUserPair);
-        return tokenUserPair;
-    }*/
+    public Optional<String> getUsernameByToken(UUID token) {
+        Optional<TokenUserPair> pair = tokenUserPairDao.findByKey(token);
+        if (pair.isPresent()) {
+            return Optional.of(pair.get().getUser().getUsername());
+        }
+        return Optional.empty();
+    }
 }
