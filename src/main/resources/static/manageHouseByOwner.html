@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/header.css">
+    <link rel="stylesheet" href="css/sidebar.css">
+    <link rel="stylesheet" href="css/filter.css">
+    <link rel="stylesheet" href="css/house.css">
+    <link rel="stylesheet" href="css/footer.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playwrite+BE+VLG:wght@100..400&family=Playwrite+PE:wght@100..400&display=swap" rel="stylesheet">
+
+    <title>Manage House</title>
+</head>
+<body>
+
+<div class="main-grid-area">
+
+    <div class="header-div" id="header"></div><!-- loads header here -->
+
+    <div class="left-sidebar-div" id="left-sidebar"></div><!-- loads left sidebar here -->
+
+    <div class="body-div" id="body">
+
+        <!-- huis object opvragen -->
+        <!-- Opmaak nog veranderen -->
+        <div class="house-details" id="house-details">
+            <h2>House Details</h2>
+            <p><strong>House ID:</strong> <span id="houseId"></span></p>
+            <p><strong>House Name:</strong> <span id="houseName"></span></p>
+            <p><strong>House Type:</strong> <span id="houseType"></span></p>
+            <p><strong>House Owner:</strong> <span id="houseOwner"></span></p>
+            <p><strong>Province:</strong> <span id="province"></span></p>
+            <p><strong>City:</strong> <span id="city"></span></p>
+            <p><strong>Street and Number:</strong> <span id="streetAndNumber"></span></p>
+            <p><strong>Zipcode:</strong> <span id="zipcode"></span></p>
+            <p><strong>Max Guests:</strong> <span id="maxGuest"></span></p>
+            <p><strong>Room Count:</strong> <span id="roomCount"></span></p>
+            <p><strong>Price Per Person Per Day:</strong> <span id="pricePPPD"></span></p>
+            <p><strong>Description:</strong> <span id="description"></span></p>
+            <p><strong>Availability:</strong> <span id="isNotAvailable"></span></p>
+
+            <!-- pictures nog implementeren -->
+            <p><strong>Pictures:</strong></p>
+            <div id="pictures"></div>
+
+            <!-- extra features bestaat nog niet -->
+            <p><strong>Extra Features:</strong></p>
+            <ul id="extraFeatures"></ul>
+            <p><strong>Other Entity IDs:</strong> <span id="otherEntityIds"></span></p>
+
+        </div>
+        <!-- script hieronder houden anders laadt de pagina niet goed -->
+        <script src="/js/manageHouseByOwner.js" type="module" defer></script>
+
+    </div><!-- loads body here -->
+
+    <div class="footer-div" id="footer"></div><!-- loads footer here -->
+
+</div>
+
+
+
+
+</body>
+</html>
