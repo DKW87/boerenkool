@@ -102,7 +102,6 @@ public class MessageController {
 
     @GetMapping("/messages/unreadmessages")
     ResponseEntity<?> checkForUnreadMessages(@RequestHeader("Authorization") String token) {
-        // TODO user authentication  (user is receiver of this message)
         Optional<User> validatedUser = authorizationService.validate(UUID.fromString(token));
         if (validatedUser.isPresent()) {
             int numberOfUnread = messageService.checkForUnreadMessages(validatedUser.get().getUserId());
@@ -112,19 +111,19 @@ public class MessageController {
         }
     }
 
-    @PutMapping("/users/{userid}/messages")
-    ResponseEntity<?> updateMessage(@PathVariable("userid") int userId,
-                                    @RequestBody MessageDTO messageDTO)
-            throws MessageDoesNotExistException, MessageNotSavedException, UserIsNotSenderOfMessage {
-        // TODO user authentication (user is sender of this message)
-        if (userId == messageDTO.getSenderId()) {
+    @PutMapping("/messages")
+    ResponseEntity<?> updateMessage(@RequestBody MessageDTO messageDTO,
+                                    @RequestHeader("Authorization") String token)
+            throws MessageDoesNotExistException, MessageNotSavedException {
+        Optional<User> validatedUser = authorizationService.validate(UUID.fromString(token));
+        if (validatedUser.isPresent() && validatedUser.get().getUserId() == messageDTO.getSenderId()) {
             if (messageService.updateMessage(messageDTO)) {
-                return new ResponseEntity<>("Message updated", HttpStatus.OK);
+                return ResponseEntity.status(HttpStatus.OK).build();
             } else {
                 throw new MessageNotSavedException();
             }
         } else {
-            throw new UserIsNotSenderOfMessage();
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
 

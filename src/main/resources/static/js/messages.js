@@ -1,10 +1,8 @@
 import * as main from "./modules/main.mjs"
-import * as authutils from "./modules/authUtils.mjs";
 import * as auth from "./modules/auth.mjs";
 
 main.loadHeader()
 main.loadFooter()
-await authutils.checkIfLoggedIn()
 
 const NO_MESSAGES = "Geen berichten."
 
@@ -18,7 +16,6 @@ const DATE_TIME_OPTIONS = {
     hour: `numeric`,
     minute: `numeric`
 }
-let token = {}
 let loggedInUser = {}
 let inboxArray = {}
 let outboxArray = {}
@@ -27,11 +24,16 @@ let overviewShowsInbox = true
 let listOfCorrespondents = []
 let headerWithToken = new Headers()
 
+// authenticate user
+const token = auth.getToken()
+console.log(token)
+await auth.checkIfLoggedIn(token)
+
+
 setup()
 
 async function setup() {
-    loggedInUser = await authutils.getLoggedInUser()
-
+    loggedInUser = await auth.getLoggedInUser(token)
     headerWithToken.append("Authorization", localStorage.getItem('authToken'))
 
     inboxArray = await getInbox()
@@ -106,7 +108,7 @@ export async function getUsername(userId) {
             headers: headerWithToken
         })
         if (!response.ok) {
-            throw new Error(`Response status: ${response.status}`)
+            new Error(`Response status: ${response.status}`)
         }
         return await response.text()
     } catch (error) {
@@ -141,8 +143,6 @@ async function getMessages(box) {
         boxParameter = `?box=` + box
     } else boxParameter = ``
     const url = `/api/users/${loggedInUser.userId}/messages${boxParameter}`
-    const headerWithToken = new Headers()
-    headerWithToken.append("Authorization", localStorage.getItem('authToken'))
     try {
         const response = await fetch(url, {
                 headers: headerWithToken
@@ -218,19 +218,34 @@ function noMessages() {
 }
 
 function markMessageUnread(messageId) {
-    // TODO....
-    updateMessage(message)
-}
-
-function markMessageRead(messageId) {
-    // TODO....
-    console.log("markMessageRead is called, how about making this do something?")
+    // TODO later...
     // updateMessage(message)
 }
 
+async function markMessageRead(messageId) {
+    const message = inboxArray.find(({messageId}) => messageId === messageId)
+    message.readByReceiver = true
+    await updateMessage(message)
+}
+
 async function updateMessage(message) {
-    const url = `/api/users/${loggedInUser.userId}/messages`
-    // TODO
+    const url = `/api/messages`
+    let headerWithTokenAndContentType = headerWithToken
+    headerWithTokenAndContentType.append("Content-Type", "application/json" )
+    try {
+        const response = await fetch(url, {
+            method: "PUT",
+            headers: headerWithTokenAndContentType,
+            body: JSON.stringify(message)
+        })
+        if (!response.ok) {
+            new Error(`Response status: ${response.status}`)
+        } else {
+            console.log("updateMessage success!")
+        }
+    } catch (error) {
+        console.error(error.message);
+    }
 }
 
 function reverseMessageOverview() {
@@ -245,7 +260,7 @@ function reverseMessageOverview() {
 function showMessageContent(messageId) {
     // check which overview is showing
     let visibleArray = overviewShowsInbox ? inboxArray : outboxArray
-        // find the message in the array, using its messageId
+    // find the message in the array, using its messageId
     let selectedMessage = visibleArray.find((e) => e.messageId === parseInt(messageId, 10))
     // show the message values in the relevant HTML elements
     // TODO show username instead of userid of sender / receiver
