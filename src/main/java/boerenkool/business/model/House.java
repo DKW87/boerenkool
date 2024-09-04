@@ -100,7 +100,6 @@ public class House implements Comparable<House> {
     }
 
     // getters and setters
-    // TODO implement as needed
 
     public int getHouseId() {
         return houseId;
@@ -247,10 +246,6 @@ public class House implements Comparable<House> {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public boolean isNotAvailable() {
-        return isNotAvailable;
     }
 
     public void setIsNotAvailable(boolean isNotAvailable) {
