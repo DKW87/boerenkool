@@ -1,64 +1,101 @@
-// import and load header and footer
 import * as main from "./modules/main.mjs";
 import * as auth from "./modules/auth.mjs";
+import {getUsername} from "./modules/user.mjs";
 
 main.loadHeader()
 main.loadFooter()
-await auth.checkIfLoggedIn()
 
-import {fillCorrespondentsDropDown, getListOfCorrespondents, getUsername} from "./messages.js";
+// logged in ? continue : redirect
+await auth.checkIfLoggedIn()
 
 let receiverId = {}
 let receiverName = {}
 let listOfCorrespondents = []
-
-setupContent()
 let loggedInUser = {}
-loggedInUser = auth.getLoggedInUser()
 
-document.querySelector('#goToMessagesButton').addEventListener('click', () => {
-    window.location.href = "/messages.html"
-})
-document.querySelector('#sendMessageButton').addEventListener('click', () => {
-    sendMessage()
-})
+// authenticate user
+const token = auth.getToken()
+loggedInUser = await auth.getLoggedInUser(token)
 
-await // nodig vanwege asynchrone functie getusername in onderstaande eventlistener
-    document.querySelector('#getSenderIdButton').addEventListener('click', () => {
-        let username = getUsername(document.getElementById("senderIdField").value)
+await setup()
+
+async function setup() {
+    document.querySelector('#goToMessagesButton').addEventListener('click', () => {
+        window.location.href = "/messages.html"
     })
-
-function setupContent() {
+    document.querySelector('#sendMessageButton').addEventListener('click', () => {
+        sendMessage()
+    })
     // check for parameters in URL
     const parameters = new URLSearchParams(document.location.search);
-    if (parameters != null) {
-        console.log("parameters not null")
-        fillReceiverIdFromURL(parameters)
-        // TODO show receiverNameFromParameterField
+    if (parameters.size !== 0) {
+        console.log("parameter is present : ")
+        console.log(parameters)
+        addElementForReceiverUsername()
+        await fillReceiverDataFromParameters(parameters)
     } else {
-        console.log("parameters null")
-        // TODO invulveld maken om userId (en later username) in te kunnen vullen
-        // TODO show receiverNameField
-        listOfCorrespondents = getListOfCorrespondents()
-        fillCorrespondentsDropDown()
+        console.log("no parameters")
+        addElementForReceiverDropdown()
+        listOfCorrespondents = await getListOfCorrespondents()
+        await fillCorrespondentsDropDown(listOfCorrespondents, "receiver")
     }
 }
 
-async function fillReceiverIdFromURL(parameters) {
-    const parameterUsername = parameters.get("username");
-    const paramUserId = parameters.get("userid");
-    if (paramUserId != null) {
+function addElementForReceiverUsername() {
+    const elementForReceiverUsername = document.createElement(`div`)
+    elementForReceiverUsername.innerHTML = "Aan :\n" +
+        "<span id=\"receiverName\">{username from parameter}</span>"
+    document.querySelector(`#receiverPlaceholder`).replaceWith(elementForReceiverUsername)
+}
+function addElementForReceiverDropdown() {
+    const elementForReceiverDropdown = document.createElement(`div`)
+    elementForReceiverDropdown.innerHTML = "Aan :\n" +
+        "<select name=\"receiverDropDown\" id=\"receiver\">\n" +
+        "<option>Selecteer een gebruikersnaam</option>\n" +
+        "</select>"
+    document.querySelector(`#receiverPlaceholder`).replaceWith(elementForReceiverDropdown)
+}
+
+async function fillReceiverDataFromParameters(parameters) {
+    receiverId = parameters.get("userid");
+    // TODO perhaps later : add ?username={username} parameter
+    if (receiverId > 0) {
         // resolve parameter with userid
-        receiverId = paramUserId
         receiverName = await getUsername(receiverId)
         console.log("receiverId is " + receiverId)
         console.log("receiverName is " + receiverName)
         // document.querySelector("#receiverNameInputField").value = `${receiverName}`
-        document.querySelector("#receiverNameFromParameterField").innerHTML = `${receiverName}`
-    } else if (parameterUsername != null) {
-        // resolve parameter with username
-
+        document.querySelector("#receiverName").innerHTML = `${receiverName}`
+    } else {
+        console.log("URL parameters invalid : " + parameters)
     }
+}
+
+async function getListOfCorrespondents() {
+    const url = `/api/users/correspondents`
+    try {
+        const response = await fetch(url, {
+            headers: {
+                "Authorization": localStorage.getItem('authToken')
+            },
+        })
+        if (!response.ok) {
+            new Error(`Response status: ${response.status}`)
+        }
+        return await response.json()
+    } catch (error) {
+        console.error(error.message)
+    }
+}
+
+function fillCorrespondentsDropDown(listOfCorrespondents, optionElementId) {
+    const dropDownElement = document.querySelector(`#${optionElementId}`)
+    listOfCorrespondents.forEach((pair) => {
+        let optionElement = document.createElement("option")
+        optionElement.value = pair.userId
+        optionElement.text = pair.username
+        dropDownElement.appendChild(optionElement)
+    })
 }
 
 async function sendMessage() {
@@ -66,7 +103,7 @@ async function sendMessage() {
     // TODO get userId from username
     // or save list of usernames that current user has messages of, matched with their userId
     const senderId = loggedInUser.userId
-    const receiverId = document.querySelector("#receiverNameField").value;
+    const receiverId = document.querySelector("#receiver").value;
     const subject = document.querySelector("#subjectField").value;
     const body = document.querySelector("#bodyField").value;
     // create URL

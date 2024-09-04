@@ -31,6 +31,20 @@ await auth.checkIfLoggedIn(token)
 setup()
 
 async function setup() {
+
+    document.querySelector('#reverseMessageOverviewButton').addEventListener('click', () => {
+        reverseMessageOverview()
+    })
+    document.querySelector('#refreshInboxButton').addEventListener('click', () => {
+        inboxArray = getInbox()
+    })
+    document.querySelector('#refreshOutboxButton').addEventListener('click', () => {
+        outboxArray = getOutbox()
+    })
+    document.querySelector('#writeMessageButton').addEventListener('click', () => {
+        window.location.href = "send-a-message.html"
+    })
+
     loggedInUser = await auth.getLoggedInUser(token)
     inboxArray = await getInbox()
 
@@ -44,57 +58,19 @@ async function setup() {
     //     sortMessageArray(outboxArray)
     //     fillMessageOverview(outboxArray)
     // } else noMessages()
-    listOfCorrespondents = await getListOfCorrespondents()
-    await fillCorrespondentsDropDown(listOfCorrespondents, "receiverDropDown")
 }
 
 
-document.querySelector('#reverseMessageOverviewButton').addEventListener('click', () => {
-    reverseMessageOverview()
-})
-document.querySelector('#refreshInboxButton').addEventListener('click', () => {
-    inboxArray = getInbox()
-})
-document.querySelector('#refreshOutboxButton').addEventListener('click', () => {
-    outboxArray = getOutbox()
-})
-document.querySelector('#writeMessageButton').addEventListener('click', () => {
-    window.location.href = "send-a-message.html"
-})
-// for floatingCheatMenu
-document.querySelector('#fillListOfCorrespondentsButton').addEventListener('click', () => {
-    fillCorrespondentsDropDown(listOfCorrespondents, "receiverDropDown")
-})
-document.querySelector('#fillReceiverDropDown').addEventListener('click', () => {
-    fillCorrespondentsDropDown(listOfCorrespondents, "receiverDropDown")
-})
 
-export async function getListOfCorrespondents() {
-    const url = `/api/users/correspondents`
-    try {
-        const response = await fetch(url, {
-            headers: {
-                "Authorization": localStorage.getItem('authToken')
-            },
-        })
-        if (!response.ok) {
-            new Error(`Response status: ${response.status}`)
-        }
-        return await response.json()
-    } catch (error) {
-        console.error(error.message)
-    }
-}
+// // for floatingCheatMenu
+// document.querySelector('#fillListOfCorrespondentsButton').addEventListener('click', () => {
+//     fillCorrespondentsDropDown(listOfCorrespondents, "receiverDropDown")
+// })
+// document.querySelector('#fillReceiverDropDown').addEventListener('click', () => {
+//     fillCorrespondentsDropDown(listOfCorrespondents, "receiverDropDown")
+// })
 
-export function fillCorrespondentsDropDown(listOfCorrespondents, optionElementId) {
-    const dropDownElement = document.querySelector(`#${optionElementId}`)
-    listOfCorrespondents.forEach((pair) => {
-        let optionElement = document.createElement("option")
-        optionElement.value = pair.userId
-        optionElement.text = pair.username
-        dropDownElement.appendChild(optionElement)
-    })
-}
+
 
 // TODO verplaats naar user.js module of iets dergelijks?
 export async function getUsername(userId) {
