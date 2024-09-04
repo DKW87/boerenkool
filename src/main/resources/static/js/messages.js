@@ -1,13 +1,12 @@
 import * as main from "./modules/main.mjs"
 import * as auth from "./modules/auth.mjs";
+import {getUsername} from "./modules/user.mjs";
 
 main.loadHeader()
 main.loadFooter()
 
 const NO_MESSAGES = "Geen berichten."
 
-// Welke eigenschappen van de timestamp van een message
-// worden weergegeven? Nodig voor formatDateTime()
 const DATE_TIME_OPTIONS = {
     weekday: `long`,
     year: `numeric`,
@@ -21,8 +20,6 @@ let inboxArray = {}
 let outboxArray = {}
 let sortAscending = false
 let overviewShowsInbox = true
-let listOfCorrespondents = []
-
 
 // authenticate user
 const token = auth.getToken()
@@ -35,29 +32,40 @@ async function setup() {
     document.querySelector('#reverseMessageOverviewButton').addEventListener('click', () => {
         reverseMessageOverview()
     })
-    document.querySelector('#refreshInboxButton').addEventListener('click', () => {
-        inboxArray = getInbox()
+    document.querySelector('#refreshInboxButton').addEventListener('click', async () => {
+        overviewShowsInbox = true
+        inboxArray = await getInbox()
+        if (inboxArray.length > 0) {
+            sortMessageArray(inboxArray)
+            fillMessageOverview(inboxArray)
+        } else noMessages()
     })
-    document.querySelector('#refreshOutboxButton').addEventListener('click', () => {
-        outboxArray = getOutbox()
+    document.querySelector('#refreshOutboxButton').addEventListener('click', async () => {
+        overviewShowsInbox = false
+        outboxArray = await getOutbox()
+        if (outboxArray.length > 0) {
+            sortMessageArray(outboxArray)
+            fillMessageOverview(outboxArray)
+        } else noMessages()
     })
     document.querySelector('#writeMessageButton').addEventListener('click', () => {
         window.location.href = "send-a-message.html"
     })
 
     loggedInUser = await auth.getLoggedInUser(token)
-    inboxArray = await getInbox()
 
-    if (inboxArray.length > 0) {
-        await sortMessageArray(inboxArray)
-        await fillMessageOverview(inboxArray)
-    } else noMessages()
+    // refresh messageoverview with inbox by default
+    document.querySelector('#refreshInboxButton').click();
+
+    // if (inboxArray.length > 0) {
+    //     await sortMessageArray(inboxArray)
+    //     await fillMessageOverview(inboxArray)
+    // } else noMessages()
 
     // outboxArray = await getOutbox()
     // if (outboxArray.length > 0) {
     //     sortMessageArray(outboxArray)
-    //     fillMessageOverview(outboxArray)
-    // } else noMessages()
+    // }
 }
 
 
@@ -69,26 +77,6 @@ async function setup() {
 // document.querySelector('#fillReceiverDropDown').addEventListener('click', () => {
 //     fillCorrespondentsDropDown(listOfCorrespondents, "receiverDropDown")
 // })
-
-
-
-// TODO verplaats naar user.js module of iets dergelijks?
-export async function getUsername(userId) {
-    const url = `/api/users/username?userid=${userId}`
-    try {
-        const response = await fetch(url, {
-            headers: {
-                "Authorization": localStorage.getItem('authToken')
-            },
-        })
-        if (!response.ok) {
-            new Error(`Response status: ${response.status}`)
-        }
-        return await response.text()
-    } catch (error) {
-        console.error(error.message)
-    }
-}
 
 async function getInbox() {
     overviewShowsInbox = true
@@ -235,14 +223,15 @@ function reverseMessageOverview() {
     }
 }
 
-function showMessageContent(messageId) {
+async function showMessageContent(messageId) {
     // check which overview is showing
     let visibleArray = overviewShowsInbox ? inboxArray : outboxArray
     // find the message in the array, using its messageId
     let selectedMessage = visibleArray.find((e) => e.messageId === parseInt(messageId, 10))
     // show the message values in the relevant HTML elements
-    // TODO show username instead of userid of sender / receiver
-    document.querySelector(`#singleViewUserId`).textContent = selectedMessage.senderId
+    document.querySelector(`#singleViewUsername`).textContent = (overviewShowsInbox ?
+        await getUsername(selectedMessage.senderId) :
+        loggedInUser.username)
     const messageDateTime = new Date(selectedMessage.dateTimeSent)
     document.querySelector(`#singleViewDateTimeSent`).textContent = formatDateTime(messageDateTime)
     document.querySelector(`#singleViewSubject`).textContent = selectedMessage.subject

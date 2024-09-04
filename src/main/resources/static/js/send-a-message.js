@@ -37,20 +37,20 @@ async function setup() {
         console.log("no parameters")
         addElementForReceiverDropdown()
         listOfCorrespondents = await getListOfCorrespondents()
-        await fillCorrespondentsDropDown(listOfCorrespondents, "receiver")
+        await fillCorrespondentsDropDown(listOfCorrespondents, "receiverDropDown")
     }
 }
 
 function addElementForReceiverUsername() {
     const elementForReceiverUsername = document.createElement(`div`)
     elementForReceiverUsername.innerHTML = "Aan :\n" +
-        "<span id=\"receiverName\">{username from parameter}</span>"
+        "<span id=\"receiverName\"></span>"
     document.querySelector(`#receiverPlaceholder`).replaceWith(elementForReceiverUsername)
 }
 function addElementForReceiverDropdown() {
     const elementForReceiverDropdown = document.createElement(`div`)
     elementForReceiverDropdown.innerHTML = "Aan :\n" +
-        "<select name=\"receiverDropDown\" id=\"receiver\">\n" +
+        "<select name=\"receiverDropDown\" id=\"receiverDropDown\">\n" +
         "<option>Selecteer een gebruikersnaam</option>\n" +
         "</select>"
     document.querySelector(`#receiverPlaceholder`).replaceWith(elementForReceiverDropdown)
