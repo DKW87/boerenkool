@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="nl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HuisjeBoompjeBoerenkool - Nieuw Huis Aanmaken</title>
+
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/header.css">
+    <link rel="stylesheet" href="css/footer.css">
+    <link rel="stylesheet" href="css/create-house.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playwrite+BE+VLG:wght@100..400&family=Playwrite+PE:wght@100..400&display=swap" rel="stylesheet">
+
+    <script src="js/create-house.js" type="module"></script>
+</head>
+
+<body>
+
+<div class="main-grid-area">
+
+
+    <div class="header-div" id="header"></div>
+
+
+    <div id="huis-create" class="container">
+        <h1 id="form-header">Plaats Nieuwe Huisje</h1><br><br>
+        <form id="houseForm" enctype="multipart/form-data">
+            <label for="houseName">Huis Naam</label>
+            <input type="text" id="houseName" required>
+
+            <label for="houseType">Huis Type</label>
+            <input id="houseType" required>
+
+
+            <label for="houseOwner">Eigenaar ID</label>
+            <input type="number" id="houseOwner" required>
+
+            <label for="province">Provincie</label>
+            <input type="text" id="province" required>
+
+            <label for="city">Stad</label>
+            <input type="text" id="city" required>
+
+            <label for="streetAndNumber">Straat en Nummer</label>
+            <input type="text" id="streetAndNumber" required>
+
+            <label for="zipcode">Postcode</label>
+            <input type="text" id="zipcode" required>
+
+            <label for="maxGuest">Max Gasten</label>
+            <input type="number" id="maxGuest" required>
+
+            <label for="roomCount">Aantal Kamers</label>
+            <input type="number" id="roomCount" required>
+
+            <label for="pricePPPD">Prijs per Persoon per Dag</label>
+            <input type="number" id="pricePPPD" required>
+
+            <label for="description">Beschrijving</label>
+            <textarea id="description" rows="4" required></textarea>
+
+            <label class="switch">
+                <input type="checkbox" id="isNotAvailable" required>
+                <span class="slider round"></span>
+            </label>
+            <span id="availabilityText">Beschikbaar</span>
+
+
+
+            <label for="housePictures">Foto's Toevoegen</label>
+            <input type="file" id="housePictures" name="pictures" accept="image/*" multiple required>
+
+
+            <div id="imagePreview" class="image-preview"></div>
+            <br>
+
+            <button type="submit">Maak Huis Aan</button>
+            <p id="message"></p>
+        </form>
+    </div>
+
+    <!-- Modal (Pop-up) -->
+    <div id="imageModal" class="modal">
+        <span class="close">&times;</span>
+        <img class="modal-content" id="modalImage">
+        <div id="caption"></div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer-div" id="footer"></div>
+
+</div>
+
+</body>
+</html>
