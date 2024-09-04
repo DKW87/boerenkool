@@ -81,7 +81,7 @@ public class RegistrationController {
     }
 
     @GetMapping("/username")
-    public ResponseEntity<?> getUsername(@RequestParam UUID token) {
+    public ResponseEntity<?> getUsernameByToken(@RequestParam UUID token) {
         Optional<String> username = authorizationService.getUsernameByToken(token);
         if (username.isPresent()) {
             return ResponseEntity.ok(Collections.singletonMap("username", username.get()));
