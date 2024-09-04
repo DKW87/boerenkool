@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 
 /**
@@ -35,6 +36,7 @@ public class HouseService {
     private final UserService userService;
     private final PictureService pictureService;
 
+
     @Autowired
     public HouseService(HouseRepository houseRepository, CacheManager cacheManager, UserService userService,
                         PictureService pictureService) {
@@ -45,16 +47,83 @@ public class HouseService {
         logger.info("New HouseService");
     }
 
-    @Cacheable(value = "houses", key = "#houseId")
+
     public House getOneById(int houseId) {
         return houseRepository.getHouseById(houseId).orElse(null);
     }
 
+    @Cacheable(value = "houses", key = "#houseId")
     public HouseDetailsDTO getOneByIdAndConvertToDTO(int houseId) {
         House house = getOneById(houseId);
         return house == null
                 ? null
                 : convertHouseToHouseDetailsDTO(house);
+    }
+
+    public List<House> getAllHouses() {
+        return houseRepository.getListOfAllHouses();
+    }
+
+    public List<HouseListDTO> getListOfHousesByOwnerId(int houseOwnerId) {
+        List<House> houses = houseRepository.getListOfAllHousesByOwner(houseOwnerId);
+
+        return houses.isEmpty()
+                ? null
+                : convertListToHouseListDTO(houses);
+    }
+
+    public String getHouseOwnerName(int houseOwnerId) {
+        return userService.getOneById(houseOwnerId).get().getUsername();
+    }
+
+    public List<HouseListDTO> getFilteredListOfHouses(HouseFilter filter) {
+        List<House> filteredHouses = houseRepository.getHousesWithFilter(filter);
+        return filteredHouses.isEmpty()
+                ? null
+                : convertListToHouseListDTO(filteredHouses);
+    }
+
+    public List<String> getUniqueCities() {
+        return houseRepository.getUniqueCities();
+    }
+
+    public List<HouseType> getAllHouseTypes() {
+        return houseRepository.getAllHouseTypes();
+    }
+
+    public boolean saveHouse(HouseDetailsDTO house) {
+
+        boolean result = houseRepository.saveHouse(convertHouseDetailsDTOToHouse(house));
+        if (result) {
+            updateCache(house);
+        }
+        return result;
+    }
+
+    private void updateCache(HouseDetailsDTO house) {
+        Cache cache = cacheManager.getCache("houses");
+        if (cache != null) {
+            cache.put(house.getHouseId(), house);
+        }
+    }
+
+    private List<HouseListDTO> convertListToHouseListDTO(List<House> houses) {
+        List<HouseListDTO> strippedFilteredHouses = new ArrayList<>();
+        for (House fullHouse : houses) {
+            HouseListDTO strippedHouse = new HouseListDTO();
+            strippedHouse.setHouseId(fullHouse.getHouseId());
+            if (!fullHouse.getPictures().isEmpty()) {
+                PictureDTO pictureDTO = pictureService.convertToDTO(fullHouse.getPictures().getFirst());
+                strippedHouse.setPicture(pictureDTO);
+            }
+            strippedHouse.setHouseName(fullHouse.getHouseName());
+            strippedHouse.setHouseType(fullHouse.getHouseType().getHouseTypeName());
+            strippedHouse.setProvince(fullHouse.getProvince());
+            strippedHouse.setCity(fullHouse.getCity());
+            strippedHouse.setPrice(fullHouse.getPricePPPD());
+            strippedFilteredHouses.add(strippedHouse);
+        }
+        return strippedFilteredHouses;
     }
 
     private HouseDetailsDTO convertHouseToHouseDetailsDTO(House house) {
@@ -89,69 +158,24 @@ public class HouseService {
         return listPictureDTO;
     }
 
-    public List<House> getAllHouses() {
-        return houseRepository.getListOfAllHouses();
-    }
-
-    public List<HouseListDTO> getListOfHousesByOwnerId(int houseOwnerId) {
-        List<House> houses = houseRepository.getListOfAllHousesByOwner(houseOwnerId);
-
-        return houses.isEmpty()
-                ? null
-                : convertListToHouseListDTO(houses);
-    }
-
-    public String getHouseOwnerName(int houseOwnerId) {
-        return userService.getOneById(houseOwnerId).get().getUsername();
-    }
-
-    public List<HouseListDTO> getFilteredListOfHouses(HouseFilter filter) {
-        List<House> filteredHouses = houseRepository.getHousesWithFilter(filter);
-        return filteredHouses.isEmpty()
-                ? null
-                : convertListToHouseListDTO(filteredHouses);
-    }
-
-    private List<HouseListDTO> convertListToHouseListDTO(List<House> houses) {
-        List<HouseListDTO> strippedFilteredHouses = new ArrayList<>();
-        for (House fullHouse : houses) {
-            HouseListDTO strippedHouse = new HouseListDTO();
-            strippedHouse.setHouseId(fullHouse.getHouseId());
-            if (!fullHouse.getPictures().isEmpty()) {
-                PictureDTO pictureDTO = pictureService.convertToDTO(fullHouse.getPictures().getFirst());
-                strippedHouse.setPicture(pictureDTO);
-            }
-            strippedHouse.setHouseName(fullHouse.getHouseName());
-            strippedHouse.setHouseType(fullHouse.getHouseType().getHouseTypeName());
-            strippedHouse.setProvince(fullHouse.getProvince());
-            strippedHouse.setCity(fullHouse.getCity());
-            strippedHouse.setPrice(fullHouse.getPricePPPD());
-            strippedFilteredHouses.add(strippedHouse);
-        }
-        return strippedFilteredHouses;
-    }
-
-    public List<String> getUniqueCities() {
-        return houseRepository.getUniqueCities();
-    }
-
-    public List<HouseType> getAllHouseTypes() {
-        return houseRepository.getAllHouseTypes();
-    }
-
-    public boolean saveHouse(House house) {
-        boolean result = houseRepository.saveHouse(house);
-        if (result) {
-            updateCache(house);
-        }
-        return result;
-    }
-
-    private void updateCache(House house) {
-        Cache cache = cacheManager.getCache("houses");
-        if (cache != null) {
-            cache.put(house.getHouseId(), house);
-        }
+    private House convertHouseDetailsDTOToHouse(HouseDetailsDTO houseDetailsDTO) {
+        House house = new House();
+        house.setHouseName(houseDetailsDTO.getHouseName());
+        house.setHouseType(houseDetailsDTO.getHouseType());
+        house.setHouseOwner(userService.getOneById(houseDetailsDTO.getHouseOwnerId())
+                .orElseThrow(() -> new NoSuchElementException("user not found")));
+        house.setProvince(houseDetailsDTO.getProvince());
+        house.setCity(houseDetailsDTO.getCity());
+        house.setStreetAndNumber(houseDetailsDTO.getStreetAndNumber());
+        house.setZipcode(houseDetailsDTO.getZipcode());
+        house.setMaxGuest(houseDetailsDTO.getMaxGuest());
+        house.setRoomCount(houseDetailsDTO.getRoomCount());
+        house.setPricePPPD(houseDetailsDTO.getPricePPPD());
+        house.setDescription(houseDetailsDTO.getDescription());
+        house.setNotAvailable(houseDetailsDTO.isNotAvailable());
+        /* TODO discuss how we handle saving pictures and extraFeatures. I don't think it should be included here but
+        *   need separate query on front-end. Thoughts? */
+        return house;
     }
 
     @CacheEvict(value = "houses", key = "#houseId")

@@ -237,6 +237,26 @@ public class House implements Comparable<House> {
         this.pictures = pictures;
     }
 
+    public void setHouseName(String houseName) {
+        this.houseName = houseName;
+    }
+
+    public void setStreetAndNumber(String streetAndNumber) {
+        this.streetAndNumber = streetAndNumber;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public boolean isNotAvailable() {
+        return isNotAvailable;
+    }
+
+    public void setNotAvailable(boolean notAvailable) {
+        isNotAvailable = notAvailable;
+    }
+
     public static class otherEntityIds {
 
         int houseOwnerId;
