@@ -19,6 +19,8 @@ public class PasswordService {
     private JavaMailSender javaMailSender;
 
     private static final String PEPPER = "TheWholeWorldHatesBoerenkool";
+    private static final String BASE_URL = "http://localhost:8080/";
+
 
     @Autowired
     public PasswordService(JavaMailSender javaMailSender) {
@@ -73,7 +75,7 @@ public class PasswordService {
         message.setFrom("huisjeboompjeboerenkool@gmail.com");
         message.setTo(email);
         message.setSubject("Wachtwoord resetten");
-        message.setText("Om je wachtwoord te resetten, gebruik deze token: " + token);
+        message.setText("Klik op de volgende link om je wachtwoord te resetten: " + BASE_URL + "\nToken: " + token);
         javaMailSender.send(message);
     }
 

@@ -8,6 +8,7 @@ import boerenkool.utilities.exceptions.UserUpdateFailedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -84,10 +85,10 @@ public class UserService {
 
 
     //code Bart
-    public List<Map<String, Object>> getMapOfCorrespondents(int userId) throws MessageDoesNotExistException {
+    public List<Map<String, Object>> getMapOfCorrespondents(int userId) {
         Optional<List<Map<String, Object>>> mapOfCorrespondents = userRepository.getMapOfCorrespondents(userId);
         if (mapOfCorrespondents.isEmpty()) {
-            throw new MessageDoesNotExistException();
+            return new ArrayList<>();
         } else {
             return mapOfCorrespondents.get();
         }

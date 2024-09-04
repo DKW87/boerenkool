@@ -4,28 +4,71 @@
 
 export async function login(username, password) {
     try {
-        const response = await fetch('/api/registration/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password })
-        });
+        const response = await sendLoginRequest(username, password);
 
-        if (!response.ok) {
-            throw new Error('Login mislukt. Controleer je inloggegevens.');
+        if (isAccountLocked(response)) {
+            handleAccountLockout();
+            return false;
         }
 
-        const token = response.headers.get('Authorization');
+        if (!isResponseOk(response)) {
+            handleLoginError();
+            return false;
+        }
+
+        const token = getTokenFromResponse(response);
         if (!token) {
             throw new Error('Geen token ontvangen van de server.');
         }
 
-        localStorage.setItem('authToken', token);
+        saveToken(token);
         return true;
     } catch (error) {
-        console.error(error.message);
+        handleUnexpectedError(error);
         return false;
     }
 }
+
+// Smaller helper functions
+
+async function sendLoginRequest(username, password) {
+    return await fetch('/api/registration/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+    });
+}
+
+function isAccountLocked(response) {
+    return response.status === 403;
+}
+
+function handleAccountLockout() {
+    alert('Je account is tijdelijk geblokkeerd wegens te veel mislukte inlogpogingen. Probeer het later opnieuw.');
+}
+
+function isResponseOk(response) {
+    return response.ok;
+}
+
+function handleLoginError() {
+    alert('Login mislukt. Controleer je inloggegevens.');
+}
+
+function getTokenFromResponse(response) {
+    return response.headers.get('Authorization');
+}
+
+function saveToken(token) {
+    localStorage.setItem('authToken', token);
+}
+
+function handleUnexpectedError(error) {
+    console.error("Unexpected error caught", error);
+    alert(error.message);
+}
+
+// Other existing functions
 
 export function logout() {
     localStorage.removeItem('authToken');
@@ -64,6 +107,34 @@ export async function getLoggedInUser(token) {
     } catch (error) {
         alert('Kon gebruikersinformatie niet ophalen.');
         console.error(error);
+        return null;
+    }
+}
+
+//  functie om de gebruikersnaam op te halen op basis van de UUID
+
+export async function getUsernameByToken() {
+    const token = getToken();
+    if (!token) {
+        alert('Geen token gevonden.');
+        return null;
+    }
+
+    try {
+        const response = await fetch(`/api/authorization/username?token=${token}`, {
+            method: 'GET',
+            headers: { 'Authorization': token }
+        });
+
+        if (!response.ok) {
+            throw new Error('Kon gebruikersnaam niet ophalen.');
+        }
+
+        const data = await response.json();
+        return data.username;
+    } catch (error) {
+        console.error("Error fetching username:", error);
+        alert('Kon gebruikersnaam niet ophalen.');
         return null;
     }
 }

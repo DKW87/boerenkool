@@ -29,6 +29,7 @@ public class LoginAttemptService {
     public void loginSucceeded(String username) {
         attemptsCache.remove(username);
         lockoutCache.remove(username);
+        System.out.println("Login succeeded for user: " + username + ". Failed attempts and lockout records removed."); // Debugging
     }
 
     /**
@@ -41,9 +42,12 @@ public class LoginAttemptService {
         attempts++;
         attemptsCache.put(username, attempts);
 
+        System.out.println("Failed login attempt " + attempts + " for user: " + username); // Debugging
+
         // If the user has exceeded the maximum number of attempts, lock the account
         if (attempts >= MAX_ATTEMPT) {
             lockoutCache.put(username, LocalDateTime.now().plusMinutes(LOCK_TIME_DURATION));
+            System.out.println("User " + username + " is now locked out until " + lockoutCache.get(username)); // Debugging
         }
     }
 
@@ -56,13 +60,16 @@ public class LoginAttemptService {
     public boolean isBlocked(String username) {
         if (lockoutCache.containsKey(username)) {
             LocalDateTime lockoutTime = lockoutCache.get(username);
+            System.out.println("Checking if user " + username + " is locked out. Lockout expires at: " + lockoutTime); // Debugging
 
             // If the current time is before the lockout expiration, the account is locked
             if (LocalDateTime.now().isBefore(lockoutTime)) {
+                System.out.println("User " + username + " is currently locked out."); // Debugging
                 return true;
             } else {
                 // If the lockout period has expired, remove the lockout record
                 lockoutCache.remove(username);
+                System.out.println("Lockout expired for user: " + username + ". Lockout record removed."); // Debugging
                 return false;
             }
         }

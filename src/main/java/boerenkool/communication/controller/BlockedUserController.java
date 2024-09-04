@@ -2,11 +2,12 @@ package boerenkool.communication.controller;
 
 import boerenkool.business.model.User;
 import boerenkool.business.service.BlockedUserService;
-import boerenkool.business.service.UserService;
+import boerenkool.communication.dto.BlockedUserDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/blocked-users")
@@ -30,8 +31,13 @@ public class BlockedUserController {
     }
 
     @GetMapping("/{userId}")
-    public List<User> getBlockedUsers(@PathVariable int userId) {
-        return blockedUserService.getBlockedUsers(userId);
+    public List<BlockedUserDTO> getBlockedUsers(@PathVariable int userId) {
+        List<User> blockedUsers = blockedUserService.getBlockedUsers(userId);
+
+        // Convert each User to BlockedUserDTO to exclude sensitive information
+        return blockedUsers.stream()
+                .map(user -> new BlockedUserDTO(user.getUsername()))
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/is-blocked")
