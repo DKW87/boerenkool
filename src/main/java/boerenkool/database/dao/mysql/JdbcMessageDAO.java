@@ -133,7 +133,7 @@ public class JdbcMessageDAO implements MessageDAO {
                 userId);
     }
 
-    public int checkForUnreadMessages(int receiverId) {
+    public int numberOfUnreadMessages(int receiverId) {
         Integer numberOfUnread = jdbcTemplate.queryForObject(
                 "SELECT COUNT(readByReceiver = 1 ) FROM Message WHERE receiverId = ?;",
                 Integer.class,
@@ -161,8 +161,14 @@ public class JdbcMessageDAO implements MessageDAO {
         return (success == 1);
     }
 
+    @Override
+    public boolean setReadByReceiver(Message message) {
+        return (jdbcTemplate.update(
+                "UPDATE Message SET readByReceiver = TRUE WHERE messageId = ?;",
+                message.getMessageId()) != 0);
+    }
+
     public boolean archiveMessageForSender(Message message) {
-        logger.info("archiveMessageForSender");
         return (jdbcTemplate.update(
                 "UPDATE Message SET archivedBySender = TRUE WHERE messageId = ?;",
                 message.getMessageId()) != 0);

@@ -22,20 +22,16 @@ let outboxArray = {}
 let sortAscending = false
 let overviewShowsInbox = true
 let listOfCorrespondents = []
-let headerWithToken = new Headers()
+
 
 // authenticate user
 const token = auth.getToken()
-console.log(token)
 await auth.checkIfLoggedIn(token)
-
 
 setup()
 
 async function setup() {
     loggedInUser = await auth.getLoggedInUser(token)
-    headerWithToken.append("Authorization", localStorage.getItem('authToken'))
-
     inboxArray = await getInbox()
 
     if (inboxArray.length > 0) {
@@ -49,8 +45,6 @@ async function setup() {
     //     fillMessageOverview(outboxArray)
     // } else noMessages()
     listOfCorrespondents = await getListOfCorrespondents()
-    console.log("listOfCorrespondents is :")
-    await console.log(listOfCorrespondents)
     await fillCorrespondentsDropDown(listOfCorrespondents, "receiverDropDown")
 }
 
@@ -79,10 +73,12 @@ export async function getListOfCorrespondents() {
     const url = `/api/users/correspondents`
     try {
         const response = await fetch(url, {
-            headers: headerWithToken
+            headers: {
+                "Authorization": localStorage.getItem('authToken')
+            },
         })
         if (!response.ok) {
-            throw new Error(`Response status: ${response.status}`)
+            new Error(`Response status: ${response.status}`)
         }
         return await response.json()
     } catch (error) {
@@ -105,7 +101,9 @@ export async function getUsername(userId) {
     const url = `/api/users/username?userid=${userId}`
     try {
         const response = await fetch(url, {
-            headers: headerWithToken
+            headers: {
+                "Authorization": localStorage.getItem('authToken')
+            },
         })
         if (!response.ok) {
             new Error(`Response status: ${response.status}`)
@@ -142,12 +140,13 @@ async function getMessages(box) {
     if (box != null) {
         boxParameter = `?box=` + box
     } else boxParameter = ``
-    const url = `/api/users/${loggedInUser.userId}/messages${boxParameter}`
+    const url = `/api/messages${boxParameter}`
     try {
         const response = await fetch(url, {
-                headers: headerWithToken
+            headers: {
+                "Authorization": localStorage.getItem('authToken')
             }
-        )
+        })
         if (!response.ok) {
             new Error(`Response status: ${response.status}`)
         } else if (response.status === 200) {
@@ -187,6 +186,8 @@ function fillMessageOverview(listOfMessages) {
                 showMessageContent(`${element.messageId}`)
                 markMessageRead(`${element.messageId}`)
             })
+            // TODO message readByReceiver = true ? ... : change class and add markMessageRead to eventListener
+
             // add subject element
             const subject = document.createElement(`div`)
             subject.setAttribute("class", "subject")
@@ -230,18 +231,19 @@ async function markMessageRead(messageId) {
 
 async function updateMessage(message) {
     const url = `/api/messages`
-    let headerWithTokenAndContentType = headerWithToken
-    headerWithTokenAndContentType.append("Content-Type", "application/json" )
     try {
         const response = await fetch(url, {
             method: "PUT",
-            headers: headerWithTokenAndContentType,
+            headers: {
+                "Authorization": localStorage.getItem('authToken'),
+                "Content-Type": "application/json"
+            },
             body: JSON.stringify(message)
         })
         if (!response.ok) {
             new Error(`Response status: ${response.status}`)
         } else {
-            console.log("updateMessage success!")
+            console.log("updateMessage success! Add visual feedback later...")
         }
     } catch (error) {
         console.error(error.message);
