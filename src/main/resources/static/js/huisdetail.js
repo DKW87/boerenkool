@@ -1,48 +1,53 @@
-"use strict"
-import * as main from "./modules/main.mjs"
-main.loadHeader()
-main.loadFooter()
+"use strict";
+import * as main from "./modules/main.mjs";
+main.loadHeader();
+main.loadFooter();
 
 let currentImageIndex = 0;
 let allImages = [];
 
-
-document.addEventListener('DOMContentLoaded', async function() {
+// Wait for the DOM to be fully loaded
+document.addEventListener('DOMContentLoaded', async function () {
     const params = new URLSearchParams(window.location.search);
-    const houseId = params.get('id');
+    const houseId = params.get('id');  // Get house ID from URL parameters
 
     if (houseId) {
+        // Fetch house details if houseId is available
         await fetchHouseDetails(houseId);
 
         const modal = document.getElementById('imageModal');
-        const modalImg = document.getElementById('enlargedImg');
         const closeBtn = document.getElementsByClassName('close')[0];
 
-        closeBtn.onclick = function() {
+        // Close the modal when the close button is clicked
+        closeBtn.onclick = function () {
             modal.style.display = 'none';
         };
 
-        window.onclick = function(event) {
+        // Close the modal when clicking outside the modal content
+        window.onclick = function (event) {
             if (event.target == modal) {
                 modal.style.display = 'none';
             }
         };
 
+        // Add event listeners for previous and next buttons in the modal
         document.getElementById('prev').addEventListener('click', prevImage);
         document.getElementById('next').addEventListener('click', nextImage);
 
+        // Event listener for clicking on the location to open Google Maps
         const locationElement = document.getElementById('location');
-        locationElement.addEventListener('click', function() {
+        locationElement.addEventListener('click', function () {
             const address = locationElement.textContent;
             const googleMapsUrl = `https://www.google.com/maps?q=${encodeURIComponent(address)}`;
             window.open(googleMapsUrl, '_blank');
         });
 
     } else {
-        console.error('House ID ontbreekt in de URL');
+        console.error('House ID is missing in the URL');
     }
 });
 
+// Fetch house details from the API using houseId
 async function fetchHouseDetails(houseId) {
     const url = `/api/houses/${houseId}`;
     try {
@@ -51,13 +56,14 @@ async function fetchHouseDetails(houseId) {
             throw new Error(`Response status: ${response.status}`);
         }
         const house = await response.json();
-        displayHouseDetails(house);
+        displayHouseDetails(house);  // Display house details in the DOM
     } catch (error) {
-        console.error('Fout bij het ophalen van huisdetails:', error);
+        console.error('Error fetching house details:', error);
         displayErrorMessage();
     }
 }
 
+// Go to the previous image in the modal
 function prevImage() {
     if (currentImageIndex > 0) {
         currentImageIndex--;
@@ -65,6 +71,7 @@ function prevImage() {
     }
 }
 
+// Go to the next image in the modal
 function nextImage() {
     if (currentImageIndex < allImages.length - 1) {
         currentImageIndex++;
@@ -72,6 +79,7 @@ function nextImage() {
     }
 }
 
+// Update the modal with the current image
 function updateModalImage() {
     const modalImg = document.getElementById('enlargedImg');
     modalImg.src = allImages[currentImageIndex].src;
@@ -79,6 +87,7 @@ function updateModalImage() {
     const prevBtn = document.getElementById('prev');
     const nextBtn = document.getElementById('next');
 
+    // Hide or show navigation buttons based on the number of images
     if (allImages.length <= 1) {
         prevBtn.style.display = 'none';
         nextBtn.style.display = 'none';
@@ -97,6 +106,7 @@ function updateModalImage() {
     }
 }
 
+// Display house details on the page
 function displayHouseDetails(house) {
     document.getElementById('houseName').textContent = house.houseName;
     document.getElementById('houseType').textContent = house.houseType.houseTypeName;
@@ -106,19 +116,22 @@ function displayHouseDetails(house) {
     document.getElementById('roomCount').textContent = house.roomCount;
     document.getElementById('pricePPPD').textContent = `€${house.pricePPPD}`;
     document.getElementById('description').textContent = house.description;
-    document.getElementById('availability').textContent = house.isNotAvailable ? 'Niet Beschikbaar' : 'Beschikbaar';
+    document.getElementById('availability').textContent = house.isNotAvailable ? 'Niet Beschikbaar' : 'Beschikbaar';  // Dutch UI
 
     const picturesContainer = document.getElementById('pictures');
     picturesContainer.innerHTML = '';
     allImages = [];
+
+    // Display each house image in the gallery and set up modal functionality
     house?.pictures?.forEach((picture, index) => {
         const img = document.createElement('img');
         img.src = `data:${picture.mimeType};base64,${picture.base64Picture}`;
-        img.alt = picture.description || "Huis afbeelding";
+        img.alt = picture.description || "Huis afbeelding";  // Nederlands alt text for house image
         img.classList.add('house-picture');
         picturesContainer.appendChild(img);
 
-        img.onclick = function() {
+        // When an image is clicked, open it in the modal
+        img.onclick = function () {
             currentImageIndex = index;
             const modal = document.getElementById('imageModal');
             modal.style.display = 'block';
@@ -130,14 +143,23 @@ function displayHouseDetails(house) {
 
     const featuresContainer = document.getElementById('extraFeatures');
     featuresContainer.innerHTML = '';
+    // Display extra features in a list
     house?.extraFeatures?.forEach(feature => {
         const featureItem = document.createElement('li');
         featureItem.textContent = feature.name;
         featuresContainer.appendChild(featureItem);
     });
+
+    // Add click event to the "Reserveer" button to navigate to the reservation page with houseId
+    const reserveerButton = document.getElementById('reserveerButton');
+    reserveerButton.addEventListener('click', function () {
+        // Redirect to reservation.html and pass houseId as a query parameter
+        window.location.href = `reservation.html?id=${house.houseId}`;
+    });
 }
 
+// Display an error message if fetching house details fails
 function displayErrorMessage() {
     const container = document.getElementById('house-details');
-    container.innerHTML = '<p>Kan huisdetails niet laden. Probeer het later opnieuw.</p>';
+    container.innerHTML = '<p>Kan huisdetails niet laden. Probeer het later opnieuw.</p>';  // Dutch error message
 }
