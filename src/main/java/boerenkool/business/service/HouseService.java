@@ -172,7 +172,7 @@ public class HouseService {
         house.setRoomCount(houseDetailsDTO.getRoomCount());
         house.setPricePPPD(houseDetailsDTO.getPricePPPD());
         house.setDescription(houseDetailsDTO.getDescription());
-        house.setNotAvailable(houseDetailsDTO.isNotAvailable());
+        house.setIsNotAvailable(houseDetailsDTO.isNotAvailable());
         /* TODO discuss how we handle saving pictures and extraFeatures. I don't think it should be included here but
         *   need separate query on front-end. Thoughts? */
         return house;

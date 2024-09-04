@@ -253,8 +253,8 @@ public class House implements Comparable<House> {
         return isNotAvailable;
     }
 
-    public void setNotAvailable(boolean notAvailable) {
-        isNotAvailable = notAvailable;
+    public void setIsNotAvailable(boolean isNotAvailable) {
+        isNotAvailable = isNotAvailable;
     }
 
     public static class otherEntityIds {
