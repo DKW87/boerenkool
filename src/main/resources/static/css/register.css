@@ -1,14 +1,14 @@
-/* Basisstijl voor het body-element */
+/* Algemene instellingen voor de registratiepagina */
 body {
     margin: 0;
     padding: 0;
     font-family: Arial, Helvetica, sans-serif;
     background-color: var(--boerenkool-grijs);
-    height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;
+    height: 100vh;
 }
 
 /* Main grid area voor gecentreerde inhoud */
@@ -17,7 +17,7 @@ body {
     height: 100%;
     display: grid;
     grid-template-columns: 1fr;
-    grid-template-rows: auto 1fr auto; /* Zorg ervoor dat de body-div het midden vult */
+    grid-template-rows: auto 1fr auto;
 }
 
 /* Header en footer styling */
@@ -31,7 +31,7 @@ body {
     color: var(--boerenkool-wit);
 }
 
-/* Body-styling */
+/* Body-div styling */
 .body-div {
     grid-column: 1 / 2;
     display: flex;
@@ -39,10 +39,10 @@ body {
     align-items: center;
     justify-content: center;
     padding: 0;
-    height: 100%; /* Zorgt ervoor dat de body-div de resterende ruimte inneemt */
+    height: 100%;
 }
 
-/* Registratiecontainer */
+/* Registratiecontainer styling */
 .registration-container {
     background-color: var(--boerenkool-wit);
     border-radius: 12px;
@@ -71,7 +71,7 @@ body {
     color: var(--boerenkool-zwart);
 }
 
-/* Input-styling */
+/* Input-styling voor tekst, email en wachtwoordvelden */
 .registration-container input[type="text"],
 .registration-container input[type="email"],
 .registration-container input[type="password"] {
@@ -83,5 +83,47 @@ body {
     margin-bottom: 20px;
 }
 
+/* Styling voor het telefoonveld */
+.registration-container input[type="tel"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: var(--font-size-large);
+    margin-bottom: 20px;
+}
+
 /* Dropdown menu styling */
-.registration-cont
+.registration-container select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: var(--font-size-large);
+    margin-bottom: 20px;
+    background-color: var(--boerenkool-wit);
+}
+
+/* Button styling */
+.registration-container button {
+    background-color: var(--boerenkool-groen);
+    color: var(--boerenkool-wit);
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    font-size: var(--font-size-large);
+    cursor: pointer;
+    width: 100%; /* Zorgt ervoor dat de knop dezelfde breedte heeft als de inputs */
+}
+
+/* Button hover-effect */
+.registration-container button:hover {
+    background-color: var(--boerenkool-lichtgroen);
+}
+
+/* Notificatiestijlen, als er een notificatie getoond moet worden */
+#notification {
+    margin-top: 20px;
+    color: var(--boerenkool-zwart);
+    font-size: var(--font-size-large);
+}
