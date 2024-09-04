@@ -53,7 +53,22 @@ document.addEventListener('DOMContentLoaded', function() {
         // picturelist uit filteren naar img element. Zit al in house object
         // extraFeatures checkboxes aanmaken, bestaan nog niet maar kan alvast omhulsen maken.
 
-        // Voeg afbeeldingen toe (als die er zijn)
+        // Add pictures if avaiable
+        //todo maintenance ? methode huidige functie halen ?
+        const picturesContainer = document.getElementById('pictures');
+        picturesContainer.innerHTML = '';
+        if (house.pictures && house.pictures.length > 0) {
+            house.pictures.forEach(picture => {
+                const img = document.createElement('img');
+                img.src = `data:${picture.mimeType};base64,${picture.base64Picture}`; // Construct the image source using Base64 encoding
+                img.alt = picture.description || 'House picture';
+                img.style.maxWidth = '25%'; //todo LET OP! pictures zijn verkleind,
+                img.style.marginBottom = '10px';
+                picturesContainer.appendChild(img);
+            });
+        } else {
+            picturesContainer.textContent = 'No pictures available';
+        }
 
 
     }
