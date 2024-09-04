@@ -31,21 +31,10 @@
                 <button id="sendMessageButton">Verstuur dit bericht</button>
             </menu>
 
-            <div>
-<!--                used when setting receiver username manually-->
-                <label for="receiverNameField">Gebruikersnaam : </label>
-                <input type="text" class="inputField" id="receiverNameField" name="username" required
-                       oninvalid="this.setCustomValidity('Voer de gebruikersnaam van de ontvanger in')"
-                       oninput="this.setCustomValidity('')">
-            </div>
-
-            <select name="receiverDropDown" id="receiverDropDown">
-                <option>Selecteer een gebruikersnaam</option>
-            </select>
-
-            <div>
-<!--                used when getting a userid as parameter -->
-               Aan : <span id="receiverNameFromParameterField">....</span>
+<!--            receiverPlaceholder is replaced by a single username -->
+<!--            (when userid parameter is passed in URL) -->
+<!--            or a dropdown list of correspondents (without parameter in URL)-->
+            <div id ="receiverPlaceholder">
             </div>
 
             <div>

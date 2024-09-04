@@ -43,8 +43,8 @@ public class MessageService {
         return convertMessageToDTO(messageRepository.getMessageById(messageId));
     }
 
-    public int checkForUnreadMessages(int receiverId) {
-        return messageRepository.checkForUnreadMessages(receiverId);
+    public int numberOfUnreadMessages(int receiverId) {
+        return messageRepository.numberOfUnreadMessages(receiverId);
     }
 
     public List<MessageDTO> getAllMessages() {
@@ -74,8 +74,14 @@ public class MessageService {
         return convertMessagesToDTOs(listOfMessages);
     }
 
-    public boolean updateMessage(MessageDTO messageDTO) throws MessageDoesNotExistException {
-        return messageRepository.updateMessage(convertDTOToMessage(messageDTO));
+    public boolean updateMessage(int userId, MessageDTO messageDTO) throws MessageDoesNotExistException {
+        if (userId == messageDTO.getSenderId()) {
+            // the sender can update everything in the message
+            return messageRepository.updateMessage(convertDTOToMessage(messageDTO));
+        } else if (userId == messageDTO.getReceiverId()) {
+            // the receiver can only update readByReceiver field
+            return messageRepository.setReadByReceiver(convertDTOToMessage(messageDTO));
+        } else return false;
     }
 
     public boolean deleteMessage(int messageId) {

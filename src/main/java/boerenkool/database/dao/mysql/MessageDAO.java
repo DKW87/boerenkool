@@ -25,10 +25,12 @@ public interface MessageDAO extends GenericDAO<Message> {
     @Override
     Optional<Message> getOneById(int messageId);
 
-    int checkForUnreadMessages(int receiverId);
+    int numberOfUnreadMessages(int receiverId);
 
     @Override
     boolean updateOne(Message message);
+
+    boolean setReadByReceiver(Message message);
 
     @Override
     boolean removeOneById(int id);

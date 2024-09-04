@@ -1,13 +1,12 @@
 import * as main from "./modules/main.mjs"
 import * as auth from "./modules/auth.mjs";
+import {getUsername} from "./modules/user.mjs";
 
 main.loadHeader()
 main.loadFooter()
 
 const NO_MESSAGES = "Geen berichten."
 
-// Welke eigenschappen van de timestamp van een message
-// worden weergegeven? Nodig voor formatDateTime()
 const DATE_TIME_OPTIONS = {
     weekday: `long`,
     year: `numeric`,
@@ -21,100 +20,67 @@ let inboxArray = {}
 let outboxArray = {}
 let sortAscending = false
 let overviewShowsInbox = true
-let listOfCorrespondents = []
-let headerWithToken = new Headers()
 
 // authenticate user
 const token = auth.getToken()
-console.log(token)
 await auth.checkIfLoggedIn(token)
-
 
 setup()
 
 async function setup() {
+
+    document.querySelector('#reverseMessageOverviewButton').addEventListener('click', () => {
+        reverseMessageOverview()
+    })
+    document.querySelector('#refreshInboxButton').addEventListener('click', async () => {
+        overviewShowsInbox = true
+        inboxArray = await getInbox()
+        if (inboxArray.length > 0) {
+            sortMessageArray(inboxArray)
+            fillMessageOverview(inboxArray)
+            // TODO showMessageContent(messageId) first in array
+            await showMessageContent(inboxArray[0].messageId)
+        } else noMessages()
+    })
+    document.querySelector('#refreshOutboxButton').addEventListener('click', async () => {
+        overviewShowsInbox = false
+        outboxArray = await getOutbox()
+        if (outboxArray.length > 0) {
+            sortMessageArray(outboxArray)
+            fillMessageOverview(outboxArray)
+            // TODO select first message in array
+            await showMessageContent(outboxArray[0].messageId)
+        } else noMessages()
+    })
+    document.querySelector('#writeMessageButton').addEventListener('click', () => {
+        window.location.href = "send-a-message.html"
+    })
+
     loggedInUser = await auth.getLoggedInUser(token)
-    headerWithToken.append("Authorization", localStorage.getItem('authToken'))
 
-    inboxArray = await getInbox()
+    // refresh messageoverview with inbox by default
+    document.querySelector('#refreshInboxButton').click();
 
-    if (inboxArray.length > 0) {
-        await sortMessageArray(inboxArray)
-        await fillMessageOverview(inboxArray)
-    } else noMessages()
+    // if (inboxArray.length > 0) {
+    //     await sortMessageArray(inboxArray)
+    //     await fillMessageOverview(inboxArray)
+    // } else noMessages()
 
     // outboxArray = await getOutbox()
     // if (outboxArray.length > 0) {
     //     sortMessageArray(outboxArray)
-    //     fillMessageOverview(outboxArray)
-    // } else noMessages()
-    listOfCorrespondents = await getListOfCorrespondents()
-    console.log("listOfCorrespondents is :")
-    await console.log(listOfCorrespondents)
-    await fillCorrespondentsDropDown(listOfCorrespondents, "receiverDropDown")
+    // }
 }
 
 
-document.querySelector('#reverseMessageOverviewButton').addEventListener('click', () => {
-    reverseMessageOverview()
-})
-document.querySelector('#refreshInboxButton').addEventListener('click', () => {
-    inboxArray = getInbox()
-})
-document.querySelector('#refreshOutboxButton').addEventListener('click', () => {
-    outboxArray = getOutbox()
-})
-document.querySelector('#writeMessageButton').addEventListener('click', () => {
-    window.location.href = "send-a-message.html"
-})
-// for floatingCheatMenu
-document.querySelector('#fillListOfCorrespondentsButton').addEventListener('click', () => {
-    fillCorrespondentsDropDown(listOfCorrespondents, "receiverDropDown")
-})
-document.querySelector('#fillReceiverDropDown').addEventListener('click', () => {
-    fillCorrespondentsDropDown(listOfCorrespondents, "receiverDropDown")
-})
 
-export async function getListOfCorrespondents() {
-    const url = `/api/users/correspondents`
-    try {
-        const response = await fetch(url, {
-            headers: headerWithToken
-        })
-        if (!response.ok) {
-            throw new Error(`Response status: ${response.status}`)
-        }
-        return await response.json()
-    } catch (error) {
-        console.error(error.message)
-    }
-}
-
-export function fillCorrespondentsDropDown(listOfCorrespondents, optionElementId) {
-    const dropDownElement = document.querySelector(`#${optionElementId}`)
-    listOfCorrespondents.forEach((pair) => {
-        let optionElement = document.createElement("option")
-        optionElement.value = pair.userId
-        optionElement.text = pair.username
-        dropDownElement.appendChild(optionElement)
-    })
-}
-
-// TODO verplaats naar user.js module of iets dergelijks?
-export async function getUsername(userId) {
-    const url = `/api/users/username?userid=${userId}`
-    try {
-        const response = await fetch(url, {
-            headers: headerWithToken
-        })
-        if (!response.ok) {
-            throw new Error(`Response status: ${response.status}`)
-        }
-        return await response.text()
-    } catch (error) {
-        console.error(error.message)
-    }
-}
+// // for floatingCheatMenu
+// document.querySelector('#fillListOfCorrespondentsButton').addEventListener('click', () => {
+//     fillCorrespondentsDropDown(listOfCorrespondents, "receiverDropDown")
+// })
+// document.querySelector('#fillReceiverDropDown').addEventListener('click', () => {
+//     fillCorrespondentsDropDown(listOfCorrespondents, "receiverDropDown")
+// })
 
 async function getInbox() {
     overviewShowsInbox = true
@@ -142,14 +108,13 @@ async function getMessages(box) {
     if (box != null) {
         boxParameter = `?box=` + box
     } else boxParameter = ``
-    const url = `/api/users/${loggedInUser.userId}/messages${boxParameter}`
-    const headerWithToken = new Headers()
-    headerWithToken.append("Authorization", localStorage.getItem('authToken'))
+    const url = `/api/messages${boxParameter}`
     try {
         const response = await fetch(url, {
-                headers: headerWithToken
+            headers: {
+                "Authorization": localStorage.getItem('authToken')
             }
-        )
+        })
         if (!response.ok) {
             new Error(`Response status: ${response.status}`)
         } else if (response.status === 200) {
@@ -189,6 +154,8 @@ function fillMessageOverview(listOfMessages) {
                 showMessageContent(`${element.messageId}`)
                 markMessageRead(`${element.messageId}`)
             })
+            // TODO message readByReceiver = true ? ... : change class and add markMessageRead to eventListener
+
             // add subject element
             const subject = document.createElement(`div`)
             subject.setAttribute("class", "subject")
@@ -220,19 +187,35 @@ function noMessages() {
 }
 
 function markMessageUnread(messageId) {
-    // TODO....
-    updateMessage(message)
-}
-
-function markMessageRead(messageId) {
-    // TODO....
-    console.log("markMessageRead is called, how about making this do something?")
+    // TODO later...
     // updateMessage(message)
 }
 
+async function markMessageRead(messageId) {
+    const message = inboxArray.find(({messageId}) => messageId === messageId)
+    message.readByReceiver = true
+    await updateMessage(message)
+}
+
 async function updateMessage(message) {
-    const url = `/api/users/${loggedInUser.userId}/messages`
-    // TODO
+    const url = `/api/messages`
+    try {
+        const response = await fetch(url, {
+            method: "PUT",
+            headers: {
+                "Authorization": localStorage.getItem('authToken'),
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(message)
+        })
+        if (!response.ok) {
+            new Error(`Response status: ${response.status}`)
+        } else {
+            console.log("updateMessage success! Add visual feedback later...")
+        }
+    } catch (error) {
+        console.error(error.message);
+    }
 }
 
 function reverseMessageOverview() {
@@ -244,14 +227,15 @@ function reverseMessageOverview() {
     }
 }
 
-function showMessageContent(messageId) {
+async function showMessageContent(messageId) {
     // check which overview is showing
     let visibleArray = overviewShowsInbox ? inboxArray : outboxArray
-        // find the message in the array, using its messageId
+    // find the message in the array, using its messageId
     let selectedMessage = visibleArray.find((e) => e.messageId === parseInt(messageId, 10))
     // show the message values in the relevant HTML elements
-    // TODO show username instead of userid of sender / receiver
-    document.querySelector(`#singleViewUserId`).textContent = selectedMessage.senderId
+    document.querySelector(`#singleViewUsername`).textContent = (overviewShowsInbox ?
+        await getUsername(selectedMessage.senderId) :
+        loggedInUser.username)
     const messageDateTime = new Date(selectedMessage.dateTimeSent)
     document.querySelector(`#singleViewDateTimeSent`).textContent = formatDateTime(messageDateTime)
     document.querySelector(`#singleViewSubject`).textContent = selectedMessage.subject
