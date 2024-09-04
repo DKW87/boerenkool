@@ -38,6 +38,8 @@ async function setup() {
         if (inboxArray.length > 0) {
             sortMessageArray(inboxArray)
             fillMessageOverview(inboxArray)
+            // TODO showMessageContent(messageId) first in array
+            await showMessageContent(inboxArray[0].messageId)
         } else noMessages()
     })
     document.querySelector('#refreshOutboxButton').addEventListener('click', async () => {
@@ -46,6 +48,8 @@ async function setup() {
         if (outboxArray.length > 0) {
             sortMessageArray(outboxArray)
             fillMessageOverview(outboxArray)
+            // TODO select first message in array
+            await showMessageContent(outboxArray[0].messageId)
         } else noMessages()
     })
     document.querySelector('#writeMessageButton').addEventListener('click', () => {
