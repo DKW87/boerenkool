@@ -1,16 +1,19 @@
-
 import * as Main from './modules/main.mjs';
+import * as Auth from "./modules/auth.mjs";
 
 /* load all page elements of index.html */
 Main.loadHeader();
 Main.loadFooter();
 document.addEventListener('DOMContentLoaded', function() {
+
+    const urlParams = new URLSearchParams(window.location.search);
+    document.getElementById('houseId').value=urlParams.get('id');
+
     const reservationForm = document.getElementById('reservation-form');
 
     reservationForm.addEventListener('submit', function(event) {
         event.preventDefault();
         const houseId = document.getElementById('houseId').value;
-        const userId = document.getElementById('userId').value;
         const guestCount = document.getElementById('guestCount').value;
         const startDate = document.getElementById('startDate').value;
         const endDate = document.getElementById('endDate').value;
@@ -18,11 +21,11 @@ document.addEventListener('DOMContentLoaded', function() {
         fetch('/api/reservations', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': Auth.getToken()
             },
             body: JSON.stringify({
                 houseId,
-                userId,
                 guestCount,
                 startDate,
                 endDate
