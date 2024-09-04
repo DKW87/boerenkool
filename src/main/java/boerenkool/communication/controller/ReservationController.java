@@ -7,6 +7,7 @@ import boerenkool.business.service.HouseService;
 import boerenkool.business.service.ReservationService;
 import boerenkool.business.service.UserService;
 import boerenkool.communication.dto.ReservationDTO;
+import boerenkool.utilities.authorization.AuthorizationService;
 import boerenkool.utilities.exceptions.UserNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequestMapping(value = "/api/reservations")
@@ -27,12 +29,13 @@ public class ReservationController {
     private final HouseService houseService;
     private final UserService userService;
     private final Logger logger = LoggerFactory.getLogger(ReservationController.class);
-
+    private final AuthorizationService authorizationService;
     @Autowired
-    public ReservationController(ReservationService reservationService, HouseService houseService, UserService userService) {
+    public ReservationController(ReservationService reservationService, AuthorizationService authorizationService, HouseService houseService, UserService userService) {
         this.reservationService = reservationService;
         this.houseService = houseService;
         this.userService = userService;
+        this.authorizationService = authorizationService;
         logger.info("Reservation Controller created");
     }
 
@@ -214,18 +217,26 @@ public class ReservationController {
 
     // 7. CREATE
     @PostMapping
-    public ResponseEntity<?> saveReservation(@RequestBody ReservationDTO reservationDTO) {
+    public ResponseEntity<?> saveReservation(@RequestHeader("Authorization") String token, @RequestBody ReservationDTO reservationDTO) {
         try {
-            House house = houseService.getOneById(reservationDTO.getHouseId());
-            User user = userService.getOneById(reservationDTO.getUserId())
-                    .orElseThrow(() -> new IllegalArgumentException("User not found"));
+            Optional<User> userOpt = authorizationService.validate(UUID.fromString(token));
+            if(userOpt.isPresent())
+            {
+                House house = houseService.getOneById(reservationDTO.getHouseId());
+                User user = userService.getOneById(userOpt.get().getUserId())
+                        .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-            Reservation reservation = reservationService.convertToEntity(reservationDTO, house, user);
-            Reservation savedReservation = reservationService.saveReservation(reservation);
+                Reservation reservation = reservationService.convertToEntity(reservationDTO, house, user);
+                Reservation savedReservation = reservationService.saveReservation(reservation);
 
-            ReservationDTO savedReservationDTO = reservationService.convertToDto(savedReservation);
-            logger.info("Created new reservation with ID: {}", savedReservation.getReservationId());
-            return new ResponseEntity<>(savedReservationDTO, HttpStatus.CREATED);
+                ReservationDTO savedReservationDTO = reservationService.convertToDto(savedReservation);
+                logger.info("Created new reservation with ID: {}", savedReservation.getReservationId());
+                return new ResponseEntity<>(savedReservationDTO, HttpStatus.CREATED);
+            }
+            else{
+                logger.error("Invalid token or email");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token or email");
+            }
 
         } catch (IllegalArgumentException e) {
             logger.warn("Failed to create reservation: {}", e.getMessage());
