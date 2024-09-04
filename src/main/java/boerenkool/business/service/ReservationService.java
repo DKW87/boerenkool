@@ -49,15 +49,15 @@ public class ReservationService {
 
     private void checkGuestCount(House house, int guestCount) {
         if (guestCount > house.getMaxGuest()) {
-            throw new IllegalArgumentException("Guest count exceeds the maximum allowed ("
-                    + house.getMaxGuest() + ") for this house.");
+            throw new IllegalArgumentException("Het aantal gasten overschrijdt het maximaal toegestane aantal ("
+                    + house.getMaxGuest() + ") voor dit huis");
         }
     }
 
     private void checkDateOverlap(int houseId, LocalDate startDate, LocalDate endDate) {
         boolean hasOverlap = reservationRepository.checkDateOverlap(houseId, startDate, endDate);
         if (hasOverlap) {
-            throw new IllegalStateException("This reservation conflicts with an existing reservation for the same house and dates.");
+            throw new IllegalStateException("Deze reservering is in conflict met een bestaande reservering voor hetzelfde huis en dezelfde data");
         }
     }
 

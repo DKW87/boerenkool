@@ -7,15 +7,44 @@ document.addEventListener('DOMContentLoaded', () => {
     Main.loadHeader();
     Main.loadFooter();
 
-    document.getElementById('loginBtn').addEventListener('click', async () => {
-        const username = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
-
-        const success = await Auth.login(username, password);
-        if (success) {
-            window.location.href = '/profile.html';
-        } else {
-            alert('Login mislukt. Controleer je inloggegevens.');  // Vervangt showNotification
-        }
-    });
+    // Voeg event listener toe aan de login-knop
+    setupLoginHandler();
 });
+
+// Functie om de event listener voor de login-knop in te stellen
+function setupLoginHandler() {
+    document.getElementById('loginBtn').addEventListener('click', handleLogin);
+}
+
+// Functie om het inloggen af te handelen
+async function handleLogin() {
+    const { username, password } = getLoginInputValues();
+
+    const success = await Auth.login(username, password);
+    handleLoginResponse(success);
+}
+
+// Functie om de invoerwaarden voor login op te halen
+function getLoginInputValues() {
+    return {
+        username: document.getElementById('username').value,
+        password: document.getElementById('password').value
+    };
+}
+
+// Functie om de response van de login poging te verwerken
+function handleLoginResponse(success) {
+    if (success) {
+        redirectToIndex();
+    }
+}
+
+// Functie om door te sturen naar het profiel na succesvolle login
+function redirectToIndex() {
+    window.location.href = '/index.html';
+}
+
+// Functie om een notificatie te tonen
+function showNotification(message) {
+    alert(message);  // Hier kan je ook een custom notificatie systeem aanroepen
+}

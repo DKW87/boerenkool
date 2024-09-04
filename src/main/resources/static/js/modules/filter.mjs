@@ -89,7 +89,7 @@ export function getListOfHousesByURL(url) {
 
                 let linkToDetails = document.createElement('a');
                 linkToDetails.className = 'house-link';
-                linkToDetails.href = 'huisdetail?id=' + house.houseId + '&naam=' + seoFriendlyName;
+                linkToDetails.href = 'huisdetail.html?id=' + house.houseId + '&naam=' + seoFriendlyName;
                 
                 let outerDiv = document.createElement('div');
                 outerDiv.className = 'huisje';

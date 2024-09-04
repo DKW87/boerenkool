@@ -1,18 +1,22 @@
 import * as Main from './modules/main.mjs';
+import {checkIfLoggedIn} from "./modules/auth.mjs";
 
 /* load all page elements of index.html */
 Main.loadHeader();
 Main.loadFooter();
 
+var user = null;
+
+document.addEventListener('DOMContentLoaded', async function(){
+    user = await checkIfLoggedIn();
+    await getAllSavedReservation();
+})
 
 
-var userId =5;
-getAllSavedReservation();
+async function getAllSavedReservation() {
 
-function getAllSavedReservation() {
 
-    console.log("getAllSavedReservation");
-    fetch(`/api/reservations/reservations-by-userId/${userId}`, {
+    fetch(`/api/reservations/reservations-by-userId/${user?.userId}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
@@ -43,7 +47,6 @@ function getAllSavedReservation() {
 
 function addCancelEventListener() {
     const cancelButtons = document.querySelectorAll('.cancel-reservation');
-
     cancelButtons.forEach(cancelButton => {
 
             cancelButton.addEventListener('click', event => {
@@ -69,7 +72,7 @@ function addCancelEventListener() {
 
 function cancelReservation(reservationId) {
 
-    fetch(`/api/reservations/${userId}/reservations/${reservationId}`, {
+    fetch(`/api/reservations/${user?.userId}/reservations/${reservationId}`, {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json'

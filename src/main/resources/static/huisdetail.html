@@ -6,15 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HuisjeBoompjeBoerenkool - Huis Detail</title>
 
-    <!-- stylesheets -->
     <link rel="stylesheet" href="css/global.css">
     <link rel="stylesheet" href="css/header.css">
     <link rel="stylesheet" href="css/footer.css">
+    <link rel="stylesheet" href="css/huisdetail.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-            href="https://fonts.googleapis.com/css2?family=Playwrite+BE+VLG:wght@100..400&family=Playwrite+PE:wght@100..400&display=swap"
-            rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playwrite+BE+VLG:wght@100..400&family=Playwrite+PE:wght@100..400&display=swap" rel="stylesheet">
 
     <script src="js/huisdetail.js" type="module"></script>
 </head>
@@ -28,21 +26,52 @@
     <div id="huis-detail" class="container">
         <div id="house-details">
 
-            <h1 id="houseName">Huisnaam</h1>
-            <p>Type: <span id="houseType"></span></p>
-            <p>Eigenaar: <span id="houseOwnerUsername"></span></p>
-            <p>Locatie: <span id="location"></span></p>
-            <p>Maximale Gasten: <span id="maxGuests"></span></p>
-            <p>Aantal Kamers: <span id="roomCount"></span></p>
-            <p>Prijs Per Persoon Per Dag: €<span id="pricePPPD"></span></p>
-            <p>Beschrijving: <span id="description"></span></p>
-            <p>Beschikbaarheid: <span id="availability"></span></p>
+            <h1 id="houseName"></h1>
 
-            <h2>Foto's</h2>
             <div id="pictures" class="pictures-gallery"></div>
 
-            <h2>Extra Kenmerken</h2>
-            <ul id="extraFeatures" class="extra-features-list"></ul>
+            <div id="imageModal" class="modal">
+                <span class="close">&times;</span>
+                <img class="modal-content" id="enlargedImg">
+                <a class="prev" id="prev">&#10094;</a>
+                <a class="next" id="next">&#10095;</a>
+            </div>
+
+            <div class="flex-container">
+                <div class="left-column">
+                    <div class="property-info">
+                        <h2><span id="houseType"></span> - <span id="location" class="location-clickable"></span></h2><br>
+
+                        <p><span id="maxGuests"></span> gasten - <span id="roomCount"></span> kamers - <span id="availability"></span></p><br>
+                        <hr style="border: 1px solid rgba(211, 211, 211, 0.5); width: 100%;">
+
+                        <br>
+                        <p><b>Eigenaar:</b> <span id="houseOwnerUsername"></span></p>
+                    </div>
+
+                    <div class="description-info">
+                        <p><span id="description"></span></p>
+                    </div>
+                </div>
+
+                <div class="right-column">
+                    <div class="pricing">
+                        <div>
+                            <p>Prijs Per Persoon Per Dag </p><br>
+                        </div>
+                        <div><h2 ><span id="pricePPPD"></span></h2></div>
+                        <div>
+                            <button id="reserveerButton">Reserveer</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="extras-info">
+                <h3>Extra Kenmerken</h3>
+                <ul id="extraFeatures" class="extra-features-list"></ul>
+            </div>
+
         </div>
     </div>
 
