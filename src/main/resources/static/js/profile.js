@@ -22,10 +22,12 @@ async function initPage() {
         if (!user) return;
 
         populateForm(user);
-        configureUserSpecificSettings(user);
 
         loadBlockedUsers(user.userId, Auth.getToken());
         console.log("Geblokkeerde gebruikers geladen");
+
+        setupEventListeners(user);
+
 
         // Fetch and display the wallet details
         const coinBalance = await fetchWalletDetails();
@@ -79,13 +81,17 @@ function populateForm(user) {
     }
 }
 
-function setupEventListeners() {
+function setupEventListeners(user) {
+    // Controleer of user is gedefinieerd
+    if (!user || !user.userId) {
+        console.error("User of userId is niet gedefinieerd.");
+        return;
+    }
     // Event listeners voor verschillende knoppen en formulierelementen
     document.getElementById('profileForm').addEventListener('submit', updateProfile);
     document.getElementById('deleteProfileBtn').addEventListener('click', deleteProfile);
     document.getElementById('block-user-btn').addEventListener('click', () => {
-        const userId = document.getElementById('userId').value;
-        blockUser(userId, Auth.getToken());
+        blockUser(user.userId, Auth.getToken());  // Geef userId door aan blockUser
     });
     document.getElementById('logoutBtn').addEventListener('click', () => {
         Auth.logout();
