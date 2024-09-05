@@ -12,6 +12,9 @@ Main.loadFooter();
 
 document.addEventListener('DOMContentLoaded', function() {
 
+
+    // todo logica toevoegen dat pagina alleen mutable is voor Verhuurder matchende id
+
     // Creates id from URL parameters
     function getHouseIdFromURL() {
         const urlParams = new URLSearchParams(window.location.search);

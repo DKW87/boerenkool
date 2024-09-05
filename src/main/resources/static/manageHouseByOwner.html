@@ -29,6 +29,8 @@
         <!-- Opmaak nog veranderen -->
         <div class="house-details" id="house-details">
             <h2>House Details</h2>
+            <br>
+            <br>
             <p><strong>House Name:</strong> <span id="houseName"></span></p>
             <p><strong>House Type:</strong> <span id="houseType"></span></p>
             <p><strong>House Owner:</strong> <span id="houseOwner"></span></p>
@@ -42,19 +44,28 @@
             <p><strong>Description:</strong> <span id="description"></span></p>
             <p><strong>Availability:</strong> <span id="isNotAvailable"></span></p>
 
-            <!-- pictures nog implementeren -->
+            <!-- pictures -->
             <p><strong>Pictures:</strong></p>
             <div id="pictures"></div>
 
-            <!-- extra features bestaat nog niet -->
+            <!-- extra features checkboxes maken -->
             <p><strong>Extra Features:</strong></p>
             <ul id="extraFeatures"></ul>
+            <br>
+            <br>
+            <!-- edit button -->
+            <button id="editHouse">Aanpassen</button>
+            <button id="saveChanges" style="display:none;">Opslaan</button>
+            <button id="cancelChanges">Annuleer</button>
+            <button id="backToMyHouses">Terug naar overzicht</button>
+            <button id="logout">Uitloggen</button>
+
 
         </div>
         <!-- script hieronder houden anders laadt de pagina niet goed -->
         <script src="/js/manageHouseByOwner.js" type="module" defer></script>
 
-    </div><!-- loads body here -->
+    </div>
 
     <div class="footer-div" id="footer"></div><!-- loads footer here -->
 
