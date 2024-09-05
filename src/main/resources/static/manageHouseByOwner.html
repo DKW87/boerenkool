@@ -30,7 +30,7 @@
             <form id="houseForm">
                 <p><strong>Huis naam:</strong> <input type="text" id="houseName" disabled /></p>
                 <p><strong>Huis type:</strong> <input type="text" id="houseType" disabled /></p>
-                <p><strong>Eigenaar:</strong> <input type="text" id="houseOwner" readonly /></p>
+                <p><strong id="houseOwnerLabel">Eigenaar:</strong> <input type="text" id="houseOwner" readonly /></p>
                 <p><strong>Provincie:</strong> <input type="text" id="province" disabled /></p>
                 <p><strong>Stad:</strong> <input type="text" id="city" disabled /></p>
                 <p><strong>Straat en huisnummer:</strong> <input type="text" id="streetAndNumber" disabled /></p>
@@ -50,7 +50,7 @@
                     </select>
                 </p>
                 <p><strong>Foto's:</strong></p>
-                <div id="pictures"></div>
+                <div class="pictures" id="pictures"></div>
                 <br>
                 <br>
                 <p><strong>Extra voorzieningen:</strong></p>
@@ -64,7 +64,7 @@
                     <button type="button" id="deleteHouse">Verwijderen</button>
 
 
-                    <button type="button" id="managePictures">Verwijderen</button>
+                    <button type="button" id="managePictures">Beheer foto's</button>
                     <button type="button" id="backToMyHouses">Terug naar overzicht</button>
                 </div>
             </form>

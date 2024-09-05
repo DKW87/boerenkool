@@ -188,7 +188,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     //todo links moeten ook tijdens gemaakte wijziging een waarschuwing geven voordat je wordt doorverwezen?
     document.getElementById('managePictures').addEventListener('click', () => window.location.href
-        = '/mijnFOTOSBLABLABLA.html'); //todo deze link nog aanpassen naar nieuwe pagina
+        = '/managePictures.html'); //todo deze link nog aanpassen naar nieuwe pagina
     document.getElementById('backToMyHouses').addEventListener('click', () => {
         window.location.href = '/mijn-huisjes.html';
     });
