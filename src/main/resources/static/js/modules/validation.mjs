@@ -1,6 +1,6 @@
 // modules/validation.mjs
 export function validateName(name) {
-    const nameRegex = /^[A-Za-z]+$/;
+    const nameRegex = /^[A-Za-zÀ-ÿ' -]+$/;  // Staat letters, accenten, spaties en streepjes toe
     return nameRegex.test(name);
 }
 
