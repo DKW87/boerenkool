@@ -47,17 +47,23 @@ public class ReservationService {
         return reservationRepository.saveReservation(reservation);
     }
 
+    public void validateReservationDates(LocalDate startDate, LocalDate endDate) {
+        if (startDate.isAfter(endDate)) {
+            throw new IllegalArgumentException("Startdatum kan niet na einddatum zijn!");
+        }
+    }
+
     private void checkGuestCount(House house, int guestCount) {
         if (guestCount > house.getMaxGuest()) {
             throw new IllegalArgumentException("Het aantal gasten overschrijdt het maximaal toegestane aantal ("
-                    + house.getMaxGuest() + ") voor dit huis");
+                    + house.getMaxGuest() + ") voor dit huis!");
         }
     }
 
     private void checkDateOverlap(int houseId, LocalDate startDate, LocalDate endDate) {
         boolean hasOverlap = reservationRepository.checkDateOverlap(houseId, startDate, endDate);
         if (hasOverlap) {
-            throw new IllegalStateException("Deze reservering is in conflict met een bestaande reservering voor hetzelfde huis en dezelfde data");
+            throw new IllegalStateException("Dit huis is niet beschikbaar op deze data!");
         }
     }
 

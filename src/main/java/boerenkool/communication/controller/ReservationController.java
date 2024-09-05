@@ -222,6 +222,7 @@ public class ReservationController {
             Optional<User> userOpt = authorizationService.validate(UUID.fromString(token));
             if(userOpt.isPresent())
             {
+                reservationService.validateReservationDates(reservationDTO.getStartDate(), reservationDTO.getEndDate());
                 House house = houseService.getOneById(reservationDTO.getHouseId());
                 User user = userService.getOneById(userOpt.get().getUserId())
                         .orElseThrow(() -> new IllegalArgumentException("User not found"));
