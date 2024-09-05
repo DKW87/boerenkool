@@ -8,6 +8,11 @@ main.loadFooter()
 // logged in ? continue : redirect
 await auth.checkIfLoggedIn()
 
+const FILL_IN_SUBJECT_FIELD = "Vul een onderwerp in."
+const FILL_IN_BODY_FIELD = "Vul een bericht in."
+const SELECT_A_USERNAME = "Selecteer een gebruikersnaam"
+const SELECT_A_RECEIVER = "Selecteer een ontvanger"
+
 let receiverId = {}
 let receiverName = {}
 let listOfCorrespondents = []
@@ -20,11 +25,11 @@ loggedInUser = await auth.getLoggedInUser(token)
 await setup()
 
 async function setup() {
-    document.querySelector('#goToMessagesButton').addEventListener('click', () => {
-        window.location.href = "/messages.html"
-    })
+    // document.querySelector('#goToMessagesButton').addEventListener('click', () => {
+    //     window.location.href = "/messages.html"
+    // })
     document.querySelector('#sendMessageButton').addEventListener('click', () => {
-        sendMessage()
+        checkRequiredFields()
     })
     // check for parameters in URL
     const parameters = new URLSearchParams(document.location.search);
@@ -43,16 +48,14 @@ async function setup() {
 
 function addElementForReceiverUsername() {
     const elementForReceiverUsername = document.createElement(`div`)
-    elementForReceiverUsername.innerHTML = "Aan :\n" +
-        "<span id=\"receiverName\"></span>"
+    elementForReceiverUsername.innerHTML = "<span id=\"receiverName\"></span>"
     document.querySelector(`#receiverPlaceholder`).replaceWith(elementForReceiverUsername)
 }
+
 function addElementForReceiverDropdown() {
     const elementForReceiverDropdown = document.createElement(`div`)
-    elementForReceiverDropdown.innerHTML = "Aan :\n" +
-        "<select name=\"receiverDropDown\" id=\"receiverDropDown\">\n" +
-        "<option>Selecteer een gebruikersnaam</option>\n" +
-        "</select>"
+    elementForReceiverDropdown.innerHTML = "<select name=\"receiverDropDown\" id=\"receiverDropDown\">\n" +
+        "<option value=\"0\">" + SELECT_A_USERNAME + "</option></select>"
     document.querySelector(`#receiverPlaceholder`).replaceWith(elementForReceiverDropdown)
 }
 
@@ -61,7 +64,7 @@ async function fillReceiverDataFromParameters(parameters) {
     // TODO perhaps later : add ?username={username} parameter
     if (receiverId > 0) {
         // resolve parameter with userid
-        receiverName = await getUsername(receiverId)
+        receiverName = await getUsername(receiverId) // TODO fix getUsername to use body text
         console.log("receiverId is " + receiverId)
         console.log("receiverName is " + receiverName)
         // document.querySelector("#receiverNameInputField").value = `${receiverName}`
@@ -81,8 +84,7 @@ async function getListOfCorrespondents() {
         })
         if (!response.ok) {
             new Error(`Response status: ${response.status}`)
-        }
-        return await response.json()
+        } else return await response.json()
     } catch (error) {
         console.error(error.message)
     }
@@ -98,14 +100,44 @@ function fillCorrespondentsDropDown(listOfCorrespondents, optionElementId) {
     })
 }
 
-async function sendMessage() {
-    // const username = document.getElementById("usernameField").value;
-    // TODO get userId from username
-    // or save list of usernames that current user has messages of, matched with their userId
+function checkRequiredFields() {
+    if (document.querySelector("#receiverDropDown") !== null) {
+        console.log("receiverDropDown.value is NOT null")
+       receiverId = document.querySelector("#receiverDropDown").value
+    }
+    // const selectedOptionValue = document.querySelector("#receiverDropDown").value
+    const subject = document.querySelector("#subjectInput").value;
+    const body = document.querySelector("#bodyInput").value;
+
+    if (receiverId === undefined || receiverId === 0) {
+        window.alert(SELECT_A_RECEIVER)
+    } else
+
+    // else {
+    //     receiverId = selectedOptionValue
+    //     console.log("selectedOption.value is ")
+    //     console.log(selectedOptionValue)
+    // }
+
+    if (subject === null || subject === "") {
+        window.alert(FILL_IN_SUBJECT_FIELD)
+    } else if (body === null || body === "") {
+        window.alert(FILL_IN_BODY_FIELD)
+    } else {
+        sendMessage(receiverId, subject, body)
+    }
+}
+
+async function sendMessage(receiverId, subject, body) {
+    // receiverId is already filled from userId in URL.
+    // if receiver is selected using a dropdown menu, update receiverId from selected option
+    // let selectedOption = document.querySelector("#receiverDropDown")
+    // if (selectedOption !== null) {
+    //     receiverId = selectedOption.value
+    //     console.log("selectedOption.value is ")
+    //     console.log(selectedOption.value)
+    // }
     const senderId = loggedInUser.userId
-    const receiverId = document.querySelector("#receiver").value;
-    const subject = document.querySelector("#subjectField").value;
-    const body = document.querySelector("#bodyField").value;
     // create URL
     const url = "/api/messages"
     // create header
