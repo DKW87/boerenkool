@@ -35,23 +35,25 @@ async function setup() {
         reverseMessageOverview()
     })
     document.querySelector('#refreshInboxButton').addEventListener('click', async () => {
+        // TODO extract this to a new function, combined with the one below
         overviewShowsInbox = true
         inboxArray = await getInbox()
         if (inboxArray.length > 0) {
             sortMessageArray(inboxArray)
             fillMessageOverview(inboxArray)
-            // TODO showMessageContent(messageId) first in array
             await showMessageContent(inboxArray[0].messageId)
+            showElement(`messageSingleView`, true)
         } else noMessages()
     })
     document.querySelector('#refreshOutboxButton').addEventListener('click', async () => {
+        // TODO extract this to a new function
         overviewShowsInbox = false
         outboxArray = await getOutbox()
         if (outboxArray.length > 0) {
             sortMessageArray(outboxArray)
             fillMessageOverview(outboxArray)
-            // TODO select first message in array
             await showMessageContent(outboxArray[0].messageId)
+            showElement(`messageSingleView`, true)
         } else noMessages()
     })
     document.querySelector('#writeMessageButton').addEventListener('click', () => {
@@ -62,16 +64,6 @@ async function setup() {
 
     // refresh messageoverview with inbox by default
     document.querySelector('#refreshInboxButton').click();
-
-    // if (inboxArray.length > 0) {
-    //     await sortMessageArray(inboxArray)
-    //     await fillMessageOverview(inboxArray)
-    // } else noMessages()
-
-    // outboxArray = await getOutbox()
-    // if (outboxArray.length > 0) {
-    //     sortMessageArray(outboxArray)
-    // }
 }
 
 
@@ -185,7 +177,16 @@ function noMessages() {
     noMessages.setAttribute("id", "messageInOverview")
     noMessages.textContent = NO_MESSAGES
     document.querySelector(`#messageOverview`).appendChild(noMessages)
-    document.querySelector()
+    showElement(`messageSingleView`, false)
+}
+
+function showElement(elementSelector, boolean) {
+    const element = document.getElementById(`${elementSelector}`);
+    if (boolean) {
+        element.style.display = "block";
+    } else {
+        element.style.display = "none";
+    }
 }
 
 function markMessageUnread(messageId) {

@@ -101,25 +101,18 @@ function fillCorrespondentsDropDown(listOfCorrespondents, optionElementId) {
 }
 
 function checkRequiredFields() {
+    // when using userid parameter, receiverId is already set to correct value.
+    // when using dropdown menu, update receiverId from selected option
     if (document.querySelector("#receiverDropDown") !== null) {
         console.log("receiverDropDown.value is NOT null")
-       receiverId = document.querySelector("#receiverDropDown").value
+        receiverId = document.querySelector("#receiverDropDown").value
     }
-    // const selectedOptionValue = document.querySelector("#receiverDropDown").value
     const subject = document.querySelector("#subjectInput").value;
     const body = document.querySelector("#bodyInput").value;
 
     if (receiverId === undefined || receiverId === 0) {
         window.alert(SELECT_A_RECEIVER)
-    } else
-
-    // else {
-    //     receiverId = selectedOptionValue
-    //     console.log("selectedOption.value is ")
-    //     console.log(selectedOptionValue)
-    // }
-
-    if (subject === null || subject === "") {
+    } else if (subject === null || subject === "") {
         window.alert(FILL_IN_SUBJECT_FIELD)
     } else if (body === null || body === "") {
         window.alert(FILL_IN_BODY_FIELD)
@@ -129,14 +122,6 @@ function checkRequiredFields() {
 }
 
 async function sendMessage(receiverId, subject, body) {
-    // receiverId is already filled from userId in URL.
-    // if receiver is selected using a dropdown menu, update receiverId from selected option
-    // let selectedOption = document.querySelector("#receiverDropDown")
-    // if (selectedOption !== null) {
-    //     receiverId = selectedOption.value
-    //     console.log("selectedOption.value is ")
-    //     console.log(selectedOption.value)
-    // }
     const senderId = loggedInUser.userId
     // create URL
     const url = "/api/messages"
@@ -159,18 +144,19 @@ async function sendMessage(receiverId, subject, body) {
             "archivedByReceiver": false
         })
     }
-    console.log(newMessage)
-
-    // POST with fetch
+    // POST message to database
     try {
         const response = await fetch(url, newMessage)
         if (!response.ok) {
             throw new Error(`Response status: ${response.status}`)
+        } else {
+            console.log("Message posted to db")
+            // TODO geef bevestiging terug aan gebruiker
+            // en daarna;
+            history.back()
         }
-        console.log("response was ok")
-        // TODO geef bevestiging terug aan gebruiker
-
     } catch (error) {
+        // TODO geef bericht terug aan gebruiker
         console.error(error.message);
     }
 }
