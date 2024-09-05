@@ -20,6 +20,7 @@ public class PasswordService {
 
     private static final String PEPPER = "TheWholeWorldHatesBoerenkool";
     private static final String BASE_URL = "http://localhost:8080/";
+    private static final String RESET_URL = "reset-password-confirm.html";
 
 
     @Autowired
@@ -75,7 +76,7 @@ public class PasswordService {
         message.setFrom("huisjeboompjeboerenkool@gmail.com");
         message.setTo(email);
         message.setSubject("Wachtwoord resetten");
-        message.setText("Klik op de volgende link om je wachtwoord te resetten: " + BASE_URL + "\nToken: " + token);
+        message.setText("Klik op de volgende link om je wachtwoord te resetten: " + BASE_URL + RESET_URL + "\nToken: " + token);
         javaMailSender.send(message);
     }
 
