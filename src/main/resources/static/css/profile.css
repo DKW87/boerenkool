@@ -221,3 +221,8 @@ body {
 .unblock-button:hover {
     background-color: #FF4500;
 }
+.header-div {
+    align-items: flex-start !important; /* Zorg ervoor dat de header uitgelijnd blijft */
+    justify-content: flex-start !important;
+    text-align: left !important;
+}

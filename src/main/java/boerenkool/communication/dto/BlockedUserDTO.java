@@ -4,7 +4,7 @@ public class BlockedUserDTO {
     private String username;
     private int userId;
 
-    public BlockedUserDTO(String username) {
+    public BlockedUserDTO(int userId, String username) {
         this.userId = userId;
         this.username = username;
     }
@@ -13,4 +13,7 @@ public class BlockedUserDTO {
         return username;
     }
 
+    public int getUserId() {
+        return userId;
+    }
 }

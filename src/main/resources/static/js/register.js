@@ -1,7 +1,11 @@
 import { validateName, validatePhoneNumber, validateEmail, validatePassword } from './modules/validation.mjs';
+import * as Main from "./modules/main.mjs";
 
 // Hoofdfunctie die wordt aangeroepen wanneer de pagina volledig is geladen
 document.addEventListener('DOMContentLoaded', () => {
+
+    Main.loadHeader();
+    Main.loadFooter();
     setupFormSubmission();
 });
 
