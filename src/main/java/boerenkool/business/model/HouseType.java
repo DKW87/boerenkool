@@ -20,6 +20,10 @@ public class HouseType {
         this.houseTypeName = houseTypeName;
     }
 
+    public HouseType() {
+
+    }
+
     // getters and setters
     public int getHouseTypeId() {
         return houseTypeId;

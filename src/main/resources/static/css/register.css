@@ -127,3 +127,8 @@ body {
     color: var(--boerenkool-zwart);
     font-size: var(--font-size-large);
 }
+.header-div {
+    align-items: flex-start !important; /* Zorg ervoor dat de header uitgelijnd blijft */
+    justify-content: flex-start !important;
+    text-align: left !important;
+}

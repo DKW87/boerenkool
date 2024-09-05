@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -40,13 +41,17 @@ public class HouseTypeController {
         }
     }
 
-    @PostMapping
-    public ResponseEntity<String> createHouseType(@RequestBody HouseType houseType) {
+    @PostMapping("/add")
+    public ResponseEntity<String> createHouseType(@RequestBody Map<String, String> body) {
+        String houseTypeName = body.get("name");
+        HouseType newHouseType = new HouseType();
+        newHouseType.setHouseTypeName(houseTypeName);
+
         try {
-            HouseType savedHouseType = houseTypeService.saveHouseType(houseType);
-            return new ResponseEntity<>("HouseType succesvol aangemaakt met ID: " + savedHouseType.getHouseTypeId(), HttpStatus.CREATED);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>("Mislukt om HouseType aan te maken: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+            houseTypeService.saveHouseType(newHouseType);
+            return new ResponseEntity<>("HouseType succesvol aangemaakt!", HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Fout bij het aanmaken van HouseType", HttpStatus.BAD_REQUEST);
         }
     }
 

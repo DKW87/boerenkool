@@ -15,23 +15,35 @@
 
     <main id="body" class="body-div">
 
+        <div class="resFormBody">
         <section id="make-reservation">
             <h2>Maak een Reservering</h2>
             <form id="reservation-form">
-                <label for="houseId">Huis ID:</label>
-                <input type="number" id="houseId" name="houseId" required>
-                <label for="userId">Gebruiker ID:</label>
-                <input type="number" id="userId" name="userId" required>
-                <label for="guestCount">Aantal Gasten:</label>
-                <input type="number" id="guestCount" name="guestCount" required min="1">
-                <label for="startDate">Startdatum:</label>
+                <input type="hidden"  id="houseId" name="houseId" required>
+                <br/>
+                <div class="resInputLine">
+                <label for="guestCount">Aantal Gasten</label>
+                <input style="width: 130px; margin-left: 20px" type="number" id="guestCount" name="guestCount" required min="1">
+                </div>
+                <br/>
+                <div class="resInputLine">
+                <label for="startDate">Startdatum</label>
                 <input type="date" id="startDate" name="startDate" required>
-                <label for="endDate">Einddatum:</label>
+                </div>
+                <br/>
+                <div class="resInputLine">
+                <label for="endDate">Einddatum</label>
                 <input type="date" id="endDate" name="endDate" required>
+                </div>
+                <br/>
+                <div class="resInputLineButton">
                 <button type="submit">Verstuur Reservering</button>
+                </div>
             </form>
-            <div id="reservation-result"></div>
+
         </section>
+        <div id="reservation-result"></div>
+        </div>
     </main>
 
     <footer id="footer" class="footer-div"></footer>

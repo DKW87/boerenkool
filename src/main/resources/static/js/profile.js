@@ -5,11 +5,13 @@ import * as Auth from './modules/auth.mjs';
 import * as Main from './modules/main.mjs';
 import { loadBlockedUsers, blockUser } from './blockedUsers.js';
 import { fetchWalletDetails, handleUpdateCoins } from './modules/wallet.mjs';
+import { validateName, validatePhoneNumber, validateEmail } from './modules/validation.mjs';
 
 document.addEventListener('DOMContentLoaded', () => {
     initPage();
 });
 
+// Initialiseer de pagina en haal gebruikersprofiel op
 async function initPage() {
     console.log("DOM volledig geladen en geparsed");
 
@@ -22,10 +24,11 @@ async function initPage() {
         if (!user) return;
 
         populateForm(user);
-        configureUserSpecificSettings(user);
 
         loadBlockedUsers(user.userId, Auth.getToken());
         console.log("Geblokkeerde gebruikers geladen");
+
+        setupEventListeners(user);
 
         // Fetch and display the wallet details
         const coinBalance = await fetchWalletDetails();
@@ -37,10 +40,9 @@ async function initPage() {
         alert('Kon gebruikersinformatie niet ophalen.');
         console.error("Fout bij het ophalen van gebruikersinformatie:", error);
     }
-
-    setupEventListeners();
 }
 
+// Haal het gebruikersprofiel op
 async function getUserProfile() {
     try {
         console.log("Auth object:", Auth);
@@ -60,6 +62,7 @@ async function getUserProfile() {
     }
 }
 
+// Vul het formulier met gebruikersgegevens
 function populateForm(user) {
     document.getElementById('username').value = user.username;
     document.getElementById('email').value = user.email;
@@ -79,13 +82,18 @@ function populateForm(user) {
     }
 }
 
-function setupEventListeners() {
-    // Event listeners voor verschillende knoppen en formulierelementen
+// Event listeners instellen voor formulier en knoppen
+function setupEventListeners(user) {
+    // Controleer of user is gedefinieerd
+    if (!user || !user.userId) {
+        console.error("User of userId is niet gedefinieerd.");
+        return;
+    }
+
     document.getElementById('profileForm').addEventListener('submit', updateProfile);
     document.getElementById('deleteProfileBtn').addEventListener('click', deleteProfile);
     document.getElementById('block-user-btn').addEventListener('click', () => {
-        const userId = document.getElementById('userId').value;
-        blockUser(userId, Auth.getToken());
+        blockUser(user.userId, Auth.getToken());  // Geef userId door aan blockUser
     });
     document.getElementById('logoutBtn').addEventListener('click', () => {
         Auth.logout();
@@ -93,10 +101,9 @@ function setupEventListeners() {
     });
 }
 
-async function updateProfile(event) {
-    event.preventDefault();
-
-    const profileData = {
+// Functie om de profielgegevens op te halen uit het formulier
+function getProfileData() {
+    return {
         username: document.getElementById('username').value,
         email: document.getElementById('email').value,
         phone: document.getElementById('phone').value,
@@ -105,6 +112,38 @@ async function updateProfile(event) {
         lastName: document.getElementById('lastName').value,
         typeOfUser: document.getElementById('typeOfUser').value
     };
+}
+
+// Valideer de profielgegevens
+function validateProfileData(data) {
+    if (!validateName(data.firstName) || !validateName(data.lastName)) {
+        alert('Voer een geldige naam in (alleen letters).');
+        return false;
+    }
+
+    if (!validatePhoneNumber(data.phone)) {
+        alert('Voer een geldig telefoonnummer in (bijvoorbeeld 0612345678).');
+        return false;
+    }
+
+    if (!validateEmail(data.email)) {
+        alert('Voer een geldig e-mailadres in.');
+        return false;
+    }
+
+    return true;
+}
+
+// Profiel bijwerken
+async function updateProfile(event) {
+    event.preventDefault();
+
+    const profileData = getProfileData();
+
+    // Valideer de profielgegevens
+    if (!validateProfileData(profileData)) {
+        return;  // Stop als de validatie faalt
+    }
 
     try {
         const response = await fetch('/api/users/profile', {
@@ -127,6 +166,7 @@ async function updateProfile(event) {
     }
 }
 
+// Profiel verwijderen
 async function deleteProfile() {
     if (!confirm('Weet je zeker dat je je profiel wilt verwijderen? Dit kan niet ongedaan worden gemaakt.')) {
         return;

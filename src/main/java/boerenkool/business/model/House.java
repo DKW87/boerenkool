@@ -100,7 +100,6 @@ public class House implements Comparable<House> {
     }
 
     // getters and setters
-    // TODO implement as needed
 
     public int getHouseId() {
         return houseId;
@@ -235,6 +234,22 @@ public class House implements Comparable<House> {
 
     public void setPictures(List<Picture> pictures) {
         this.pictures = pictures;
+    }
+
+    public void setHouseName(String houseName) {
+        this.houseName = houseName;
+    }
+
+    public void setStreetAndNumber(String streetAndNumber) {
+        this.streetAndNumber = streetAndNumber;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setIsNotAvailable(boolean isNotAvailable) {
+        isNotAvailable = isNotAvailable;
     }
 
     public static class otherEntityIds {

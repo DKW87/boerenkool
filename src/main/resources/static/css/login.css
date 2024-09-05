@@ -91,3 +91,9 @@ body {
     color: var(--boerenkool-paars);
     text-decoration: none;
 }
+
+.header-div {
+    align-items: flex-start !important; /* Zorg ervoor dat de header uitgelijnd blijft */
+    justify-content: flex-start !important;
+    text-align: left !important;
+}

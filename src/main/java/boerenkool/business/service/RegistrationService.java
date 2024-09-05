@@ -36,7 +36,6 @@ public class RegistrationService {
         logger.info("Starting registration process for username: {}", userDto.getUsername());
 
         validateUsernameAndEmail(userDto);
-        validatePassword(userDto.getPassword());
 
         User user = createUser(userDto);
         userRepository.storeOne(user);
@@ -56,12 +55,6 @@ public class RegistrationService {
         }
     }
 
-    private void validatePassword(String password) throws RegistrationFailedException {
-        if (!isValidPassword(password)) {
-            logger.warn("Registration failed: password does not meet requirements");
-            throw new RegistrationFailedException("Wachtwoord moet minstens 6 tekens lang zijn en minstens één hoofdletter, één cijfer en één speciaal teken bevatten.");
-        }
-    }
 
     private User createUser(UserDto userDto) {
         String salt = passwordService.generateSalt();
@@ -89,7 +82,6 @@ public class RegistrationService {
     public boolean resetPassword(PasswordResetDto passwordResetDto) throws RegistrationFailedException {
         User user = validateTokenAndEmail(passwordResetDto);
 
-        validatePassword(passwordResetDto.getNewPassword());
         updatePassword(user, passwordResetDto.getNewPassword());
 
         return true;
