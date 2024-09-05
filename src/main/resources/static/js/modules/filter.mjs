@@ -135,7 +135,6 @@ export function getListOfHousesByURL(url) {
         })
         .catch(error => {
             console.error('Error:', error)
-            // amountOfHousesStringSwitch(parentElement, 0);
         });
 }
 
