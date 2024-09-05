@@ -6,6 +6,8 @@ main.loadHeader()
 main.loadFooter()
 
 const NO_MESSAGES = "Geen berichten."
+const PREFIX_FROM = "Van : "
+const PREFIX_TO = "Aan : "
 
 const DATE_TIME_OPTIONS = {
     weekday: `long`,
@@ -71,7 +73,6 @@ async function setup() {
     //     sortMessageArray(outboxArray)
     // }
 }
-
 
 
 // // for floatingCheatMenu
@@ -184,6 +185,7 @@ function noMessages() {
     noMessages.setAttribute("id", "messageInOverview")
     noMessages.textContent = NO_MESSAGES
     document.querySelector(`#messageOverview`).appendChild(noMessages)
+    document.querySelector()
 }
 
 function markMessageUnread(messageId) {
@@ -233,9 +235,9 @@ async function showMessageContent(messageId) {
     // find the message in the array, using its messageId
     let selectedMessage = visibleArray.find((e) => e.messageId === parseInt(messageId, 10))
     // show the message values in the relevant HTML elements
-    document.querySelector(`#singleViewUsername`).textContent = (overviewShowsInbox ?
-        await getUsername(selectedMessage.senderId) :
-        loggedInUser.username)
+    document.querySelector(`#singleViewUsername`).textContent = overviewShowsInbox ?
+        PREFIX_FROM + await getUsername(selectedMessage.senderId) + ", "
+        : PREFIX_TO + await getUsername(selectedMessage.receiverId) + ", "
     const messageDateTime = new Date(selectedMessage.dateTimeSent)
     document.querySelector(`#singleViewDateTimeSent`).textContent = formatDateTime(messageDateTime)
     document.querySelector(`#singleViewSubject`).textContent = selectedMessage.subject
