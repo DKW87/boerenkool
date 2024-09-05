@@ -3,9 +3,12 @@ package boerenkool.communication.controller;
 import boerenkool.business.model.House;
 import boerenkool.business.model.HouseFilter;
 import boerenkool.business.model.HouseType;
+import boerenkool.business.model.User;
 import boerenkool.business.service.HouseService;
+import boerenkool.business.service.ReservationService;
 import boerenkool.communication.dto.HouseDetailsDTO;
 import boerenkool.communication.dto.HouseListDTO;
+import boerenkool.utilities.authorization.AuthorizationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +19,8 @@ import org.springframework.web.servlet.view.RedirectView;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 /**
  * @author Danny KWANT
@@ -28,10 +33,15 @@ public class HouseApiController {
 
     private final Logger logger = LoggerFactory.getLogger(HouseApiController.class);
     private final HouseService houseService;
+    private final AuthorizationService authorizationService;
+    private final ReservationService reservationService;
 
     @Autowired
-    public HouseApiController(HouseService houseService) {
+    public HouseApiController(HouseService houseService, AuthorizationService authorizationService,
+                              ReservationService reservationService) {
         this.houseService = houseService;
+        this.authorizationService = authorizationService;
+        this.reservationService = reservationService;
         logger.info("New HouseApiController");
     }
 
@@ -131,55 +141,69 @@ public class HouseApiController {
     }
 
     @PostMapping(value = "/new")
-    public ResponseEntity<?> saveNewHouse(@RequestBody House house) {
-        if (house == null) {
-            return new ResponseEntity<>("House cannot be null", HttpStatus.BAD_REQUEST);
-        } else if (house.getHouseType() == null || house.getHouseOwner() == null) {
-            return new ResponseEntity<>("No user/housetype attached, incomplete House", HttpStatus.BAD_REQUEST);
-        } else {
-            return houseService.saveHouse(house)
-                    ? new ResponseEntity<>("House successfully created", HttpStatus.CREATED)
-                    : new ResponseEntity<>("Unable to store new house", HttpStatus.CONFLICT);
+    public ResponseEntity<?> saveNewHouse(@RequestHeader("Authorization") String token, @RequestBody HouseDetailsDTO house) {
+        Optional<User> optionalUser = authorizationService.validate(UUID.fromString(token));
+        if (optionalUser.isPresent()) {
+            if (house == null) {
+                return new ResponseEntity<>("House cannot be null", HttpStatus.BAD_REQUEST);
+            } else if (house.getHouseType() == null || house.getHouseOwnerId() == 0) {
+                return new ResponseEntity<>("No user/housetype attached, incomplete House", HttpStatus.BAD_REQUEST);
+            } else {
+                return houseService.saveHouse(house)
+                        ? new ResponseEntity<>("House successfully created", HttpStatus.CREATED)
+                        : new ResponseEntity<>("Unable to store new house", HttpStatus.CONFLICT);
+            }
         }
+        return new ResponseEntity<>("Invalid token", HttpStatus.UNAUTHORIZED);
     }
 
     @PutMapping(value = "/{houseId}")
-    public ResponseEntity<?> updateHouse(@PathVariable int houseId,
-                                         @RequestParam(name = "huis-eigenaarId") int houseOwnerId,
-                                         @RequestBody House house) {
-        if (houseId <= 0 || houseOwnerId <= 0) {
-            return new ResponseEntity<>("ID's cannot not be 0 or negative", HttpStatus.BAD_REQUEST);
-        } else if (house == null) {
-            return new ResponseEntity<>("House cannot be null", HttpStatus.BAD_REQUEST);
-        } else if (house.getHouseType() == null || house.getHouseOwner() == null) {
-            return new ResponseEntity<>("No user/housetype attached, incomplete House", HttpStatus.BAD_REQUEST);
-        } else {
-            if (houseOwnerId == house.getHouseOwner().getUserId()) {
-                return houseService.saveHouse(house)
-                        ? new ResponseEntity<>("House successfully modified", HttpStatus.OK)
-                        : new ResponseEntity<>("Unable to update this house", HttpStatus.CONFLICT);
+    public ResponseEntity<?> updateHouse(@RequestHeader("Authorization") String token, @RequestBody HouseDetailsDTO house) {
+        Optional<User> optionalUser = authorizationService.validate(UUID.fromString(token));
+        if (optionalUser.isPresent()) {
+            int houseId = house.getHouseId();
+            int houseOwnerId = optionalUser.get().getUserId();
+
+            if (houseId <= 0 || houseOwnerId <= 0) {
+                return new ResponseEntity<>("ID's cannot not be 0 or negative", HttpStatus.BAD_REQUEST);
+            } else if (house == null) {
+                return new ResponseEntity<>("House cannot be null", HttpStatus.BAD_REQUEST);
+            } else if (house.getHouseType() == null || house.getHouseOwnerId() == 0) {
+                return new ResponseEntity<>("No user/housetype attached, incomplete House", HttpStatus.BAD_REQUEST);
+            } else {
+                if (houseOwnerId == house.getHouseOwnerId()) {
+                    return houseService.saveHouse(house)
+                            ? new ResponseEntity<>("House successfully modified", HttpStatus.OK)
+                            : new ResponseEntity<>("Unable to update this house", HttpStatus.CONFLICT);
+                }
+                return new ResponseEntity<>("Unauthorized to update this house", HttpStatus.UNAUTHORIZED);
             }
-            return new ResponseEntity<>("Unauthorized to update this house", HttpStatus.UNAUTHORIZED);
         }
+        return new ResponseEntity<>("Invalid token", HttpStatus.UNAUTHORIZED);
     }
 
     @DeleteMapping(value = "/{houseId}")
-    public ResponseEntity<?> deleteHouse(@PathVariable int houseId,
-                                         @RequestParam(name = "huis-eigenaarId") int houseOwnerId) {
-        if (houseId <= 0 || houseOwnerId <= 0) {
-            return new ResponseEntity<>("ID's cannot not be 0 or negative", HttpStatus.BAD_REQUEST);
+    public ResponseEntity<?> deleteHouse(@RequestHeader("Authorization") String token, @PathVariable int houseId) {
+        Optional<User> optionalUser = authorizationService.validate(UUID.fromString(token));
+        if (optionalUser.isPresent()) {
+            int houseOwnerId = optionalUser.get().getUserId();
+            if (houseId <= 0 || houseOwnerId <= 0) {
+                return new ResponseEntity<>("ID's cannot not be 0 or negative", HttpStatus.BAD_REQUEST);
+            }
+            House house = houseService.getOneById(houseId);
+            if (house == null) {
+                return new ResponseEntity<>("House was not found", HttpStatus.NOT_FOUND);
+            } else if (houseOwnerId != house.getHouseOwner().getUserId()) {
+                return new ResponseEntity<>("Not authorized to delete this house", HttpStatus.FORBIDDEN);
+            } else if (!reservationService.getAllReservationsByHouseId(houseId).isEmpty()) {
+              return new ResponseEntity<>("Not authorized to delete this house", HttpStatus.CONFLICT);
+            } else {
+                return houseService.deleteHouse(houseId)
+                        ? new ResponseEntity<>("Successfully deleted house", HttpStatus.OK)
+                        : new ResponseEntity<>("Unable to delete house", HttpStatus.CONFLICT);
+            }
         }
-        House house = houseService.getOneById(houseId);
-        if (house == null) {
-            return new ResponseEntity<>("House was not found", HttpStatus.NOT_FOUND);
-        } else if (houseOwnerId != house.getHouseOwner().getUserId()) {
-            return new ResponseEntity<>("Not authorized to delete this house", HttpStatus.FORBIDDEN);
-        } else {
-            // TODO check of huis gereserveerd is
-            return houseService.deleteHouse(houseId)
-                    ? new ResponseEntity<>("Successfully deleted house", HttpStatus.OK)
-                    : new ResponseEntity<>("Unable to delete house", HttpStatus.CONFLICT);
-        }
+        return new ResponseEntity<>("Invalid token", HttpStatus.UNAUTHORIZED);
     }
 
 } // class
