@@ -1,1 +1,16 @@
-<!-- -->
+#actionButtons {
+    display: block;
+    margin-top: 20px;
+
+}
+
+#actionButtons button {
+    display: inline-block;
+    margin-right: 10px;
+}
+
+#pictures img {
+    max-width: 20%;
+    margin-bottom: 10px;
+
+}

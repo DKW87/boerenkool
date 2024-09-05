@@ -9,70 +9,72 @@
     <link rel="stylesheet" href="css/filter.css">
     <link rel="stylesheet" href="css/house.css">
     <link rel="stylesheet" href="css/footer.css">
+    <link rel="stylesheet" href="/css/manageHouseByOwner.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playwrite+BE+VLG:wght@100..400&family=Playwrite+PE:wght@100..400&display=swap" rel="stylesheet">
 
-    <title>Manage House</title>
+    <title>Beheer mijn huisje</title>
 </head>
 <body>
 
 <div class="main-grid-area">
 
     <div class="header-div" id="header"></div><!-- loads header here -->
-
     <div class="left-sidebar-div" id="left-sidebar"></div><!-- loads left sidebar here -->
 
     <div class="body-div" id="body">
-
-        <!-- huis object opvragen -->
-        <!-- Opmaak nog veranderen -->
         <div class="house-details" id="house-details">
-            <h2>House Details</h2>
+            <h2>Huis details</h2>
             <br>
-            <br>
-            <p><strong>House Name:</strong> <span id="houseName"></span></p>
-            <p><strong>House Type:</strong> <span id="houseType"></span></p>
-            <p><strong>House Owner:</strong> <span id="houseOwner"></span></p>
-            <p><strong>Province:</strong> <span id="province"></span></p>
-            <p><strong>City:</strong> <span id="city"></span></p>
-            <p><strong>Street and Number:</strong> <span id="streetAndNumber"></span></p>
-            <p><strong>Zipcode:</strong> <span id="zipcode"></span></p>
-            <p><strong>Max Guests:</strong> <span id="maxGuest"></span></p>
-            <p><strong>Room Count:</strong> <span id="roomCount"></span></p>
-            <p><strong>Price Per Person Per Day:</strong> <span id="pricePPPD"></span></p>
-            <p><strong>Description:</strong> <span id="description"></span></p>
-            <p><strong>Availability:</strong> <span id="isNotAvailable"></span></p>
+            <form id="houseForm">
+                <p><strong>Huis naam:</strong> <input type="text" id="houseName" disabled /></p>
+                <p><strong>Huis type:</strong> <input type="text" id="houseType" disabled /></p>
+                <p><strong>Eigenaar:</strong> <input type="text" id="houseOwner" readonly /></p>
+                <p><strong>Provincie:</strong> <input type="text" id="province" disabled /></p>
+                <p><strong>Stad:</strong> <input type="text" id="city" disabled /></p>
+                <p><strong>Straat en huisnummer:</strong> <input type="text" id="streetAndNumber" disabled /></p>
+                <p><strong>Postcode:</strong> <input type="text" id="zipcode" disabled /></p>
+                <p><strong>Max gasten:</strong> <input type="number" id="maxGuest" disabled /></p>
+                <p><strong>Aantal kamers:</strong> <input type="number" id="roomCount" disabled /></p>
+                <p><strong>Prijs per persoon, per dag:</strong> <input type="number" id="pricePPPD" disabled /></p>
+                <p><strong>Omschrijving:</strong> <textarea id="description" disabled></textarea></p>
+                <br>
+                <br>
+                <br>
+                <br>
+                <p><strong>Beschikbaarheid:</strong>
+                    <select id="isNotAvailable" disabled>
+                        <option value="false">Beschikbaar</option>
+                        <option value="true">Niet beschikbaar</option>
+                    </select>
+                </p>
+                <p><strong>Foto's:</strong></p>
+                <div id="pictures"></div>
+                <br>
+                <br>
+                <p><strong>Extra voorzieningen:</strong></p>
+                <ul id="extraFeatures"></ul>
+                <br>
+                <br>
+                <div id="actionButtons">
+                    <button type="button" id="editHouse">Wijzigen</button>
+                    <button type="button" id="saveChanges" style="display:none;">Opslaan</button>
+                    <button type="button" id="cancelChanges" style="display:none;">Annuleren</button>
+                    <button type="button" id="deleteHouse">Verwijderen</button>
 
-            <!-- pictures -->
-            <p><strong>Pictures:</strong></p>
-            <div id="pictures"></div>
 
-            <!-- extra features checkboxes maken -->
-            <p><strong>Extra Features:</strong></p>
-            <ul id="extraFeatures"></ul>
-            <br>
-            <br>
-            <!-- edit button -->
-            <button id="editHouse">Aanpassen</button>
-            <button id="saveChanges" style="display:none;">Opslaan</button>
-            <button id="cancelChanges">Annuleer</button>
-            <button id="backToMyHouses">Terug naar overzicht</button>
-            <button id="logout">Uitloggen</button>
-
+                    <button type="button" id="managePictures">Verwijderen</button>
+                    <button type="button" id="backToMyHouses">Terug naar overzicht</button>
+                </div>
+            </form>
 
         </div>
-        <!-- script hieronder houden anders laadt de pagina niet goed -->
         <script src="/js/manageHouseByOwner.js" type="module" defer></script>
-
     </div>
-
     <div class="footer-div" id="footer"></div><!-- loads footer here -->
 
 </div>
-
-
-
 
 </body>
 </html>
