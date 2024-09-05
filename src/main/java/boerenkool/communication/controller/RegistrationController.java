@@ -96,7 +96,7 @@ public class RegistrationController {
         String email = emailMap.get("email");
         logger.debug("Received password reset request for email: {}", email);
         registrationService.sendPasswordResetEmail(email);
-        return ResponseEntity.ok("Password reset email sent");
+        return ResponseEntity.ok("Email verstuurd");
     }
 
     @PostMapping("/reset-password/confirm")
@@ -105,7 +105,7 @@ public class RegistrationController {
         if (success) {
             return ResponseEntity.ok("Password reset successfully");
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token or email");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Ongeldige token of email");
         }
     }
 
