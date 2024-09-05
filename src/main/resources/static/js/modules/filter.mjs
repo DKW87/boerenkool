@@ -135,7 +135,7 @@ export function getListOfHousesByURL(url) {
         })
         .catch(error => {
             console.error('Error:', error)
-            amountOfHousesStringSwitch(parentElement, 0);
+            // amountOfHousesStringSwitch(parentElement, 0);
         });
 }
 
@@ -209,7 +209,7 @@ function amountOfHousesStringSwitch(parentElement, amountOfHouses) {
     amountOfHousesDiv.className = 'amount-of-houses';
 
     switch (amountOfHouses) {
-        case 0:
+        case undefined:
             amountOfHousesDiv.innerHTML = 'Geen huisjes gevonden. Verbreed je zoekcriteria en probeer het opnieuw.';
             parentElement.appendChild(amountOfHousesDiv);
             break;
