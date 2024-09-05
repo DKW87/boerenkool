@@ -63,11 +63,15 @@ function createBlockedUserListItem(user, userId, token) {
 // Functie om een deblokkeerknop aan te maken
 function createUnblockButton(userToUnblockId, userId, token) {
     const unblockButton = document.createElement('button');
-    unblockButton.textContent = 'Deblokkeer';  // Stel de knoptekst in
-    unblockButton.classList.add('unblock-button');  // Voeg een CSS-klasse toe voor styling
-    unblockButton.addEventListener('click', () => unblockUser(userToUnblockId, userId, token));  // Voeg een event listener toe die de unblockUser functie aanroept bij een klik
+    unblockButton.textContent = 'Deblokkeer';
+    unblockButton.classList.add('unblock-button');
 
-    return unblockButton;  // Retourneer de deblokkeerknop
+    unblockButton.addEventListener('click', () => {
+        console.log('Deblokkeerknop ingedrukt voor userToUnblockId:', userToUnblockId);
+        unblockUser(userToUnblockId, userId, token);
+    });
+
+    return unblockButton;
 }
 
 // Functie om een gebruiker te blokkeren
@@ -156,6 +160,15 @@ function handleBlockResponse(response, usernameToBlock, userId, token) {
 
 // Functie om een gebruiker te deblokkeren
 function unblockUser(userToUnblockId, userId, token) {
+    if (!userToUnblockId || !userId || !token) {
+        console.error('Onjuiste parameters voor deblokkeeractie:', {
+            userToUnblockId,
+            userId,
+            token
+        });
+        return;
+    }
+
     console.log('Deblokkeren van gebruiker met userToUnblockId:', userToUnblockId);
 
     fetch(`/api/blocked-users/unblock`, {
@@ -164,16 +177,16 @@ function unblockUser(userToUnblockId, userId, token) {
             'Content-Type': 'application/x-www-form-urlencoded',
             'Authorization': token
         },
-        body: `userToUnblockId=${userToUnblockId}&userBlockingId=${userId}`  // Verstuur de benodigde gegevens in de body van de request
+        body: `userToUnblockId=${userToUnblockId}&userBlockingId=${userId}`
     })
         .then(response => {
             console.log('Status bij het deblokkeren van gebruiker:', response.status);
             if (response.ok) {
-                alert('Gebruiker is gedeblokkeerd.');  // Informeer de gebruiker dat de deblokkade succesvol was
+                alert('Gebruiker is gedeblokkeerd.');
                 loadBlockedUsers(userId, token);  // Vernieuw de lijst van geblokkeerde gebruikers
             } else {
-                throw new Error('Fout bij het deblokkeren van de gebruiker.');  // Gooi een fout als de deblokkade mislukt is
+                throw new Error('Fout bij het deblokkeren van de gebruiker.');
             }
         })
-        .catch(error => console.error('Fout bij het deblokkeren van gebruiker:', error));  // Foutafhandeling
+        .catch(error => console.error('Fout bij het deblokkeren van gebruiker:', error));
 }
