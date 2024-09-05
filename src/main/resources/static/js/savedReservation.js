@@ -1,7 +1,6 @@
 import * as Main from './modules/main.mjs';
 import {checkIfLoggedIn} from "./modules/auth.mjs";
 
-/* load all page elements of index.html */
 Main.loadHeader();
 Main.loadFooter();
 

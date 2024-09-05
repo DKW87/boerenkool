@@ -1,10 +1,15 @@
 import * as Main from './modules/main.mjs';
 import * as Auth from "./modules/auth.mjs";
 
-/* load all page elements of index.html */
 Main.loadHeader();
 Main.loadFooter();
-document.addEventListener('DOMContentLoaded', function() {
+
+document.addEventListener('DOMContentLoaded', async function() {
+
+    const user = await Auth.checkIfLoggedIn();
+    if (!user) {
+        return;
+    }
 
     const urlParams = new URLSearchParams(window.location.search);
     document.getElementById('houseId').value=urlParams.get('id');
@@ -43,7 +48,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 document.getElementById('reservation-result').textContent = `Reservering is aangemaakt: ID ${data.reservationId}`;
                 setTimeout(() => {
-                    window.location.reload();
+                    window.location.href='saved-reservation.html';
                 }, 2000);
             })
             .catch(error => {
