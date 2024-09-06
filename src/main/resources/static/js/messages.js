@@ -6,6 +6,8 @@ main.loadHeader()
 main.loadFooter()
 
 const NO_MESSAGES = "Geen berichten."
+const PREFIX_FROM = "Van : "
+const PREFIX_TO = "Aan : "
 
 const DATE_TIME_OPTIONS = {
     weekday: `long`,
@@ -33,23 +35,25 @@ async function setup() {
         reverseMessageOverview()
     })
     document.querySelector('#refreshInboxButton').addEventListener('click', async () => {
+        // TODO extract this to a new function, combined with the one below
         overviewShowsInbox = true
         inboxArray = await getInbox()
         if (inboxArray.length > 0) {
             sortMessageArray(inboxArray)
             fillMessageOverview(inboxArray)
-            // TODO showMessageContent(messageId) first in array
             await showMessageContent(inboxArray[0].messageId)
+            showElement(`messageSingleView`, true)
         } else noMessages()
     })
     document.querySelector('#refreshOutboxButton').addEventListener('click', async () => {
+        // TODO extract this to a new function
         overviewShowsInbox = false
         outboxArray = await getOutbox()
         if (outboxArray.length > 0) {
             sortMessageArray(outboxArray)
             fillMessageOverview(outboxArray)
-            // TODO select first message in array
             await showMessageContent(outboxArray[0].messageId)
+            showElement(`messageSingleView`, true)
         } else noMessages()
     })
     document.querySelector('#writeMessageButton').addEventListener('click', () => {
@@ -60,18 +64,7 @@ async function setup() {
 
     // refresh messageoverview with inbox by default
     document.querySelector('#refreshInboxButton').click();
-
-    // if (inboxArray.length > 0) {
-    //     await sortMessageArray(inboxArray)
-    //     await fillMessageOverview(inboxArray)
-    // } else noMessages()
-
-    // outboxArray = await getOutbox()
-    // if (outboxArray.length > 0) {
-    //     sortMessageArray(outboxArray)
-    // }
 }
-
 
 
 // // for floatingCheatMenu
@@ -184,6 +177,16 @@ function noMessages() {
     noMessages.setAttribute("id", "messageInOverview")
     noMessages.textContent = NO_MESSAGES
     document.querySelector(`#messageOverview`).appendChild(noMessages)
+    showElement(`messageSingleView`, false)
+}
+
+function showElement(elementSelector, boolean) {
+    const element = document.getElementById(`${elementSelector}`);
+    if (boolean) {
+        element.style.display = "block";
+    } else {
+        element.style.display = "none";
+    }
 }
 
 function markMessageUnread(messageId) {
@@ -233,9 +236,9 @@ async function showMessageContent(messageId) {
     // find the message in the array, using its messageId
     let selectedMessage = visibleArray.find((e) => e.messageId === parseInt(messageId, 10))
     // show the message values in the relevant HTML elements
-    document.querySelector(`#singleViewUsername`).textContent = (overviewShowsInbox ?
-        await getUsername(selectedMessage.senderId) :
-        loggedInUser.username)
+    document.querySelector(`#singleViewUsername`).textContent = overviewShowsInbox ?
+        PREFIX_FROM + await getUsername(selectedMessage.senderId) + ", "
+        : PREFIX_TO + await getUsername(selectedMessage.receiverId) + ", "
     const messageDateTime = new Date(selectedMessage.dateTimeSent)
     document.querySelector(`#singleViewDateTimeSent`).textContent = formatDateTime(messageDateTime)
     document.querySelector(`#singleViewSubject`).textContent = selectedMessage.subject
