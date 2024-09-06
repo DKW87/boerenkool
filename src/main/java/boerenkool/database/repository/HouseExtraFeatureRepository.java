@@ -44,4 +44,9 @@ public class HouseExtraFeatureRepository {
     public List<HouseExtraFeature> getAllFeaturesByHouseId(int houseId) {
         return houseExtraFeatureDAO.getAllFeaturesByHouseId(houseId);
     }
+
+    public List<HouseExtraFeature> getAllFeaturesByHouseIdWithNames(int houseId) {
+        return houseExtraFeatureDAO.getAllFeaturesByHouseIdWithNames(houseId);
+    }
+
 }

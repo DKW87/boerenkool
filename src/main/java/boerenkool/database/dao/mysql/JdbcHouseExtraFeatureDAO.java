@@ -80,6 +80,11 @@ public class JdbcHouseExtraFeatureDAO implements HouseExtraFeatureDAO {
         return jdbcTemplate.query(sql, new HouseExtraFeatureRowMapper(), houseId);
     }
 
+    @Override
+    public List<HouseExtraFeature> getAllFeaturesByHouseIdWithNames(int houseId) {
+        return List.of();
+    }
+
     private void insert(HouseExtraFeature houseExtraFeature) {
         String sql = "INSERT INTO HouseExtraFeature (houseId, featureId) VALUES (?, ?)";
         jdbcTemplate.update(sql,

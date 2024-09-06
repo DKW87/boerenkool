@@ -26,4 +26,6 @@ public interface HouseExtraFeatureDAO extends GenericDAO<HouseExtraFeature> {
 
 
     List<HouseExtraFeature> getAllFeaturesByHouseId(int houseId);
+
+    List<HouseExtraFeature> getAllFeaturesByHouseIdWithNames(int houseId);
 }

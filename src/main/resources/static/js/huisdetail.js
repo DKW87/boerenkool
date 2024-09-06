@@ -12,8 +12,9 @@ document.addEventListener('DOMContentLoaded', async function () {
     const houseId = params.get('id');  // Get house ID from URL parameters
 
     if (houseId) {
-        // Fetch house details if houseId is available
+        // Fetch house details and extra features if houseId is available
         await fetchHouseDetails(houseId);
+        await fetchExtraFeatures(houseId);
 
         const modal = document.getElementById('imageModal');
         const closeBtn = document.getElementsByClassName('close')[0];
@@ -60,6 +61,36 @@ async function fetchHouseDetails(houseId) {
     } catch (error) {
         console.error('Error fetching house details:', error);
         displayErrorMessage();
+    }
+}
+
+async function fetchExtraFeatures(houseId) {
+    try {
+        // URL'de boşluk veya yeni satır olmadığından emin olun
+        const url = `/api/houses/${houseId}/extraFeatures`.trim();  // trim() ile boşlukları temizle
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Error fetching extra features: ${response.status}`);
+        }
+        const extraFeatures = await response.json();
+        displayExtraFeatures(extraFeatures);
+    } catch (error) {
+        console.error('Error fetching extra features:', error);
+    }
+}
+
+// Display the extra features in the DOM
+function displayExtraFeatures(extraFeatures) {
+    const featuresContainer = document.getElementById('extraFeatures');
+    featuresContainer.innerHTML = '';
+    if (extraFeatures.length === 0) {
+        featuresContainer.innerHTML = '<p>Geen extra functies beschikbaar.</p>';  // Eğer özellik yoksa mesaj göster
+    } else {
+        extraFeatures.forEach(feature => {
+            const featureItem = document.createElement('li');
+            featureItem.textContent = feature.name;
+            featuresContainer.appendChild(featureItem);
+        });
     }
 }
 
@@ -114,7 +145,7 @@ function displayHouseDetails(house) {
     document.getElementById('location').textContent = `${house.streetAndNumber}, ${house.city}, ${house.province}`;
     document.getElementById('maxGuests').textContent = house.maxGuest;
     document.getElementById('roomCount').textContent = house.roomCount;
-    document.getElementById('pricePPPD').textContent = `€${house.pricePPPD}`;
+    document.getElementById('pricePPPD').textContent = `${house.pricePPPD} bkC`;
     document.getElementById('description').textContent = house.description;
     document.getElementById('availability').textContent = house.isNotAvailable ? 'Niet Beschikbaar' : 'Beschikbaar';  // Dutch UI
 
@@ -141,16 +172,7 @@ function displayHouseDetails(house) {
         allImages.push(img);
     });
 
-    const featuresContainer = document.getElementById('extraFeatures');
-    featuresContainer.innerHTML = '';
-    // Display extra features in a list
-    house?.extraFeatures?.forEach(feature => {
-        const featureItem = document.createElement('li');
-        featureItem.textContent = feature.name;
-        featuresContainer.appendChild(featureItem);
-    });
-
-    // Add click event to the "Reserveer" button to navigate to the reservation page with houseId
+    // Reserveer button click event
     const reserveerButton = document.getElementById('reserveerButton');
     reserveerButton.addEventListener('click', function () {
         // Redirect to reservation.html and pass houseId as a query parameter

@@ -18,12 +18,18 @@ public class HouseExtraFeatureService {
         this.houseExtraFeatureRepository = houseExtraFeatureRepository;
     }
 
+
     public List<HouseExtraFeature> getAllHouseExtraFeatures() {
         return houseExtraFeatureRepository.getAll();
     }
 
+
     public Optional<HouseExtraFeature> getHouseExtraFeatureByIds(int houseId, int featureId) {
         return houseExtraFeatureRepository.getOneByIds(houseId, featureId);
+    }
+
+    public List<HouseExtraFeature> getAllFeaturesByHouseIdWithNames(int houseId) {
+        return houseExtraFeatureRepository.getAllFeaturesByHouseIdWithNames(houseId);
     }
 
     public HouseExtraFeature saveHouseExtraFeature(HouseExtraFeature houseExtraFeature) {
@@ -35,8 +41,8 @@ public class HouseExtraFeatureService {
         return houseExtraFeature;
     }
 
+
     public boolean deleteHouseExtraFeatureByIds(int houseId, int featureId) {
-        // Controleer of de te verwijderen HouseExtraFeature bestaat
         if (!houseExtraFeatureRepository.getOneByIds(houseId, featureId).isPresent()) {
             throw new IllegalArgumentException("Een HouseExtraFeature met houseId " + houseId + " en featureId " + featureId + " bestaat niet.");
         }

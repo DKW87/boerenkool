@@ -9,6 +9,7 @@ public class HouseExtraFeature {
     // attributes
     private int houseId;
     private int featureId;
+    private String extraFeatureName;
 
     // constructors
     public HouseExtraFeature(int houseId, int featureId) {
@@ -17,9 +18,20 @@ public class HouseExtraFeature {
     }
 
     // getters and setters
+
+    public String getExtraFeatureName() {
+        return extraFeatureName;
+    }
+
+    public void setExtraFeatureName(String extraFeatureName) {
+        this.extraFeatureName = extraFeatureName;
+    }
+
     public int getHouseId() {
         return houseId;
     }
+
+
 
     public void setHouseId(int houseId) {
         this.houseId = houseId;

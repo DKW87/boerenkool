@@ -1,6 +1,7 @@
 package boerenkool.database.dao.mysql;
 
 import boerenkool.business.model.ExtraFeature;
+import boerenkool.business.model.HouseExtraFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,7 @@ public class JdbcExtraFeatureDAO implements ExtraFeatureDAO {
         logger.info("JdbcExtraFeatureDAO instantiated");
     }
 
+    // ExtraFeature ile ilgili işlemler
     @Override
     public List<ExtraFeature> getAll() {
         String sql = "SELECT * FROM ExtraFeature";
@@ -75,6 +77,17 @@ public class JdbcExtraFeatureDAO implements ExtraFeatureDAO {
                 .findFirst();
     }
 
+    // JOIN işlemi ile evin ekstra özellik adlarını alıyoruz
+    @Override
+    public List<HouseExtraFeature> getAllFeaturesByHouseIdWithNames(int houseId) {
+        String sql = "SELECT h.houseId, h.featureId, e.extraFeatureName " +
+                "FROM HouseExtraFeature h " +
+                "JOIN ExtraFeature e ON h.featureId = e.extraFeatureId " +
+                "WHERE h.houseId = ?";
+
+        return jdbcTemplate.query(sql, new HouseExtraFeatureWithNameRowMapper(), houseId);
+    }
+
     private void insert(ExtraFeature extraFeature) {
         String sql = "INSERT INTO ExtraFeature (extraFeatureName) VALUES (?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -86,12 +99,60 @@ public class JdbcExtraFeatureDAO implements ExtraFeatureDAO {
         extraFeature.setExtraFeatureId(keyHolder.getKey().intValue());
     }
 
+    // HouseExtraFeatures işlemleri (houseId ile ExtraFeature'lar arasında ilişki)
+
+    // 1. Belirli bir houseId'ye göre ExtraFeature'ları getir
+    public List<ExtraFeature> getExtraFeaturesByHouseId(int houseId) {
+        String sql = "SELECT ef.* FROM ExtraFeature ef " +
+                "INNER JOIN HouseExtraFeatures hef ON ef.extraFeatureId = hef.extraFeatureId " +
+                "WHERE hef.houseId = ?";
+        return jdbcTemplate.query(sql, new ExtraFeatureRowMapper(), houseId);
+    }
+
+    // 2. Bir eve yeni ExtraFeature ekle
+    public boolean addExtraFeatureToHouse(int houseId, int extraFeatureId) {
+        String sql = "INSERT INTO HouseExtraFeatures (houseId, extraFeatureId) VALUES (?, ?)";
+        int rowsAffected = jdbcTemplate.update(sql, houseId, extraFeatureId);
+        return rowsAffected > 0;
+    }
+
+    // 3. Bir evden belirli bir ExtraFeature'ı kaldır
+    public boolean removeExtraFeatureFromHouse(int houseId, int extraFeatureId) {
+        String sql = "DELETE FROM HouseExtraFeatures WHERE houseId = ? AND extraFeatureId = ?";
+        int rowsAffected = jdbcTemplate.update(sql, houseId, extraFeatureId);
+        return rowsAffected > 0;
+    }
+
+    // 4. Bir evden tüm ExtraFeature'ları kaldır (ev silindiğinde vs.)
+    public boolean removeAllExtraFeaturesFromHouse(int houseId) {
+        String sql = "DELETE FROM HouseExtraFeatures WHERE houseId = ?";
+        int rowsAffected = jdbcTemplate.update(sql, houseId);
+        return rowsAffected > 0;
+    }
+
     private static class ExtraFeatureRowMapper implements RowMapper<ExtraFeature> {
         @Override
         public ExtraFeature mapRow(ResultSet resultSet, int rowNum) throws SQLException {
             int extraFeatureId = resultSet.getInt("extraFeatureId");
             String extraFeatureName = resultSet.getString("extraFeatureName");
             return new ExtraFeature(extraFeatureId, extraFeatureName);
+        }
+    }
+
+
+
+    // HouseExtraFeature için RowMapper: Ekstra özellik adını da içeriyor
+    private static class HouseExtraFeatureWithNameRowMapper implements RowMapper<HouseExtraFeature> {
+        @Override
+        public HouseExtraFeature mapRow(ResultSet resultSet, int rowNum) throws SQLException {
+            int houseId = resultSet.getInt("houseId");
+            int featureId = resultSet.getInt("featureId");
+            String extraFeatureName = resultSet.getString("extraFeatureName");
+
+            // HouseExtraFeature objesine ekstra özellik adını ekliyoruz
+            HouseExtraFeature houseExtraFeature = new HouseExtraFeature(houseId, featureId);
+            houseExtraFeature.setExtraFeatureName(extraFeatureName);
+            return houseExtraFeature;
         }
     }
 }
