@@ -178,3 +178,108 @@ input:checked + .slider:before {
     border-radius: 50%;
 }
 
+
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.75); /* Arka plan karartma */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.popup-message {
+    background-color: white;
+    padding: 20px 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+}
+
+
+.popup-message h2 {
+    margin-bottom: 10px;
+    font-size: 24px;
+}
+
+
+#popup-ok-button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 20px;
+}
+
+#popup-ok-button:hover {
+    background-color: #0056b3;
+}
+
+
+@media (max-width: 768px) {
+    .popup-message {
+        width: 80%;
+    }
+}
+
+
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.75);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+
+.popup-message {
+    background-color: white;
+    padding: 20px 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+}
+
+.popup-message h2 {
+    margin-bottom: 10px;
+    font-size: 24px;
+}
+
+
+#popup-ok-button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 20px;
+}
+
+#popup-ok-button:hover {
+    background-color: #0056b3;
+}
+
+
+@media (max-width: 768px) {
+    .popup-message {
+        width: 80%;
+    }
+}
+
+

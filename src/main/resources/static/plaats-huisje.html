@@ -21,23 +21,23 @@
 <body>
 
 <div class="main-grid-area">
-
-
     <div class="header-div" id="header"></div>
 
-
     <div id="huis-create" class="container">
-        <h1 id="form-header">Plaats Nieuwe Huisje</h1><br><br>
+        <h1 id="form-header">Plaats Nieuw Huisje</h1><br><br>
         <form id="houseForm" enctype="multipart/form-data">
+
             <label for="houseName">Huis Naam</label>
             <input type="text" id="houseName" required>
 
+            <!-- House Type seçimi için select kutusu -->
             <label for="houseType">Huis Type</label>
-            <input id="houseType" required>
+            <select id="houseTypes" required>
+                <option value="">Kies huis type</option>
+            </select>
 
-
-            <label for="houseOwner">Eigenaar ID</label>
-            <input type="number" id="houseOwner" required>
+            <!-- House Owner ID gizli input -->
+            <input type="hidden" id="houseOwner" name="houseOwnerId" value="">
 
             <label for="province">Provincie</label>
             <input type="text" id="province" required>
@@ -63,31 +63,31 @@
             <label for="description">Beschrijving</label>
             <textarea id="description" rows="4" required></textarea>
 
+            <!-- Fotoğraf Yükleme Alanı -->
+            <label for="housePictures">Foto's Uploaden</label>
+            <input type="file" id="housePictures" multiple>
+
+            <!-- Fotoğraf Önizleme Alanı -->
+            <div id="imagePreview" class="image-preview"></div>
+
+            <!-- Modal (Büyütülmüş resim gösterimi için) -->
+            <div id="imageModal" class="modal">
+                <span class="close">&times;</span>
+                <img class="modal-content" id="modalImage">
+                <div id="caption"></div>
+            </div>
+
+            <!-- Beschikbaarheid İkili Anahtar -->
+            <label for="isNotAvailable">Beschikbaarheid</label>
             <label class="switch">
-                <input type="checkbox" id="isNotAvailable" required>
+                <input type="checkbox" id="isNotAvailable">
                 <span class="slider round"></span>
             </label>
             <span id="availabilityText">Beschikbaar</span>
 
-
-
-            <label for="housePictures">Foto's Toevoegen</label>
-            <input type="file" id="housePictures" name="pictures" accept="image/*" multiple required>
-
-
-            <div id="imagePreview" class="image-preview"></div>
-            <br>
-
             <button type="submit">Maak Huis Aan</button>
             <p id="message"></p>
         </form>
-    </div>
-
-    <!-- Modal (Pop-up) -->
-    <div id="imageModal" class="modal">
-        <span class="close">&times;</span>
-        <img class="modal-content" id="modalImage">
-        <div id="caption"></div>
     </div>
 
     <!-- Footer -->
