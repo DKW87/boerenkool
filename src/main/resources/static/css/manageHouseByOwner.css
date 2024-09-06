@@ -1,1 +1,55 @@
-<!-- -->
+:root {
+    --boerenkool-groen: #556B2F;
+    --boerenkool-paars: #a975de;
+    --boerenkool-lichtgroen: #718E3F;
+    --boerenkool-lichtpaars: #DAC4F1;
+    --boerenkool-zwart: black;
+    --boerenkool-wit: white;
+    --boerenkool-grijs: #0b00ff;
+    --font-size-large: 18px;
+    --font-size-small: 12px;
+    --button-padding: 10px 20px;
+    --border-radius: 5px;
+}
+
+
+#pictures {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    padding: 10px;
+    background-color: var(--boerenkool-wit);
+}
+#pictures img {
+    height: 200px;
+    width: 200px;
+    object-fit: contain;
+    margin-bottom: 10px;
+
+}
+#houseOwnerLabel {
+    display: none;
+}
+#houseOwner {
+    display: none;
+}
+
+#actionButtons {
+    display: inline-block;
+    padding: var(--button-padding);
+    font-size: var(--font-size-large);
+    font-weight: bold;
+    border: none;
+    border-radius: var(--border-radius);
+    text-transform: uppercase;
+    color: var(--boerenkool-wit);
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    margin: 10px;
+}
+
+#actionButtons button {
+    display: inline-block;
+    margin-right: 10px;
+}
