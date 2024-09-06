@@ -134,20 +134,11 @@ public class JdbcMessageDAO implements MessageDAO {
     }
 
     public int numberOfUnreadMessages(int receiverId) {
-        Integer numberOfUnread = jdbcTemplate.queryForObject(
-                "SELECT COUNT(readByReceiver = 1 ) FROM Message WHERE receiverId = ?;",
-                Integer.class,
-                receiverId);
-        return (numberOfUnread != null) ? numberOfUnread : 0;
+        String sql = "SELECT SUM(!readByReceiver) as number FROM Message WHERE receiverId = ?;";
+        List<Integer> result = jdbcTemplate.query(sql, (rs, rowNum) -> rs.getInt("number"), receiverId);
+        System.out.println("resultaat query numberOfUnreadMessages; " + result.getFirst());
+        return result.getFirst();
     }
-//    public int checkForUnreadMessages(int receiverId) {
-//        int numberOfUnread = jdbcTemplate.queryForObject(
-//                "SELECT COUNT(readByReceiver = 1 ) FROM Message WHERE receiverId = ?;",
-//                Integer.class,
-//                receiverId);
-//        return numberOfUnread;
-//    }
-
 
     /**
      * update existing message in database
