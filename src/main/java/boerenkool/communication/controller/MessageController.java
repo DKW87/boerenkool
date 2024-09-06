@@ -114,25 +114,42 @@ public class MessageController {
                                     @RequestHeader("Authorization") String token)
             throws MessageDoesNotExistException, MessageNotSavedException {
         Optional<User> validatedUser = authorizationService.validate(UUID.fromString(token));
+        // indien alleen de zender deze update methode mag gebruiken;
+        //        if (validatedUser.isPresent() && messageDTO.getSenderId() == validatedUser.get().getUserId()) {
         if (validatedUser.isPresent()) {
-            if (messageService.updateMessage(validatedUser.get().getUserId(), messageDTO)) {
-                return ResponseEntity.status(HttpStatus.OK).build();
+            int userId = validatedUser.get().getUserId();
+            if ((userId == messageDTO.getSenderId()) ^ (userId == messageDTO.getReceiverId())) {
+                if (messageService.updateMessage(messageDTO)) {
+                    return ResponseEntity.status(HttpStatus.OK).build();
+                } else {
+                    throw new MessageNotSavedException();
+                }
             } else {
-                throw new MessageNotSavedException();
+                System.out.println("updateMessage userId not equal to senderId or receiverId");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             }
         } else {
+            System.out.println("updateMessage validateUser not present");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
 
-    @DeleteMapping("/{messageid}")
-    ResponseEntity<?> deleteMessage(@PathVariable("messageid") int messageId)
+    @DeleteMapping()
+    ResponseEntity<?> deleteMessage(@RequestBody MessageDTO messageDTO,
+                                    @RequestHeader("Authorization") String token)
             throws MessageDoesNotExistException {
-        // TODO user authentication (user must be sender to delete a message)
-        if (messageService.deleteMessage(messageId)) {
-            return ResponseEntity.ok("Message deleted");
+        Optional<User> validatedUser = authorizationService.validate(UUID.fromString(token));
+        if (validatedUser.isPresent()) {
+            int userId = validatedUser.get().getUserId();
+            MessageDTO messageFromDatabase = messageService.getByMessageId(messageDTO.getMessageId());
+            if (userId == messageDTO.getSenderId() & userId == messageFromDatabase.getSenderId()) {
+                messageService.deleteMessage(messageDTO.getMessageId());
+                return ResponseEntity.ok("Message deleted");
+            } else {
+                throw new UserIsNotSenderOfMessage();
+            }
         } else {
-            throw new MessageDoesNotExistException();
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
 }

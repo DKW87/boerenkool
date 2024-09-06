@@ -74,14 +74,19 @@ public class MessageService {
         return convertMessagesToDTOs(listOfMessages);
     }
 
-    public boolean updateMessage(int userId, MessageDTO messageDTO) throws MessageDoesNotExistException {
-        if (userId == messageDTO.getSenderId()) {
+    public boolean updateMessage(MessageDTO messageDTO) throws MessageDoesNotExistException {
+//        if (userId == messageDTO.getSenderId()) {
             // the sender can update everything in the message
             return messageRepository.updateMessage(convertDTOToMessage(messageDTO));
-        } else if (userId == messageDTO.getReceiverId()) {
-            // the receiver can only update readByReceiver field
-            return messageRepository.setReadByReceiver(convertDTOToMessage(messageDTO));
-        } else return false;
+//        } else if (userId == messageDTO.getReceiverId()) {
+//            // the receiver can only update readByReceiver value and/or archivedByReceiver value
+//            if (messageDTO.isArchivedByReceiver()) {
+//                return messageRepository.setArchivedByReceiver(convertDTOToMessage(messageDTO));
+//            }
+//            else if (messageDTO.isReadByReceiver()) {
+//                return messageRepository.setReadByReceiver(convertDTOToMessage(messageDTO));
+//            }
+//        } else return false;
     }
 
     public boolean deleteMessage(int messageId) {

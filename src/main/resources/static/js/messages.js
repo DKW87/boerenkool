@@ -20,6 +20,7 @@ const DATE_TIME_OPTIONS = {
 let loggedInUser = {}
 let inboxArray = {}
 let outboxArray = {}
+let selectedMessage = {}
 let sortAscending = false
 let overviewShowsInbox = true
 
@@ -31,9 +32,6 @@ setup()
 
 async function setup() {
 
-    document.querySelector('#reverseMessageOverviewButton').addEventListener('click', () => {
-        reverseMessageOverview()
-    })
     document.querySelector('#refreshInboxButton').addEventListener('click', async () => {
         // TODO extract this to a new function, combined with the one below
         overviewShowsInbox = true
@@ -56,9 +54,16 @@ async function setup() {
             showElement(`messageSingleView`, true)
         } else noMessages()
     })
+    document.querySelector('#reverseMessageOverviewButton').addEventListener('click', () => {
+        reverseMessageOverview()
+    })
     document.querySelector('#writeMessageButton').addEventListener('click', () => {
         window.location.href = "send-a-message.html"
     })
+    document.querySelector('#deleteMessageButton').addEventListener('click', () => {
+        deleteMessageHelper(selectedMessage)
+    })
+
 
     loggedInUser = await auth.getLoggedInUser(token)
 
@@ -121,6 +126,25 @@ async function getMessages(box) {
     }
 }
 
+async function getMessage(messageId) {
+    const url = `/api/messages/${messageId}`
+    try {
+        const response = await fetch(url, {
+            headers: {
+                "Authorization": localStorage.getItem('authToken')
+            }
+        })
+        if (!response.ok) {
+            new Error(`Response status: ${response.status}`)
+        } else {
+            return response.json()
+        }
+    } catch
+        (error) {
+        console.error(error.message);
+    }
+}
+
 // sort the array according to sortAscending value (newest on top, or oldest on top)
 function sortMessageArray(array) {
     if (array.length !== 0) {
@@ -145,9 +169,9 @@ function fillMessageOverview(listOfMessages) {
             // add eventhandler to entire element
             newOverviewMessage.addEventListener('click', () => {
                 showMessageContent(`${element.messageId}`)
-                markMessageRead(`${element.messageId}`)
+                overviewShowsInbox ?
+                    updateMessageProperty(`${element.messageId}`, "readByReceiver", true) : null
             })
-            // TODO message readByReceiver = true ? ... : change class and add markMessageRead to eventListener
 
             // add subject element
             const subject = document.createElement(`div`)
@@ -189,14 +213,16 @@ function showElement(elementSelector, boolean) {
     }
 }
 
-function markMessageUnread(messageId) {
-    // TODO later...
-    // updateMessage(message)
-}
-
-async function markMessageRead(messageId) {
-    const message = inboxArray.find(({messageId}) => messageId === messageId)
-    message.readByReceiver = true
+async function updateMessageProperty(messageId, key, value) {
+    let message
+    if (overviewShowsInbox) {
+        message = inboxArray.find(element => element.messageId === Number(messageId))
+    } else {
+        message = outboxArray.find(element => element.messageId === Number(messageId))
+    }
+    message[key] = value
+    console.log("updateMessageProperty message is : ")
+    console.log(message)
     await updateMessage(message)
 }
 
@@ -214,10 +240,46 @@ async function updateMessage(message) {
         if (!response.ok) {
             new Error(`Response status: ${response.status}`)
         } else {
-            console.log("updateMessage success! Add visual feedback later...")
+            console.log("updateMessage success for messageId " + message.messageId)
         }
     } catch (error) {
         console.error(error.message);
+    }
+}
+
+async function deleteMessage(message) {
+    const url = `/api/messages`
+    try {
+        const response = await fetch(url, {
+            method: "DELETE",
+            headers: {
+                "Authorization": localStorage.getItem('authToken'),
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(message)
+        })
+        if (!response.ok) {
+            new Error(`Response status: ${response.status}`)
+        } else {
+            console.log("deleteMessage success for messageId " + message.messageId)
+        }
+    } catch (error) {
+        console.error(error.message);
+    }
+}
+
+async function deleteMessageHelper(message) {
+    console.log("deleteMessageHelper is called")
+    if (message) {
+        if (loggedInUser.userId === message.senderId) {
+            // sender deletes message; message is deleted from database
+            await deleteMessage(message)
+        } else {
+            // receiver deletes message; message is marked "archivedByReceiver" using update function
+            await updateMessageProperty(message.messageId, "archivedByReceiver", true)
+        }
+    } else {
+        // TODO show "Select a message to delete" notification?
     }
 }
 
@@ -234,7 +296,7 @@ async function showMessageContent(messageId) {
     // check which overview is showing
     let visibleArray = overviewShowsInbox ? inboxArray : outboxArray
     // find the message in the array, using its messageId
-    let selectedMessage = visibleArray.find((e) => e.messageId === parseInt(messageId, 10))
+    selectedMessage = visibleArray.find((e) => e.messageId === parseInt(messageId, 10))
     // show the message values in the relevant HTML elements
     document.querySelector(`#singleViewUsername`).textContent = overviewShowsInbox ?
         PREFIX_FROM + await getUsername(selectedMessage.senderId) + ", "
