@@ -114,22 +114,29 @@ public class MessageController {
                                     @RequestHeader("Authorization") String token)
             throws MessageDoesNotExistException, MessageNotSavedException {
         Optional<User> validatedUser = authorizationService.validate(UUID.fromString(token));
-        // indien alleen de zender deze update methode mag gebruiken;
-        //        if (validatedUser.isPresent() && messageDTO.getSenderId() == validatedUser.get().getUserId()) {
         if (validatedUser.isPresent()) {
             int userId = validatedUser.get().getUserId();
-            if ((userId == messageDTO.getSenderId()) ^ (userId == messageDTO.getReceiverId())) {
-                if (messageService.updateMessage(messageDTO)) {
-                    return ResponseEntity.status(HttpStatus.OK).build();
-                } else {
-                    throw new MessageNotSavedException();
-                }
+            MessageDTO messageFromDatabase = messageService.getByMessageId(messageDTO.getMessageId());
+            if (userId == messageDTO.getSenderId()) {
+                // sender can update subject and body
+                messageFromDatabase.setSubject(messageDTO.getSubject());
+                messageFromDatabase.setBody(messageDTO.getBody());
+            } else if (userId == messageDTO.getReceiverId()) {
+                // receiver can only update ReadByReceiver and ArchivedByReceiver booleans
+                messageFromDatabase.setReadByReceiver(messageDTO.getReadByReceiver());
+                messageFromDatabase.setArchivedByReceiver(messageDTO.getArchivedByReceiver());
             } else {
-                System.out.println("updateMessage userId not equal to senderId or receiverId");
+                System.out.println("updateMessage : userId not equal to senderId or receiverId");
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             }
+            if (messageService.updateMessage(messageFromDatabase)) {
+                System.out.println(messageFromDatabase);
+                return ResponseEntity.status(HttpStatus.OK).build();
+            } else {
+                throw new MessageNotSavedException();
+            }
         } else {
-            System.out.println("updateMessage validateUser not present");
+            System.out.println("updateMessage : validateUser not present");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }

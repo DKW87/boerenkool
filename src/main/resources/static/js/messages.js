@@ -159,27 +159,33 @@ function sortMessageArray(array) {
 function fillMessageOverview(listOfMessages) {
     // remove old messages from overview
     document.querySelectorAll(`#messageInOverview`).forEach(e => e.remove())
-    // create new rows with data in the list, and add them to messageOverview
+    // build new element for every message in the list, and add it to messageOverview
     if (listOfMessages != null) {
         listOfMessages.forEach(element => {
-            // create new row
+            // create new message element
             const newOverviewMessage = document.createElement("div");
             newOverviewMessage.setAttribute("id", "messageInOverview")
             newOverviewMessage.setAttribute("data-messageid", `${element.messageId}`)
             // add eventhandler to entire element
             newOverviewMessage.addEventListener('click', () => {
                 showMessageContent(`${element.messageId}`)
-                overviewShowsInbox ?
-                    updateMessageProperty(`${element.messageId}`, "readByReceiver", true) : null
+                console.log("element.readByReceiver is ")
+                console.log(element.readByReceiver)
+                if (overviewShowsInbox && element.readByReceiver === false) {
+                    element.readByReceiver = true
+                    console.log("element.readByReceiver is ")
+                    console.log(element.readByReceiver)
+                    updateMessage(element)
+                }
             })
 
-            // add subject element
+            // add subject as child
             const subject = document.createElement(`div`)
             subject.setAttribute("class", "subject")
             subject.textContent = element.subject
             newOverviewMessage.appendChild(subject)
 
-            // add senderId, dateTimeSent and messageId element
+            // add senderId, dateTimeSent and messageId as child
             const senderAndDateTime = document.createElement(`div`)
             const senderId = element.senderId
             const dateTimeSent = formatDateTime(element.dateTimeSent)
@@ -261,9 +267,12 @@ async function deleteMessage(message) {
         if (!response.ok) {
             new Error(`Response status: ${response.status}`)
         } else {
-            console.log("deleteMessage success for messageId " + message.messageId)
+            // console.log("deleteMessage success for messageId " + message.messageId)
+            // TODO add notification for user
+            await getOutbox()
         }
     } catch (error) {
+        // TODO add notification for user
         console.error(error.message);
     }
 }
@@ -276,7 +285,8 @@ async function deleteMessageHelper(message) {
             await deleteMessage(message)
         } else {
             // receiver deletes message; message is marked "archivedByReceiver" using update function
-            await updateMessageProperty(message.messageId, "archivedByReceiver", true)
+            message.archivedByReceiver = true
+            await updateMessage(message)
         }
     } else {
         // TODO show "Select a message to delete" notification?
@@ -312,7 +322,7 @@ async function getMessageById(messageId) {
     try {
         const response = await fetch(url)
         if (!response.ok) {
-            throw new Error(`Response status: ${response.status}`)
+            new Error(`Response status: ${response.status}`)
         }
         return await response.json()
     } catch (error) {
