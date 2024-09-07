@@ -112,7 +112,7 @@ public class JdbcMessageDAO implements MessageDAO {
     @Override
     public List<Message> getAllToReceiverId(int receiverId) {
         return jdbcTemplate.query(
-                "Select * From Message where receiverId = ?;",
+                "Select * From Message where receiverId = ? and archivedByReceiver = false;",
                 new MessageRowMapper(),
                 receiverId);
     }

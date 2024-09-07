@@ -1,6 +1,7 @@
 package boerenkool.communication.controller;
 
 import boerenkool.business.model.User;
+import boerenkool.business.service.BlockedUserService;
 import boerenkool.business.service.MessageService;
 import boerenkool.business.service.UserService;
 import boerenkool.communication.dto.MessageDTO;
@@ -31,29 +32,42 @@ public class MessageController {
     private final MessageService messageService;
     private final UserService userService;
     private final AuthorizationService authorizationService;
+    private final BlockedUserService blockedUserService;
 
 
     @Autowired
     public MessageController(MessageService messageService, UserService userService,
-                             AuthorizationService authorizationService) {
+                             AuthorizationService authorizationService, BlockedUserService blockedUserService) {
         this.messageService = messageService;
         logger.info("new MessageController");
         this.userService = userService;
         this.authorizationService = authorizationService;
+        this.blockedUserService = blockedUserService;
     }
 
     // save ("send") a new message
     @PostMapping
-    ResponseEntity<?> saveMessage(@RequestBody MessageDTO messageDTO)
-            throws UserNotFoundException {
-        // TODO check user is authenticated as sender of this message
+    ResponseEntity<?> saveMessage(@RequestHeader("Authorization") String token,
+                                  @RequestBody MessageDTO messageDTO) {
         // eventuele verbetering; geef de messageId terug van de bewaarde Messsage
         // (save methode in MessageDAO moet daarvoor een int teruggeven; genericDAO moet weer aangepast... gedoe!)
-        if (userService.getOneById(messageDTO.getReceiverId()).isPresent()
-                && userService.getOneById(messageDTO.getSenderId()).isPresent()) {
-            return new ResponseEntity<>(messageService.saveMessage(messageDTO), HttpStatus.CREATED);
-        } else throw new UserNotFoundException("SenderId and / or userId not linked to existing user(s)");
+        Optional<User> validatedUser = authorizationService.validate(UUID.fromString(token));
+        int receiverId = messageDTO.getReceiverId();
+        if (validatedUser.isPresent() && userService.getOneById(receiverId).isPresent()) {
+            int senderId = validatedUser.get().getUserId();
+            // perhaps overkill ; to prevent hacking the dto for sender spoofing
+            messageDTO.setSenderId(senderId);
+            if (blockedUserService.isUserBlocked(senderId, receiverId)) {
+                // if receiver has blocked the sender, return OK but do not save the message
+                System.out.println("receiver " + receiverId + " has blocked the sender " + senderId +
+                        "; message not saved");
+                return ResponseEntity.status(HttpStatus.OK).build();
+            } else {
+                return new ResponseEntity<>(messageService.saveMessage(messageDTO), HttpStatus.CREATED);
+            }
+        } else  return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
     }
+
 // not used in front end (security risk)
 //    @GetMapping("/messages")
 //    ResponseEntity<?> getAllMessages() throws MessageDoesNotExistException {
@@ -66,8 +80,8 @@ public class MessageController {
 //    }
 
     @GetMapping
-    ResponseEntity<?> getAllByUserId(@RequestParam(name = "box", required = false, defaultValue = "") String box,
-                                     @RequestHeader("Authorization") String token) {
+    ResponseEntity<?> getAllForUser(@RequestParam(name = "box", required = false, defaultValue = "") String box,
+                                    @RequestHeader("Authorization") String token) {
         Optional<User> validatedUser = authorizationService.validate(UUID.fromString(token));
         if (validatedUser.isPresent()) {
             int userId = validatedUser.get().getUserId();

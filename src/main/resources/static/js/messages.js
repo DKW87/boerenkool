@@ -33,6 +33,7 @@ setup()
 async function setup() {
 
     document.querySelector('#refreshInboxButton').addEventListener('click', async () => {
+        console.log("refreshinbox event fired")
         // TODO extract this to a new function, combined with the one below
         overviewShowsInbox = true
         inboxArray = await getInbox()
@@ -43,7 +44,9 @@ async function setup() {
             showElement(`messageSingleView`, true)
         } else noMessages()
     })
+
     document.querySelector('#refreshOutboxButton').addEventListener('click', async () => {
+        console.log("refreshoutbox event fired")
         // TODO extract this to a new function
         overviewShowsInbox = false
         outboxArray = await getOutbox()
@@ -54,14 +57,27 @@ async function setup() {
             showElement(`messageSingleView`, true)
         } else noMessages()
     })
+
     document.querySelector('#reverseMessageOverviewButton').addEventListener('click', () => {
         reverseMessageOverview()
     })
+
     document.querySelector('#writeMessageButton').addEventListener('click', () => {
         window.location.href = "send-a-message.html"
     })
+
     document.querySelector('#deleteMessageButton').addEventListener('click', () => {
         deleteMessageHelper(selectedMessage)
+        selectedMessage = null
+        if (overviewShowsInbox) {
+            // inboxArray.remove()
+            // inboxArray.find(element => element.messageId === Number(messageId))
+            document.querySelector('#refreshInboxButton').click()
+            console.log("refreshinbox.click() inside DeleteMessageButton function")
+        } else {
+            document.querySelector('#refreshOutboxButton').click()
+            console.log("refreshoutbox.click() inside DeleteMessageButton function")
+        }
     })
 
 
@@ -219,18 +235,18 @@ function showElement(elementSelector, boolean) {
     }
 }
 
-async function updateMessageProperty(messageId, key, value) {
-    let message
-    if (overviewShowsInbox) {
-        message = inboxArray.find(element => element.messageId === Number(messageId))
-    } else {
-        message = outboxArray.find(element => element.messageId === Number(messageId))
-    }
-    message[key] = value
-    console.log("updateMessageProperty message is : ")
-    console.log(message)
-    await updateMessage(message)
-}
+// async function updateMessageProperty(messageId, key, value) {
+//     let message
+//     if (overviewShowsInbox) {
+//         message = inboxArray.find(element => element.messageId === Number(messageId))
+//     } else {
+//         message = outboxArray.find(element => element.messageId === Number(messageId))
+//     }
+//     message[key] = value
+//     console.log("updateMessageProperty message is : ")
+//     console.log(message)
+//     await updateMessage(message)
+// }
 
 async function updateMessage(message) {
     const url = `/api/messages`
@@ -246,7 +262,8 @@ async function updateMessage(message) {
         if (!response.ok) {
             new Error(`Response status: ${response.status}`)
         } else {
-            console.log("updateMessage success for messageId " + message.messageId)
+            // TODO notification OK
+            // console.log("updateMessage success for messageId " + message.messageId)
         }
     } catch (error) {
         console.error(error.message);
@@ -289,7 +306,7 @@ async function deleteMessageHelper(message) {
             await updateMessage(message)
         }
     } else {
-        // TODO show "Select a message to delete" notification?
+        // TODO notification "Select a message to delete"
     }
 }
 
