@@ -1,6 +1,7 @@
 import * as main from "./modules/main.mjs";
 import * as auth from "./modules/auth.mjs";
 import {getUsername} from "./modules/user.mjs";
+import {showNotification} from "./messages.js";
 
 main.loadHeader()
 main.loadFooter()
@@ -8,10 +9,19 @@ main.loadFooter()
 // logged in ? continue : redirect
 await auth.checkIfLoggedIn()
 
-const FILL_IN_SUBJECT_FIELD = "Vul een onderwerp in."
-const FILL_IN_BODY_FIELD = "Vul een bericht in."
+const PAGE_TITLE = "HuisjeBoompjeBoerenkool - Stuur een bericht"
+const SEND_A_MESSAGE = "Stuur een bericht"
+const FILL_IN_SUBJECT_FIELD = "Vul een onderwerp in"
+const FILL_IN_BODY_FIELD = "Vul een bericht in"
 const SELECT_A_USERNAME = "Selecteer een gebruikersnaam"
 const SELECT_A_RECEIVER = "Selecteer een ontvanger"
+const SEND_THIS_MESSAGE = "Verstuur dit bericht"
+const MESSAGE_SENT = "Bericht verstuurd"
+const BLOCKED_BY_RECEIVER = "U bent geblokkeerd door de ontvanger"
+const RESPONSE_ERROR = "Er is iets mis met de verbinding"
+const TO = "Aan"
+const SUBJECT = "Onderwerp"
+const BODY = "Bericht"
 
 let receiverId = {}
 let receiverName = {}
@@ -22,24 +32,30 @@ let loggedInUser = {}
 const token = auth.getToken()
 loggedInUser = await auth.getLoggedInUser(token)
 
+// replace english with user language
+document.querySelector("title").textContent = PAGE_TITLE
+document.querySelector('#headerSendMessage').textContent = SEND_A_MESSAGE
+document.querySelector('#labelForReceiverInput').textContent = TO + " :"
+document.querySelector('#labelForSubjectInput').textContent = SUBJECT + " :"
+document.querySelector('#labelForBodyInput').textContent = BODY + " :"
+document.querySelector('#sendMessageButton').textContent = SEND_THIS_MESSAGE
+
 await setup()
 
 async function setup() {
     // document.querySelector('#goToMessagesButton').addEventListener('click', () => {
     //     window.location.href = "/messages.html"
     // })
+
     document.querySelector('#sendMessageButton').addEventListener('click', () => {
         checkRequiredFields()
     })
     // check for parameters in URL
     const parameters = new URLSearchParams(document.location.search);
     if (parameters.size !== 0) {
-        console.log("parameter is present : ")
-        console.log(parameters)
         addElementForReceiverUsername()
         await fillReceiverDataFromParameters(parameters)
     } else {
-        console.log("no parameters")
         addElementForReceiverDropdown()
         listOfCorrespondents = await getListOfCorrespondents()
         await fillCorrespondentsDropDown(listOfCorrespondents, "receiverDropDown")
@@ -104,17 +120,20 @@ function checkRequiredFields() {
     // when using userid parameter, receiverId is already set to correct value.
     // when using dropdown menu, update receiverId from selected option
     if (document.querySelector("#receiverDropDown") !== null) {
-        console.log("receiverDropDown.value is NOT null")
+        // console.log("receiverDropDown.value is NOT null")
         receiverId = document.querySelector("#receiverDropDown").value
     }
     const subject = document.querySelector("#subjectInput").value;
     const body = document.querySelector("#bodyInput").value;
 
     if (receiverId === undefined || receiverId === 0) {
+        showNotification(SELECT_A_RECEIVER)
         window.alert(SELECT_A_RECEIVER)
     } else if (subject === null || subject === "") {
+        showNotification(FILL_IN_SUBJECT_FIELD)
         window.alert(FILL_IN_SUBJECT_FIELD)
     } else if (body === null || body === "") {
+        showNotification(FILL_IN_BODY_FIELD)
         window.alert(FILL_IN_BODY_FIELD)
     } else {
         sendMessage(receiverId, subject, body)
@@ -123,16 +142,8 @@ function checkRequiredFields() {
 
 async function sendMessage(receiverId, subject, body) {
     const senderId = loggedInUser.userId
-    // create URL
     const url = "/api/messages"
-    // create header
-    const headers = new Headers();
-    headers.append("Content-Type", "application/json");
-    // create message
-    const newMessage = {
-        method: "POST",
-        headers: headers,
-        body: JSON.stringify({
+    const newMessage = JSON.stringify({
             "messageId": 0,
             "senderId": `${senderId}`,
             "receiverId": `${receiverId}`,
@@ -143,20 +154,23 @@ async function sendMessage(receiverId, subject, body) {
             "readByReceiver": false,
             "archivedByReceiver": false
         })
-    }
     // POST message to database
     try {
-        const response = await fetch(url, newMessage)
-        if (!response.ok) {
-            throw new Error(`Response status: ${response.status}`)
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {"Authorization": localStorage.getItem('authToken'),
+                "Content-Type": "application/json"},
+            body: newMessage
+        })
+        if (response.status === 200) {
+            showNotification(MESSAGE_SENT)
+            // history.back()
+        } else if (response.status === 403) {
+            showNotification(BLOCKED_BY_RECEIVER)
         } else {
-            console.log("Message posted to db")
-            // TODO geef bevestiging terug aan gebruiker
-            // en daarna;
-            history.back()
+            new Error(`Response status: ${response.status}`)
         }
     } catch (error) {
-        // TODO geef bericht terug aan gebruiker
-        console.error(error.message);
+        showNotification(RESPONSE_ERROR + " : " + error.message)
     }
 }

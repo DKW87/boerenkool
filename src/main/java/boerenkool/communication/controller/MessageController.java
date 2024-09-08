@@ -61,7 +61,7 @@ public class MessageController {
                 // if receiver has blocked the sender, return OK but do not save the message
                 System.out.println("receiver " + receiverId + " has blocked the sender " + senderId +
                         "; message not saved");
-                return ResponseEntity.status(HttpStatus.OK).build();
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             } else {
                 return new ResponseEntity<>(messageService.saveMessage(messageDTO), HttpStatus.CREATED);
             }

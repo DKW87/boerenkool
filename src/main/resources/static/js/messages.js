@@ -70,7 +70,7 @@ async function setup() {
     })
 
     document.querySelector('#overviewVisibilityButton').addEventListener('click', () => {
-        showNotification("probeersel notification!!")
+        showNotification("overviewVisibilityButton clicked!")
     })
 
     document.querySelector('#writeMessageButton').addEventListener('click', () => {
@@ -98,9 +98,9 @@ async function setup() {
     document.querySelector('#refreshInboxButton').click();
 }
 
-function showNotification(text) {
+export function showNotification(message) {
     let notification = document.querySelector('#notification')
-    notification.innerHTML = text
+    notification.innerHTML = message
     notification.style.display = `block`
     setTimeout(() => {
         notification.style.display = `none`;
