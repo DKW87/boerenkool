@@ -8,7 +8,11 @@ main.loadFooter()
 const NO_MESSAGES = "Geen berichten."
 const PREFIX_FROM = "Van : "
 const PREFIX_TO = "Aan : "
+const ASK_CONFIRMATION_FOR_DELETE = "Weet u zeker dat u dit bericht wilt verwijderen?"
+const BUTTON_TEXT_CONFIRM = "Akkoord"
+const BUTTON_TEXT_CANCEL = "Annuleren"
 
+const NOTIFICATION_DURATION = 3000
 const DATE_TIME_OPTIONS = {
     weekday: `long`,
     year: `numeric`,
@@ -31,6 +35,7 @@ await auth.checkIfLoggedIn(token)
 setup()
 
 async function setup() {
+    document.querySelector('#notification').style.display = `none`
 
     document.querySelector('#refreshInboxButton').addEventListener('click', async () => {
         console.log("refreshinbox event fired")
@@ -62,16 +67,20 @@ async function setup() {
         reverseMessageOverview()
     })
 
+    document.querySelector('#overviewVisibilityButton').addEventListener('click', () => {
+        showNotification("probeersel notification!!")
+    })
+
     document.querySelector('#writeMessageButton').addEventListener('click', () => {
         window.location.href = "send-a-message.html"
     })
 
     document.querySelector('#deleteMessageButton').addEventListener('click', () => {
-        deleteMessageHelper(selectedMessage)
+        showDeleteMessageDialog()
         selectedMessage = null
         if (overviewShowsInbox) {
-            // inboxArray.remove()
             // inboxArray.find(element => element.messageId === Number(messageId))
+            // inboxArray.splice(... , ... ) voor verwijderen van element met bekende index
             document.querySelector('#refreshInboxButton').click()
             console.log("refreshinbox.click() inside DeleteMessageButton function")
         } else {
@@ -87,6 +96,12 @@ async function setup() {
     document.querySelector('#refreshInboxButton').click();
 }
 
+function showNotification(text) {
+    let notification = document.querySelector('#notification')
+    notification.innerHTML = text
+    notification.style.display = `block`
+    setTimeout(notification.style.display = `none`, NOTIFICATION_DURATION)
+}
 
 // // for floatingCheatMenu
 // document.querySelector('#fillListOfCorrespondentsButton').addEventListener('click', () => {
@@ -292,6 +307,26 @@ async function deleteMessage(message) {
         // TODO add notification for user
         console.error(error.message);
     }
+}
+
+function showDeleteMessageDialog() {
+    let dialog = document.querySelector("dialog")
+    let dialogText = document.querySelector("#dialogText")
+    let dialogButtonConfirm = document.querySelector("#dialogButtonConfirm")
+    let dialogButtonCancel = document.querySelector("#dialogButtonCancel")
+    dialogText.innerHTML = ASK_CONFIRMATION_FOR_DELETE
+    dialogButtonConfirm.innerHTML = BUTTON_TEXT_CONFIRM
+    dialogButtonConfirm.addEventListener("click", () => {
+        deleteMessageHelper(selectedMessage)
+        dialog.close();
+    });
+    dialogButtonCancel.innerHTML = BUTTON_TEXT_CANCEL
+    dialogButtonCancel.addEventListener("click", () => {
+        dialog.close();
+    });
+    document.querySelector("dialog").showModal()
+
+
 }
 
 async function deleteMessageHelper(message) {

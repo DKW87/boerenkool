@@ -86,6 +86,16 @@ button {
     margin: 3px;
 }
 
+dialog {
+    position:fixed;
+    left: 50%;
+    top: 40%;
+    border-style: solid;
+    border-color: var(--borderGrey);
+    border-radius: 4px;
+    padding: 20px;
+}
+
 #floatingCheatMenu {
     position: absolute;
     bottom: 10px;
