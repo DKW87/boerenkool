@@ -31,6 +31,7 @@ function loadLeftSidebar() {
                     Filter.getListOfHousesByURL(defaultList);
                 }
                 Filter.applyFilterListener();
+                Filter.priceListener();
             })
             .catch(error => {
                 console.error('Er is een probleem opgetreden met fetch:', error);
