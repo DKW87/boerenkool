@@ -5,12 +5,13 @@ import {getUsername} from "./modules/user.mjs";
 main.loadHeader()
 main.loadFooter()
 
-const NO_MESSAGES = "Geen berichten."
+const NO_MESSAGES = "Geen berichten"
 const PREFIX_FROM = "Van : "
 const PREFIX_TO = "Aan : "
+const SELECT_A_MESSAGE = "Selecteer een bericht"
 const ASK_CONFIRMATION_FOR_DELETE = "Weet u zeker dat u dit bericht wilt verwijderen?"
-const CONFIRMATION_FOR_DELETE = "Bericht verwijderd."
-const CONFIRMATION_FOR_UPDATE = "Bericht bijgewerkt."
+const CONFIRMED_DELETE = "Bericht verwijderd"
+const CONFIRMED_UPDATE = "Bericht bijgewerkt"
 const BUTTON_TEXT_CONFIRM = "Akkoord"
 const BUTTON_TEXT_CANCEL = "Annuleren"
 
@@ -70,7 +71,7 @@ async function setup() {
     })
 
     document.querySelector('#overviewVisibilityButton').addEventListener('click', () => {
-        showNotification("probeersel notification!!")
+        showNotification("overviewVisibilityButton clicked!")
     })
 
     document.querySelector('#writeMessageButton').addEventListener('click', () => {
@@ -98,9 +99,9 @@ async function setup() {
     document.querySelector('#refreshInboxButton').click();
 }
 
-function showNotification(text) {
+export function showNotification(message) {
     let notification = document.querySelector('#notification')
-    notification.innerHTML = text
+    notification.innerHTML = message
     notification.style.display = `block`
     setTimeout(() => {
         notification.style.display = `none`;
@@ -214,7 +215,6 @@ function fillMessageOverview(listOfMessages) {
                     updateMessage(element)
                 }
             })
-
             // add subject as child
             const subject = document.createElement(`div`)
             subject.setAttribute("class", "subject")
@@ -255,19 +255,6 @@ function showElement(elementSelector, boolean) {
     }
 }
 
-// async function updateMessageProperty(messageId, key, value) {
-//     let message
-//     if (overviewShowsInbox) {
-//         message = inboxArray.find(element => element.messageId === Number(messageId))
-//     } else {
-//         message = outboxArray.find(element => element.messageId === Number(messageId))
-//     }
-//     message[key] = value
-//     console.log("updateMessageProperty message is : ")
-//     console.log(message)
-//     await updateMessage(message)
-// }
-
 async function updateMessage(message) {
     const url = `/api/messages`
     try {
@@ -283,7 +270,7 @@ async function updateMessage(message) {
             new Error(`Response status: ${response.status}`)
         } else {
             // TODO notification OK
-            // console.log("updateMessage success for messageId " + message.messageId)
+            // BUT readByReceiver also uses this method... damn!!!
         }
     } catch (error) {
         console.error(error.message);
@@ -304,8 +291,7 @@ async function deleteMessage(message) {
         if (!response.ok) {
             new Error(`Response status: ${response.status}`)
         } else {
-            // console.log("deleteMessage success for messageId " + message.messageId)
-            // TODO add notification for user
+            showNotification(MESSAGE_DELETED)
             await getOutbox()
         }
     } catch (error) {
@@ -340,14 +326,14 @@ async function deleteMessageHelper(message) {
         if (loggedInUser.userId === message.senderId) {
             // sender deletes message; message is deleted from database
             await deleteMessage(message)
+            showNotification(CONFIRMED_DELETE)
         } else {
-            // receiver deletes message; message is marked "archivedByReceiver" using update function
+            // receiver deletes message; message is marked "archivedByReceiver" using updateMessage
             message.archivedByReceiver = true
             await updateMessage(message)
         }
-        showNotification(CONFIRMATION_FOR_DELETE)
     } else {
-        // TODO notification "Select a message to delete"
+        showNotification(SELECT_A_MESSAGE)
     }
 }
 

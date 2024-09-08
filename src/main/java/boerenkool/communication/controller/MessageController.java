@@ -45,7 +45,6 @@ public class MessageController {
         this.blockedUserService = blockedUserService;
     }
 
-    // save ("send") a new message
     @PostMapping
     ResponseEntity<?> saveMessage(@RequestHeader("Authorization") String token,
                                   @RequestBody MessageDTO messageDTO) {
@@ -57,11 +56,9 @@ public class MessageController {
             int senderId = validatedUser.get().getUserId();
             // perhaps overkill ; to prevent hacking the dto for sender spoofing
             messageDTO.setSenderId(senderId);
+            // check if sender is blocked by receiver
             if (blockedUserService.isUserBlocked(senderId, receiverId)) {
-                // if receiver has blocked the sender, return OK but do not save the message
-                System.out.println("receiver " + receiverId + " has blocked the sender " + senderId +
-                        "; message not saved");
-                return ResponseEntity.status(HttpStatus.OK).build();
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             } else {
                 return new ResponseEntity<>(messageService.saveMessage(messageDTO), HttpStatus.CREATED);
             }
