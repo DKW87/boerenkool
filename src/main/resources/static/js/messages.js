@@ -9,6 +9,8 @@ const NO_MESSAGES = "Geen berichten."
 const PREFIX_FROM = "Van : "
 const PREFIX_TO = "Aan : "
 const ASK_CONFIRMATION_FOR_DELETE = "Weet u zeker dat u dit bericht wilt verwijderen?"
+const CONFIRMATION_FOR_DELETE = "Bericht verwijderd."
+const CONFIRMATION_FOR_UPDATE = "Bericht bijgewerkt."
 const BUTTON_TEXT_CONFIRM = "Akkoord"
 const BUTTON_TEXT_CANCEL = "Annuleren"
 
@@ -100,7 +102,10 @@ function showNotification(text) {
     let notification = document.querySelector('#notification')
     notification.innerHTML = text
     notification.style.display = `block`
-    setTimeout(notification.style.display = `none`, NOTIFICATION_DURATION)
+    setTimeout(() => {
+        notification.style.display = `none`;
+    }, NOTIFICATION_DURATION);
+
 }
 
 // // for floatingCheatMenu
@@ -340,6 +345,7 @@ async function deleteMessageHelper(message) {
             message.archivedByReceiver = true
             await updateMessage(message)
         }
+        showNotification(CONFIRMATION_FOR_DELETE)
     } else {
         // TODO notification "Select a message to delete"
     }
