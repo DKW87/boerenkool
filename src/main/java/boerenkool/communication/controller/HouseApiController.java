@@ -65,7 +65,7 @@ public class HouseApiController {
         if (houseDetailsDTO == null) {
             return new ResponseEntity<>("House was not found", HttpStatus.NOT_FOUND);
         }
-
+        System.out.println(houseDetailsDTO.getExtraFeatures());
         return new ResponseEntity<>(houseDetailsDTO, HttpStatus.OK);
     }
 
