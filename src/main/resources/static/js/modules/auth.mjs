@@ -2,6 +2,8 @@
 
 // Existing functions in auth.mjs
 
+import {showToast} from "./notification.mjs";
+
 export async function login(username, password) {
     try {
         const response = await sendLoginRequest(username, password);
@@ -52,7 +54,7 @@ function isResponseOk(response) {
 }
 
 function handleLoginError() {
-    alert('Login mislukt. Controleer je inloggegevens.');
+    showToast('Login mislukt. Controleer je inloggegevens.');
 }
 
 function getTokenFromResponse(response) {
@@ -65,7 +67,7 @@ function saveToken(token) {
 
 function handleUnexpectedError(error) {
     console.error("Unexpected error caught", error);
-    alert(error.message);
+    showToast(error.message);
 }
 
 // Other existing functions
@@ -105,7 +107,7 @@ export async function getLoggedInUser(token) {
         const user = await response.json();
         return user;
     } catch (error) {
-        alert('Kon gebruikersinformatie niet ophalen.');
+        showToast('Kon gebruikersinformatie niet ophalen.');
         console.error(error);
         return null;
     }
@@ -116,7 +118,7 @@ export async function getLoggedInUser(token) {
 export async function getUsernameByToken() {
     const token = getToken();
     if (!token) {
-        alert('Geen token gevonden.');
+        showToast('Geen token gevonden.');
         return null;
     }
 
@@ -134,7 +136,7 @@ export async function getUsernameByToken() {
         return data.username;
     } catch (error) {
         console.error("Error fetching username:", error);
-        alert('Kon gebruikersnaam niet ophalen.');
+        showToast('Kon gebruikersnaam niet ophalen.');
         return null;
     }
 }
