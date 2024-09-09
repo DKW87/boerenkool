@@ -1,5 +1,7 @@
 "use strict"
 
+import { showToast } from './notification.mjs';
+
 export function getUniqueCities() {
     const parentElement = document.getElementById('uniqueCities');
 
@@ -174,6 +176,31 @@ export function urlHasParameters() {
     return params.toString() !== '';
 }
 
+export function priceListener() {
+    let minPriceInput = document.getElementById('min-price');
+    let maxPriceInput = document.getElementById('max-price');
+
+    document.getElementById('min-price').addEventListener('change', function() {
+        let minPrice = parseInt(this.value);
+        
+        if (minPrice >= parseInt(maxPriceInput.value)) {
+            showToast('Minimumprijs kan niet gelijk aan of hoger dan maximumprijs zijn');
+            minPriceInput.value = parseInt(maxPriceInput.value) - 1;
+        }
+    
+    });
+
+    document.getElementById('max-price').addEventListener('change', function() {
+        let maxPrice = parseInt(this.value);
+
+        if (maxPrice <= parseInt(minPriceInput.value)) {
+            showToast('Maximumprijs kan niet gelijk aan of lager dan minimumprijs zijn');
+            maxPriceInput.value = parseInt(minPriceInput.value) + 1;
+        }
+        
+    });
+}
+
 // TODO works on province but not plaats and type :/
 function setSelectedOptions(elementId, values) {
     const element = document.getElementById(elementId);
@@ -220,3 +247,4 @@ function amountOfHousesStringSwitch(parentElement, amountOfHouses) {
             parentElement.appendChild(amountOfHousesDiv);
     }
 }
+

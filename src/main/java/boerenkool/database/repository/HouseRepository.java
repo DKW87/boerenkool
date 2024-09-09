@@ -49,7 +49,7 @@ public class HouseRepository {
                     .orElseThrow(() -> new NoSuchElementException("houseOwner not found")));
             house.setHouseType(houseTypeDAO.getOneById(house.accessOtherEntityIds().getHouseTypeId())
                     .orElseThrow(() -> new NoSuchElementException("houseType not found")));
-            // TODO @Emine > T for getAllFeaturesByHouseId = ExtraFeature
+            house.setExtraFeatures(extraFeatureDAO.getExtraFeaturesByHouseId(house.getHouseId()));
             house.setPictures(pictureDAO.getAllByHouseId(house.getHouseId()));
 
         }
@@ -64,19 +64,12 @@ public class HouseRepository {
             optionalHouse.get()
                     .setHouseOwner(userDAO.getOneById(optionalHouse.get().accessOtherEntityIds().getHouseOwnerId())
                             .orElseThrow(() -> new NoSuchElementException("houseOwner not found")));
-            // TODO @Emine > T for getAllFeaturesByHouseId = ExtraFeature
+            optionalHouse.get()
+                    .setExtraFeatures(extraFeatureDAO.getExtraFeaturesByHouseId(optionalHouse.get().getHouseId()));
             optionalHouse.get()
                     .setPictures(pictureDAO.getAllByHouseId(optionalHouse.get().getHouseId()));
         }
         return optionalHouse;
-    }
-
-    private List<ExtraFeature> collectHouseExtraFeatures(List<HouseExtraFeature> houseExtraFeatures) {
-        List<ExtraFeature> extraFeatures = new ArrayList<>();
-        for (HouseExtraFeature houseExtraFeature : houseExtraFeatures) {
-
-        }
-        return extraFeatures;
     }
 
     public List<House> getListOfAllHouses() {
