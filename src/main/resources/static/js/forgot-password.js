@@ -20,6 +20,11 @@ function setupResetPasswordHandler() {
 async function handlePasswordReset() {
     const email = getEmailInputValue();
 
+    if (!validateEmail(email)) {
+        showToast("Voer een geldig e-mailadres in.");
+        return;
+    }
+
     try {
         const response = await sendPasswordResetRequest(email);
         handleResponse(response);
