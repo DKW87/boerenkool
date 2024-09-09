@@ -57,7 +57,7 @@ body {
     visibility: hidden;
     min-width: 250px;
     margin-left: -125px;
-    background-color: var(--boerenkool-groen);
+    background-color: var(--boerenkool-paars);
     color: var(--boerenkool-wit);
     text-align: center;
     border-radius: 5px;

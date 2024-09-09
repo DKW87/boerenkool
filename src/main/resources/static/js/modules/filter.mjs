@@ -1,6 +1,6 @@
 "use strict"
 
-import * as Toast from './toast.mjs';
+import { showToast } from './notification.mjs';
 
 export function getUniqueCities() {
     const parentElement = document.getElementById('uniqueCities');
@@ -184,7 +184,7 @@ export function priceListener() {
         let minPrice = parseInt(this.value);
         
         if (minPrice >= parseInt(maxPriceInput.value)) {
-            Toast.showToast('Minimumprijs kan niet gelijk aan of hoger dan maximumprijs zijn');
+            showToast('Minimumprijs kan niet gelijk aan of hoger dan maximumprijs zijn');
             minPriceInput.value = parseInt(maxPriceInput.value) - 1;
         }
     
@@ -194,7 +194,7 @@ export function priceListener() {
         let maxPrice = parseInt(this.value);
 
         if (maxPrice <= parseInt(minPriceInput.value)) {
-            Toast.showToast('Maximumprijs kan niet gelijk aan of lager dan minimumprijs zijn');
+            showToast('Maximumprijs kan niet gelijk aan of lager dan minimumprijs zijn');
             maxPriceInput.value = parseInt(minPriceInput.value) + 1;
         }
         
