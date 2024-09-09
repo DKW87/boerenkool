@@ -55,6 +55,6 @@ async function handleResponse(response) {
     }
 
     const message = await response.text();
-    showNotification(message);
+    showToast(message);
 }
 
