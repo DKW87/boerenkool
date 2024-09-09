@@ -25,14 +25,19 @@ async function initPage() {
         if (!user) return;
 
         populateForm(user);
+        // Log de gebruiker en het type gebruiker
+        console.log("Gebruiker opgehaald:", user);
+        console.log("Gebruikerstype:", user.typeOfUser); // Controleer het type
+
 
         // Laad alleen de geblokkeerde gebruikers en activeer de block-knop als de gebruiker een 'Verhuurder' is
         if (user.typeOfUser === "Verhuurder") {
             loadBlockedUsers(user.userId, Auth.getToken());
             console.log("Geblokkeerde gebruikers geladen voor 'Verhuurder'");
-            document.getElementById('block-user-btn').style.display = 'block';  // Toon de block-knop
-        } else {
-            document.getElementById('block-user-btn').style.display = 'none';   // Verberg de block-knop
+
+            // Toon de sectie voor geblokkeerde gebruikers en de block-knop
+            document.getElementById('blocked-users-container').style.display = 'block';
+            document.getElementById('block-user-section').style.display = 'block';
         }
 
 
