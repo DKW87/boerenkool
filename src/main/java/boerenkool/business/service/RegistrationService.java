@@ -123,7 +123,7 @@ public class RegistrationService {
         logger.info("Password successfully reset for user: {}", user.getUsername());
     }
 
-    public void sendPasswordResetEmail(String email) {
+    public boolean sendPasswordResetEmail(String email) {
         Optional<User> userOpt = userRepository.findByEmail(email);
         if (userOpt.isPresent()) {
             User user = userOpt.get();
@@ -131,10 +131,13 @@ public class RegistrationService {
 
             TokenUserPair tokenUserPair = authorizationService.authorize(user);
             passwordService.sendPasswordResetEmail(email, tokenUserPair.getKey().toString());
+            return true; // Gebruiker gevonden, e-mail verstuurd
         } else {
             logger.warn("User not found for email: {}", email);
+            return false; // Gebruiker niet gevonden
         }
     }
+
 
     // Methode om het wachtwoord te valideren
     private boolean isValidPassword(String password) {

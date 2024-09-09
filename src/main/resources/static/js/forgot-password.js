@@ -2,6 +2,7 @@
 
 import * as Main from './modules/main.mjs';
 import {showToast} from "./modules/notification.mjs";
+import {validateEmail} from "./modules/validation.mjs";
 
 document.addEventListener('DOMContentLoaded', () => {
     Main.loadHeader();
@@ -56,13 +57,16 @@ async function sendPasswordResetRequest(email) {
 // Functie om de response van de server te verwerken
 async function handleResponse(response) {
     if (!response.ok) {
+        // Controleer de statuscode van de response
         if (response.status === 404) {
-            throw new Error("E-mailadres niet gevonden.");
+            showToast('E-mailadres niet gevonden. Controleer of je het juiste e-mailadres hebt ingevoerd.');
         } else {
-            throw new Error("Er is een fout opgetreden. Probeer het later opnieuw.");
+            showToast('Er is een fout opgetreden. Probeer het later opnieuw.');
         }
+        return;  // Stop hier, geen success melding weergeven
     }
 
+    // Als de response OK is, geef de success melding
     const message = await response.text();
-    showToast(message);
+    showToast('E-mail succesvol verstuurd. Controleer je inbox voor verdere instructies.');
 }
