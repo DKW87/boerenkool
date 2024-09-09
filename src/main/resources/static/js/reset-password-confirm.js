@@ -2,6 +2,7 @@
 
 import * as Main from './modules/main.mjs';
 import { validatePassword } from './modules/validation.mjs';
+import {showToast} from "./modules/notification.mjs";
 
 document.addEventListener('DOMContentLoaded', () => {
     Main.loadHeader();
@@ -32,7 +33,7 @@ async function handlePasswordReset(event) {
 
         handleResetPasswordResponse(response.ok, message);
     } catch (error) {
-        showNotification('Er is een fout opgetreden tijdens het herstellen van het wachtwoord. Probeer het later opnieuw.');
+        showToast('Er is een fout opgetreden tijdens het herstellen van het wachtwoord. Probeer het later opnieuw.');
     }
 }
 
@@ -49,12 +50,12 @@ function getResetPasswordInputValues() {
 // Functie om de geldigheid van het wachtwoord te controleren
 function isPasswordValid(newPassword, confirmPassword) {
     if (!validatePassword(newPassword)) {
-        showNotification("Wachtwoord moet minstens 6 tekens lang zijn en minstens één hoofdletter, één cijfer en één speciaal teken bevatten.");
+        showToast("Wachtwoord moet minstens 6 tekens lang zijn en minstens één hoofdletter, één cijfer en één speciaal teken bevatten.");
         return false;
     }
 
     if (newPassword !== confirmPassword) {
-        showNotification('Wachtwoorden komen niet overeen');
+        showToast('Wachtwoorden komen niet overeen');
         return false;
     }
 
@@ -73,17 +74,14 @@ async function sendPasswordResetRequest(email, token, newPassword) {
 // Functie om de response van de server te verwerken
 function handleResetPasswordResponse(success, message) {
     if (success) {
-        showNotification('Wachtwoord succesvol hersteld!');
+        showToast('Wachtwoord succesvol hersteld!');
         redirectToLoginPage();
     } else {
         showNotification(message);
     }
 }
 
-// Functie om een notificatie te tonen
-function showNotification(message) {
-    alert(message);  // Hier kan je ook een custom notificatie systeem aanroepen
-}
+
 
 // Functie om door te sturen naar de login pagina na succesvolle reset
 function redirectToLoginPage() {

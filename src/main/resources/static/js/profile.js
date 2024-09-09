@@ -6,6 +6,7 @@ import * as Main from './modules/main.mjs';
 import { loadBlockedUsers, blockUser } from './blockedUsers.js';
 import { fetchWalletDetails, handleUpdateCoins } from './modules/wallet.mjs';
 import { validateName, validatePhoneNumber, validateEmail } from './modules/validation.mjs';
+import {showToast} from "./modules/notification.mjs";
 
 document.addEventListener('DOMContentLoaded', () => {
     initPage();
@@ -37,7 +38,7 @@ async function initPage() {
         }
 
     } catch (error) {
-        alert('Kon gebruikersinformatie niet ophalen.');
+        showToast('Kon gebruikersinformatie niet ophalen.');
         console.error("Fout bij het ophalen van gebruikersinformatie:", error);
     }
 }
@@ -117,17 +118,17 @@ function getProfileData() {
 // Valideer de profielgegevens
 function validateProfileData(data) {
     if (!validateName(data.firstName) || !validateName(data.lastName)) {
-        alert('Voer een geldige naam in (alleen letters).');
+        showToast('Voer een geldige naam in (alleen letters).');
         return false;
     }
 
     if (!validatePhoneNumber(data.phone)) {
-        alert('Voer een geldig telefoonnummer in (bijvoorbeeld 0612345678).');
+        showToast('Voer een geldig telefoonnummer in (bijvoorbeeld 0612345678).');
         return false;
     }
 
     if (!validateEmail(data.email)) {
-        alert('Voer een geldig e-mailadres in.');
+        showToast('Voer een geldig e-mailadres in.');
         return false;
     }
 
@@ -159,9 +160,9 @@ async function updateProfile(event) {
             throw new Error('Kon profiel niet updaten.');
         }
 
-        alert('Profiel succesvol bijgewerkt!');
+        showToast('Profiel succesvol bijgewerkt!');
     } catch (error) {
-        alert('Fout bij het bijwerken van profielgegevens.');
+        showToast('Fout bij het bijwerken van profielgegevens.');
         console.error(error);
     }
 }
@@ -182,11 +183,11 @@ async function deleteProfile() {
             throw new Error('Kon profiel niet verwijderen.');
         }
 
-        alert('Profiel succesvol verwijderd!');
+        showToast('Profiel succesvol verwijderd!');
         Auth.logout();
         window.location.href = '/register.html';
     } catch (error) {
-        alert('Fout bij het verwijderen van profiel.');
+        showToast('Fout bij het verwijderen van profiel.');
         console.error(error);
     }
 }

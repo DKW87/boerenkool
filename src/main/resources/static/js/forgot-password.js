@@ -1,6 +1,7 @@
 "use strict";
 
 import * as Main from './modules/main.mjs';
+import {showToast} from "./modules/notification.mjs";
 
 document.addEventListener('DOMContentLoaded', () => {
     Main.loadHeader();
@@ -23,7 +24,13 @@ async function handlePasswordReset() {
         const response = await sendPasswordResetRequest(email);
         handleResponse(response);
     } catch (error) {
-        showNotification(error.message);
+        if (error.response && error.response.status === 404) {
+            showToast("E-mailadres niet gevonden. Controleer of je het juiste e-mailadres hebt ingevoerd.");
+        } else if (error.response && error.response.status === 500) {
+            showToast("Er is een probleem op de server. Probeer het later opnieuw.");
+        } else {
+            showToast("Er is iets misgegaan. Probeer het opnieuw.");
+        }
     }
 }
 
@@ -51,7 +58,3 @@ async function handleResponse(response) {
     showNotification(message);
 }
 
-// Functie om een notificatie te tonen, zowel voor successen als fouten
-function showNotification(message) {
-    alert(message);  // Hier kan je ook een custom notificatie systeem aanroepen
-}
