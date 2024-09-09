@@ -56,10 +56,13 @@ async function sendPasswordResetRequest(email) {
 // Functie om de response van de server te verwerken
 async function handleResponse(response) {
     if (!response.ok) {
-        throw new Error('Er is een fout opgetreden. Probeer het later opnieuw.');
+        if (response.status === 404) {
+            throw new Error("E-mailadres niet gevonden.");
+        } else {
+            throw new Error("Er is een fout opgetreden. Probeer het later opnieuw.");
+        }
     }
 
     const message = await response.text();
     showToast(message);
 }
-
