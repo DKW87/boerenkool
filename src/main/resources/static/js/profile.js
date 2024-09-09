@@ -26,8 +26,15 @@ async function initPage() {
 
         populateForm(user);
 
-        loadBlockedUsers(user.userId, Auth.getToken());
-        console.log("Geblokkeerde gebruikers geladen");
+        // Laad alleen de geblokkeerde gebruikers en activeer de block-knop als de gebruiker een 'Verhuurder' is
+        if (user.typeOfUser === "Verhuurder") {
+            loadBlockedUsers(user.userId, Auth.getToken());
+            console.log("Geblokkeerde gebruikers geladen voor 'Verhuurder'");
+            document.getElementById('block-user-btn').style.display = 'block';  // Toon de block-knop
+        } else {
+            document.getElementById('block-user-btn').style.display = 'none';   // Verberg de block-knop
+        }
+
 
         setupEventListeners(user);
 
