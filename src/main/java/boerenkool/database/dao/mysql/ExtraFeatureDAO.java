@@ -31,4 +31,6 @@ public interface ExtraFeatureDAO extends GenericDAO<ExtraFeature> {
     Optional<ExtraFeature> findByName(String extraFeatureName);
 
     List<HouseExtraFeature> getAllFeaturesByHouseIdWithNames(int houseId);
+
+    List<ExtraFeature> getExtraFeaturesByHouseId(int houseId);
 }

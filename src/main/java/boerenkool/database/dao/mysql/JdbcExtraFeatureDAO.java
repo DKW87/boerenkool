@@ -102,30 +102,31 @@ public class JdbcExtraFeatureDAO implements ExtraFeatureDAO {
     // HouseExtraFeatures işlemleri (houseId ile ExtraFeature'lar arasında ilişki)
 
     // 1. Belirli bir houseId'ye göre ExtraFeature'ları getir
+    @Override
     public List<ExtraFeature> getExtraFeaturesByHouseId(int houseId) {
-        String sql = "SELECT ef.* FROM ExtraFeature ef " +
-                "INNER JOIN HouseExtraFeatures hef ON ef.extraFeatureId = hef.extraFeatureId " +
+        String sql = "SELECT ef.* FROM ExtraFeature AS ef " +
+                "INNER JOIN HouseExtraFeature AS hef ON ef.extraFeatureId = hef.featureId " +
                 "WHERE hef.houseId = ?";
         return jdbcTemplate.query(sql, new ExtraFeatureRowMapper(), houseId);
     }
 
     // 2. Bir eve yeni ExtraFeature ekle
     public boolean addExtraFeatureToHouse(int houseId, int extraFeatureId) {
-        String sql = "INSERT INTO HouseExtraFeatures (houseId, extraFeatureId) VALUES (?, ?)";
+        String sql = "INSERT INTO HouseExtraFeature (houseId, extraFeatureId) VALUES (?, ?)";
         int rowsAffected = jdbcTemplate.update(sql, houseId, extraFeatureId);
         return rowsAffected > 0;
     }
 
     // 3. Bir evden belirli bir ExtraFeature'ı kaldır
     public boolean removeExtraFeatureFromHouse(int houseId, int extraFeatureId) {
-        String sql = "DELETE FROM HouseExtraFeatures WHERE houseId = ? AND extraFeatureId = ?";
+        String sql = "DELETE FROM HouseExtraFeature WHERE houseId = ? AND extraFeatureId = ?";
         int rowsAffected = jdbcTemplate.update(sql, houseId, extraFeatureId);
         return rowsAffected > 0;
     }
 
     // 4. Bir evden tüm ExtraFeature'ları kaldır (ev silindiğinde vs.)
     public boolean removeAllExtraFeaturesFromHouse(int houseId) {
-        String sql = "DELETE FROM HouseExtraFeatures WHERE houseId = ?";
+        String sql = "DELETE FROM HouseExtraFeature WHERE houseId = ?";
         int rowsAffected = jdbcTemplate.update(sql, houseId);
         return rowsAffected > 0;
     }

@@ -65,7 +65,7 @@ public class HouseApiController {
         if (houseDetailsDTO == null) {
             return new ResponseEntity<>("House was not found", HttpStatus.NOT_FOUND);
         }
-
+        System.out.println(houseDetailsDTO.getExtraFeatures());
         return new ResponseEntity<>(houseDetailsDTO, HttpStatus.OK);
     }
 
@@ -150,7 +150,7 @@ public class HouseApiController {
                 return new ResponseEntity<>("No user/housetype attached, incomplete House", HttpStatus.BAD_REQUEST);
             } else {
                 return houseService.saveHouse(house)
-                        ? new ResponseEntity<>("House successfully created", HttpStatus.CREATED)
+                        ? new ResponseEntity<>(house.getHouseId(), HttpStatus.CREATED)
                         : new ResponseEntity<>("Unable to store new house", HttpStatus.CONFLICT);
             }
         }
