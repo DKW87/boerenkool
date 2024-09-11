@@ -92,11 +92,12 @@ public class HouseService {
     }
 
     public boolean saveHouse(HouseDetailsDTO house) {
-
-        boolean result = houseRepository.saveHouse(convertHouseDetailsDTOToHouse(house));
+        House fullHouse = convertHouseDetailsDTOToHouse(house);
+        boolean result = houseRepository.saveHouse(fullHouse);
         if (result) {
             updateCache(house);
         }
+        house.setHouseId(fullHouse.getHouseId()); // sets id for DTO to return in controller
         return result;
     }
 
@@ -173,8 +174,6 @@ public class HouseService {
         house.setPricePPPD(houseDetailsDTO.getPricePPPD());
         house.setDescription(houseDetailsDTO.getDescription());
         house.setIsNotAvailable(houseDetailsDTO.isNotAvailable());
-        /* TODO discuss how we handle saving pictures and extraFeatures. I don't think it should be included here but
-        *   need separate query on front-end. Thoughts? */
         return house;
     }
 
