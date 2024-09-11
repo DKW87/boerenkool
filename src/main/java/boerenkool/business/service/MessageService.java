@@ -74,14 +74,19 @@ public class MessageService {
         return convertMessagesToDTOs(listOfMessages);
     }
 
-    public boolean updateMessage(int userId, MessageDTO messageDTO) throws MessageDoesNotExistException {
-        if (userId == messageDTO.getSenderId()) {
+    public boolean updateMessage(MessageDTO messageDTO) throws MessageDoesNotExistException {
+//        if (userId == messageDTO.getSenderId()) {
             // the sender can update everything in the message
             return messageRepository.updateMessage(convertDTOToMessage(messageDTO));
-        } else if (userId == messageDTO.getReceiverId()) {
-            // the receiver can only update readByReceiver field
-            return messageRepository.setReadByReceiver(convertDTOToMessage(messageDTO));
-        } else return false;
+//        } else if (userId == messageDTO.getReceiverId()) {
+//            // the receiver can only update readByReceiver value and/or archivedByReceiver value
+//            if (messageDTO.getArchivedByReceiver()) {
+//                return messageRepository.setArchivedByReceiver(convertDTOToMessage(messageDTO));
+//            }
+//            else if (messageDTO.getReadByReceiver()) {
+//                return messageRepository.setReadByReceiver(convertDTOToMessage(messageDTO));
+//            }
+//        } else return false;
     }
 
     public boolean deleteMessage(int messageId) {
@@ -99,9 +104,9 @@ public class MessageService {
                     dto.getDateTimeSent(),
                     dto.getSubject(),
                     dto.getBody(),
-                    dto.isReadByReceiver(),
-                    dto.isArchivedBySender(),
-                    dto.isArchivedByReceiver());
+                    dto.getReadByReceiver(),
+                    dto.getArchivedBySender(),
+                    dto.getArchivedByReceiver());
         } else {
             logger.info("sender and/or receiver is null, message will be null");
             return null;
@@ -117,9 +122,9 @@ public class MessageService {
                 message.getDateTimeSent(),
                 message.getSubject(),
                 message.getBody(),
-                message.isReadByReceiver(),
-                message.isArchivedBySender(),
-                message.isArchivedByReceiver());
+                message.getReadByReceiver(),
+                message.getArchivedBySender(),
+                message.getArchivedByReceiver());
     }
 
     private List<MessageDTO> convertMessagesToDTOs(List<Message> listOfMessages) {

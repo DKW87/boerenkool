@@ -112,7 +112,7 @@ public class MessageDTO implements Comparable<MessageDTO> {
         this.body = body;
     }
 
-    public boolean isArchivedBySender() {
+    public boolean getArchivedBySender() {
         return archivedBySender;
     }
 
@@ -120,7 +120,7 @@ public class MessageDTO implements Comparable<MessageDTO> {
         this.archivedBySender = archivedBySender;
     }
 
-    public boolean isReadByReceiver() {
+    public boolean getReadByReceiver() {
         return readByReceiver;
     }
 
@@ -128,7 +128,7 @@ public class MessageDTO implements Comparable<MessageDTO> {
         this.readByReceiver = readByReceiver;
     }
 
-    public boolean isArchivedByReceiver() {
+    public boolean getArchivedByReceiver() {
         return archivedByReceiver;
     }
 
