@@ -150,7 +150,7 @@ public class HouseApiController {
                 return new ResponseEntity<>("No user/housetype attached, incomplete House", HttpStatus.BAD_REQUEST);
             } else {
                 return houseService.saveHouse(house)
-                        ? new ResponseEntity<>("House successfully created", HttpStatus.CREATED)
+                        ? new ResponseEntity<>(house.getHouseId(), HttpStatus.CREATED)
                         : new ResponseEntity<>("Unable to store new house", HttpStatus.CONFLICT);
             }
         }
