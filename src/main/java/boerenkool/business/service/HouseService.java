@@ -95,9 +95,9 @@ public class HouseService {
         House fullHouse = convertHouseDetailsDTOToHouse(house);
         boolean result = houseRepository.saveHouse(fullHouse);
         if (result) {
+            house.setHouseId(fullHouse.getHouseId()); // set new house id for cache and to return as response in controller
             updateCache(house);
         }
-        house.setHouseId(fullHouse.getHouseId()); // sets id for DTO to return in controller
         return result;
     }
 
