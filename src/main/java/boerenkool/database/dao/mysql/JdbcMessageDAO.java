@@ -1,7 +1,6 @@
 package boerenkool.database.dao.mysql;
 
 import boerenkool.business.model.Message;
-import boerenkool.business.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,9 +74,9 @@ public class JdbcMessageDAO implements MessageDAO {
         ps.setObject(3, message.getDateTimeSent());
         ps.setString(4, message.getSubject());
         ps.setString(5, message.getBody());
-        ps.setBoolean(6, message.isArchivedBySender());
-        ps.setBoolean(7, message.isReadByReceiver());
-        ps.setBoolean(8, message.isArchivedByReceiver());
+        ps.setBoolean(6, message.getArchivedBySender());
+        ps.setBoolean(7, message.getReadByReceiver());
+        ps.setBoolean(8, message.getArchivedByReceiver());
     }
 
     @Override
@@ -113,7 +112,7 @@ public class JdbcMessageDAO implements MessageDAO {
     @Override
     public List<Message> getAllToReceiverId(int receiverId) {
         return jdbcTemplate.query(
-                "Select * From Message where receiverId = ?;",
+                "Select * From Message where receiverId = ? and archivedByReceiver = false;",
                 new MessageRowMapper(),
                 receiverId);
     }

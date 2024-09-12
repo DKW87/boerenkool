@@ -1,9 +1,6 @@
 package boerenkool.business.model;
 
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.util.Date;
-import java.util.Optional;
 
 public class Message implements Comparable<Message> {
     private int messageId;
@@ -111,7 +108,7 @@ public class Message implements Comparable<Message> {
         return body;
     }
 
-    public boolean isReadByReceiver() {
+    public boolean getReadByReceiver() {
         return readByReceiver;
     }
 
@@ -119,7 +116,7 @@ public class Message implements Comparable<Message> {
         this.readByReceiver = readByReceiver;
     }
 
-    public boolean isArchivedBySender() {
+    public boolean getArchivedBySender() {
         return archivedBySender;
     }
 
@@ -127,7 +124,7 @@ public class Message implements Comparable<Message> {
         this.archivedBySender = archivedBySender;
     }
 
-    public boolean isArchivedByReceiver() {
+    public boolean getArchivedByReceiver() {
         return archivedByReceiver;
     }
 

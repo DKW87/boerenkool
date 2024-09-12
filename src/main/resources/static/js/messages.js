@@ -5,10 +5,17 @@ import {getUsername} from "./modules/user.mjs";
 main.loadHeader()
 main.loadFooter()
 
-const NO_MESSAGES = "Geen berichten."
+const NO_MESSAGES = "Geen berichten"
 const PREFIX_FROM = "Van : "
 const PREFIX_TO = "Aan : "
+const SELECT_A_MESSAGE = "Selecteer een bericht"
+const ASK_CONFIRMATION_FOR_DELETE = "Weet u zeker dat u dit bericht wilt verwijderen?"
+const CONFIRMED_DELETE = "Bericht verwijderd"
+const CONFIRMED_UPDATE = "Bericht bijgewerkt"
+const BUTTON_TEXT_CONFIRM = "Akkoord"
+const BUTTON_TEXT_CANCEL = "Annuleren"
 
+const NOTIFICATION_DURATION = 3000
 const DATE_TIME_OPTIONS = {
     weekday: `long`,
     year: `numeric`,
@@ -20,6 +27,7 @@ const DATE_TIME_OPTIONS = {
 let loggedInUser = {}
 let inboxArray = {}
 let outboxArray = {}
+let selectedMessage = {}
 let sortAscending = false
 let overviewShowsInbox = true
 
@@ -30,11 +38,10 @@ await auth.checkIfLoggedIn(token)
 setup()
 
 async function setup() {
+    document.querySelector('#notification').style.display = `none`
 
-    document.querySelector('#reverseMessageOverviewButton').addEventListener('click', () => {
-        reverseMessageOverview()
-    })
     document.querySelector('#refreshInboxButton').addEventListener('click', async () => {
+        console.log("refreshinbox event fired")
         // TODO extract this to a new function, combined with the one below
         overviewShowsInbox = true
         inboxArray = await getInbox()
@@ -45,7 +52,9 @@ async function setup() {
             showElement(`messageSingleView`, true)
         } else noMessages()
     })
+
     document.querySelector('#refreshOutboxButton').addEventListener('click', async () => {
+        console.log("refreshoutbox event fired")
         // TODO extract this to a new function
         overviewShowsInbox = false
         outboxArray = await getOutbox()
@@ -56,9 +65,33 @@ async function setup() {
             showElement(`messageSingleView`, true)
         } else noMessages()
     })
+
+    document.querySelector('#reverseMessageOverviewButton').addEventListener('click', () => {
+        reverseMessageOverview()
+    })
+
+    document.querySelector('#overviewVisibilityButton').addEventListener('click', () => {
+        showNotification("overviewVisibilityButton clicked!")
+    })
+
     document.querySelector('#writeMessageButton').addEventListener('click', () => {
         window.location.href = "send-a-message.html"
     })
+
+    document.querySelector('#deleteMessageButton').addEventListener('click', () => {
+        showDeleteMessageDialog()
+        selectedMessage = null
+        if (overviewShowsInbox) {
+            // inboxArray.find(element => element.messageId === Number(messageId))
+            // inboxArray.splice(... , ... ) voor verwijderen van element met bekende index
+            document.querySelector('#refreshInboxButton').click()
+            console.log("refreshinbox.click() inside DeleteMessageButton function")
+        } else {
+            document.querySelector('#refreshOutboxButton').click()
+            console.log("refreshoutbox.click() inside DeleteMessageButton function")
+        }
+    })
+
 
     loggedInUser = await auth.getLoggedInUser(token)
 
@@ -66,6 +99,15 @@ async function setup() {
     document.querySelector('#refreshInboxButton').click();
 }
 
+export function showNotification(message) {
+    let notification = document.querySelector('#notification')
+    notification.innerHTML = message
+    notification.style.display = `block`
+    setTimeout(() => {
+        notification.style.display = `none`;
+    }, NOTIFICATION_DURATION);
+
+}
 
 // // for floatingCheatMenu
 // document.querySelector('#fillListOfCorrespondentsButton').addEventListener('click', () => {
@@ -121,6 +163,25 @@ async function getMessages(box) {
     }
 }
 
+async function getMessage(messageId) {
+    const url = `/api/messages/${messageId}`
+    try {
+        const response = await fetch(url, {
+            headers: {
+                "Authorization": localStorage.getItem('authToken')
+            }
+        })
+        if (!response.ok) {
+            new Error(`Response status: ${response.status}`)
+        } else {
+            return response.json()
+        }
+    } catch
+        (error) {
+        console.error(error.message);
+    }
+}
+
 // sort the array according to sortAscending value (newest on top, or oldest on top)
 function sortMessageArray(array) {
     if (array.length !== 0) {
@@ -135,27 +196,32 @@ function sortMessageArray(array) {
 function fillMessageOverview(listOfMessages) {
     // remove old messages from overview
     document.querySelectorAll(`#messageInOverview`).forEach(e => e.remove())
-    // create new rows with data in the list, and add them to messageOverview
+    // build new element for every message in the list, and add it to messageOverview
     if (listOfMessages != null) {
         listOfMessages.forEach(element => {
-            // create new row
+            // create new message element
             const newOverviewMessage = document.createElement("div");
             newOverviewMessage.setAttribute("id", "messageInOverview")
             newOverviewMessage.setAttribute("data-messageid", `${element.messageId}`)
             // add eventhandler to entire element
             newOverviewMessage.addEventListener('click', () => {
                 showMessageContent(`${element.messageId}`)
-                markMessageRead(`${element.messageId}`)
+                console.log("element.readByReceiver is ")
+                console.log(element.readByReceiver)
+                if (overviewShowsInbox && element.readByReceiver === false) {
+                    element.readByReceiver = true
+                    console.log("element.readByReceiver is ")
+                    console.log(element.readByReceiver)
+                    updateMessage(element)
+                }
             })
-            // TODO message readByReceiver = true ? ... : change class and add markMessageRead to eventListener
-
-            // add subject element
+            // add subject as child
             const subject = document.createElement(`div`)
             subject.setAttribute("class", "subject")
             subject.textContent = element.subject
             newOverviewMessage.appendChild(subject)
 
-            // add senderId, dateTimeSent and messageId element
+            // add senderId, dateTimeSent and messageId as child
             const senderAndDateTime = document.createElement(`div`)
             const senderId = element.senderId
             const dateTimeSent = formatDateTime(element.dateTimeSent)
@@ -189,17 +255,6 @@ function showElement(elementSelector, boolean) {
     }
 }
 
-function markMessageUnread(messageId) {
-    // TODO later...
-    // updateMessage(message)
-}
-
-async function markMessageRead(messageId) {
-    const message = inboxArray.find(({messageId}) => messageId === messageId)
-    message.readByReceiver = true
-    await updateMessage(message)
-}
-
 async function updateMessage(message) {
     const url = `/api/messages`
     try {
@@ -214,10 +269,71 @@ async function updateMessage(message) {
         if (!response.ok) {
             new Error(`Response status: ${response.status}`)
         } else {
-            console.log("updateMessage success! Add visual feedback later...")
+            // TODO notification OK
+            // BUT readByReceiver also uses this method... damn!!!
         }
     } catch (error) {
         console.error(error.message);
+    }
+}
+
+async function deleteMessage(message) {
+    const url = `/api/messages`
+    try {
+        const response = await fetch(url, {
+            method: "DELETE",
+            headers: {
+                "Authorization": localStorage.getItem('authToken'),
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(message)
+        })
+        if (!response.ok) {
+            new Error(`Response status: ${response.status}`)
+        } else {
+            showNotification(MESSAGE_DELETED)
+            await getOutbox()
+        }
+    } catch (error) {
+        // TODO add notification for user
+        console.error(error.message);
+    }
+}
+
+function showDeleteMessageDialog() {
+    let dialog = document.querySelector("dialog")
+    let dialogText = document.querySelector("#dialogText")
+    let dialogButtonConfirm = document.querySelector("#dialogButtonConfirm")
+    let dialogButtonCancel = document.querySelector("#dialogButtonCancel")
+    dialogText.innerHTML = ASK_CONFIRMATION_FOR_DELETE
+    dialogButtonConfirm.innerHTML = BUTTON_TEXT_CONFIRM
+    dialogButtonConfirm.addEventListener("click", () => {
+        deleteMessageHelper(selectedMessage)
+        dialog.close();
+    });
+    dialogButtonCancel.innerHTML = BUTTON_TEXT_CANCEL
+    dialogButtonCancel.addEventListener("click", () => {
+        dialog.close();
+    });
+    document.querySelector("dialog").showModal()
+
+
+}
+
+async function deleteMessageHelper(message) {
+    console.log("deleteMessageHelper is called")
+    if (message) {
+        if (loggedInUser.userId === message.senderId) {
+            // sender deletes message; message is deleted from database
+            await deleteMessage(message)
+            showNotification(CONFIRMED_DELETE)
+        } else {
+            // receiver deletes message; message is marked "archivedByReceiver" using updateMessage
+            message.archivedByReceiver = true
+            await updateMessage(message)
+        }
+    } else {
+        showNotification(SELECT_A_MESSAGE)
     }
 }
 
@@ -234,7 +350,7 @@ async function showMessageContent(messageId) {
     // check which overview is showing
     let visibleArray = overviewShowsInbox ? inboxArray : outboxArray
     // find the message in the array, using its messageId
-    let selectedMessage = visibleArray.find((e) => e.messageId === parseInt(messageId, 10))
+    selectedMessage = visibleArray.find((e) => e.messageId === parseInt(messageId, 10))
     // show the message values in the relevant HTML elements
     document.querySelector(`#singleViewUsername`).textContent = overviewShowsInbox ?
         PREFIX_FROM + await getUsername(selectedMessage.senderId) + ", "
@@ -250,7 +366,7 @@ async function getMessageById(messageId) {
     try {
         const response = await fetch(url)
         if (!response.ok) {
-            throw new Error(`Response status: ${response.status}`)
+            new Error(`Response status: ${response.status}`)
         }
         return await response.json()
     } catch (error) {
