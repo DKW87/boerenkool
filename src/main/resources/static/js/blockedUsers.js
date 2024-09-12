@@ -1,5 +1,8 @@
 "use strict";
 
+import {showToast} from "./modules/notification.mjs";
+
+
 // Functie om de geblokkeerde gebruikers te laden en weer te geven
 export function loadBlockedUsers(userId, token) {
     // Controleer of userId is gedefinieerd
@@ -96,7 +99,7 @@ export function blockUser(userId, token) {
 function getUsernameToBlock() {
     const usernameToBlock = document.getElementById('user-to-block').value;  // Haal de gebruikersnaam op uit het invoerveld
     if (!usernameToBlock) {
-        alert('Voer een geldige gebruikersnaam in.');  // Waarschuw de gebruiker als er geen gebruikersnaam is ingevoerd
+        showToast('Voer een geldige gebruikersnaam in.');  // Waarschuw de gebruiker als er geen gebruikersnaam is ingevoerd
     }
     return usernameToBlock;  // Retourneer de ingevoerde gebruikersnaam
 }
@@ -120,7 +123,7 @@ function fetchUserByUsername(username, token) {
 // Functie om fouten af te handelen bij het ophalen van een gebruiker
 function handleFetchUserError(response, username) {
     if (response.status === 404) {
-        alert(`Gebruiker met gebruikersnaam ${username} bestaat niet.`);  // Waarschuw de gebruiker als de gebruiker niet bestaat
+        showToast(`Gebruiker met gebruikersnaam ${username} bestaat niet.`);  // Waarschuw de gebruiker als de gebruiker niet bestaat
     } else {
         throw new Error(`Fout bij het ophalen van gebruiker met gebruikersnaam ${username}.`);  // Gooi een fout voor andere problemen
     }
@@ -151,7 +154,7 @@ function handleBlockResponse(response, usernameToBlock, userId, token) {
 
     console.log('Status bij het blokkeren van gebruiker:', response.status);
     if (response.ok) {
-        alert(`${usernameToBlock} is geblokkeerd.`);  // Informeer de gebruiker dat de blokkade succesvol was
+        showToast(`${usernameToBlock} is geblokkeerd.`);  // Informeer de gebruiker dat de blokkade succesvol was
         loadBlockedUsers(userId, token);  // Vernieuw de lijst van geblokkeerde gebruikers
     } else {
         throw new Error('Fout bij het blokkeren van de gebruiker.');  // Gooi een fout als de blokkade mislukt is
@@ -182,7 +185,7 @@ function unblockUser(userToUnblockId, userId, token) {
         .then(response => {
             console.log('Status bij het deblokkeren van gebruiker:', response.status);
             if (response.ok) {
-                alert('Gebruiker is gedeblokkeerd.');
+                showToast('Gebruiker is gedeblokkeerd.');
                 loadBlockedUsers(userId, token);  // Vernieuw de lijst van geblokkeerde gebruikers
             } else {
                 throw new Error('Fout bij het deblokkeren van de gebruiker.');
