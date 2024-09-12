@@ -1,42 +1,40 @@
 package boerenkool.communication.controller.registration;
 
 import boerenkool.business.model.User;
+import boerenkool.communication.dto.UserDto;
 import boerenkool.business.service.RegistrationService;
 import boerenkool.communication.controller.RegistrationController;
-import boerenkool.communication.dto.UserDto;
 import boerenkool.utilities.exceptions.RegistrationFailedException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.transaction.annotation.Transactional;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@SpringBootTest
+@AutoConfigureMockMvc // Zorgt ervoor dat MockMvc beschikbaar is
+@Transactional // Zorgt ervoor dat databaseacties worden teruggedraaid na elke test
 class RegistrationControllerAcceptanceTest {
 
+    @Autowired
     private MockMvc mockMvc;
 
-    @Mock
+    @Autowired
     private RegistrationService registrationService;
 
-    @InjectMocks
-    private RegistrationController registrationController;
-
-    private ObjectMapper objectMapper = new ObjectMapper(); // Geen @Autowired meer
+    private ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
-        mockMvc = MockMvcBuilders.standaloneSetup(registrationController).build();
+        // Geen mocks nodig, we gebruiken echte services
     }
 
     @Test
@@ -46,11 +44,6 @@ class RegistrationControllerAcceptanceTest {
         userDto.setUsername("testUser");
         userDto.setEmail("test@example.com");
         userDto.setPassword("password");
-
-        User registeredUser = new User();
-        registeredUser.setUsername("testUser");
-
-        when(registrationService.register(any(UserDto.class))).thenReturn(registeredUser);
 
         // Act & Assert
         mockMvc.perform(post("/api/registration")
@@ -62,19 +55,23 @@ class RegistrationControllerAcceptanceTest {
 
     @Test
     void testRegisterUser_Fail_UsernameAlreadyExists() throws Exception {
-        // Arrange
+        // Arrange: Eerst een gebruiker registreren
         UserDto userDto = new UserDto();
         userDto.setUsername("existingUser");
         userDto.setEmail("test@example.com");
         userDto.setPassword("password");
+        registrationService.register(userDto); // Eerste registratie
 
-        when(registrationService.register(any(UserDto.class)))
-                .thenThrow(new RegistrationFailedException("Gebruikersnaam bestaat al."));
+        // Probeer dezelfde gebruiker opnieuw te registreren
+        UserDto duplicateUserDto = new UserDto();
+        duplicateUserDto.setUsername("existingUser");
+        duplicateUserDto.setEmail("test@example.com");
+        duplicateUserDto.setPassword("password");
 
         // Act & Assert
         mockMvc.perform(post("/api/registration")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(userDto)))
+                        .content(objectMapper.writeValueAsString(duplicateUserDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("Gebruikersnaam bestaat al."));
     }
@@ -86,9 +83,6 @@ class RegistrationControllerAcceptanceTest {
         userDto.setUsername(""); // Lege gebruikersnaam
         userDto.setEmail("test@example.com");
         userDto.setPassword("password");
-
-        when(registrationService.register(any(UserDto.class)))
-                .thenThrow(new RegistrationFailedException("Gebruikersnaam is verplicht."));
 
         // Act & Assert
         mockMvc.perform(post("/api/registration")
@@ -119,9 +113,6 @@ class RegistrationControllerAcceptanceTest {
         userDto.setEmail("test@example.com");
         userDto.setPassword("password");
 
-        when(registrationService.register(any(UserDto.class)))
-                .thenThrow(new RegistrationFailedException("Gebruikersnaam is te lang."));
-
         // Act & Assert
         mockMvc.perform(post("/api/registration")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -138,9 +129,6 @@ class RegistrationControllerAcceptanceTest {
         userDto.setEmail("test@example.com");
         // Wachtwoord ontbreekt
 
-        when(registrationService.register(any(UserDto.class)))
-                .thenThrow(new RegistrationFailedException("Wachtwoord is verplicht."));
-
         // Act & Assert
         mockMvc.perform(post("/api/registration")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -148,5 +136,4 @@ class RegistrationControllerAcceptanceTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("Wachtwoord is verplicht."));
     }
-
 }

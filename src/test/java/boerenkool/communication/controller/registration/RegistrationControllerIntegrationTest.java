@@ -25,6 +25,10 @@ class RegistrationControllerIntegrationTest {
         userDto.setUsername("integrationUser");
         userDto.setEmail("integration@test.com");
         userDto.setPassword("Password123!");
+        userDto.setFirstName("John");
+        userDto.setLastName("Doe");
+        userDto.setPhone("0612345678");
+
 
         // Act: Call the controller method
         ResponseEntity<String> response = registrationController.registerUserHandler(userDto);
@@ -41,6 +45,9 @@ class RegistrationControllerIntegrationTest {
         userDto.setUsername("existingUser");
         userDto.setEmail("integrationfail@test.com");
         userDto.setPassword("Password123!");
+        userDto.setFirstName("Jane");
+        userDto.setLastName("Doe");
+        userDto.setPhone("0612345678");
 
         // First, register the user
         registrationController.registerUserHandler(userDto);
