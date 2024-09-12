@@ -44,7 +44,3 @@ function redirectToIndex() {
     window.location.href = '/index.html';
 }
 
-// Functie om een notificatie te tonen
-function showNotification(message) {
-    alert(message);  // Hier kan je ook een custom notificatie systeem aanroepen
-}

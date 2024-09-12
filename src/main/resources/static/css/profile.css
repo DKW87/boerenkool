@@ -226,3 +226,10 @@ body {
     justify-content: flex-start !important;
     text-align: left !important;
 }
+
+#toast {
+    left: 50% !important;
+    transform: translateX(-50%) !important; /* Forceren dat de toast gecentreerd wordt */
+    position: fixed !important; /* Zorg ervoor dat het fixed blijft, onafhankelijk van andere layout-elementen */
+    margin: 0; /* Zorg ervoor dat er geen margin is die het toast-element verplaatst */
+}

@@ -95,9 +95,17 @@ public class RegistrationController {
     public ResponseEntity<String> requestPasswordReset(@RequestBody Map<String, String> emailMap) {
         String email = emailMap.get("email");
         logger.debug("Received password reset request for email: {}", email);
-        registrationService.sendPasswordResetEmail(email);
-        return ResponseEntity.ok("Email verstuurd");
+
+        boolean emailExists = registrationService.sendPasswordResetEmail(email);
+
+        if (!emailExists) {
+            // Als de gebruiker niet bestaat, retourneer een 404 status
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("E-mailadres niet gevonden");
+        }
+
+        return ResponseEntity.ok("E-mail verstuurd");
     }
+
 
     @PostMapping("/reset-password/confirm")
     public ResponseEntity<String> confirmPasswordReset(@RequestBody PasswordResetDto passwordResetDto) throws RegistrationFailedException {
