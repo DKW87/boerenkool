@@ -1,11 +1,5 @@
 /* reservation.css */
 
-.main-grid-area {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-height: 100vh;
-}
 .body-div {
     display: flex;
     justify-content: center;
@@ -25,9 +19,8 @@ h1 {
 }
 
 #make-reservation {
-    margin-top: 20px;
     background-color: #f9f9f9;
-    padding: 20px;
+    padding: 10px;
     border-radius: 8px;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
     height: 380px;
@@ -59,9 +52,9 @@ form input {
 }
 
 form button {
-    margin-top: 40px;
+    margin-top: 30px;
     padding: 10px;
-    background-color: #556B2F;
+    background-color: var(--boerenkool-paars);
     color: white;
     border: none;
     border-radius: 4px;

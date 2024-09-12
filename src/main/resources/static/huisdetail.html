@@ -10,11 +10,14 @@
     <link rel="stylesheet" href="css/header.css">
     <link rel="stylesheet" href="css/footer.css">
     <link rel="stylesheet" href="css/huisdetail.css">
+    <link rel="stylesheet" href="css/reservation.css">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playwrite+BE+VLG:wght@100..400&family=Playwrite+PE:wght@100..400&display=swap" rel="stylesheet">
 
     <script src="js/huisdetail.js" type="module"></script>
+    <script src="js/reservation.js" type="module"></script>
 </head>
 
 <body>
@@ -42,7 +45,12 @@
                     <div class="property-info">
                         <h2><span id="houseType"></span> - <span id="location" class="location-clickable"></span></h2><br>
 
+
                         <p><span id="maxGuests"></span> gasten - <span id="roomCount"></span> kamers - <span id="availability"></span></p><br>
+                        <div style="display: flex ; align-items: center; gap: 5px">
+                            <p>Prijs Per Persoon Per Dag: </p>
+                            <h2 ><span id="pricePPPD"></span></h2>
+                        </div>
                         <hr style="border: 1px solid rgba(211, 211, 211, 0.5); width: 100%;">
 
                         <br>
@@ -55,14 +63,44 @@
                 </div>
 
                 <div class="right-column">
-                    <div class="pricing">
-                        <div>
-                            <p>Prijs Per Persoon Per Dag </p><br>
-                        </div>
-                        <div><h2 ><span id="pricePPPD"></span></h2></div>
-                        <div>
-                            <button id="reserveerButton">Reserveer</button>
-                        </div>
+                    <div class="resFormBody">
+                        <section id="make-reservation">
+                            <h2>Maak een reservering</h2>
+                            <form id="reservation-form">
+                                <input type="hidden"  id="houseId" name="houseId" required>
+                                <br/>
+                                <div class="resInputLine">
+                                    <label for="guestCount">Aantal Gasten</label>
+                                    <input style="width: 130px; margin-left: 20px" type="number" id="guestCount" name="guestCount" required min="1">
+                                </div>
+                                <br/>
+                                <div class="resInputLine">
+                                    <label for="startDate">Startdatum</label>
+                                    <input type="date" id="startDate" name="startDate" required>
+                                </div>
+                                <br/>
+                                <div class="resInputLine">
+                                    <label for="endDate">Einddatum</label>
+                                    <input type="date" id="endDate" name="endDate" required>
+                                </div>
+                                <br/>
+                                <div class="resInputLine">
+                                    <label for="resCalculate">Kosten</label>
+                                    <span id="resCalculate">--bkC</span>
+                                </div>
+                                <br/>
+                                <div class="resInputLine">
+                                    <label for="resCalculate">Uw Budget</label>
+                                    <span id="coinBalance">--</span>
+                                </div>
+                                <br/>
+                                <div class="resInputLineButton">
+                                    <button type="submit">Verstuur</button>
+                                </div>
+                            </form>
+
+                        </section>
+                        <div id="reservation-result"></div>
                     </div>
                 </div>
             </div>
@@ -72,7 +110,7 @@
         </div>
     </div>
 
-    <div class="footer-div" id="footer"></div>
+    <footer id="footer" class="footer-div"></footer>
 
 </div>
 </body>
