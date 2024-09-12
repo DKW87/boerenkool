@@ -5,10 +5,11 @@ import boerenkool.business.model.Reservation;
 import boerenkool.business.model.User;
 import boerenkool.communication.dto.ReservationDTO;
 import boerenkool.database.repository.ReservationRepository;
+import boerenkool.database.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -19,12 +20,14 @@ public class ReservationService {
     private final ReservationRepository reservationRepository;
     private final HouseService houseService;
     private final UserService userService;
+    private final UserRepository userRepository;
 
     @Autowired
-    public ReservationService(ReservationRepository reservationRepository, HouseService houseService, UserService userService) {
+    public ReservationService(ReservationRepository reservationRepository, HouseService houseService, UserService userService, UserRepository userRepository) {
         this.reservationRepository = reservationRepository;
         this.houseService = houseService;
         this.userService = userService;
+        this.userRepository = userRepository;
     }
 
     public List<Reservation> getAllReservations() {
@@ -35,19 +38,61 @@ public class ReservationService {
         return reservationRepository.getReservationById(id);
     }
 
-    /*public Reservation saveReservation(Reservation reservation) {
-        //validateReservation(reservation);
-        return reservationRepository.saveReservation(reservation);
-    }*/
-
     public Reservation saveReservation(Reservation reservation) {
         checkGuestCount(reservation.getHouse(), reservation.getGuestCount());
         checkDateOverlap(reservation.getHouse().getHouseId(), reservation.getStartDate(), reservation.getEndDate());
 
-        return reservationRepository.saveReservation(reservation);
+        User user = reservation.getReservedByUser();
+
+        int totalCost = calculateReservationCost(
+                reservation.getStartDate(),
+                reservation.getEndDate(),
+                reservation.getHouse().getHouseId(),
+                reservation.getGuestCount()
+        );
+
+        validateUserBudget(totalCost, user);
+
+        Reservation savedReservation = reservationRepository.saveReservation(reservation);
+
+        int newBalance = user.getCoinBalance() - totalCost;
+        boolean updateSuccess = userRepository.updateBoerenkoolcoins(user.getUserId(), newBalance);
+
+        if (!updateSuccess) {
+            throw new RuntimeException("Failed to update user balance");
+        }
+
+        return savedReservation;
     }
 
+    public int calculateReservationCost(LocalDate startDate, LocalDate endDate, int houseId, int guestCount) {
+
+        if (startDate.isAfter(endDate)) {
+            throw new IllegalArgumentException("Startdatum kan niet na einddatum zijn!");
+        }
+
+        House house = houseService.getOneById(houseId);
+
+        int pppd = house.getPricePPPD();
+
+        int days = (int) ChronoUnit.DAYS.between(startDate, endDate.plusDays(1));
+
+        return pppd * days * guestCount;
+    }
+
+    public void validateUserBudget(int totalCost, User user) {
+        int userBudget = user.getCoinBalance();
+        if (totalCost> userBudget) {
+            throw new IllegalArgumentException("De reserveringskosten overschrijden uw budget!");
+        }
+    }
+
+
     public void validateReservationDates(LocalDate startDate, LocalDate endDate) {
+        LocalDate today = LocalDate.now();
+        if (startDate.isBefore(today)) {
+            throw new IllegalArgumentException("De datums kan niet in het verleden liggen!");
+        }
         if (startDate.isAfter(endDate)) {
             throw new IllegalArgumentException("Startdatum kan niet na einddatum zijn!");
         }
@@ -69,10 +114,32 @@ public class ReservationService {
 
 
     public boolean deleteReservationById(int id) {
-        if (reservationRepository.getReservationById(id).isEmpty()) {
-            throw new IllegalArgumentException("Reservation not found");
+
+        Reservation reservation = reservationRepository.getReservationById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Reservation not found"));
+
+        User user = reservation.getReservedByUser();
+        int totalCost = calculateReservationCost(
+                reservation.getStartDate(),
+                reservation.getEndDate(),
+                reservation.getHouse().getHouseId(),
+                reservation.getGuestCount()
+        );
+
+        int newBalance = user.getCoinBalance() + totalCost;
+        boolean updateSuccess = userRepository.updateBoerenkoolcoins(user.getUserId(), newBalance);
+
+        if (!updateSuccess) {
+            throw new RuntimeException("Failed to update user balance");
         }
-        return reservationRepository.deleteReservationById(id);
+
+        boolean cancellationSuccess = reservationRepository.deleteReservationById(id);
+
+        if (!cancellationSuccess) {
+            throw new RuntimeException("Failed to cancel reservation");
+        }
+
+        return true;
     }
 
     public List<Reservation> getAllReservationsByLandlord(int landlordId) {
@@ -144,23 +211,6 @@ public class ReservationService {
         reservation.setReservedByUser(user);
         return reservation;
     }
-
-    /*private void validateReservation(Reservation reservation) {
-        if (reservation.getGuestCount() < 0) {
-            throw new IllegalArgumentException("Guest count cannot be negative.");
-        }
-
-        LocalDate startDate = reservation.getStartDate();
-        LocalDate endDate = reservation.getEndDate();
-
-        if (startDate == null || endDate == null) {
-            throw new IllegalArgumentException("Start date and end date cannot be null.");
-        }
-
-        if (endDate.isBefore(startDate)) {
-            throw new IllegalArgumentException("End date cannot be before start date.");
-        }
-    }*/
 
     public List<Reservation> getAllReservationsByUserId(int userId) {
         return reservationRepository.getAllReservationsByUserId(userId);
