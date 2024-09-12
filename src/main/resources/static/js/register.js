@@ -1,5 +1,6 @@
 import { validateName, validatePhoneNumber, validateEmail, validatePassword } from './modules/validation.mjs';
 import * as Main from "./modules/main.mjs";
+import {showToast} from "./modules/notification.mjs";
 
 // Hoofdfunctie die wordt aangeroepen wanneer de pagina volledig is geladen
 document.addEventListener('DOMContentLoaded', () => {
@@ -31,19 +32,19 @@ function getFormData() {
 // Valideert het formulier en geeft foutmeldingen als er iets mis is
 function validateFormData({ email, firstName, lastName, phone, password }) {
     if (!validateEmail(email)) {
-        alert("Voer een geldig e-mailadres in.");
+        showToast("Voer een geldig e-mailadres in.");
         return false;
     }
     if (!validateName(firstName) || !validateName(lastName)) {
-        alert("Voornaam en achternaam mogen alleen letters bevatten.");
+        showToast("Voornaam en achternaam mogen alleen letters bevatten.");
         return false;
     }
     if (!validatePhoneNumber(phone)) {
-        alert("Telefoonnummer moet beginnen met 06 en precies 8 cijfers bevatten.");
+        showToast("Telefoonnummer moet beginnen met 06 en precies 8 cijfers bevatten.");
         return false;
     }
     if (!validatePassword(password)) {
-        alert("Wachtwoord moet minstens 6 tekens lang zijn en minstens één hoofdletter, één cijfer en één speciaal teken bevatten.");
+        showToast("Wachtwoord moet minstens 6 tekens lang zijn en minstens één hoofdletter, één cijfer en één speciaal teken bevatten.");
         return false;
     }
     return true;
@@ -60,10 +61,18 @@ async function handleFormSubmission(event) {
 
     try {
         await submitRegistrationData(formData);
-        alert("Registratie succesvol!");
+        showToast("Registratie succesvol!");
         window.location.href = '/login.html';
     } catch (error) {
-        alert(error.message);
+        if (error.response && error.response.status === 400) {
+            showToast("Ongeldige invoer. Controleer of alle velden correct zijn ingevuld.");
+        } else if (error.response && error.response.status === 409) {
+            showToast("Dit e-mailadres is al geregistreerd. Probeer een ander e-mailadres.");
+        } else if (error.response && error.response.status === 500) {
+            showToast("Er is een probleem met de server. Probeer het later opnieuw.");
+        } else {
+            showToast("Er is iets misgegaan. Probeer het opnieuw.");
+        }
     }
 }
 

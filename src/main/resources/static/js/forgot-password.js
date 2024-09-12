@@ -1,6 +1,8 @@
 "use strict";
 
 import * as Main from './modules/main.mjs';
+import {showToast} from "./modules/notification.mjs";
+import {validateEmail} from "./modules/validation.mjs";
 
 document.addEventListener('DOMContentLoaded', () => {
     Main.loadHeader();
@@ -19,11 +21,22 @@ function setupResetPasswordHandler() {
 async function handlePasswordReset() {
     const email = getEmailInputValue();
 
+    if (!validateEmail(email)) {
+        showToast("Voer een geldig e-mailadres in.");
+        return;
+    }
+
     try {
         const response = await sendPasswordResetRequest(email);
         handleResponse(response);
     } catch (error) {
-        showNotification(error.message);
+        if (error.response && error.response.status === 404) {
+            showToast("E-mailadres niet gevonden. Controleer of je het juiste e-mailadres hebt ingevoerd.");
+        } else if (error.response && error.response.status === 500) {
+            showToast("Er is een probleem op de server. Probeer het later opnieuw.");
+        } else {
+            showToast("Er is iets misgegaan. Probeer het opnieuw.");
+        }
     }
 }
 
@@ -44,14 +57,16 @@ async function sendPasswordResetRequest(email) {
 // Functie om de response van de server te verwerken
 async function handleResponse(response) {
     if (!response.ok) {
-        throw new Error('Er is een fout opgetreden. Probeer het later opnieuw.');
+        // Controleer de statuscode van de response
+        if (response.status === 404) {
+            showToast('E-mailadres niet gevonden. Controleer of je het juiste e-mailadres hebt ingevoerd.');
+        } else {
+            showToast('Er is een fout opgetreden. Probeer het later opnieuw.');
+        }
+        return;  // Stop hier, geen success melding weergeven
     }
 
+    // Als de response OK is, geef de success melding
     const message = await response.text();
-    showNotification(message);
-}
-
-// Functie om een notificatie te tonen, zowel voor successen als fouten
-function showNotification(message) {
-    alert(message);  // Hier kan je ook een custom notificatie systeem aanroepen
+    showToast('E-mail succesvol verstuurd. Controleer je inbox voor verdere instructies.');
 }
