@@ -249,7 +249,7 @@ public class House implements Comparable<House> {
     }
 
     public void setIsNotAvailable(boolean isNotAvailable) {
-        isNotAvailable = isNotAvailable;
+        this.isNotAvailable = isNotAvailable;
     }
 
     public static class otherEntityIds {

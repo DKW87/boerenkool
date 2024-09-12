@@ -58,7 +58,7 @@ public class JdbcHouseDAO implements HouseDAO {
 
     @Override
     public List<House> getHousesWithFilter(HouseFilter filter) {
-        StringBuilder sql = new StringBuilder("SELECT * FROM House WHERE 1=1");
+        StringBuilder sql = new StringBuilder("SELECT * FROM House WHERE 1=1 AND isNotAvailable = 0");
         List<Object> params = new ArrayList<>();
 
         addProvinceFilter(sql, params, filter);
