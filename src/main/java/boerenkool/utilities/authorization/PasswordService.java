@@ -30,7 +30,7 @@ public class PasswordService {
 
 
 
-    public static String hashPassword(String password, String salt) {
+    public String hashPassword(String password, String salt) {
         try {
             //initialiseer een sha-256 hash algoritme
             MessageDigest md = MessageDigest.getInstance("SHA-256");
