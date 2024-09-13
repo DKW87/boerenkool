@@ -196,7 +196,7 @@ public class HouseApiController {
             } else if (houseOwnerId != house.getHouseOwner().getUserId()) {
                 return new ResponseEntity<>("Not authorized to delete this house", HttpStatus.FORBIDDEN);
             } else if (!reservationService.getAllReservationsByHouseId(houseId).isEmpty()) {
-              return new ResponseEntity<>("Not authorized to delete this house", HttpStatus.CONFLICT);
+              return new ResponseEntity<>("House is reserved and may not be deleted", HttpStatus.CONFLICT);
             } else {
                 return houseService.deleteHouse(houseId)
                         ? new ResponseEntity<>("Successfully deleted house", HttpStatus.OK)
