@@ -2,16 +2,20 @@ import * as main from "./modules/main.mjs"
 import * as auth from "./modules/auth.mjs";
 import {getUsername} from "./modules/user.mjs";
 import {showToast} from './modules/notification.mjs';
-
-// if (document.documentElement.lang === "nl") {
-    import * as lang from './languages/nl.mjs';
-// } else {
-//     import * as lang from './languages/en.mjs';
-// }
+import * as lang from './languages/nl.mjs';
 
 main.loadHeader()
 main.loadFooter()
 
+// authenticate user
+const token = auth.getToken()
+let loggedInUser = await auth.getLoggedInUser(token)
+
+let inboxArray = {}
+let outboxArray = {}
+let selectedMessage = {}
+let sortAscending = false
+let overviewShowsInbox = true
 const DATE_TIME_OPTIONS = {
     weekday: `long`,
     year: `numeric`,
@@ -20,18 +24,8 @@ const DATE_TIME_OPTIONS = {
     hour: `numeric`,
     minute: `numeric`
 }
-let loggedInUser = {}
-let inboxArray = {}
-let outboxArray = {}
-let selectedMessage = {}
-let sortAscending = false
-let overviewShowsInbox = true
 
-// authenticate user
-const token = auth.getToken()
-await auth.checkIfLoggedIn(token)
-
-setup()
+await setup()
 
 async function setup() {
     document.querySelector('#refreshInboxButton').addEventListener('click', async () => {

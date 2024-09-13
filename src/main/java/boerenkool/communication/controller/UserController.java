@@ -153,8 +153,7 @@ public class UserController {
 
     //code Bart
     @GetMapping(value = "/correspondents")
-    public ResponseEntity<Object> getMapOfCorrespondents(@RequestHeader("Authorization") String token)
-            throws MessageDoesNotExistException {
+    public ResponseEntity<Object> getMapOfCorrespondents(@RequestHeader("Authorization") String token) {
         Optional<User> userOpt = authorizationService.validate(UUID.fromString(token));
         if (userOpt.isPresent()) {
             return new ResponseEntity<>(userService.getMapOfCorrespondents(userOpt.get().getUserId()), HttpStatus.OK);

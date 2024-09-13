@@ -2,42 +2,51 @@ import * as main from "./modules/main.mjs";
 import * as auth from "./modules/auth.mjs";
 import {getUsername} from "./modules/user.mjs";
 import {showToast} from './modules/notification.mjs';
-
-// if (document.documentElement.lang === "nl") {
-    import * as lang from './languages/nl.mjs';
-// } else {
-//     import * as lang from './languages/en.mjs';
-// }
+import * as lang from './languages/nl.mjs';
 
 main.loadHeader()
 main.loadFooter()
 
 // is user logged in ? continue : redirect
 await auth.checkIfLoggedIn()
+// authenticate user
+const token = auth.getToken()
+let loggedInUser = await auth.getLoggedInUser(token)
 
+// variables used in different methods
 let receiverId = {}
 let receiverName = {}
 let listOfCorrespondents = []
-let loggedInUser = {}
 
-// authenticate user
-const token = auth.getToken()
-loggedInUser = await auth.getLoggedInUser(token)
-
-// replace english with user language
-document.querySelector("title").textContent = lang.PAGE_TITLE
-document.querySelector('#headerSendMessage').textContent = lang.SEND_A_MESSAGE
-document.querySelector('#labelForReceiverInput').textContent = lang.TO + " :"
-document.querySelector('#labelForSubjectInput').textContent = lang.SUBJECT + " :"
-document.querySelector('#labelForBodyInput').textContent = lang.BODY + " :"
-document.querySelector('#sendMessageButton').textContent = lang.SEND_THIS_MESSAGE
-
+await injectHtmlFromFile("sendMessageInjectHtml", "templates/send-message.html")
 await setup()
+
+async function injectHtmlFromFile(elementId, pathToHtmlFile) {
+    const elementToFill = document.getElementById(elementId);
+    try {
+        const response = await fetch(pathToHtmlFile)
+        if (!response.ok) {
+            new Error(`Response status: ${response.status}`)
+        } else {
+            elementToFill.innerHTML = await response.text()
+        }
+    } catch
+        (error) {
+        console.error(error.message);
+    }
+}
 
 async function setup() {
     // document.querySelector('#goToMessagesButton').addEventListener('click', () => {
     //     window.location.href = "/messages.html"
     // })
+    // replace english with user language
+    document.querySelector("title").textContent = lang.PAGE_TITLE
+    document.querySelector('#headerSendMessage').textContent = lang.SEND_A_MESSAGE
+    document.querySelector('#labelForReceiverInput').textContent = lang.TO + " :"
+    document.querySelector('#labelForSubjectInput').textContent = lang.SUBJECT + " :"
+    document.querySelector('#labelForBodyInput').textContent = lang.BODY + " :"
+    document.querySelector('#sendMessageButton').textContent = lang.SEND_THIS_MESSAGE
 
     document.querySelector('#sendMessageButton').addEventListener('click', () => {
         checkRequiredFields()
