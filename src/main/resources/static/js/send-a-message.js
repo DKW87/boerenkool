@@ -14,9 +14,11 @@ const token = auth.getToken()
 let loggedInUser = await auth.getLoggedInUser(token)
 
 // variables used in different methods
-let receiverId = {}
-let receiverName = {}
-let listOfCorrespondents = []
+let receiverId
+let receiverName
+let subject
+let body
+let listOfCorrespondents
 
 await injectHtmlFromFile("sendMessageInjectHtml", "templates/send-message.html")
 await setup()
@@ -51,12 +53,29 @@ async function setup() {
     document.querySelector('#sendMessageButton').addEventListener('click', () => {
         checkRequiredFields()
     })
+
     // check for parameters in URL
+    // TODO extract method
     const parameters = new URLSearchParams(document.location.search);
-    if (parameters.size !== 0) {
+    receiverId = parameters.get("userid")
+    let replyBoolean = parameters.get("reply")
+    if (receiverId) {
+        // form with prefilled receiver
         addElementForReceiverUsername()
-        await fillReceiverDataFromParameters(parameters)
+        receiverName = await getUsername(receiverId) // TODO fix getUsername to use body text
+        document.querySelector("#receiverName").innerText = `${receiverName}`
+    } else if (replyBoolean === "true") {
+        // form with prefilled receiver, subject and body
+        receiverId = JSON.parse(localStorage.getItem("messageToReply")).senderId
+        receiverName = await getUsername(receiverId)
+        subject = JSON.parse(localStorage.getItem("messageToReply")).subject
+        body = JSON.parse(localStorage.getItem("messageToReply")).body
+        if (subject && body) {
+            document.querySelector("#subjectInput").innerText = `${lang.REPLY_PREFIX_SUBJECT} ${subject}`
+            document.querySelector("#bodyInput").innerHTML = `\r\n\r\n${lang.REPLY_PREFIX_BODY}\r\n${body}`
+        }
     } else {
+        // empty form with receiver dropdown
         addElementForReceiverDropdown()
         listOfCorrespondents = await getListOfCorrespondents()
         await fillCorrespondentsDropDown(listOfCorrespondents, "receiverDropDown")
@@ -76,18 +95,8 @@ function addElementForReceiverDropdown() {
     document.querySelector(`#receiverPlaceholder`).replaceWith(elementForReceiverDropdown)
 }
 
-async function fillReceiverDataFromParameters(parameters) {
-    receiverId = parameters.get("userid");
-    // TODO perhaps later : add ?username={username} parameter
-    if (receiverId > 0) {
-        // resolve parameter with userid
-        receiverName = await getUsername(receiverId) // TODO fix getUsername to use body text
-        console.log("receiverId is " + receiverId)
-        console.log("receiverName is " + receiverName)
-        document.querySelector("#receiverName").innerHTML = `${receiverName}`
-    } else {
-        console.log("URL parameters invalid : " + parameters)
-    }
+async function fillReceiverDataFromUserId(receiverId) {
+
 }
 
 async function getListOfCorrespondents() {

@@ -22,3 +22,6 @@ export const RESPONSE_ERROR = "Er is iets mis gegaan"
 export const TO = "Aan"
 export const SUBJECT = "Onderwerp"
 export const BODY = "Bericht"
+
+export const REPLY_PREFIX_SUBJECT = "Re : "
+export const REPLY_PREFIX_BODY = "In antwoord op je bericht : "

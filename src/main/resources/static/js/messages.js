@@ -29,7 +29,7 @@ await setup()
 
 async function setup() {
     document.querySelector('#refreshInboxButton').addEventListener('click', async () => {
-        console.log("refreshinbox event fired")
+        // console.log("refreshinbox event fired")
         // TODO extract this to a new function, combined with the one below
         overviewShowsInbox = true
         inboxArray = await getInbox()
@@ -42,7 +42,7 @@ async function setup() {
     })
 
     document.querySelector('#refreshOutboxButton').addEventListener('click', async () => {
-        console.log("refreshoutbox event fired")
+        // console.log("refreshoutbox event fired")
         // TODO extract this to a new function
         overviewShowsInbox = false
         outboxArray = await getOutbox()
@@ -80,8 +80,15 @@ async function setup() {
         }
     })
 
+    document.querySelector('#reverseMessageOverviewButton').addEventListener('click', () => {
+        reverseMessageOverview()
+    })
 
-    loggedInUser = await auth.getLoggedInUser(token)
+    document.querySelector('#answerMessageButton').addEventListener('click', () => {
+        console.log(selectedMessage)
+        localStorage.setItem("messageToReply", JSON.stringify(selectedMessage))
+        window.location.href = `send-a-message.html?reply=true`
+    })
 
     // refresh messageoverview with inbox by default
     document.querySelector('#refreshInboxButton').click();
