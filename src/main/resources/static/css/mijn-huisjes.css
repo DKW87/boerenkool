@@ -8,27 +8,46 @@ a {
     display: flex;
     align-items: top; 
     justify-content: center;
-    height: 100vh; 
 }
 
 .huisjes-container {
+    height: auto;
     background-color: var(--boerenkool-wit);
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     padding: 20px;
-    width: 80vh;
-    max-width: 80vw;
     margin-top: 20px;
     margin-bottom: 20px;
     box-sizing: border-box;
     text-align: left;
 }
 
-.huisjes-container h1 {
+h1, h2 {
     color: var(--boerenkool-paars);
 }
 
-.huisjes-container img {
+.inline-checkbox {
+    scale: 1.35;
+    margin: 15px;
+}
+
+.inline-del {
+    padding: 14px;
+    background-color: var(--boerenkool-grijs);
+}
+
+.inline-del:hover {
+    background-color: rgb(210, 97, 97);
+    cursor: pointer;
+}
+
+.inline-del-img {
+    width: 25px;
+    height: 25x;
+    align-items: center;
+}
+
+.inline-img {
     width: 50px;
     height: 50px;
     object-fit: cover;
@@ -47,5 +66,25 @@ a {
     display: flex;
     flex-direction: column;
     text-decoration: none;
-    color: var(--boerenkool-paars);
+}
+
+.deleteAllButton {
+    margin-top: 25px;
+    width: 250px;
+    padding: 10px;
+    background-color: var(--boerenkool-lichtgroen);
+    color: var(--boerenkool-zwart);
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.deleteAllButton.active {
+    background-color: rgb(210, 97, 97);
+    cursor: pointer;
+    color: var(--boerenkool-wit);
+}
+
+.selectAll {
+    margin-top: 25px;
 }

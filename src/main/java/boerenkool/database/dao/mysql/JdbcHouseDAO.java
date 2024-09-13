@@ -58,7 +58,7 @@ public class JdbcHouseDAO implements HouseDAO {
 
     @Override
     public List<House> getHousesWithFilter(HouseFilter filter) {
-        StringBuilder sql = new StringBuilder("SELECT * FROM House WHERE 1=1");
+        StringBuilder sql = new StringBuilder("SELECT * FROM House WHERE 1=1 AND isNotAvailable = 0");
         List<Object> params = new ArrayList<>();
 
         addProvinceFilter(sql, params, filter);
@@ -89,7 +89,7 @@ public class JdbcHouseDAO implements HouseDAO {
     }
 
     @Override
-    public List<String> getUniqueCities(){
+    public List<String> getUniqueCities() {
         String sql = "SELECT DISTINCT city FROM House ORDER BY city ASC";
         return jdbcTemplate.query(sql, (rs, rowNum) -> rs.getString("city"));
     }
@@ -189,9 +189,14 @@ public class JdbcHouseDAO implements HouseDAO {
 
     private void addPriceFilter(StringBuilder sql, List<Object> params, HouseFilter filter) {
         if (filter.getMinPricePPPD() > 0 && filter.getMaxPricePPPD() > 0) {
-            sql.append(" AND pricePPPD BETWEEN ? AND ?");
-            params.add(filter.getMinPricePPPD());
-            params.add(filter.getMaxPricePPPD());
+            if (filter.getMaxPricePPPD() == filter.getMinPricePPPD()) {
+                sql.append(" AND pricePPPD = ?");
+                params.add(filter.getMaxPricePPPD());
+            } else {
+                sql.append(" AND pricePPPD BETWEEN ? AND ?");
+                params.add(filter.getMinPricePPPD());
+                params.add(filter.getMaxPricePPPD());
+            }
         } else if (filter.getMinPricePPPD() > 0) {
             sql.append(" AND pricePPPD >= ?");
             params.add(filter.getMinPricePPPD());
