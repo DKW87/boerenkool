@@ -1,3 +1,4 @@
+<!--
 <!DOCTYPE html>
 <html lang="nl">
 <head>
@@ -8,16 +9,27 @@
     <link rel="stylesheet" href="css/global.css">
     <link rel="stylesheet" href="css/header.css">
     <link rel="stylesheet" href="css/footer.css">
+    <link rel="stylesheet" href="css/sidebar.css">
 </head>
 <body>
 <div class="main-grid-area">
     <header id="header" class="header-div"></header>
 
+        <aside class="sidebar">
+            <div>
+                <p>HUISNAAM: <span id="houseName">--</span></p>
+                <br>
+                <p>MAXIMAAL AANTAL GASTEN: <span id="maxGuest">--</span></p>
+                <br>
+                <p>UW BEGROTING: <span id="coinBalance">--</span><br></p>
+            </div>
+        </aside>
+
     <main id="body" class="body-div">
 
         <div class="resFormBody">
         <section id="make-reservation">
-            <h2>Maak een Reservering</h2>
+            <h2>Maak een reservering</h2>
             <form id="reservation-form">
                 <input type="hidden"  id="houseId" name="houseId" required>
                 <br/>
@@ -36,8 +48,13 @@
                 <input type="date" id="endDate" name="endDate" required>
                 </div>
                 <br/>
+                <div class="resInputLine">
+                    <label for="resCalculate">Kosten</label>
+                    <span id="resCalculate">--bkC</span>
+                </div>
+                <br/>
                 <div class="resInputLineButton">
-                <button type="submit">Verstuur Reservering</button>
+                <button type="submit">Verstuur</button>
                 </div>
             </form>
 
@@ -52,3 +69,4 @@
 <script src="/js/reservation.js" type="module" defer></script>
 </body>
 </html>
+-->

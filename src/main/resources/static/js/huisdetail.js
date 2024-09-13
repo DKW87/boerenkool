@@ -183,5 +183,5 @@ function displayHouseDetails(house) {
 // Display an error message if fetching house details fails
 function displayErrorMessage() {
     const container = document.getElementById('house-details');
-    container.innerHTML = '<p>Kan huisdetails niet laden. Probeer het later opnieuw.</p>';  // Dutch error message
+    //container.innerHTML = '<p>Kan huisdetails niet laden. Probeer het later opnieuw.</p>';  // Dutch error message
 }
