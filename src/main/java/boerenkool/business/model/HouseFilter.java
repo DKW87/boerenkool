@@ -1,5 +1,6 @@
 package boerenkool.business.model;
 
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -27,6 +28,8 @@ import java.util.List;
  */
 public class HouseFilter {
 
+    private LocalDate startDate;
+    private LocalDate endDate;
     private List<String> provinces;
     private List<String> cities;
     private List<Integer> houseTypeIds;
@@ -56,6 +59,14 @@ public class HouseFilter {
     }
 
     // getters
+
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
 
     public List<String> getProvinces() {
         return provinces;
@@ -107,6 +118,8 @@ public class HouseFilter {
 
     public static class Builder {
 
+        private LocalDate startDate;
+        private LocalDate endDate;
         private List<String> provinces;
         private List<String> cities;
         private List<Integer> houseTypeIds;
@@ -119,6 +132,16 @@ public class HouseFilter {
         private String sortOrder;
         private int limit;
         private int offset;
+
+        public Builder setStartDate(LocalDate startDate) {
+            this.startDate = startDate;
+            return this;
+        }
+
+        public Builder setEndDate(LocalDate endDate) {
+            this.endDate = endDate;
+            return this;
+        }
 
         public Builder setProvinces(List<String> provinces) {
             this.provinces = provinces;

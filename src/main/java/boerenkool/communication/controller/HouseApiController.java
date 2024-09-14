@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.net.URI;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -105,6 +106,8 @@ public class HouseApiController {
 
     @GetMapping(value = "/l/filter")
     public ResponseEntity<?> getListOfHousesByFilter(
+            @RequestParam(name = "aankomst", required = false, defaultValue = "") LocalDate startDate,
+            @RequestParam(name = "vertrek", required = false, defaultValue = "") LocalDate endDate,
             @RequestParam(name = "provincies", required = false, defaultValue = "") List<String> provinces,
             @RequestParam(name = "steden", required = false, defaultValue = "") List<String> cities,
             @RequestParam(name = "huis-typen", required = false, defaultValue = "") List<Integer> houseTypeIds,
@@ -119,6 +122,8 @@ public class HouseApiController {
             @RequestParam(required = false, defaultValue = "0") int offset) {
 
         HouseFilter filter = new HouseFilter.Builder()
+                .setStartDate(startDate)
+                .setEndDate(endDate)
                 .setProvinces(provinces)
                 .setCities(cities)
                 .setHouseTypeIds(houseTypeIds)
