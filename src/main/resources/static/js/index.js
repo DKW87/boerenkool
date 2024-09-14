@@ -30,6 +30,8 @@ function loadLeftSidebar() {
                     const defaultList = '/api/houses/l/filter';
                     Filter.getListOfHousesByURL(defaultList);
                 }
+                Filter.setTodayAsMinValueDateInput();
+                Filter.dateListener();
                 Filter.applyFilterListener();
                 Filter.priceListener();
             })

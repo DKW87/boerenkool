@@ -106,8 +106,8 @@ public class HouseApiController {
 
     @GetMapping(value = "/l/filter")
     public ResponseEntity<?> getListOfHousesByFilter(
-            @RequestParam(name = "aankomst", required = false, defaultValue = "") LocalDate startDate,
-            @RequestParam(name = "vertrek", required = false, defaultValue = "") LocalDate endDate,
+            @RequestParam(name = "aankomst", required = false, defaultValue = "") String startDate,
+            @RequestParam(name = "vertrek", required = false, defaultValue = "") String endDate,
             @RequestParam(name = "provincies", required = false, defaultValue = "") List<String> provinces,
             @RequestParam(name = "steden", required = false, defaultValue = "") List<String> cities,
             @RequestParam(name = "huis-typen", required = false, defaultValue = "") List<Integer> houseTypeIds,
@@ -121,9 +121,15 @@ public class HouseApiController {
             @RequestParam(required = false, defaultValue = "12") int limit,
             @RequestParam(required = false, defaultValue = "0") int offset) {
 
+        LocalDate startDateParsed = null;
+        LocalDate endDateParsed = null;
+
+        if (!startDate.isEmpty()) startDateParsed = LocalDate.parse(startDate);
+        if (!endDate.isBlank()) endDateParsed = LocalDate.parse(endDate);
+
         HouseFilter filter = new HouseFilter.Builder()
-                .setStartDate(startDate)
-                .setEndDate(endDate)
+                .setStartDate(startDateParsed)
+                .setEndDate(endDateParsed)
                 .setProvinces(provinces)
                 .setCities(cities)
                 .setHouseTypeIds(houseTypeIds)

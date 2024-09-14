@@ -61,7 +61,7 @@ public class JdbcHouseDAO implements HouseDAO {
         StringBuilder sql = new StringBuilder("SELECT house.* FROM House AS house WHERE 1=1 AND house.isNotAvailable = 0");
         List<Object> params = new ArrayList<>();
 
-        addDateFilter(sql,params, filter);
+        addDateFilter(sql, params, filter);
         addProvinceFilter(sql, params, filter);
         addCityFilter(sql, params, filter);
         addHouseTypeFilter(sql, params, filter);
@@ -120,7 +120,7 @@ public class JdbcHouseDAO implements HouseDAO {
     private void addDateFilter(StringBuilder sql, List<Object> params, HouseFilter filter) {
         if (filter.getStartDate() != null && filter.getEndDate() != null) {
             sql.append(" AND NOT EXISTS (SELECT 1 FROM Reservation AS reservation " +
-                    "WHERE reservation.houseId = house.houseId AND reservation.startDate > ? AND reservation.endDate < ?)");
+                    "WHERE reservation.houseId = house.houseId AND reservation.startDate < ? AND reservation.endDate > ?)");
             params.add(filter.getEndDate());
             params.add(filter.getStartDate());
         }

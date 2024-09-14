@@ -51,6 +51,11 @@
     cursor: pointer;
 }
 
+.dateInput {
+    width: 100%;
+    height: 30px;
+}
+
 .dropdown-filter {
     background-color: white;
 }

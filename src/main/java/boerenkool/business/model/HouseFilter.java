@@ -1,5 +1,7 @@
 package boerenkool.business.model;
 
+import org.springframework.cglib.core.Local;
+
 import java.time.LocalDate;
 import java.util.List;
 
@@ -44,6 +46,8 @@ public class HouseFilter {
     private int offset; // if you go to page 2 and result limit is 10, offset will become 10 (to hide page 1 results)
 
     private HouseFilter(Builder builder) {
+        this.startDate = builder.startDate;
+        this.endDate = builder.endDate;
         this.provinces = builder.provinces;
         this.cities = builder.cities;
         this.houseTypeIds = builder.houseTypeIds;

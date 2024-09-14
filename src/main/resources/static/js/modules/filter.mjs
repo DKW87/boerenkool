@@ -38,8 +38,8 @@ export function applyFilterListener() {
     document.querySelector('button').addEventListener('click', function () {
         const api = '/api/houses/l/filter';
 
-        const sortOrder = document.getElementById('sortOrder').value;
-        const sortBy = document.getElementById('sortBy').value;
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
 
         const province = Array.from(document.getElementById('province').selectedOptions).map(option => option.value).join(',');
         const city = Array.from(document.getElementById('uniqueCities').selectedOptions).map(option => option.value).join(',');
@@ -50,10 +50,13 @@ export function applyFilterListener() {
         const minPrice = document.getElementById('min-price').value;
         const maxPrice = document.getElementById('max-price').value;
 
+        const sortOrder = document.getElementById('sortOrder').value;
+        const sortBy = document.getElementById('sortBy').value;
+
         const params = new URLSearchParams();
 
-        if (sortOrder) params.append('sorteer-orde', sortOrder);
-        if (sortBy) params.append('sorteer-op', sortBy);
+        if (startDate) params.append('aankomst', startDate);
+        if (endDate) params.append('vertrek', endDate);
 
         if (province) params.append('provincies', province);
         if (city) params.append('steden', city);
@@ -64,7 +67,11 @@ export function applyFilterListener() {
         if (minPrice) params.append('minimum-prijs-per-persoon-per-nacht', minPrice);
         if (maxPrice) params.append('maximum-prijs-per-persoon-per-nacht', maxPrice);
 
+        if (sortOrder) params.append('sorteer-orde', sortOrder);
+        if (sortBy) params.append('sorteer-op', sortBy);
+
         const finalUrl = `${api}?${params.toString()}`;
+        console.log(finalUrl);
 
         window.history.pushState({}, '', `?${params.toString()}`);
 
@@ -85,22 +92,22 @@ export function getListOfHousesByURL(url) {
 
             houses.forEach(house => {
                 let seoFriendlyName = house.houseName.toLowerCase()
-                .replace(/ /g, "-")
-                .replace(/[^a-z0-9\-]/g, "");
-                
+                    .replace(/ /g, "-")
+                    .replace(/[^a-z0-9\-]/g, "");
+
 
                 let linkToDetails = document.createElement('a');
                 linkToDetails.className = 'house-link';
                 linkToDetails.href = 'huisdetail.html?id=' + house.houseId + '&naam=' + seoFriendlyName;
-                
+
                 let outerDiv = document.createElement('div');
                 outerDiv.className = 'huisje';
 
                 let thumbnail = document.createElement('img');
                 thumbnail.alt = house.houseName;
-                
+
                 if (house.picture !== null) {
-                    thumbnail.src = `data:${house.picture.mimeType};base64,${house.picture.base64Picture}`;    
+                    thumbnail.src = `data:${house.picture.mimeType};base64,${house.picture.base64Picture}`;
                 } else {
                     thumbnail.src = './images/notAvailable.png';
                 }
@@ -143,8 +150,8 @@ export function getListOfHousesByURL(url) {
 export function applyFiltersFromUrl() {
     const params = new URLSearchParams(window.location.search);
 
-    const sortOrder = params.get('sorteer-orde');
-    const sortBy = params.get('sorteer-op');
+    const startDate = params.get('aankomst');
+    const endDate = params.get('vertrek');
     const provinces = params.get('provincies');
     const cities = params.get('steden');
     const types = params.get('huis-typen');
@@ -152,9 +159,11 @@ export function applyFiltersFromUrl() {
     const rooms = params.get('aantal-kamers');
     const minPrice = params.get('minimum-prijs-per-persoon-per-nacht');
     const maxPrice = params.get('maximum-prijs-per-persoon-per-nacht');
+    const sortOrder = params.get('sorteer-orde');
+    const sortBy = params.get('sorteer-op');
 
-    if (sortOrder) document.getElementById('sortOrder').value = sortOrder;
-    if (sortBy) document.getElementById('sortBy').value = sortBy;
+    if (startDate) document.getElementById('startDate').value = startDate;
+    if (endDate) document.getElementById('endDate').value = endDate;
 
     if (provinces) setSelectedOptions('province', provinces);
     if (cities) setSelectedOptions('uniqueCities', cities);
@@ -164,6 +173,9 @@ export function applyFiltersFromUrl() {
     if (rooms) document.getElementById('rooms').value = rooms;
     if (minPrice) document.getElementById('min-price').value = minPrice;
     if (maxPrice) document.getElementById('max-price').value = maxPrice;
+
+    if (sortOrder) document.getElementById('sortOrder').value = sortOrder;
+    if (sortBy) document.getElementById('sortBy').value = sortBy;
 
     const api = '/api/houses/l/filter';
     const finalUrl = `${api}?${params.toString()}`;
@@ -177,28 +189,87 @@ export function urlHasParameters() {
 }
 
 export function priceListener() {
-    let minPriceInput = document.getElementById('min-price');
-    let maxPriceInput = document.getElementById('max-price');
+    const minPriceInput = document.getElementById('min-price');
+    const maxPriceInput = document.getElementById('max-price');
 
-    document.getElementById('min-price').addEventListener('change', function() {
+    minPriceInput.addEventListener('change', function () {
         let minPrice = parseInt(this.value);
-        
+
         if (minPrice > parseInt(maxPriceInput.value)) {
             showToast('Minimumprijs kan niet hoger dan maximumprijs zijn');
             minPriceInput.value = parseInt(maxPriceInput.value);
         }
-    
+
     });
 
-    document.getElementById('max-price').addEventListener('change', function() {
+    maxPriceInput.addEventListener('change', function () {
         let maxPrice = parseInt(this.value);
 
         if (maxPrice < parseInt(minPriceInput.value)) {
             showToast('Maximumprijs kan niet lager dan minimumprijs zijn');
             maxPriceInput.value = parseInt(minPriceInput.value);
         }
-        
+
     });
+}
+
+export function dateListener() {
+    const startDateElement = document.getElementById('startDate');
+    const endDateElement = document.getElementById('endDate');
+
+    startDateElement.addEventListener('change', function () {
+        let startDate = new Date(startDateElement.value);
+        let endDate = new Date(endDateElement.value);
+
+        if (startDate >= endDate) {
+            let correctedDate = new Date(endDate);
+            correctedDate.setDate(endDate.getDate() - 1);
+
+            startDateElement.value = correctedDate.toISOString().split('T')[0];
+
+            showToast('Aankomst kan niet na of op dezelfde dag als vertrek plaatsvinden');
+        }
+
+        if (endDateElement.value == '') {
+            let newEndDate = new Date(startDate);
+            newEndDate.setDate(startDate.getDate() + 1);
+
+            endDateElement.value = newEndDate.toISOString().split('T')[0];
+        }
+    });
+
+    endDateElement.addEventListener('change', function () {
+        let startDate = new Date(startDateElement.value);
+        let endDate = new Date(endDateElement.value);
+
+        if (endDate <= startDate) {
+            let correctedDate = new Date(startDate);
+            correctedDate.setDate(startDate.getDate() + 1);
+
+            endDateElement.value = correctedDate.toISOString().split('T')[0];
+
+            showToast('Vertrek kan niet voor of op dezelfde dag als aankomst plaatsvinden');
+        }
+
+        if (startDateElement.value == '') {
+            let newEndDate = new Date(endDate);
+            newEndDate.setDate(endDate.getDate() + - 1);
+
+            startDateElement.value = newEndDate.toISOString().split('T')[0];
+        }
+    });
+}
+
+export function setTodayAsMinValueDateInput() {
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+
+    const todayYYYYMMDD = today.toISOString().split('T')[0];
+    const tomorrowYYYYMMDD = tomorrow.toISOString().split('T')[0];
+
+    document.getElementById('startDate').setAttribute('min', todayYYYYMMDD);
+    document.getElementById('endDate').setAttribute('min', tomorrowYYYYMMDD);
 }
 
 // TODO works on province but not plaats and type :/
@@ -247,4 +318,3 @@ function amountOfHousesStringSwitch(parentElement, amountOfHouses) {
             parentElement.appendChild(amountOfHousesDiv);
     }
 }
-
