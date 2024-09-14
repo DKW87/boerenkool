@@ -44,6 +44,7 @@ public class HouseFilter {
     private String sortOrder; // ASC or DESC
     private int limit; // used to determine how many results you want per page
     private int offset; // if you go to page 2 and result limit is 10, offset will become 10 (to hide page 1 results)
+    private boolean count; // returns the amount of records found
 
     private HouseFilter(Builder builder) {
         this.startDate = builder.startDate;
@@ -60,6 +61,7 @@ public class HouseFilter {
         this.sortOrder = builder.sortOrder;
         this.limit = builder.limit;
         this.offset = builder.offset;
+        this.count = builder.count;
     }
 
     // getters
@@ -120,6 +122,10 @@ public class HouseFilter {
         return offset;
     }
 
+    public boolean getCount() {
+        return count;
+    }
+
     public static class Builder {
 
         private LocalDate startDate;
@@ -136,6 +142,7 @@ public class HouseFilter {
         private String sortOrder;
         private int limit;
         private int offset;
+        private boolean count;
 
         public Builder setStartDate(LocalDate startDate) {
             this.startDate = startDate;
@@ -218,6 +225,11 @@ public class HouseFilter {
             if (offset > 0) {
                 this.offset = offset;
             }
+            return this;
+        }
+
+        public Builder setCount(boolean count) {
+            this.count = count;
             return this;
         }
 

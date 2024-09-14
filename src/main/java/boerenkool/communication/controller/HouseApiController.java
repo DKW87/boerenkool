@@ -118,14 +118,15 @@ public class HouseApiController {
             @RequestParam(name = "maximum-prijs-per-persoon-per-nacht", required = false, defaultValue = "0") int maxPricePPPD,
             @RequestParam(name = "sorteer-op", required = false, defaultValue = "houseId") String sortBy,
             @RequestParam(name = "sorteer-orde", required = false, defaultValue = "DESC") String sortOrder,
-            @RequestParam(required = false, defaultValue = "12") int limit,
-            @RequestParam(required = false, defaultValue = "0") int offset) {
+            @RequestParam(name = "limit", required = false, defaultValue = "12") int limit,
+            @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
+            @RequestParam(name = "count", required = false, defaultValue = "false") boolean count) {
 
         LocalDate startDateParsed = null;
         LocalDate endDateParsed = null;
 
         if (!startDate.isEmpty()) startDateParsed = LocalDate.parse(startDate);
-        if (!endDate.isBlank()) endDateParsed = LocalDate.parse(endDate);
+        if (!endDate.isEmpty()) endDateParsed = LocalDate.parse(endDate);
 
         HouseFilter filter = new HouseFilter.Builder()
                 .setStartDate(startDateParsed)
@@ -142,13 +143,18 @@ public class HouseApiController {
                 .setSortOrder(sortOrder)
                 .setLimit(limit)
                 .setOffset(offset)
+                .setCount(count)
                 .build();
 
-        List<HouseListDTO> filteredHouses = houseService.getFilteredListOfHouses(filter);
+        if (count) {
+            return new ResponseEntity<>(houseService.countFilteredListOfHouses(filter), HttpStatus.OK);
+        } else {
+            List<HouseListDTO> filteredHouses = houseService.getFilteredListOfHouses(filter);
 
-        return filteredHouses.isEmpty()
-                ? new ResponseEntity<>(filteredHouses, HttpStatus.NO_CONTENT)
-                : new ResponseEntity<>(filteredHouses, HttpStatus.OK);
+            return filteredHouses.isEmpty()
+                    ? new ResponseEntity<>(filteredHouses, HttpStatus.NO_CONTENT)
+                    : new ResponseEntity<>(filteredHouses, HttpStatus.OK);
+        }
     }
 
     @PostMapping(value = "/new")

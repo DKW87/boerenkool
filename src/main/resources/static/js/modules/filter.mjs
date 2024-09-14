@@ -88,7 +88,10 @@ export function getListOfHousesByURL(url) {
         .then(response => response.json())
         .then(houses => {
 
-            amountOfHousesStringSwitch(parentElement, houses.length);
+            let amountOfHousesDiv = document.createElement('div');
+            amountOfHousesDiv.className = 'amount-of-houses';
+            parentElement.appendChild(amountOfHousesDiv);
+            amountOfHousesStringSwitch(amountOfHousesDiv);
 
             houses.forEach(house => {
                 let seoFriendlyName = house.houseName.toLowerCase()
@@ -301,20 +304,33 @@ function createPageNumbers(parentElement) {
     parentElement.appendChild(pageNumbersDiv);
 }
 
-function amountOfHousesStringSwitch(parentElement, amountOfHouses) {
-    let amountOfHousesDiv = document.createElement('div');
-    amountOfHousesDiv.className = 'amount-of-houses';
+function amountOfHousesStringSwitch(element) {
+    const api = '/api/houses/l/filter?count=true&';
+    const params = new URLSearchParams(window.location.search);
+    const url = api + params.toString();
 
-    switch (amountOfHouses) {
-        case undefined:
-            amountOfHousesDiv.innerHTML = 'Geen huisjes gevonden. Verbreed je zoekcriteria en probeer het opnieuw.';
-            parentElement.appendChild(amountOfHousesDiv);
-            break;
-        case 1:
-            amountOfHousesDiv.innerHTML = '<b>' + amountOfHouses + '</b> geurig huisje gevonden om te boeken. Wees er snel bij!';
-            parentElement.appendChild(amountOfHousesDiv);
-        default:
-            amountOfHousesDiv.innerHTML = '<b>' + amountOfHouses + '</b> geurige huisjes gevonden om te boeken!';
-            parentElement.appendChild(amountOfHousesDiv);
-    }
+    console.log(url);
+
+    fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Netwerkreactie was niet ok.');
+            } else {
+                return response.text();
+            }
+
+        })
+        .then(data => {
+
+            switch (data) {
+                case 0:
+                    element.innerHTML = 'Geen huisjes gevonden. Verbreed je zoekcriteria en probeer het opnieuw.';
+                    break;
+                case 1:
+                    element.innerHTML = '<b>' + data + '</b> geurig huisje gevonden om te boeken. Wees er snel bij!';
+                default:
+                    element.innerHTML = '<b>' + data + '</b> geurige huisjes gevonden om te boeken!';
+            }
+        })
 }
+

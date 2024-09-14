@@ -71,10 +71,26 @@ public class JdbcHouseDAO implements HouseDAO {
         addPriceFilter(sql, params, filter);
         addOrderByClause(sql, filter);
         addLimitOffset(sql, params, filter);
-        System.out.println("Final sql string was: " + sql.toString());
-        System.out.println("Final parameters were: " + params.toString());
 
         return jdbcTemplate.query(sql.toString(), new HouseMapper(), params.toArray());
+    }
+
+    @Override
+    public int countHousesWithFilter(HouseFilter filter) {
+        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM House AS house WHERE 1=1" +
+                " AND house.isNotAvailable = 0");
+        List<Object> params = new ArrayList<>();
+
+        addDateFilter(sql, params, filter);
+        addProvinceFilter(sql, params, filter);
+        addCityFilter(sql, params, filter);
+        addHouseTypeFilter(sql, params, filter);
+        addHouseOwnerFilter(sql, params, filter);
+        addGuestFilter(sql, params, filter);
+        addRoomCountFilter(sql, params, filter);
+        addPriceFilter(sql, params, filter);
+
+        return jdbcTemplate.queryForObject(sql.toString(), Integer.class, params.toArray());
     }
 
     @Override
@@ -82,7 +98,7 @@ public class JdbcHouseDAO implements HouseDAO {
         String sql = "SELECT * FROM House WHERE houseId = ?";
         try {
             House house = jdbcTemplate.queryForObject(sql, new HouseMapper(), id);
-            System.out.println("HouseDAO heeft gegevens uit DB gehaald");
+            System.out.println("HouseDAO heeft eenmalig gegevens uit DB gehaald");
             return Optional.ofNullable(house);
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();

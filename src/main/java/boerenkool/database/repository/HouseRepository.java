@@ -105,6 +105,10 @@ public class HouseRepository {
         return allHouses;
     }
 
+    public int countHousesWithFilter(HouseFilter filter) {
+        return houseDAO.countHousesWithFilter(filter);
+    }
+
     public List<String> getUniqueCities() {
         return houseDAO.getUniqueCities();
     }
