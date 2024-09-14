@@ -9,38 +9,38 @@ Main.loadHeader();
 loadLeftSidebar();
 Main.loadFooter();
 
-function loadLeftSidebar() {
+async function loadLeftSidebar() {
     const leftSidebar = document.getElementById("left-sidebar");
     if (leftSidebar) {
-        fetch('templates/filter.html')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Netwerkreactie was niet ok.');
-                }
-                return response.text();
-            })
-            .then(data => {
-                leftSidebar.innerHTML = data;
-                Filter.getUniqueCities();
-                Filter.getHouseTypes();
-                if (Filter.urlHasParameters()) {
-                    Filter.applyFiltersFromUrl();
-                }
-                else {
-                    const defaultList = '/api/houses/l/filter';
-                    Filter.getListOfHousesByURL(defaultList);
-                }
-                Filter.setTodayAsMinValueDateInput();
-                Filter.dateListener();
-                Filter.applyFilterListener();
-                Filter.priceListener();
-            })
-            .catch(error => {
-                console.error('Er is een probleem opgetreden met fetch:', error);
-            });
+        try {
+            const response = await fetch('templates/filter.html');
+            if (!response.ok) {
+                throw new Error('Netwerkreactie was niet ok.');
+            }
+            const data = await response.text();
+            leftSidebar.innerHTML = data;
+
+            await Filter.getUniqueCities();
+            await Filter.getHouseTypes();
+
+            Filter.setTodayAsMinValueDateInput();
+            Filter.dateListener();
+            Filter.applyFilterListener();
+            Filter.priceListener();
+
+            if (Filter.urlHasParameters()) {
+                Filter.applyFiltersFromUrl();
+            } else {
+                const defaultList = '/api/houses/l/filter';
+                Filter.getListOfHousesByURL(defaultList);
+            }
+        } catch (error) {
+            console.error('Er is een probleem opgetreden:', error);
+        }
     } else {
         console.error('Element met ID "left-sidebar" niet gevonden.');
     }
 }
+
 
 

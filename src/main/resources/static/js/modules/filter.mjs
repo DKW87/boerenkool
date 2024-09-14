@@ -2,36 +2,42 @@
 
 import { showToast } from './notification.mjs';
 
-export function getUniqueCities() {
+export async function getUniqueCities() {
     const parentElement = document.getElementById('uniqueCities');
-
-    fetch('/api/houses/cities')
-        .then(response => response.json())
-        .then(data => {
-            data.forEach(city => {
-                let option = document.createElement('option');
-                option.value = city;
-                option.textContent = city;
-                parentElement.appendChild(option);
-            });
-        })
-        .catch(error => console.error('Error:', error));
+    try {
+        const response = await fetch('/api/houses/cities');
+        if (!response.ok) {
+            throw new Error('Netwerkreactie was niet ok.');
+        }
+        const data = await response.json();
+        data.forEach(city => {
+            let option = document.createElement('option');
+            option.value = city;
+            option.textContent = city;
+            parentElement.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Error:', error);
+    }
 }
 
-export function getHouseTypes() {
+export async function getHouseTypes() {
     const parentElement = document.getElementById('houseTypes');
-
-    fetch('/api/houses/types')
-        .then(response => response.json())
-        .then(data => {
-            data.forEach(houseType => {
-                let option = document.createElement('option');
-                option.value = houseType.houseTypeId;
-                option.textContent = houseType.houseTypeName;
-                parentElement.appendChild(option);
-            });
-        })
-        .catch(error => console.error('Error:', error));
+    try {
+        const response = await fetch('/api/houses/types');
+        if (!response.ok) {
+            throw new Error('Netwerkreactie was niet ok.');
+        }
+        const data = await response.json();
+        data.forEach(houseType => {
+            let option = document.createElement('option');
+            option.value = houseType.houseTypeId;
+            option.textContent = houseType.houseTypeName;
+            parentElement.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Error:', error);
+    }
 }
 
 export function applyFilterListener() {
