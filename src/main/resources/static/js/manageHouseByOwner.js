@@ -7,13 +7,24 @@ Main.loadFooter();
 document.addEventListener('DOMContentLoaded', function() {
 
 
+    console.log("DOM is volledig geladen");
 
     function getHouseIdFromURL() {
         const urlParams = new URLSearchParams(window.location.search);
         return urlParams.get('id');
+        console.log("getHouseIdFromURL voltooid");
     }
 
     const id = getHouseIdFromURL();
+    console.log(id + "Dit is de constante house id: " + id);
+    setLinkHref(); // deze methode is extra om link te testen, later weghalen.
+
+    function setLinkHref() {
+        const link = document.getElementById('textLinkNaarFotos');
+        const urlForTextLink = '/managePictures.html?id=${id}';
+        link.href = urlForTextLink;
+        console.log(urlForTextLink + " Dit is de URL meegegeven aan de 'a' tag");
+    }
 
     async function getHouseById(id) {
         const url = `/api/houses/${id}`;
@@ -186,12 +197,20 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('cancelChanges').addEventListener('click', handleCancelChanges);
 
 
+
     //todo links moeten ook tijdens gemaakte wijziging een waarschuwing geven voordat je wordt doorverwezen?
-    document.getElementById('managePictures').addEventListener('click', () => window.location.href
-        = '/managePictures.html'); //todo deze link nog aanpassen naar nieuwe pagina
+    document.getElementById('managePictures').addEventListener('click', () => {
+        const houseId = getHouseIdFromURL();
+        if(houseId) {
+            window.location.href = `/managePictures.html?id=${houseId}`;
+            console.log("succes !")
+        } else {
+            console.log("kan pagina niet laden")
+        }
+    });
+
     document.getElementById('backToMyHouses').addEventListener('click', () => {
         window.location.href = '/mijn-huisjes.html';
     });
-
 
 });

@@ -5,13 +5,16 @@ Main.loadFooter();
 
 document.addEventListener('DOMContentLoaded', function() {
 
+    //todo werkt niet nog tunen, waarschijnlijk ligt het aan params. requestParams in controller updaten ??
     function getHouseIdFromURL() {
         const urlParams = new URLSearchParams(window.location.search);
         return urlParams.get('id');
     }
 
-    const id = getHouseIdFromURL()
+    // todo hardcoded op 1, url link werkte niet.
+    const id = getHouseIdFromURL();
 
+    //todo deze functie werkt.
     async function getPicturesByHouseId(id) {
         const url = `/api/pictures/houses/${id}`;
         try {
@@ -51,22 +54,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    function makePictureEditable() {
-        // verander description naar editable
-        // laat knoppen zien met opslaan en annuleren.
-        document.getElementById('pictureDescription').disabled = false;
-        document.getElementById('cancelChanges').style.display = 'inline-block'; // turn on
-        document.getElementById('saveChanges').style.display = 'inline-block'; // turn on
-
-
-
-    }
-
-    document.getElementById('editDescription').addEventListener('click', makePictureEditable());
-
-
-
-
+    //todo houseId1 geeft pictures
     getPicturesByHouseId(id).then(pictures => {
         if (pictures) {
             displayPictures(pictures);
@@ -75,6 +63,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-
+    //todo knoppen nog aanmaken.
 
 });
