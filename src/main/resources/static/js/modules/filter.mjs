@@ -332,14 +332,11 @@ function amountOfHousesStringSwitch(element) {
             switch (amountOfHouses) {
                 case 0:
                     element.innerHTML = 'Geen huisjes gevonden. Verbreed je zoekcriteria en probeer het opnieuw.';
-                    console.log('case 0');
                     break;
                 case 1:
                     element.innerHTML = '<b>' + amountOfHouses + '</b> geurig huisje gevonden om te boeken. Wees er snel bij!';
-                    console.log('case 1');
                     break;
                 default:
-                    console.log('case default');
                     element.innerHTML = '<b>' + amountOfHouses + '</b> geurige huisjes gevonden om te boeken!';
             }
         })
