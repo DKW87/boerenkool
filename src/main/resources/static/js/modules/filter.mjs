@@ -91,6 +91,7 @@ export function getListOfHousesByURL(url) {
             let amountOfHousesDiv = document.createElement('div');
             amountOfHousesDiv.className = 'amount-of-houses';
             parentElement.appendChild(amountOfHousesDiv);
+
             amountOfHousesStringSwitch(amountOfHousesDiv);
 
             houses.forEach(house => {
@@ -305,11 +306,15 @@ function createPageNumbers(parentElement) {
 }
 
 function amountOfHousesStringSwitch(element) {
-    const api = '/api/houses/l/filter?count=true&';
+    const api = '/api/houses/l/filter?count=true';
     const params = new URLSearchParams(window.location.search);
-    const url = api + params.toString();
+    let url;
 
-    console.log(url);
+    if (params.toString() === '') {
+        url = api;
+    } else {
+        url = api + '&' + params.toString();
+    }
 
     fetch(url)
         .then(response => {
@@ -322,14 +327,20 @@ function amountOfHousesStringSwitch(element) {
         })
         .then(data => {
 
-            switch (data) {
+            const amountOfHouses = parseInt(data);
+            
+            switch (amountOfHouses) {
                 case 0:
                     element.innerHTML = 'Geen huisjes gevonden. Verbreed je zoekcriteria en probeer het opnieuw.';
+                    console.log('case 0');
                     break;
                 case 1:
-                    element.innerHTML = '<b>' + data + '</b> geurig huisje gevonden om te boeken. Wees er snel bij!';
+                    element.innerHTML = '<b>' + amountOfHouses + '</b> geurig huisje gevonden om te boeken. Wees er snel bij!';
+                    console.log('case 1');
+                    break;
                 default:
-                    element.innerHTML = '<b>' + data + '</b> geurige huisjes gevonden om te boeken!';
+                    console.log('case default');
+                    element.innerHTML = '<b>' + amountOfHouses + '</b> geurige huisjes gevonden om te boeken!';
             }
         })
 }
