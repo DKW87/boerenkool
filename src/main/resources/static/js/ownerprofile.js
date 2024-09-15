@@ -140,6 +140,11 @@ async function blockUserListener() {
     document.getElementById('blockOptionLink').addEventListener('click', function(event) {
         event.preventDefault();
 
+        if (Number(houseOwnerId) === Number(userId)) {
+            showToast('Je kan jezelf niet blokkeren!');
+            return;
+        }
+
         if (houseOwnerIsBlocked) {
             unblockUser(houseOwnerId, userId, token);
             blockOptionLabel.innerHTML = `Blokkeer ${houseOwnerUsername}`;
