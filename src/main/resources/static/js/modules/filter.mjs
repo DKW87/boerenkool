@@ -80,7 +80,6 @@ export function applyFilterListener() {
         if (sortBy) params.append('sorteer-op', sortBy);
 
         const finalUrl = `${api}?${params.toString()}`;
-        console.log(finalUrl);
 
         window.history.pushState({}, '', `?${params.toString()}`);
 
@@ -101,7 +100,11 @@ export function getListOfHousesByURL(url) {
             amountOfHousesDiv.className = 'amount-of-houses';
             parentElement.appendChild(amountOfHousesDiv);
 
-            amountOfHousesStringSwitch(amountOfHousesDiv);
+            let amountOfHousesText = document.createElement('p');
+            amountOfHousesText.id = 'amountOfHousesText';
+            amountOfHousesDiv.appendChild(amountOfHousesText);
+
+            amountOfHousesStringSwitch(amountOfHousesText);
 
             houses.forEach(house => {
                 let seoFriendlyName = house.houseName.toLowerCase()
@@ -147,8 +150,6 @@ export function getListOfHousesByURL(url) {
                 innerDiv.appendChild(location);
                 innerDiv.appendChild(price);
             });
-
-            createPageNumbers(parentElement);
 
         })
         .catch(error => {
@@ -281,6 +282,61 @@ export function setTodayAsMinValueDateInput() {
     document.getElementById('endDate').setAttribute('min', tomorrowYYYYMMDD);
 }
 
+async function createPageNumbers() {
+    const params = new URLSearchParams(window.location.search);
+    const parentElement = document.getElementById('body');
+    const pageNumbersDiv = document.createElement('div');
+    pageNumbersDiv.className = 'page-numbers';
+    parentElement.appendChild(pageNumbersDiv);
+    const pageNumberSpan = document.createElement('span');
+    pageNumberSpan.id = 'pageNumberSpan';
+    pageNumbersDiv.appendChild(pageNumberSpan);
+
+    let pageCounter = 1; // start on page 1
+    let pageLimit = Number(params.get('limit')) || 12; // fallback to default of 12 results per page if no param
+    let offset = Number(params.get('offset')) || 0; // fallback to default of 0 if no param
+    let currentPage = (offset / pageLimit) + 1;
+
+    params.delete('limit');
+    params.delete('offset');
+
+    for (let i = 1; i < amountOfFilteredHouses; i++) {
+
+        if (i === 1) {
+            const pageNumberOne = document.createElement('label');
+            pageNumberOne.innerHTML = '1';
+
+            if (currentPage === 1) {
+                pageNumberSpan.appendChild(pageNumberOne);
+            } else {
+                const linkToPage = document.createElement('a');
+                linkToPage.href = `index.html?${params}&limit=${pageLimit}&offset=0`;
+                pageNumberSpan.appendChild(linkToPage);
+                linkToPage.appendChild(pageNumberOne);
+            }
+        } else if (i % pageLimit === 0) {
+            pageCounter++;
+
+            let separator = document.createElement('label');
+            separator.innerHTML = ' - ';
+            pageNumberSpan.appendChild(separator);
+
+            let nextPageNumber = document.createElement('label');
+            nextPageNumber.innerHTML = `${pageCounter}`;
+
+            if (pageCounter === currentPage) {
+                pageNumberSpan.appendChild(nextPageNumber);
+            } else {
+                let nextPageOffset = (pageCounter - 1) * pageLimit;
+                let linkToPage = document.createElement('a');
+                linkToPage.href = `index.html?${params}&limit=${pageLimit}&offset=${nextPageOffset}`;
+                pageNumberSpan.appendChild(linkToPage);
+                linkToPage.appendChild(nextPageNumber);
+            }
+        }
+    }
+}
+
 function setSelectedOptions(elementId, values) {
     const element = document.getElementById(elementId);
     const valueArray = values.split(',');
@@ -291,22 +347,6 @@ function setSelectedOptions(elementId, values) {
             option.selected = true;
         }
     });
-}
-
-// TODO make dynamic
-function createPageNumbers(parentElement) {
-    let pageNumbersDiv = document.createElement('div');
-    pageNumbersDiv.className = 'page-numbers';
-    pageNumbersDiv.innerHTML = `
-    <span class="individual-page-number">1</span>
-    <span class="individual-page-number">2</span>
-    <span class="individual-page-number">3</span>
-    ...
-    <span class="individual-page-number">8</span>
-    <span class="individual-page-number">9</span>
-    <span class="individual-page-number">10</span>
-    `;
-    parentElement.appendChild(pageNumbersDiv);
 }
 
 async function amountOfHousesStringSwitch(element) {
@@ -331,13 +371,14 @@ async function amountOfHousesStringSwitch(element) {
 
         switch (amountOfFilteredHouses) {
             case 0:
-                element.innerHTML = 'Geen huisjes gevonden. Verbreed je zoekcriteria en probeer het opnieuw.';
+                element.innerHTML = '0 huisjes gevonden. Verbreed je zoekcriteria en probeer het opnieuw.';
                 break;
             case 1:
                 element.innerHTML = '<b>1</b> geurig huisje gevonden om te boeken. Wees er snel bij!';
                 break;
             default:
                 element.innerHTML = '<b>' + amountOfFilteredHouses + '</b> geurige huisjes gevonden om te boeken!';
+                createPageNumbers();
         }
     } catch (error) {
         console.error('Error:', error);

@@ -23,17 +23,18 @@ async function loadLeftSidebar() {
             await Filter.getUniqueCities();
             await Filter.getHouseTypes();
 
-            Filter.setTodayAsMinValueDateInput();
-            Filter.dateListener();
-            Filter.applyFilterListener();
-            Filter.priceListener();
-
             if (Filter.urlHasParameters()) {
                 Filter.applyFiltersFromUrl();
             } else {
                 const defaultList = '/api/houses/l/filter';
                 Filter.getListOfHousesByURL(defaultList);
             }
+
+            Filter.setTodayAsMinValueDateInput();
+            Filter.dateListener();
+            Filter.applyFilterListener();
+            Filter.priceListener();
+
         } catch (error) {
             console.error('Er is een probleem opgetreden:', error);
         }
