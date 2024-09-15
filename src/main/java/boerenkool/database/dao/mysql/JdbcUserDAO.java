@@ -14,6 +14,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -49,7 +50,6 @@ public class JdbcUserDAO implements UserDAO {
     }
 
 
-
     private PreparedStatement insertUserStatement(User user, Connection connection) throws SQLException {
         PreparedStatement ps;
         ps = connection.prepareStatement(
@@ -59,7 +59,6 @@ public class JdbcUserDAO implements UserDAO {
         setCommonParameters(ps, user);
         return ps;
     }
-
 
 
     private PreparedStatement updateUserStatement(User user, Connection connection) throws SQLException {
@@ -185,6 +184,7 @@ public class JdbcUserDAO implements UserDAO {
             return Optional.of(users.get(0));
         }
     }
+
     @Override
     public Optional<User> getReceiverByMessageId(int messageId) {
         List<User> users = jdbcTemplate.query(
@@ -221,15 +221,22 @@ public class JdbcUserDAO implements UserDAO {
 
     //code Bart
     @Override
-    public Optional<List<Map<String, Object>>> getMapOfCorrespondents(int userId) {
+    public Optional<Map<Integer, String>> getMapOfCorrespondents(int userId) {
         String sql = "SELECT userId, username FROM `User` WHERE userId in " +
                 "(SELECT receiverId FROM Message WHERE senderId = ?) " +
                 "OR userId IN (SELECT senderId FROM Message WHERE receiverId = ?)";
-        List<Map<String, Object>> queryResults = jdbcTemplate.queryForList(sql, userId, userId);
-        if (queryResults.isEmpty()) {
+        HashMap<Integer, String> mappedResults = jdbcTemplate.query(sql, rs -> {
+            HashMap<Integer, String> mapRet1 = new HashMap<>();
+            while (rs.next()) {
+                mapRet1.put(rs.getInt("userId"), rs.getString("username"));
+            }
+            return mapRet1;
+        }, userId, userId);
+        // return results
+        if (mappedResults == null) {
             return Optional.empty();
         } else {
-            return Optional.of(queryResults);
+            return Optional.of(mappedResults);
         }
     }
 

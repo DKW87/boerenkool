@@ -82,7 +82,7 @@ public class UserRepository {
     }
 
     //code Bart
-    public Optional<List<Map<String, Object>>> getMapOfCorrespondents(int userId) {
+    public Optional<Map<Integer, String>> getMapOfCorrespondents(int userId) {
         return userDAO.getMapOfCorrespondents(userId);
     }
 
