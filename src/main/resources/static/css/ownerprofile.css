@@ -1,0 +1,38 @@
+a {
+    text-decoration: none;
+    color: var(--boerenkool-paars);
+}
+
+h1,
+h2 {
+    color: var(--boerenkool-paars);
+}
+
+.body-div {
+    display: flex;
+    align-items: top;
+    justify-content: center;
+}
+
+.profileOptions {
+    display: inline-block;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+.profile-outerdiv {
+    padding: 15px;
+    background-color: var(--boerenkool-grijs);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+.houses-box {
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    display: flexbox;
+    gap: 30px;
+}

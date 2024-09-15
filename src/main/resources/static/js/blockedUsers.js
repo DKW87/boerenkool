@@ -20,7 +20,7 @@ export function loadBlockedUsers(userId, token) {
 }
 
 // Functie om geblokkeerde gebruikers van de server op te halen
-function fetchBlockedUsers(userId, token) {
+export function fetchBlockedUsers(userId, token) {
     return fetch(`/api/blocked-users/${userId}`, {
         headers: { 'Authorization': token }  // Verstuur het autorisatietoken in de header
     })
@@ -130,13 +130,14 @@ function handleFetchUserError(response, username) {
 }
 
 // Functie om een gebruiker te blokkeren aan de hand van de userId
-function blockUserById(userToBlockId, userId, token) {
+export function blockUserById(userToBlockId, userId, token) {
     if (!userToBlockId || !userId) {
         console.error('Gebruikers-ID is niet gedefinieerd.');
         return null;  // Stop als een van de IDs niet is gedefinieerd
     }
 
     console.log('Blokkeren van gebruiker met userToBlockId:', userToBlockId);
+    showToast('Gebruiker is geblokkeerd.');
 
     return fetch(`/api/blocked-users/block`, {
         method: 'POST',
@@ -162,7 +163,7 @@ function handleBlockResponse(response, usernameToBlock, userId, token) {
 }
 
 // Functie om een gebruiker te deblokkeren
-function unblockUser(userToUnblockId, userId, token) {
+export function unblockUser(userToUnblockId, userId, token) {
     if (!userToUnblockId || !userId || !token) {
         console.error('Onjuiste parameters voor deblokkeeractie:', {
             userToUnblockId,

@@ -2,6 +2,9 @@
 
 import { showToast } from './notification.mjs';
 
+/* global var */
+let amountOfFilteredHouses = 0;
+
 export async function getUniqueCities() {
     const parentElement = document.getElementById('uniqueCities');
     try {
@@ -128,9 +131,6 @@ export function getListOfHousesByURL(url) {
                 let title = document.createElement('h2');
                 title.innerHTML = house.houseName;
 
-                // let type = document.createElement('p');
-                // type.innerHTML = house.houseType;
-
                 let location = document.createElement('p');
                 location.innerHTML = house.houseType + ' in ' + house.province + ', ' + house.city;
 
@@ -144,7 +144,6 @@ export function getListOfHousesByURL(url) {
                 outerDiv.appendChild(thumbnail);
                 outerDiv.appendChild(innerDiv);
                 innerDiv.appendChild(title);
-                // innerDiv.appendChild(type);
                 innerDiv.appendChild(location);
                 innerDiv.appendChild(price);
             });
@@ -282,7 +281,6 @@ export function setTodayAsMinValueDateInput() {
     document.getElementById('endDate').setAttribute('min', tomorrowYYYYMMDD);
 }
 
-// TODO works on province but not plaats and type :/
 function setSelectedOptions(elementId, values) {
     const element = document.getElementById(elementId);
     const valueArray = values.split(',');
@@ -311,7 +309,7 @@ function createPageNumbers(parentElement) {
     parentElement.appendChild(pageNumbersDiv);
 }
 
-function amountOfHousesStringSwitch(element) {
+async function amountOfHousesStringSwitch(element) {
     const api = '/api/houses/l/filter?count=true';
     const params = new URLSearchParams(window.location.search);
     let url;
@@ -322,29 +320,27 @@ function amountOfHousesStringSwitch(element) {
         url = api + '&' + params.toString();
     }
 
-    fetch(url)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Netwerkreactie was niet ok.');
-            } else {
-                return response.text();
-            }
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error('Netwerkreactie was niet ok.');
+        }
+        const data = await response.text();
 
-        })
-        .then(data => {
+        amountOfFilteredHouses = parseInt(data);
 
-            const amountOfHouses = parseInt(data);
-            
-            switch (amountOfHouses) {
-                case 0:
-                    element.innerHTML = 'Geen huisjes gevonden. Verbreed je zoekcriteria en probeer het opnieuw.';
-                    break;
-                case 1:
-                    element.innerHTML = '<b>' + amountOfHouses + '</b> geurig huisje gevonden om te boeken. Wees er snel bij!';
-                    break;
-                default:
-                    element.innerHTML = '<b>' + amountOfHouses + '</b> geurige huisjes gevonden om te boeken!';
-            }
-        })
+        switch (amountOfFilteredHouses) {
+            case 0:
+                element.innerHTML = 'Geen huisjes gevonden. Verbreed je zoekcriteria en probeer het opnieuw.';
+                break;
+            case 1:
+                element.innerHTML = '<b>1</b> geurig huisje gevonden om te boeken. Wees er snel bij!';
+                break;
+            default:
+                element.innerHTML = '<b>' + amountOfFilteredHouses + '</b> geurige huisjes gevonden om te boeken!';
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    }
 }
 
