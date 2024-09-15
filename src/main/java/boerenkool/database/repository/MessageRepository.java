@@ -78,6 +78,8 @@ public class MessageRepository {
 
     public List<Message> getAllFromSenderId(int senderId) {
         List<Message> listOfMessages = messageDAO.getAllFromSenderId(senderId);
+//        // TODO debug delete from sent messages;
+//        System.out.println("***********************listOfMessages is " + listOfMessages);
         addUsersToMessages(listOfMessages);
         return listOfMessages;
     }
