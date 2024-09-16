@@ -9,49 +9,38 @@
     <link rel="stylesheet" href="css/filter.css">
     <link rel="stylesheet" href="css/house.css">
     <link rel="stylesheet" href="css/footer.css">
-
     <link rel="stylesheet" href="css/managePictures.css">
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playwrite+BE+VLG:wght@100..400&family=Playwrite+PE:wght@100..400&display=swap" rel="stylesheet">
-
     <title>Beheer foto's</title>
 </head>
 <body>
 <div class="main-grid-area">
-
     <div class="header-div" id="header"></div><!-- loads header here -->
     <div class="left-sidebar-div" id="left-sidebar"></div><!-- loads left sidebar here -->
 
     <div class="body-div" id="body">
-            <h2>Fotos</h2>
-            <br>
-            <form id="picturesForm">
-                <br>
-                <br>
-                <div class="pictures-gallery" id="picturesGallery">
-                <div id="pictures"></div>
-                <br>
-                <br>
-
-                <div id="actionButtons">
-                    <button type="button" id="editDescription">Wijzigen</button>
-                    <button type="button" id="saveChanges" style="display:none;">Opslaan</button>
-                    <button type="button" id="cancelChanges" style="display:none;">Annuleren</button>
-                    <button type="button" id="deletePicture">Verwijderen</button>
-
-
-                    <button type="button" id="backToManageHouse">Terug naar beheren</button>
-                    <button type="button" id="backToMyHouses">Terug naar overzicht</button>
-                </div>
-            </form>
-
+        <div id="picturesContainer" class="pictures-gallery">
+            <!-- Pictures will be dynamically loaded here -->
         </div>
-        <script src="/js/managePictures.js" type="module" defer></script>
+        <!-- Action buttons -->
+        <div id="actionButtons">
+            <button type="button" id="backToManageHouse">Terug naar beheren</button>
+            <button type="button" id="backToMyHouses">Terug naar overzicht</button>
+        </div>
     </div>
-    <div class="footer-div" id="footer"></div><!-- loads footer here -->
-
 </div>
+
+<!-- Modal for displaying picture in fullscreen -->
+<div id="myModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <img src="" alt="Expanded picture">
+        <div class="modal-description"></div>
+    </div>
+</div>
+
+<script src="/js/managePictures.js" type="module" defer></script>
 </body>
 </html>

@@ -20,10 +20,10 @@ document.addEventListener('DOMContentLoaded', function() {
     setLinkHref(); // deze methode is extra om link te testen, later weghalen.
 
     function setLinkHref() {
-        const link = document.getElementById('textLinkNaarFotos');
-        const urlForTextLink = '/managePictures.html?id=${id}';
-        link.href = urlForTextLink;
-        console.log(urlForTextLink + " Dit is de URL meegegeven aan de 'a' tag");
+        // const link = document.getElementById('textLinkNaarFotos');
+        // const urlForTextLink = '/managePictures.html?id=${id}';
+        // link.href = urlForTextLink;
+        // console.log(urlForTextLink + " Dit is de URL meegegeven aan de 'a' tag");
     }
 
     async function getHouseById(id) {

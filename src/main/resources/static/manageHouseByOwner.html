@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="css/filter.css">
     <link rel="stylesheet" href="css/house.css">
     <link rel="stylesheet" href="css/footer.css">
+
     <link rel="stylesheet" href="/css/manageHouseByOwner.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -50,7 +51,12 @@
                     </select>
                 </p>
                 <p><strong>Foto's:</strong></p>
-                <div class="pictures" id="pictures"></div>
+                <div class="pictures" id="pictures">
+                    <div class="placeholder"></div>
+                    <div class="placeholder"></div>
+                    <div class="placeholder"></div>
+                    <div class="placeholder"></div>
+                </div>
                 <br>
                 <br>
                 <p><strong>Extra voorzieningen:</strong></p>
@@ -62,14 +68,10 @@
                     <button type="button" id="saveChanges" style="display:none;">Opslaan</button>
                     <button type="button" id="cancelChanges" style="display:none;">Annuleren</button>
                     <button type="button" id="deleteHouse">Verwijderen</button>
-
-
                     <button type="button" id="managePictures">Beheer foto's</button>
-                    <a id="textLinkNaarFotos" href="">beheer foto's via deze textlink</a>
                     <button type="button" id="backToMyHouses">Terug naar overzicht</button>
                 </div>
             </form>
-
         </div>
         <script src="/js/manageHouseByOwner.js" type="module" defer></script>
     </div>
