@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.net.URI;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -105,6 +106,8 @@ public class HouseApiController {
 
     @GetMapping(value = "/l/filter")
     public ResponseEntity<?> getListOfHousesByFilter(
+            @RequestParam(name = "aankomst", required = false, defaultValue = "") String startDate,
+            @RequestParam(name = "vertrek", required = false, defaultValue = "") String endDate,
             @RequestParam(name = "provincies", required = false, defaultValue = "") List<String> provinces,
             @RequestParam(name = "steden", required = false, defaultValue = "") List<String> cities,
             @RequestParam(name = "huis-typen", required = false, defaultValue = "") List<Integer> houseTypeIds,
@@ -115,10 +118,19 @@ public class HouseApiController {
             @RequestParam(name = "maximum-prijs-per-persoon-per-nacht", required = false, defaultValue = "0") int maxPricePPPD,
             @RequestParam(name = "sorteer-op", required = false, defaultValue = "houseId") String sortBy,
             @RequestParam(name = "sorteer-orde", required = false, defaultValue = "DESC") String sortOrder,
-            @RequestParam(required = false, defaultValue = "12") int limit,
-            @RequestParam(required = false, defaultValue = "0") int offset) {
+            @RequestParam(name = "limit", required = false, defaultValue = "12") int limit,
+            @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
+            @RequestParam(name = "count", required = false, defaultValue = "false") boolean count) {
+
+        LocalDate startDateParsed = null;
+        LocalDate endDateParsed = null;
+
+        if (!startDate.isEmpty()) startDateParsed = LocalDate.parse(startDate);
+        if (!endDate.isEmpty()) endDateParsed = LocalDate.parse(endDate);
 
         HouseFilter filter = new HouseFilter.Builder()
+                .setStartDate(startDateParsed)
+                .setEndDate(endDateParsed)
                 .setProvinces(provinces)
                 .setCities(cities)
                 .setHouseTypeIds(houseTypeIds)
@@ -131,13 +143,18 @@ public class HouseApiController {
                 .setSortOrder(sortOrder)
                 .setLimit(limit)
                 .setOffset(offset)
+                .setCount(count)
                 .build();
 
-        List<HouseListDTO> filteredHouses = houseService.getFilteredListOfHouses(filter);
+        if (count) {
+            return new ResponseEntity<>(houseService.countFilteredListOfHouses(filter), HttpStatus.OK);
+        } else {
+            List<HouseListDTO> filteredHouses = houseService.getFilteredListOfHouses(filter);
 
-        return filteredHouses.isEmpty()
-                ? new ResponseEntity<>(filteredHouses, HttpStatus.NO_CONTENT)
-                : new ResponseEntity<>(filteredHouses, HttpStatus.OK);
+            return filteredHouses.isEmpty()
+                    ? new ResponseEntity<>(filteredHouses, HttpStatus.NO_CONTENT)
+                    : new ResponseEntity<>(filteredHouses, HttpStatus.OK);
+        }
     }
 
     @PostMapping(value = "/new")
@@ -196,7 +213,7 @@ public class HouseApiController {
             } else if (houseOwnerId != house.getHouseOwner().getUserId()) {
                 return new ResponseEntity<>("Not authorized to delete this house", HttpStatus.FORBIDDEN);
             } else if (!reservationService.getAllReservationsByHouseId(houseId).isEmpty()) {
-              return new ResponseEntity<>("Not authorized to delete this house", HttpStatus.CONFLICT);
+              return new ResponseEntity<>("House is reserved and may not be deleted", HttpStatus.CONFLICT);
             } else {
                 return houseService.deleteHouse(houseId)
                         ? new ResponseEntity<>("Successfully deleted house", HttpStatus.OK)

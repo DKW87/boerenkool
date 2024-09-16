@@ -141,6 +141,7 @@ function updateModalImage() {
 function displayHouseDetails(house) {
     document.getElementById('houseName').textContent = house.houseName;
     document.getElementById('houseType').textContent = house.houseType.houseTypeName;
+    document.getElementById('houseOwnerUsernameLink').href = `overzicht-verhuurder.html?id=${house.houseOwnerId}`;
     document.getElementById('houseOwnerUsername').textContent = house.houseOwnerUsername;
     document.getElementById('location').textContent = `${house.streetAndNumber}, ${house.city}, ${house.province}`;
     document.getElementById('maxGuests').textContent = house.maxGuest;

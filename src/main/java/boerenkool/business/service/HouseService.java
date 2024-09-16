@@ -83,6 +83,10 @@ public class HouseService {
                 : convertListToHouseListDTO(filteredHouses);
     }
 
+    public int countFilteredListOfHouses(HouseFilter filter) {
+        return houseRepository.countHousesWithFilter(filter);
+    }
+
     public List<String> getUniqueCities() {
         return houseRepository.getUniqueCities();
     }

@@ -103,7 +103,7 @@ async function loadListOfHousesFromOwner() {
                             title.className = 'inline-text';
 
                             let typeAndLocation = document.createElement('p');
-                            typeAndLocation.innerHTML = house.houseType + ' in ' + house.province + ', ' + house.city;
+                            typeAndLocation.innerHTML = 'ID: ' + house.houseId + ' - ' + house.houseType + ' in ' + house.province + ', ' + house.city;
                             typeAndLocation.className = 'inline-text';
 
                             parentElement.appendChild(outerDiv);
@@ -116,7 +116,7 @@ async function loadListOfHousesFromOwner() {
                             urlToHouse.appendChild(title);
                             innerDiv.appendChild(typeAndLocation);
 
-                            selectAllListener();
+                            
                             deleteOneListener();
 
                         });
@@ -129,6 +129,7 @@ async function loadListOfHousesFromOwner() {
 
                         parentElement.appendChild(deleteAllButton);
 
+                        selectAllListener();
                         deleteAllButtonListener();
 
                     })
@@ -154,16 +155,38 @@ async function loadListOfHousesFromOwner() {
 
 function selectAllListener() {
     const selectAllLink = document.getElementById('selectAllLink');
-    const checkboxes = Array.from(document.querySelectorAll('input[type="checkbox"]'));
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
 
-    selectAllLink.addEventListener('click', (event) => {
+    selectAllLink.addEventListener('click', function (event) {
         event.preventDefault();
+        
+        const allChecked = Array.from(checkboxes).every(checkbox => checkbox.checked);
 
-        checkboxes.forEach(checkbox => checkbox.checked = true);
-
+        if (!allChecked) {
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = true;
+            });
+        } else {
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = false;
+            });
+        }
+        updateSelectAllText();
         updateDeleteAllButton();
     });
+
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateSelectAllText); 
+    });
 }
+
+function updateSelectAllText() {
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    const allChecked = Array.from(checkboxes).every(checkbox => checkbox.checked);
+    const selectAll = document.getElementById('selectAll');
+    selectAll.innerHTML = allChecked ? 'Deselecteer alles' : 'Selecteer alles';
+}
+
 
 function deleteAllButtonListener() {
     const checkboxes = document.querySelectorAll('input[type="checkbox"]');
