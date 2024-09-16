@@ -2,7 +2,7 @@ import { validateName, validatePhoneNumber, validateEmail, validatePassword } fr
 import * as Main from "./modules/main.mjs";
 import {showToast} from "./modules/notification.mjs";
 
-// Hoofdfunctie die wordt aangeroepen wanneer de pagina volledig is geladen
+
 document.addEventListener('DOMContentLoaded', () => {
 
     Main.loadHeader();
@@ -10,12 +10,11 @@ document.addEventListener('DOMContentLoaded', () => {
     setupFormSubmission();
 });
 
-// Set up de eventlistener voor het formulier
+
 function setupFormSubmission() {
     document.getElementById('registrationForm').addEventListener('submit', handleFormSubmission);
 }
 
-// Haalt de gebruikersgegevens uit het formulier
 function getFormData() {
     return {
         typeOfUser: document.getElementById('typeOfUser').value,
@@ -29,7 +28,6 @@ function getFormData() {
     };
 }
 
-// Valideert het formulier en geeft foutmeldingen als er iets mis is
 function validateFormData({ email, firstName, lastName, phone, password }) {
     if (!validateEmail(email)) {
         showToast("Voer een geldig e-mailadres in.");
@@ -50,7 +48,7 @@ function validateFormData({ email, firstName, lastName, phone, password }) {
     return true;
 }
 
-// Behandelt het indienen van het formulier
+
 async function handleFormSubmission(event) {
     event.preventDefault();
     const formData = getFormData();
@@ -76,7 +74,6 @@ async function handleFormSubmission(event) {
     }
 }
 
-// Verstuurt de registratiegegevens naar de server
 async function submitRegistrationData(formData) {
     const response = await fetch('/api/registration', {
         method: 'POST',

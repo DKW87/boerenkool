@@ -12,11 +12,9 @@ document.addEventListener('DOMContentLoaded', () => {
     initPage();
 });
 
-// Initialiseer de pagina en haal gebruikersprofiel op
 async function initPage() {
     console.log("DOM volledig geladen en geparsed");
 
-    // Load the header and footer
     Main.loadHeader();
     Main.loadFooter();
 
@@ -25,9 +23,6 @@ async function initPage() {
         if (!user) return;
 
         populateForm(user);
-        // Log de gebruiker en het type gebruiker
-        console.log("Gebruiker opgehaald:", user);
-        console.log("Gebruikerstype:", user.typeOfUser); // Controleer het type
 
 
         // Laad alleen de geblokkeerde gebruikers en activeer de block-knop als de gebruiker een 'Verhuurder' is
@@ -39,11 +34,8 @@ async function initPage() {
             document.getElementById('blocked-users-container').style.display = 'block';
             document.getElementById('block-user-section').style.display = 'block';
         }
-
-
         setupEventListeners(user);
 
-        // Fetch and display the wallet details
         const coinBalance = await fetchWalletDetails();
         if (coinBalance !== null) {
             document.getElementById('boerenkoolCoins').value = coinBalance;
@@ -55,7 +47,6 @@ async function initPage() {
     }
 }
 
-// Haal het gebruikersprofiel op
 async function getUserProfile() {
     try {
         console.log("Auth object:", Auth);
@@ -75,7 +66,6 @@ async function getUserProfile() {
     }
 }
 
-// Vul het formulier met gebruikersgegevens
 function populateForm(user) {
     document.getElementById('username').value = user.username;
     document.getElementById('email').value = user.email;
@@ -95,9 +85,7 @@ function populateForm(user) {
     }
 }
 
-// Event listeners instellen voor formulier en knoppen
 function setupEventListeners(user) {
-    // Controleer of user is gedefinieerd
     if (!user || !user.userId) {
         console.error("User of userId is niet gedefinieerd.");
         return;
@@ -106,7 +94,7 @@ function setupEventListeners(user) {
     document.getElementById('profileForm').addEventListener('submit', updateProfile);
     document.getElementById('deleteProfileBtn').addEventListener('click', deleteProfile);
     document.getElementById('block-user-btn').addEventListener('click', () => {
-        blockUser(user.userId, Auth.getToken());  // Geef userId door aan blockUser
+        blockUser(user.userId, Auth.getToken());
     });
     document.getElementById('logoutBtn').addEventListener('click', () => {
         Auth.logout();
@@ -114,7 +102,6 @@ function setupEventListeners(user) {
     });
 }
 
-// Functie om de profielgegevens op te halen uit het formulier
 function getProfileData() {
     return {
         username: document.getElementById('username').value,
@@ -127,7 +114,6 @@ function getProfileData() {
     };
 }
 
-// Valideer de profielgegevens
 function validateProfileData(data) {
     if (!validateName(data.firstName) || !validateName(data.lastName)) {
         showToast('Voer een geldige naam in (alleen letters).');
@@ -147,15 +133,12 @@ function validateProfileData(data) {
     return true;
 }
 
-// Profiel bijwerken
 async function updateProfile(event) {
     event.preventDefault();
 
     const profileData = getProfileData();
-
-    // Valideer de profielgegevens
     if (!validateProfileData(profileData)) {
-        return;  // Stop als de validatie faalt
+        return;
     }
 
     try {
@@ -179,7 +162,6 @@ async function updateProfile(event) {
     }
 }
 
-// Profiel verwijderen
 async function deleteProfile() {
     if (!confirm('Weet je zeker dat je je profiel wilt verwijderen? Dit kan niet ongedaan worden gemaakt.')) {
         return;
