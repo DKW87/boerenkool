@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // todo hardcoded op 1, url link werkte niet.
-    const houseId = 1;
+    const id = getHouseIdFromURL();
 
     //todo deze functie werkt.
     async function getPicturesByHouseId(id) {
@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     //todo houseId1 geeft pictures
-    getPicturesByHouseId(houseId).then(pictures => {
+    getPicturesByHouseId(id).then(pictures => {
         if (pictures) {
             displayPictures(pictures);
         } else {

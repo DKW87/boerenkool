@@ -183,9 +183,9 @@ export function priceListener() {
     document.getElementById('min-price').addEventListener('change', function() {
         let minPrice = parseInt(this.value);
         
-        if (minPrice >= parseInt(maxPriceInput.value)) {
-            showToast('Minimumprijs kan niet gelijk aan of hoger dan maximumprijs zijn');
-            minPriceInput.value = parseInt(maxPriceInput.value) - 1;
+        if (minPrice > parseInt(maxPriceInput.value)) {
+            showToast('Minimumprijs kan niet hoger dan maximumprijs zijn');
+            minPriceInput.value = parseInt(maxPriceInput.value);
         }
     
     });
@@ -193,9 +193,9 @@ export function priceListener() {
     document.getElementById('max-price').addEventListener('change', function() {
         let maxPrice = parseInt(this.value);
 
-        if (maxPrice <= parseInt(minPriceInput.value)) {
-            showToast('Maximumprijs kan niet gelijk aan of lager dan minimumprijs zijn');
-            maxPriceInput.value = parseInt(minPriceInput.value) + 1;
+        if (maxPrice < parseInt(minPriceInput.value)) {
+            showToast('Maximumprijs kan niet lager dan minimumprijs zijn');
+            maxPriceInput.value = parseInt(minPriceInput.value);
         }
         
     });

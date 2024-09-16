@@ -15,8 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -92,6 +91,25 @@ public class ReservationController {
         }
     }
 
+    @GetMapping("/calculate-cost")
+    public ResponseEntity<?> calculateCost(
+            @RequestParam LocalDate startDate,
+            @RequestParam LocalDate endDate,
+            @RequestParam int houseId,
+            @RequestParam int guestCount) {
+        try {
+            int totalCost = reservationService.calculateReservationCost(startDate, endDate, houseId, guestCount);
+
+            return new ResponseEntity<>(totalCost, HttpStatus.OK);
+
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
     // 3. PUT /api/reservations/{id} - Update a reservation
     @PutMapping("/{id}")
     public ResponseEntity<ReservationDTO> updateReservation(@PathVariable int id, @RequestBody ReservationDTO updatedReservationDTO) {
@@ -114,24 +132,6 @@ public class ReservationController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-
-    // 4. DELETE /api/reservations/{id} - Cancel a reservation
-   /* @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteReservationById(@PathVariable int id) {
-        try {
-            boolean isDeleted = reservationService.deleteReservationById(id);
-            if (isDeleted) {
-                logger.info("Deleted reservation with ID: {}", id);
-                return new ResponseEntity<>(HttpStatus.OK);
-            } else {
-                logger.warn("No reservation found with ID: {}", id);
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
-        } catch (Exception e) {
-            logger.error("Error deleting reservation", e);
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }*/
 
     @DeleteMapping("/{userId}/reservations/{reservationId}")
     public ResponseEntity<Void> deleteReservationById(@PathVariable int userId, @PathVariable int reservationId) {
@@ -167,53 +167,6 @@ public class ReservationController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-
-    // 5. DELETE /api/user/{userId}/reservations?reservationId={reservationId} - Tenant or Landlord cancels reservation
-    /*@DeleteMapping("/users/{userId}/cancel")
-    public ResponseEntity<?> cancelReservation(@PathVariable int userId, @RequestParam int reservationId) {
-        Optional<Reservation> reservation = reservationService.getReservationById(reservationId);
-
-        User user = userService.getOneById(userId).orElseThrow(() -> new RuntimeException("User not found"));
-        boolean isTenant = user.getTypeOfUser().equals("Huurder");
-
-        if (reservation.isPresent()) {
-            if (isTenant) {
-                if (reservation.get().getReservedByUser().getUserId() == userId) {
-                    boolean isDeleted = reservationService.deleteReservationById(reservationId);
-                    if (isDeleted) {
-                        logger.info("User with ID: {} canceled reservation with ID: {}", userId, reservationId);
-                        return new ResponseEntity<>("Reservation canceled by tenant successfully.", HttpStatus.OK);
-                    } else {
-                        logger.warn("Failed to cancel reservation with ID: {}", reservationId);
-                        return new ResponseEntity<>("Failed to cancel reservation.", HttpStatus.NOT_FOUND);
-                    }
-                } else {
-                    logger.warn("User with ID: {} does not have permission to cancel reservation with ID: {}", userId, reservationId);
-                    return new ResponseEntity<>("User not authorized to cancel this reservation.", HttpStatus.FORBIDDEN);
-                }
-            }
-            else {
-                House house = houseService.getOneById(reservation.get().getHouse().getHouseId());
-                if (house.getHouseOwner().getUserId() == userId) {
-                    boolean isDeleted = reservationService.deleteReservationById(reservationId);
-                    if (isDeleted) {
-                        logger.info("Landlord canceled reservation with ID: {}", reservationId);
-                        return new ResponseEntity<>("Reservation cancelled successfully by landlord.", HttpStatus.OK);
-                    } else {
-                        logger.warn("Failed to cancel reservation with ID: {}", reservationId);
-                        return new ResponseEntity<>("Failed to cancel reservation.", HttpStatus.NOT_FOUND);
-                    }
-                } else {
-                    logger.warn("Landlord cancel reservation with ID: {}",  reservationId);
-                    return new ResponseEntity<>("Landlord is not authorized to cancel this reservation.", HttpStatus.FORBIDDEN);
-                }
-            }
-        } else {
-            logger.warn("Reservation with ID: {} not found.", reservationId);
-            return new ResponseEntity<>("Reservation not found.", HttpStatus.NOT_FOUND);
-        }
-    }*/
 
     // 7. CREATE
     @PostMapping
