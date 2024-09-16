@@ -36,7 +36,7 @@ public class User {
         this.userId = userId;
         this.typeOfUser = typeOfUser != null ? typeOfUser : DEFAULT_USER;
         this.username = username;
-        this.salt = salt; 
+        this.salt = salt;
         this.hashedPassword = hashedPassword;
         this.email = email;
         this.phone = phone;
