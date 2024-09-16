@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             document.getElementById('maxGuest').textContent = `${data.maxGuest}`;
         })
         .catch(error => {
-            console.error('Error fetching house data:', error);
+            console.error('Fout bij het ophalen van huisgegevens:', error);
         });
 
     fetch(`/api/users/${user.userId}`, {
@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             document.getElementById('coinBalance').textContent = `${data.coinBalance} bkC`;
         })
         .catch(error => {
-            console.error('Error fetching user data:', error);
+            console.error('Fout bij het ophalen van gebruikersgegevens:', error);
         });
 
     // Function to calculate and display the cost
@@ -90,13 +90,12 @@ document.addEventListener('DOMContentLoaded', async function () {
                 }
 
             } catch (error) {
-                console.error('Error calculating cost:', error);
-                document.getElementById('resCalculate').textContent = 'Error calculating cost';
+                console.error('Fout bij het berekenen van de kosten:', error);
+                document.getElementById('resCalculate').textContent = 'Fout bij het berekenen van de kosten';
             }
         }
     }
 
-    // Attach event listeners to trigger cost calculation when dates change
     document.getElementById('startDate').addEventListener('change', calculateCost);
     document.getElementById('endDate').addEventListener('change', calculateCost);
 
@@ -139,7 +138,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                 }, 2000);
             })
             .catch(error => {
-                document.getElementById('reservation-result').textContent = `Error: ${error.message}`;
+                document.getElementById('reservation-result').textContent = `${error.message}`;
             });
     });
 

@@ -14,7 +14,6 @@ document.addEventListener('DOMContentLoaded', async function(){
 
 async function getAllSavedReservation() {
 
-
     fetch(`/api/reservations/reservations-by-userId/${user?.userId}`, {
         method: 'GET',
         headers: {
@@ -40,7 +39,7 @@ async function getAllSavedReservation() {
             addCancelEventListener();
         })
         .catch(error => {
-            document.getElementById('reservation-result').textContent = `Error: ${error.message}`;
+            document.getElementById('reservation-result').textContent = `${error.message}`;
         });
 }
 
@@ -49,6 +48,17 @@ function addCancelEventListener() {
     cancelButtons.forEach(cancelButton => {
 
             cancelButton.addEventListener('click', event => {
+                const endDate = new Date(event.target.getAttribute('data-enddate'));
+                const currentDate = new Date();
+
+                if (endDate < currentDate) {
+                    Swal.fire({
+                        title: "Niet toegestaan!",
+                        text: "U kunt een reservering uit het verleden niet annuleren.",
+                        icon: "error"
+                    });
+                    return;
+                }
                 Swal.fire({
                     title: "Weet u het zeker?",
                     text: "Dit kunt u niet meer ongedaan maken!",
@@ -95,7 +105,7 @@ function cancelReservation(reservationId) {
         )
 
         .catch(error => {
-            document.getElementById('reservation-result').textContent = `Error: ${error.message}`;
+            document.getElementById('reservation-result').textContent = `${error.message}`;
         });
 
 }
