@@ -162,6 +162,9 @@ public class ReservationController {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
 
+        } catch (IllegalArgumentException e) {
+            logger.warn("Error: {}", e.getMessage());
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             logger.error("Error deleting reservation", e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

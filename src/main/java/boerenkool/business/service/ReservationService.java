@@ -116,7 +116,13 @@ public class ReservationService {
     public boolean deleteReservationById(int id) {
 
         Reservation reservation = reservationRepository.getReservationById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Reservation not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Reservering niet gevonden!"));
+
+        LocalDate currentDate = LocalDate.now();
+
+        if (reservation.getEndDate().isBefore(currentDate)) {
+            throw new IllegalArgumentException("Eerdere reserveringen kunnen niet worden verwijderd!");
+        }
 
         User user = reservation.getReservedByUser();
         int totalCost = calculateReservationCost(
@@ -130,13 +136,13 @@ public class ReservationService {
         boolean updateSuccess = userRepository.updateBoerenkoolcoins(user.getUserId(), newBalance);
 
         if (!updateSuccess) {
-            throw new RuntimeException("Failed to update user balance");
+            throw new RuntimeException("Het is niet gelukt om het saldo van de gebruiker bij te werken");
         }
 
         boolean cancellationSuccess = reservationRepository.deleteReservationById(id);
 
         if (!cancellationSuccess) {
-            throw new RuntimeException("Failed to cancel reservation");
+            throw new RuntimeException("Reservering annuleren mislukt");
         }
 
         return true;
