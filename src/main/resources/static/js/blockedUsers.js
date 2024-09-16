@@ -177,8 +177,6 @@ function unblockUser(userToUnblockId, userId, token) {
         return;
     }
 
-    console.log('Deblokkeren van gebruiker met userToUnblockId:', userToUnblockId);
-
     fetch(`/api/blocked-users/unblock`, {
         method: 'POST',
         headers: {
@@ -188,7 +186,6 @@ function unblockUser(userToUnblockId, userId, token) {
         body: `userToUnblockId=${userToUnblockId}&userBlockingId=${userId}`
     })
         .then(response => {
-            console.log('Status bij het deblokkeren van gebruiker:', response.status);
             if (response.ok) {
                 showToast('Gebruiker is gedeblokkeerd.');
                 loadBlockedUsers(userId, token);  // Vernieuw de lijst van geblokkeerde gebruikers
