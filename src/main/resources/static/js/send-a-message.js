@@ -1,27 +1,19 @@
 import * as main from "./modules/main.mjs";
 import * as auth from "./modules/auth.mjs";
 import {getUsername} from "./modules/user.mjs";
-import {showNotification} from "./messages.js";
+import {showToast} from './modules/notification.mjs';
+
+// if (document.documentElement.lang === "nl") {
+    import * as lang from './languages/nl.mjs';
+// } else {
+//     import * as lang from './languages/en.mjs';
+// }
 
 main.loadHeader()
 main.loadFooter()
 
-// logged in ? continue : redirect
+// is user logged in ? continue : redirect
 await auth.checkIfLoggedIn()
-
-const PAGE_TITLE = "HuisjeBoompjeBoerenkool - Stuur een bericht"
-const SEND_A_MESSAGE = "Stuur een bericht"
-const FILL_IN_SUBJECT_FIELD = "Vul een onderwerp in"
-const FILL_IN_BODY_FIELD = "Vul een bericht in"
-const SELECT_A_USERNAME = "Selecteer een gebruikersnaam"
-const SELECT_A_RECEIVER = "Selecteer een ontvanger"
-const SEND_THIS_MESSAGE = "Verstuur dit bericht"
-const MESSAGE_SENT = "Bericht verstuurd"
-const BLOCKED_BY_RECEIVER = "U bent geblokkeerd door de ontvanger"
-const RESPONSE_ERROR = "Er is iets mis met de verbinding"
-const TO = "Aan"
-const SUBJECT = "Onderwerp"
-const BODY = "Bericht"
 
 let receiverId = {}
 let receiverName = {}
@@ -33,12 +25,12 @@ const token = auth.getToken()
 loggedInUser = await auth.getLoggedInUser(token)
 
 // replace english with user language
-document.querySelector("title").textContent = PAGE_TITLE
-document.querySelector('#headerSendMessage').textContent = SEND_A_MESSAGE
-document.querySelector('#labelForReceiverInput').textContent = TO + " :"
-document.querySelector('#labelForSubjectInput').textContent = SUBJECT + " :"
-document.querySelector('#labelForBodyInput').textContent = BODY + " :"
-document.querySelector('#sendMessageButton').textContent = SEND_THIS_MESSAGE
+document.querySelector("title").textContent = lang.PAGE_TITLE
+document.querySelector('#headerSendMessage').textContent = lang.SEND_A_MESSAGE
+document.querySelector('#labelForReceiverInput').textContent = lang.TO + " :"
+document.querySelector('#labelForSubjectInput').textContent = lang.SUBJECT + " :"
+document.querySelector('#labelForBodyInput').textContent = lang.BODY + " :"
+document.querySelector('#sendMessageButton').textContent = lang.SEND_THIS_MESSAGE
 
 await setup()
 
@@ -71,7 +63,7 @@ function addElementForReceiverUsername() {
 function addElementForReceiverDropdown() {
     const elementForReceiverDropdown = document.createElement(`div`)
     elementForReceiverDropdown.innerHTML = "<select name=\"receiverDropDown\" id=\"receiverDropDown\">\n" +
-        "<option value=\"0\">" + SELECT_A_USERNAME + "</option></select>"
+        "<option value=\"0\">" + lang.SELECT_A_USERNAME + "</option></select>"
     document.querySelector(`#receiverPlaceholder`).replaceWith(elementForReceiverDropdown)
 }
 
@@ -125,14 +117,11 @@ function checkRequiredFields() {
     const body = document.querySelector("#bodyInput").value;
 
     if (receiverId === undefined || receiverId === 0) {
-        showNotification(SELECT_A_RECEIVER)
-        window.alert(SELECT_A_RECEIVER)
+        showToast(lang.SELECT_A_RECEIVER)
     } else if (subject === null || subject === "") {
-        showNotification(FILL_IN_SUBJECT_FIELD)
-        window.alert(FILL_IN_SUBJECT_FIELD)
+        showToast(lang.FILL_IN_SUBJECT_FIELD)
     } else if (body === null || body === "") {
-        showNotification(FILL_IN_BODY_FIELD)
-        window.alert(FILL_IN_BODY_FIELD)
+        showToast(lang.FILL_IN_BODY_FIELD)
     } else {
         sendMessage(receiverId, subject, body)
     }
@@ -142,33 +131,35 @@ async function sendMessage(receiverId, subject, body) {
     const senderId = loggedInUser.userId
     const url = "/api/messages"
     const newMessage = JSON.stringify({
-            "messageId": 0,
-            "senderId": `${senderId}`,
-            "receiverId": `${receiverId}`,
-            "dateTimeSent": null,
-            "subject": `${subject}`,
-            "body": `${body}`,
-            "archivedBySender": false,
-            "readByReceiver": false,
-            "archivedByReceiver": false
-        })
+        "messageId": 0,
+        "senderId": `${senderId}`,
+        "receiverId": `${receiverId}`,
+        "dateTimeSent": null,
+        "subject": `${subject}`,
+        "body": `${body}`,
+        "archivedBySender": false,
+        "readByReceiver": false,
+        "archivedByReceiver": false
+    })
     // POST message to database
     try {
         const response = await fetch(url, {
             method: "POST",
-            headers: {"Authorization": localStorage.getItem('authToken'),
-                "Content-Type": "application/json"},
+            headers: {
+                "Authorization": localStorage.getItem('authToken'),
+                "Content-Type": "application/json"
+            },
             body: newMessage
         })
         if (response.status === 200) {
-            showNotification(MESSAGE_SENT)
+            showToast(lang.MESSAGE_SENT)
             // history.back()
         } else if (response.status === 403) {
-            showNotification(BLOCKED_BY_RECEIVER)
+            showToast(lang.BLOCKED_BY_RECEIVER)
         } else {
             new Error(`Response status: ${response.status}`)
         }
     } catch (error) {
-        showNotification(RESPONSE_ERROR + " : " + error.message)
+        showToast(lang.RESPONSE_ERROR + " : " + error.message)
     }
 }

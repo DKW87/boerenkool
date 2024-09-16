@@ -30,13 +30,15 @@
             <label for="houseName">Huis Naam</label>
             <input type="text" id="houseName" required>
 
-            <!-- House Type seçimi için select kutusu -->
-            <label for="houseType">Huis Type</label>
+            <!-- House Type selectieveld -->
+            <label for="houseTypes">Huis Type</label>
             <select id="houseTypes" required>
                 <option value="">Kies huis type</option>
             </select>
 
-            <!-- House Owner ID gizli input -->
+            <input type="hidden" id="houseTypeId" name="houseTypeId">
+
+            <!-- House Owner ID verborgen input -->
             <input type="hidden" id="houseOwner" name="houseOwnerId" value="">
 
             <label for="province">Provincie</label>
@@ -63,21 +65,7 @@
             <label for="description">Beschrijving</label>
             <textarea id="description" rows="4" required></textarea>
 
-            <!-- Fotoğraf Yükleme Alanı -->
-            <label for="housePictures">Foto's Uploaden</label>
-            <input type="file" id="housePictures" multiple>
-
-            <!-- Fotoğraf Önizleme Alanı -->
-            <div id="imagePreview" class="image-preview"></div>
-
-            <!-- Modal (Büyütülmüş resim gösterimi için) -->
-            <div id="imageModal" class="modal">
-                <span class="close">&times;</span>
-                <img class="modal-content" id="modalImage">
-                <div id="caption"></div>
-            </div>
-
-            <!-- Beschikbaarheid İkili Anahtar -->
+            <!-- Beschikbaarheid Toggle -->
             <label for="isNotAvailable">Beschikbaarheid</label>
             <label class="switch">
                 <input type="checkbox" id="isNotAvailable">

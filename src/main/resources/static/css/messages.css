@@ -84,24 +84,24 @@ button {
     margin: 3px;
 }
 
-dialog {
-    position:fixed;
-    left: 50%;
-    top: 40%;
-    border-style: solid;
-    border-color: var(--borderGrey);
-    border-radius: 4px;
-    padding: 20px;
-}
+/*dialog {*/
+/*    position:fixed;*/
+/*    left: 50%;*/
+/*    top: 40%;*/
+/*    border-style: solid;*/
+/*    border-color: var(--borderGrey);*/
+/*    border-radius: 4px;*/
+/*    padding: 20px;*/
+/*}*/
 
-#notification {
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-    background-color: white;
-    border: 3px;
-    border-style: solid;
-    border-color: var(--boerenkool-groen);
-    border-radius: 4px;
-    text-align: center;
-}
+/*#notification {*/
+/*    position: absolute;*/
+/*    bottom: 10px;*/
+/*    right: 10px;*/
+/*    background-color: white;*/
+/*    border: 3px;*/
+/*    border-style: solid;*/
+/*    border-color: var(--boerenkool-groen);*/
+/*    border-radius: 4px;*/
+/*    text-align: center;*/
+/*}*/

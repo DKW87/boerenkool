@@ -1,0 +1,147 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+.main-grid-area {
+    display: flex; /* Tüm alanı flexbox yap */
+    flex-direction: column;
+    justify-content: flex-start; /* Başlangıçta hizala */
+    align-items: center; /* İçindeki elemanları ortala */
+    width: 100%; /* Sayfanın tamamını kapsasın */
+}
+
+.upload-container {
+    width: 40%; /* Formun genişliği */
+    margin: 50px auto; /* Sadece formu ortalar */
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+#form-header {
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    padding: 10px;
+    font-family: "Playwrite PE", cursive;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    margin: 10px 0 5px;
+}
+
+input[type="file"] {
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+button {
+    padding: 10px;
+    background-color: #718E3F;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #a975de;
+}
+
+#message {
+    margin-top: 10px;
+    color: green;
+    text-align: center;
+}
+
+.image-preview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.image-preview img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.image-preview .remove-btn {
+    display: block;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    background-color: red;
+    color: white;
+    border: none;
+    padding: 5px;
+    cursor: pointer;
+}
+
+/* Modal style */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    padding-top: 100px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.8);
+}
+
+.modal-content {
+    margin: auto;
+    display: block;
+    max-width: 80%;
+    max-height: 80%;
+}
+
+.close {
+    position: absolute;
+    top: 50px;
+    right: 50px;
+    color: white;
+    font-size: 40px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover {
+    color: #ccc;
+}
+
+
+
+.header-div, .footer-div {
+    width: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+
+
+.footer-div {
+    position: relative;
+    bottom: 0;
+    left: 0;
+    padding: 10px;
+    text-align: center;
+}
+

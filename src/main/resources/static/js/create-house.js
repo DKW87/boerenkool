@@ -1,110 +1,50 @@
-import * as Main from './modules/main.mjs'; // Header en Footer functies
-import * as Auth from './modules/auth.mjs'; // Gebruikersauthenticatie functies
+import * as Main from './modules/main.mjs';
+import * as Auth from './modules/auth.mjs';
 
 Main.loadHeader();
 Main.loadFooter();
 
-const modal = document.getElementById("imageModal");
-const modalImg = document.getElementById("modalImage");
-const captionText = document.getElementById("caption");
-const closeBtn = document.getElementsByClassName("close")[0];
-
-
-let selectedFiles = [];
-
-
-document.getElementById('housePictures').addEventListener('change', function(event) {
-    const files = event.target.files;
-    const imagePreview = document.getElementById('imagePreview');
-
-
-    for (let i = 0; i < files.length; i++) {
-        selectedFiles.push(files[i]);
-    }
-
-
-    document.querySelector('label[for="housePictures"]').innerHTML = "Meer Foto's Toevoegen";
-
-
-    updateImagePreview();
-});
-
-function updateImagePreview() {
-    const imagePreview = document.getElementById('imagePreview');
-    imagePreview.innerHTML = '';
-
-
-    selectedFiles.forEach((file, index) => {
-        const reader = new FileReader();
-
-        reader.onload = function(e) {
-            const imgElement = document.createElement('div');
-            imgElement.innerHTML = `
-                <img src="${e.target.result}" alt="${file.name}" class="preview-image">
-                <button class="remove-btn" data-index="${index}">Verwijder</button>
-            `;
-            imagePreview.appendChild(imgElement);
-
-
-            imgElement.querySelector('img').onclick = function() {
-                modal.style.display = "block";
-                modalImg.src = e.target.result;
-                captionText.innerHTML = file.name;
-            };
-
-
-            imgElement.querySelector('.remove-btn').onclick = function() {
-                removeImage(index);
-            };
-        };
-
-        reader.readAsDataURL(file);
-    });
-}
-
-
-function removeImage(index) {
-    selectedFiles.splice(index, 1);
-    updateImagePreview();
-}
-
-document.getElementById('isNotAvailable').addEventListener('change', function() {
-    const availabilityText = document.getElementById('availabilityText');
-    if (this.checked) {
-        availabilityText.textContent = 'Niet Beschikbaar';
-    } else {
-        availabilityText.textContent = 'Beschikbaar';
-    }
-});
-
-
-closeBtn.onclick = function() {
-    modal.style.display = "none";
-};
-
-
 document.addEventListener('DOMContentLoaded', async function() {
-    // Controleer of de gebruiker is ingelogd
     const user = await Auth.checkIfLoggedIn();
     if (!user) {
-        return;  // Als de gebruiker niet is ingelogd, stop de verdere verwerking
+        window.location.href = '/login.html';
+        return;
     }
 
-    // Laad de huis types
-    await loadHouseTypes();  // Dynamisch laden van de huis types
+    await loadHouseTypes();
 
-    let selectedHouseTypeId = null;
+    let selectedHouseType = null;
 
-    // Wanneer een huis type wordt geselecteerd, schrijf het geselecteerde huis type ID naar het invoerveld
     document.getElementById('houseTypes').addEventListener('change', function() {
-        selectedHouseTypeId = this.value;  // Sla het geselecteerde huis type ID op
-        document.getElementById('houseTypeId').value = selectedHouseTypeId;  // Schrijf het geselecteerde ID naar het invoerveld
+        const selectedHouseTypeId = this.value;
+        const selectedHouseTypeName = this.options[this.selectedIndex].text;
+
+        selectedHouseType = {
+            houseTypeId: selectedHouseTypeId,
+            houseTypeName: selectedHouseTypeName
+        };
+
+        if (document.getElementById('houseTypeId')) {
+            document.getElementById('houseTypeId').value = selectedHouseTypeId;
+        }
     });
 
-    // Formulierverzending
+
+    const isNotAvailableCheckbox = document.getElementById('isNotAvailable');
+    const availabilityText = document.getElementById('availabilityText');
+
+
+    isNotAvailableCheckbox.addEventListener('change', function() {
+        if (isNotAvailableCheckbox.checked) {
+            availabilityText.textContent = 'Niet Beschikbaar';
+        } else {
+            availabilityText.textContent = 'Beschikbaar';
+        }
+    });
+
     const houseForm = document.getElementById('houseForm');
     houseForm.addEventListener('submit', async function(event) {
-        event.preventDefault();  // Voorkom standaard formulierverzending
+        event.preventDefault();
 
         const houseName = document.getElementById('houseName').value;
         const houseOwnerId = user.userId;
@@ -116,21 +56,16 @@ document.addEventListener('DOMContentLoaded', async function() {
         const roomCount = document.getElementById('roomCount').value;
         const pricePPPD = document.getElementById('pricePPPD').value;
         const description = document.getElementById('description').value;
-        const isNotAvailable = document.getElementById('isNotAvailable').checked ? true : false;
+        const isNotAvailable = document.getElementById('isNotAvailable').checked;
 
-
-
-
-        // Controleer of een geldig huis type is geselecteerd
-        if (!selectedHouseTypeId) {
-            alert('Selecteer een geldig huis type.');
+        if (!selectedHouseType) {
+            alert('Please select a valid house type.');
             return;
         }
 
-        // Maak een JSON-object met de ingevoerde gegevens
         const houseData = {
             houseName,
-            houseTypeId: selectedHouseTypeId,  // Voeg het geselecteerde huis type ID toe
+            houseType: selectedHouseType,
             houseOwnerId,
             province,
             city,
@@ -143,71 +78,81 @@ document.addEventListener('DOMContentLoaded', async function() {
             isNotAvailable
         };
 
-        // Haal het autorisatietoken op
-        const authToken = Auth.getToken();
-        let formattedToken = authToken.length > 36 ? authToken.slice(0, 36) : authToken; // Trim het token indien nodig
-
-        // Voer de fetch-aanroep uit om het formulier te verzenden
         try {
             const response = await fetch('/api/houses/new', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': formattedToken
+                    'Authorization': Auth.getToken()
                 },
-                body: JSON.stringify(houseData)  // Verzend de gegevens in JSON-formaat
+                body: JSON.stringify(houseData)
             });
 
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`Er is een fout opgetreden: ${errorText}`);
+            const contentType = response.headers.get("content-type");
+
+            let result;
+            if (contentType && contentType.includes("application/json")) {
+                result = await response.json();
+            } else {
+                result = await response.text();
             }
 
-            const result = await response.json();
-            document.getElementById('message').textContent = `Huis succesvol aangemaakt: ID ${result.houseId}`;
+            console.log('API response:', result);
+            console.log('API response (detailed):', JSON.stringify(result, null, 2));
+
+
+            if (typeof result === "number") {
+                const houseId = result;
+                document.getElementById('message').textContent = `House successfully created: ID ${houseId}`;
+                window.location.href = `/upload-pictures.html?houseId=${houseId}`;
+            }
+
+            else if (result.houseId) {
+                document.getElementById('message').textContent = `House successfully created: ID ${result.houseId}`;
+                window.location.href = `/upload-pictures.html?houseId=${result.houseId}`;
+            } else {
+                console.error('No houseId returned from API.', result);
+                document.getElementById('message').textContent = 'No houseId returned from API.';
+            }
 
         } catch (error) {
-            console.error('Fout:', error.message);
-            document.getElementById('message').textContent = `Fout: ${error.message}`;
+            console.error('Error:', error.message);
+            document.getElementById('message').textContent = `Error: ${error.message}`;
         }
+
     });
 });
 
-// Functie om dynamisch de huis types te laden
 async function loadHouseTypes() {
-    const huisTypeSelect = document.getElementById('houseTypes');  // Selecteer het HTML-element voor de huis types
-    huisTypeSelect.innerHTML = '';  // Wis eventuele bestaande opties
+    const huisTypeSelect = document.getElementById('houseTypes');
+    huisTypeSelect.innerHTML = '';
 
     try {
-        // Voeg een laadmelding toe terwijl de gegevens worden opgehaald
         const loadingOption = document.createElement('option');
         loadingOption.value = "";
-        loadingOption.textContent = "Laden...";  // "Laden..." melding
+        loadingOption.textContent = "Loading...";
         huisTypeSelect.appendChild(loadingOption);
 
-        const response = await fetch('/api/houses/types');  // Haal de huis types op via de API
+        const response = await fetch('/api/houses/types');
         if (!response.ok) {
-            throw new Error('Huis types konden niet worden geladen.');
+            throw new Error('Unable to load house types.');
         }
-        const houseTypes = await response.json();  // Ontvang de huis types in JSON-formaat
+        const houseTypes = await response.json();
 
-        // Wis de laadmelding zodra de huis types zijn opgehaald
         huisTypeSelect.innerHTML = '';
 
-        // Voeg een standaardoptie toe
         const defaultOption = document.createElement('option');
         defaultOption.value = "";
-        defaultOption.textContent = "Kies huis type";  // "Kies huis type"
+        defaultOption.textContent = "Kies huis type";
         huisTypeSelect.appendChild(defaultOption);
 
-        // Voeg de opgehaalde huis types toe aan het select-element
         houseTypes.forEach(type => {
             const option = document.createElement('option');
-            option.value = type.houseTypeId;  // Voeg het huis type ID toe
-            option.textContent = type.houseTypeName;  // Voeg de huis type naam toe
-            huisTypeSelect.appendChild(option);  // Voeg de optie toe aan de dropdown
+            option.value = type.houseTypeId;
+            option.textContent = type.houseTypeName;
+            huisTypeSelect.appendChild(option);
         });
     } catch (error) {
-        console.error("Fout bij het laden van huis types:", error);  // Log de fout
+        console.error("Error loading house types:", error);
     }
 }
