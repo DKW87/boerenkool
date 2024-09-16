@@ -136,6 +136,11 @@ function blockUserById(userToBlockId, userId, token) {
         return null;  // Stop als een van de IDs niet is gedefinieerd
     }
 
+    if (userId === userToBlockId) {
+        showToast('Je kunt jezelf niet blokkeren.');  // Waarschuw de gebruiker als deze zichzelf probeert te blokkeren
+        return null;  // Stop de actie  als de gebruiker zichzelf probeert te blokkeren
+    }
+
     console.log('Blokkeren van gebruiker met userToBlockId:', userToBlockId);
 
     return fetch(`/api/blocked-users/block`, {

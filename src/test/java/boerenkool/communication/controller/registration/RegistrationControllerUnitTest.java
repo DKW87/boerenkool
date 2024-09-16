@@ -106,7 +106,6 @@ class RegistrationControllerUnitTest {
         assertThrows(LoginException.class, () -> registrationController.loginHandler(loginDTO));
     }
 
-    // Gevaarlijke tests
     @Test
     void testRegisterUserHandler_MissingUsername_ShouldThrowRegistrationFailedException() throws RegistrationFailedException {
         // Arrange
