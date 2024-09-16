@@ -46,7 +46,6 @@ document.addEventListener('DOMContentLoaded', function () {
     async function updateHouse(id, houseData, headers) {
         const url = `/api/houses/${id}`;
 
-        console.log({headers})
         try {
             const response = await fetch(url, {
                 method: 'PUT',
@@ -57,7 +56,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (!response.ok) {
                 throw new Error(`Response status: ${response.status}`);
             }
-            return await response.json();
+            return await response.text()
         } catch (error) {
             console.error(error.message);
         }
@@ -77,11 +76,10 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function displayHouseDetails(house) {
-
         document.getElementById('houseName').value = house.houseName || '';
         document.getElementById('houseOwnerId').value = house.houseOwnerId || '';
-        document.getElementById('houseType').value = house.houseType ? house.houseType.houseTypeName : '';
-        document.getElementById('houseOwner').value = house.houseOwner ? house.houseOwner.username : '';
+        document.getElementById('houseOwnerUsername').value = house.houseOwnerUsername || '';
+        document.getElementById('houseType').value = house.houseType ? house.houseType.houseTypeId : '';
         document.getElementById('province').value = house.province || '';
         document.getElementById('city').value = house.city || '';
         document.getElementById('streetAndNumber').value = house.streetAndNumber || '';
@@ -119,6 +117,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function makeHouseEditable() {
         document.getElementById('houseName').disabled = false;
         document.getElementById('houseType').disabled = false;
+        document.getElementById('houseType').disabled = false;
         document.getElementById('province').disabled = false;
         document.getElementById('city').disabled = false;
         document.getElementById('streetAndNumber').disabled = false;
@@ -143,13 +142,25 @@ document.addEventListener('DOMContentLoaded', function () {
         const formData = new FormData(form);
 
         // Prepare the data for sending
-        const data = Object.fromEntries(formData.entries());
+        const entries = Object.fromEntries(formData.entries());
 
-        console.log({data})
+        // Get the selected house type element
+        const houseTypeSelect = document.getElementById("houseType")
 
-        updateHouse(id, {
-            houseId: id, ...data
-        }, {
+        // Get the selected option's value (houseTypeId) and text (houseTypeName)
+        const houseTypeId = parseInt(houseTypeSelect.value);
+        const houseTypeName = houseTypeSelect.options[houseTypeSelect.selectedIndex].text;
+
+        const data = {
+            ...entries,
+            houseId: parseInt(id),
+            houseType: {
+                houseTypeId,
+                houseTypeName,
+            },
+        }
+
+        updateHouse(id,data, {
             Authorization: token
         }).then(response => {
             console.log({response})

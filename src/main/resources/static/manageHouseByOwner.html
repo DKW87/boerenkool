@@ -31,10 +31,22 @@
             <form id="houseForm">
 
                 <p><strong>Huis naam:</strong> <input type="text" id="houseName" disabled name="houseName" /></p>
-                <input type="hidden" id="houseOwnerId" disabled name="houseOwnerId" />
-                <p><strong>Huis type:</strong> <input type="text" id="houseType" disabled name="houseType" /></p>
-                <p><strong id="houseOwnerLabel">Eigenaar:</strong> <input type="text" id="houseOwner" readonly  /></p>
+                <p><strong>Huis type:</strong>
+                    <select id="houseType" name="houseType" disabled>
+                        <option value="1">Woning</option>
+                        <option value="2">Appartement</option>
+                        <option value="3">Gastenverblijf</option>
+                        <option value="4">Hotel</option>
+                        <option value="5">Villa</option>
+                        <option value="6">Bungalow</option>
+                    </select>
+
+
+                </p>
+                <p><input  type="hidden" id="houseOwnerId" readonly name="houseOwnerId" /></p>
+                <p><strong id="houseOwnerLabel">Eigenaar:</strong> <input type="text" id="houseOwnerUsername" readonly  /></p>
                 <p><strong>Provincie:</strong> <input type="text" id="province" disabled name="provincie" /></p>
+                <p><strong>BSN:</strong> <input type="text" id="bsn" disabled name="bsn" /></p>
                 <p><strong>Stad:</strong> <input type="text" id="city" disabled name="city" /></p>
                 <p><strong>Straat en huisnummer:</strong> <input type="text" id="streetAndNumber" disabled name="streetAndNumber" /></p>
                 <p><strong>Postcode:</strong> <input type="text" id="zipcode" disabled name="zipcode" /></p>

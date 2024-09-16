@@ -161,6 +161,7 @@ public class HouseService {
 
     private House convertHouseDetailsDTOToHouse(HouseDetailsDTO houseDetailsDTO) {
         House house = new House();
+        house.setHouseId(houseDetailsDTO.getHouseId());
         house.setHouseName(houseDetailsDTO.getHouseName());
         house.setHouseType(houseDetailsDTO.getHouseType());
         house.setHouseOwner(userService.getOneById(houseDetailsDTO.getHouseOwnerId())

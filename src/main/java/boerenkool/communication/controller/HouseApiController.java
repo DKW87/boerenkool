@@ -53,6 +53,12 @@ public class HouseApiController {
                 : new ResponseEntity<>(allHouses, HttpStatus.OK);
     }
 
+    /**
+     * BUG: Nadat ik een house update met de PUT dan krijg ik een response terug uit de API die geen pictures bevatten.
+     * De pictures zijn dan null. Zie https://imgur.com/a/jaWtDVY
+     * @param houseId
+     * @return
+     */
     @GetMapping(value = "/{houseId}")
     public ResponseEntity<?> getOneHouseById(@PathVariable int houseId) {
 
@@ -163,7 +169,6 @@ public class HouseApiController {
         if (optionalUser.isPresent()) {
             int houseId = house.getHouseId();
             int houseOwnerId = optionalUser.get().getUserId();
-            System.out.printf("%s, %s : %s : %s", token, houseId, house.getHouseOwnerId(), house.getHouseType());
             if (houseId <= 0 || houseOwnerId <= 0) {
                 return new ResponseEntity<>("ID's cannot not be 0 or negative", HttpStatus.BAD_REQUEST);
             } else if (house == null) {
