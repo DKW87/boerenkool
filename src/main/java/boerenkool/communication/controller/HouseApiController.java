@@ -163,7 +163,7 @@ public class HouseApiController {
         if (optionalUser.isPresent()) {
             int houseId = house.getHouseId();
             int houseOwnerId = optionalUser.get().getUserId();
-
+            System.out.printf("%s, %s : %s : %s", token, houseId, house.getHouseOwnerId(), house.getHouseType());
             if (houseId <= 0 || houseOwnerId <= 0) {
                 return new ResponseEntity<>("ID's cannot not be 0 or negative", HttpStatus.BAD_REQUEST);
             } else if (house == null) {

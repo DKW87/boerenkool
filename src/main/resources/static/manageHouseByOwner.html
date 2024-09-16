@@ -29,23 +29,25 @@
             <h2>Huis details</h2>
             <br>
             <form id="houseForm">
-                <p><strong>Huis naam:</strong> <input type="text" id="houseName" disabled /></p>
-                <p><strong>Huis type:</strong> <input type="text" id="houseType" disabled /></p>
-                <p><strong id="houseOwnerLabel">Eigenaar:</strong> <input type="text" id="houseOwner" readonly /></p>
-                <p><strong>Provincie:</strong> <input type="text" id="province" disabled /></p>
-                <p><strong>Stad:</strong> <input type="text" id="city" disabled /></p>
-                <p><strong>Straat en huisnummer:</strong> <input type="text" id="streetAndNumber" disabled /></p>
-                <p><strong>Postcode:</strong> <input type="text" id="zipcode" disabled /></p>
-                <p><strong>Max gasten:</strong> <input type="number" id="maxGuest" disabled /></p>
-                <p><strong>Aantal kamers:</strong> <input type="number" id="roomCount" disabled /></p>
-                <p><strong>Prijs per persoon, per dag:</strong> <input type="number" id="pricePPPD" disabled /></p>
-                <p><strong>Omschrijving:</strong> <textarea id="description" disabled></textarea></p>
+
+                <p><strong>Huis naam:</strong> <input type="text" id="houseName" disabled name="houseName" /></p>
+                <input type="hidden" id="houseOwnerId" disabled name="houseOwnerId" />
+                <p><strong>Huis type:</strong> <input type="text" id="houseType" disabled name="houseType" /></p>
+                <p><strong id="houseOwnerLabel">Eigenaar:</strong> <input type="text" id="houseOwner" readonly  /></p>
+                <p><strong>Provincie:</strong> <input type="text" id="province" disabled name="provincie" /></p>
+                <p><strong>Stad:</strong> <input type="text" id="city" disabled name="city" /></p>
+                <p><strong>Straat en huisnummer:</strong> <input type="text" id="streetAndNumber" disabled name="streetAndNumber" /></p>
+                <p><strong>Postcode:</strong> <input type="text" id="zipcode" disabled name="zipcode" /></p>
+                <p><strong>Max gasten:</strong> <input type="number" id="maxGuest" disabled name="maxGuest"/></p>
+                <p><strong>Aantal kamers:</strong> <input type="number" id="roomCount" disabled name="roomCount" /></p>
+                <p><strong>Prijs per persoon, per dag:</strong> <input type="number" id="pricePPPD" disabled name="pricePPPD"  /></p>
+                <p><strong>Omschrijving:</strong> <textarea id="description" disabled name="description"></textarea></p>
                 <br>
                 <br>
                 <br>
                 <br>
                 <p><strong>Beschikbaarheid:</strong>
-                    <select id="isNotAvailable" disabled>
+                    <select id="isNotAvailable" disabled name="isNotAvailable">
                         <option value="false">Beschikbaar</option>
                         <option value="true">Niet beschikbaar</option>
                     </select>
