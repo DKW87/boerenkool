@@ -35,7 +35,7 @@ public class JdbcUserDAO implements UserDAO {
         ps.setString(1, user.getTypeOfUser());
         ps.setString(2, user.getUsername());
         ps.setString(3, user.getHashedPassword());
-        ps.setString(4, user.getSalt()); // Ensure salt is set here
+        ps.setString(4, user.getSalt());
         ps.setString(5, user.getFirstName());
         if (user.getInfix() != null) {
             ps.setString(6, user.getInfix());
@@ -70,7 +70,7 @@ public class JdbcUserDAO implements UserDAO {
                         " WHERE userId=?");
 
         setCommonParameters(ps, user);
-        ps.setInt(11, user.getUserId()); // Zorg ervoor dat de userId correct wordt ingesteld als de laatste parameter.
+        ps.setInt(11, user.getUserId()); // Set the userId in the WHERE clause
         return ps;
     }
 
@@ -241,7 +241,7 @@ public class JdbcUserDAO implements UserDAO {
             String typeOfUser = rs.getString("typeOfUser");
             String username = rs.getString("username");
             String hashedPassword = rs.getString("hashedPassword");
-            String salt = rs.getString("salt");  // Retrieve the salt from the ResultSet
+            String salt = rs.getString("salt");
             String firstName = rs.getString("firstName");
             String infix = rs.getString("infix");
             String lastName = rs.getString("lastName");
@@ -249,7 +249,6 @@ public class JdbcUserDAO implements UserDAO {
             String phoneNumber = rs.getString("phoneNumber");
             String email = rs.getString("emailaddress");
 
-            // Pass salt to the User constructor
             User user = new User(typeOfUser, username, hashedPassword, salt, email, phoneNumber, firstName, infix, lastName, coinBalance);
             user.setUserId(id);
             return user;

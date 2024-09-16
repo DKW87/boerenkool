@@ -6,12 +6,10 @@ import org.slf4j.LoggerFactory;
 
 import java.util.UUID;
 
-/*De TokenMemberPair klasse kan worden gebruikt in een authenticatiecontext, waar een gebruiker inlogt en een sessie of
- JWT (JSON Web Token) wordt aangemaakt. De UUID dient als een token dat de sessie identificeert, en de User is de ingelogde gebruiker .*/
+
 public class TokenUserPair {
-    //unieke sleutel met 128 bits waarde
+
     private UUID key;
-    //user geassocieerd met het token
     private User user;
 
     private final Logger logger = LoggerFactory.getLogger(TokenUserPair.class);

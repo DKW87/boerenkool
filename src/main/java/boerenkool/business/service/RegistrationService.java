@@ -134,12 +134,11 @@ public class RegistrationService {
             return true; // Gebruiker gevonden, e-mail verstuurd
         } else {
             logger.warn("User not found for email: {}", email);
-            return false; // Gebruiker niet gevonden
+            return false;
         }
     }
 
 
-    // Methode om het wachtwoord te valideren
     private boolean isValidPassword(String password) {
         String passwordRegex = "^(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{6,}$";
         return password != null && password.matches(passwordRegex);

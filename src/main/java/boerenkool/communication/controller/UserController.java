@@ -61,12 +61,6 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token or username mismatch");
     }
 
-  /*  @PostMapping
-    public ResponseEntity<Void> createOne(@RequestBody User user) {
-        userService.storeOne(user);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
-    }*/
-
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<Void> deleteOne(@PathVariable("id") int id) {
         userService.getOneById(id)
@@ -134,11 +128,7 @@ public class UserController {
 
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
-
-            // Retrieve the additional coins from the request body
             int additionalCoins = updateData.get("boerenkoolCoins");
-
-            // Update the coin balance using the service method
             boolean success = userService.updateBoerenkoolcoins(user, additionalCoins);
 
             if (success) {

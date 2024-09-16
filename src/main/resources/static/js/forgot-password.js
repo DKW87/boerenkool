@@ -8,16 +8,13 @@ document.addEventListener('DOMContentLoaded', () => {
     Main.loadHeader();
     Main.loadFooter();
 
-    // Voeg event listener toe aan de reset-knop
     setupResetPasswordHandler();
 });
 
-// Functie om de event listener voor het resetten van het wachtwoord in te stellen
 function setupResetPasswordHandler() {
     document.getElementById('resetPasswordBtn').addEventListener('click', handlePasswordReset);
 }
 
-// Functie om het resetten van het wachtwoord af te handelen
 async function handlePasswordReset() {
     const email = getEmailInputValue();
 
@@ -40,12 +37,10 @@ async function handlePasswordReset() {
     }
 }
 
-// Functie om de waarde van het e-mailveld op te halen
 function getEmailInputValue() {
     return document.getElementById('email').value;
 }
 
-// Functie om de wachtwoord reset aanvraag te versturen
 async function sendPasswordResetRequest(email) {
     return await fetch('/api/registration/reset-password', {
         method: 'POST',
@@ -54,7 +49,6 @@ async function sendPasswordResetRequest(email) {
     });
 }
 
-// Functie om de response van de server te verwerken
 async function handleResponse(response) {
     if (!response.ok) {
         // Controleer de statuscode van de response
@@ -66,7 +60,7 @@ async function handleResponse(response) {
         return;  // Stop hier, geen success melding weergeven
     }
 
-    // Als de response OK is, geef de success melding
+
     const message = await response.text();
     showToast('E-mail succesvol verstuurd. Controleer je inbox voor verdere instructies.');
 }
