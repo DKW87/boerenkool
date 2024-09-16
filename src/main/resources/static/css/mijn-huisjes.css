@@ -69,6 +69,7 @@ h1, h2 {
 }
 
 .deleteAllButton {
+    pointer-events: none;
     margin-top: 25px;
     width: 250px;
     padding: 10px;
@@ -80,6 +81,7 @@ h1, h2 {
 }
 
 .deleteAllButton.active {
+    pointer-events: all;
     background-color: rgb(210, 97, 97);
     cursor: pointer;
     color: var(--boerenkool-wit);

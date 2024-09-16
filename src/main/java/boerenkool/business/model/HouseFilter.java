@@ -1,5 +1,8 @@
 package boerenkool.business.model;
 
+import org.springframework.cglib.core.Local;
+
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -27,6 +30,8 @@ import java.util.List;
  */
 public class HouseFilter {
 
+    private LocalDate startDate;
+    private LocalDate endDate;
     private List<String> provinces;
     private List<String> cities;
     private List<Integer> houseTypeIds;
@@ -39,8 +44,11 @@ public class HouseFilter {
     private String sortOrder; // ASC or DESC
     private int limit; // used to determine how many results you want per page
     private int offset; // if you go to page 2 and result limit is 10, offset will become 10 (to hide page 1 results)
+    private boolean count; // returns the amount of records found
 
     private HouseFilter(Builder builder) {
+        this.startDate = builder.startDate;
+        this.endDate = builder.endDate;
         this.provinces = builder.provinces;
         this.cities = builder.cities;
         this.houseTypeIds = builder.houseTypeIds;
@@ -53,9 +61,18 @@ public class HouseFilter {
         this.sortOrder = builder.sortOrder;
         this.limit = builder.limit;
         this.offset = builder.offset;
+        this.count = builder.count;
     }
 
     // getters
+
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
 
     public List<String> getProvinces() {
         return provinces;
@@ -105,8 +122,14 @@ public class HouseFilter {
         return offset;
     }
 
+    public boolean getCount() {
+        return count;
+    }
+
     public static class Builder {
 
+        private LocalDate startDate;
+        private LocalDate endDate;
         private List<String> provinces;
         private List<String> cities;
         private List<Integer> houseTypeIds;
@@ -119,6 +142,17 @@ public class HouseFilter {
         private String sortOrder;
         private int limit;
         private int offset;
+        private boolean count;
+
+        public Builder setStartDate(LocalDate startDate) {
+            this.startDate = startDate;
+            return this;
+        }
+
+        public Builder setEndDate(LocalDate endDate) {
+            this.endDate = endDate;
+            return this;
+        }
 
         public Builder setProvinces(List<String> provinces) {
             this.provinces = provinces;
@@ -191,6 +225,11 @@ public class HouseFilter {
             if (offset > 0) {
                 this.offset = offset;
             }
+            return this;
+        }
+
+        public Builder setCount(boolean count) {
+            this.count = count;
             return this;
         }
 
