@@ -8,16 +8,13 @@ document.addEventListener('DOMContentLoaded', () => {
     Main.loadHeader();
     Main.loadFooter();
 
-    // Voeg event listener toe aan het wachtwoord reset formulier
     setupResetPasswordFormHandler();
 });
 
-// Functie om de event listener voor het reset-wachtwoordformulier in te stellen
 function setupResetPasswordFormHandler() {
     document.getElementById('resetPasswordForm').addEventListener('submit', handlePasswordReset);
 }
 
-// Functie om het resetten van het wachtwoord af te handelen
 async function handlePasswordReset(event) {
     event.preventDefault();
 
@@ -37,7 +34,6 @@ async function handlePasswordReset(event) {
     }
 }
 
-// Functie om de invoerwaarden voor het resetten van het wachtwoord op te halen
 function getResetPasswordInputValues() {
     return {
         email: document.getElementById('email').value,
@@ -47,7 +43,6 @@ function getResetPasswordInputValues() {
     };
 }
 
-// Functie om de geldigheid van het wachtwoord te controleren
 function isPasswordValid(newPassword, confirmPassword) {
     if (!validatePassword(newPassword)) {
         showToast("Wachtwoord moet minstens 6 tekens lang zijn en minstens één hoofdletter, één cijfer en één speciaal teken bevatten.");
@@ -62,7 +57,6 @@ function isPasswordValid(newPassword, confirmPassword) {
     return true;
 }
 
-// Functie om de wachtwoord reset aanvraag te versturen
 async function sendPasswordResetRequest(email, token, newPassword) {
     return await fetch('/api/registration/reset-password/confirm', {
         method: 'POST',
@@ -71,7 +65,6 @@ async function sendPasswordResetRequest(email, token, newPassword) {
     });
 }
 
-// Functie om de response van de server te verwerken
 function handleResetPasswordResponse(success, message) {
     if (success) {
         showToast('Wachtwoord succesvol hersteld!');
@@ -82,8 +75,6 @@ function handleResetPasswordResponse(success, message) {
 }
 
 
-
-// Functie om door te sturen naar de login pagina na succesvolle reset
 function redirectToLoginPage() {
     setTimeout(() => {
         window.location.href = '/login.html';

@@ -31,9 +31,8 @@ public class AuthorizationService {
 
 
     public TokenUserPair authorize(User user) {
-        //zoek of er al een tokenpair bestaat voor user
+
         Optional<TokenUserPair> pairOption = tokenUserPairDao.findByUser(user);
-        //verwijder het token zodat er niet versch token voor dezelfde gebruiker bestaan
         if (pairOption.isPresent()) {
             tokenUserPairDao.delete(pairOption.get().getKey());
         }
@@ -47,7 +46,6 @@ public class AuthorizationService {
     public Optional<User> validate(UUID token) {
         Optional<TokenUserPair> pair = tokenUserPairDao.findByKey(token);
         if (pair.isPresent()) {
-            //als pair bestaat retourneer de gebruiker die er bij hoort
             return Optional.of(pair.get().getUser());
         }
         return Optional.empty();
