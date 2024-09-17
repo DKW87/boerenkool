@@ -1,17 +1,11 @@
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    margin: 0;
-    padding: 0;
-    width: 100%;
-}
-
-.main-grid-area {
-    display: flex; /* Tüm alanı flexbox yap */
+.body-div {
+    background-color: var(--boerenkool-grijs); /* Global.css'te tanımlı renk değişkenini kullanın */
+    display: flex;
     flex-direction: column;
-    justify-content: flex-start; /* Başlangıçta hizala */
-    align-items: center; /* İçindeki elemanları ortala */
-    width: 100%; /* Sayfanın tamamını kapsasın */
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%; /* Sadece içerik alanı için genişlik ayarlarını yapın */
+    padding: 20px;
 }
 
 .upload-container {
@@ -28,7 +22,7 @@ body {
     margin-top: 20px;
     margin-bottom: 20px;
     padding: 10px;
-    font-family: "Playwrite PE", cursive;
+    font-family: "Playwrite PE", cursive; /* Bu font global'de tanımlı değilse bırakabilirsiniz */
 }
 
 form {
@@ -126,22 +120,3 @@ button:hover {
 .close:hover {
     color: #ccc;
 }
-
-
-
-.header-div, .footer-div {
-    width: 100%;
-    padding: 0;
-    margin: 0;
-}
-
-
-
-.footer-div {
-    position: relative;
-    bottom: 0;
-    left: 0;
-    padding: 10px;
-    text-align: center;
-}
-

@@ -1,7 +1,9 @@
 package boerenkool.communication.controller;
 
 import boerenkool.business.model.ExtraFeature;
+import boerenkool.business.model.HouseExtraFeature;
 import boerenkool.business.service.ExtraFeatureService;
+import boerenkool.business.service.HouseExtraFeatureService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,17 +20,30 @@ public class ExtraFeatureController {
 
     private final Logger logger = LoggerFactory.getLogger(ExtraFeatureController.class);
     private final ExtraFeatureService extraFeatureService;
+    private final HouseExtraFeatureService houseExtraFeatureService;
 
     @Autowired
-    public ExtraFeatureController(ExtraFeatureService extraFeatureService) {
+    public ExtraFeatureController(ExtraFeatureService extraFeatureService, HouseExtraFeatureService houseExtraFeatureService) {
         this.extraFeatureService = extraFeatureService;
+        this.houseExtraFeatureService = houseExtraFeatureService;
         logger.info("Nieuwe ExtraFeatureController aangemaakt");
     }
+
 
     @GetMapping
     public List<ExtraFeature> getAllExtraFeatures() {
         logger.info("Alle extra features ophalen");
         return extraFeatureService.getAllExtraFeatures();
+    }
+
+    @GetMapping(value = "/houses/{houseId}")
+    public ResponseEntity<List<HouseExtraFeature>> getAllFeaturesByHouseIdWithNames(@PathVariable int houseId) {
+        List<HouseExtraFeature> extraFeatures = houseExtraFeatureService.getAllFeaturesByHouseIdWithNames(houseId);
+        if (!extraFeatures.isEmpty()) {
+            return new ResponseEntity<>(extraFeatures, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
     @GetMapping(value = "/{id}")
@@ -54,6 +69,7 @@ public class ExtraFeatureController {
         }
     }
 
+
     @PutMapping(value = "/{id}")
     public ResponseEntity<?> updateExtraFeature(@PathVariable int id, @RequestBody ExtraFeature extraFeature) {
         logger.info("Extra feature bijwerken met ID: {}", id);
@@ -66,6 +82,7 @@ public class ExtraFeatureController {
         }
     }
 
+
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<?> deleteExtraFeature(@PathVariable int id) {
         logger.info("Extra feature verwijderen met ID: {}", id);
@@ -76,6 +93,7 @@ public class ExtraFeatureController {
             return new ResponseEntity<>("Mislukt om ExtraFeature te verwijderen", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 
     @GetMapping(value = "/name/{name}")
     public ResponseEntity<?> findExtraFeatureByName(@PathVariable String name) {

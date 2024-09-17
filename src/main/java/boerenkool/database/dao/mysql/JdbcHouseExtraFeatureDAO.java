@@ -82,7 +82,12 @@ public class JdbcHouseExtraFeatureDAO implements HouseExtraFeatureDAO {
 
     @Override
     public List<HouseExtraFeature> getAllFeaturesByHouseIdWithNames(int houseId) {
-        return List.of();
+        String sql = "SELECT h.houseId, h.featureId, f.extraFeatureName " +
+                "FROM HouseExtraFeature h " +
+                "JOIN ExtraFeature f ON h.featureId = f.extraFeatureId " +
+                "WHERE h.houseId = ?";
+
+        return jdbcTemplate.query(sql, new HouseExtraFeatureWithNamesRowMapper(), houseId);
     }
 
     private void insert(HouseExtraFeature houseExtraFeature) {
@@ -104,4 +109,19 @@ public class JdbcHouseExtraFeatureDAO implements HouseExtraFeatureDAO {
             return new HouseExtraFeature(houseId, featureId);
         }
     }
+
+    private static class HouseExtraFeatureWithNamesRowMapper implements RowMapper<HouseExtraFeature> {
+        @Override
+        public HouseExtraFeature mapRow(ResultSet resultSet, int rowNum) throws SQLException {
+            int houseId = resultSet.getInt("houseId");
+            int featureId = resultSet.getInt("featureId");
+            String extraFeatureName = resultSet.getString("extraFeatureName");
+
+            HouseExtraFeature houseExtraFeature = new HouseExtraFeature(houseId, featureId);
+            houseExtraFeature.setExtraFeatureName(extraFeatureName);  // Set the extra feature name
+
+            return houseExtraFeature;
+        }
+    }
+
 }
