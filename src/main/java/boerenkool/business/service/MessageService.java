@@ -50,8 +50,6 @@ public class MessageService {
     public List<MessageDTO> getAllMessages() {
         List<MessageDTO> listOfAllMessageDTOs = new ArrayList<>();
         List<Message> listOfMessages = messageRepository.getAll();
-        // convert Messages to MessageDTOs aparte methode maken
-
         for (Message message : listOfMessages) {
             listOfAllMessageDTOs.add(convertMessageToDTO(message));
         }
@@ -75,18 +73,7 @@ public class MessageService {
     }
 
     public boolean updateMessage(MessageDTO messageDTO) throws MessageDoesNotExistException {
-//        if (userId == messageDTO.getSenderId()) {
-            // the sender can update everything in the message
             return messageRepository.updateMessage(convertDTOToMessage(messageDTO));
-//        } else if (userId == messageDTO.getReceiverId()) {
-//            // the receiver can only update readByReceiver value and/or archivedByReceiver value
-//            if (messageDTO.getArchivedByReceiver()) {
-//                return messageRepository.setArchivedByReceiver(convertDTOToMessage(messageDTO));
-//            }
-//            else if (messageDTO.getReadByReceiver()) {
-//                return messageRepository.setReadByReceiver(convertDTOToMessage(messageDTO));
-//            }
-//        } else return false;
     }
 
     public boolean deleteMessage(int messageId) {
@@ -114,7 +101,6 @@ public class MessageService {
     }
 
     private MessageDTO convertMessageToDTO(Message message) {
-//        System.out.println("*********************** convertMessageToDTO message input is " + message);
         int senderId = message.getSender().getUserId();
         int receiverId = message.getReceiver().getUserId();
         return new MessageDTO(message.getMessageId(),

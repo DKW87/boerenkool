@@ -5,6 +5,7 @@ import {showToast} from './modules/notification.mjs';
 import * as sendJS from './send-a-message.js';
 import * as lang from './languages/nl.mjs';
 import {getListOfCorrespondents} from "./send-a-message.js";
+import {CONFIRMED_DELETE} from "./languages/nl.mjs";
 
 mainJS.loadHeader()
 mainJS.loadFooter()
@@ -67,7 +68,6 @@ async function setup() {
     document.querySelector('#deleteMessageButton').addEventListener('click', () => {
         showElement(`writeMessageForm`, false)
         deleteMessageHelper(displayedMessage)
-        overviewShowsInbox ? refreshInbox() : refreshOutbox()
     })
 
     document.querySelector('#answerMessageButton').addEventListener('click', () => {
@@ -276,9 +276,9 @@ async function updateMessage(message) {
         })
         if (!response.ok) {
             new Error(`Response status: ${response.status}`)
+            return false
         } else {
-            // TODO notification OK
-            // BUT readByReceiver also uses this method... damn!!!
+            return true
         }
     } catch (error) {
         console.error(error.message);
@@ -298,6 +298,9 @@ async function deleteMessage(message) {
         })
         if (!response.ok) {
             new Error(`Response status: ${response.status}`)
+            return false
+        } else {
+            return true
         }
     } catch (error) {
         console.error(error.message);
@@ -312,12 +315,21 @@ async function deleteMessageHelper(message) {
     if (message) {
         if (loggedInUser.userId === message.senderId) {
             // sender deletes message; message is deleted from database
-            await deleteMessage(message)
-            showToast(lang.CONFIRMED_DELETE)
+            if (await deleteMessage(message)) {
+                showToast(lang.CONFIRMED_DELETE)
+                outboxArray.splice(outboxArray.indexOf(displayedMessage), 1)
+                fillMessageOverview(outboxArray)
+                showElement(`messageSingleView`, false)
+            }
         } else {
             // receiver deletes message; message is marked "archivedByReceiver" using updateMessage
             message.archivedByReceiver = true
-            await updateMessage(message)
+            if (await updateMessage(message)) {
+                showToast(CONFIRMED_DELETE)
+                inboxArray.splice(inboxArray.indexOf(displayedMessage), 1)
+                fillMessageOverview(inboxArray)
+                showElement(`messageSingleView`, false)
+            }
         }
     } else {
         showToast(lang.SELECT_A_MESSAGE)
