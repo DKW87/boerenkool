@@ -1,5 +1,6 @@
 import * as Main from './modules/main.mjs';
 import * as Auth from './modules/auth.mjs';
+import {showToast} from "./modules/notification.mjs";
 
 Main.loadHeader();
 Main.loadFooter();
@@ -17,14 +18,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const id = getHouseIdFromURL();
     console.log(id + "Dit is de constante house id: " + id);
-    setLinkHref(); // deze methode is extra om link te testen, later weghalen.
-
-    function setLinkHref() {
-        // const link = document.getElementById('textLinkNaarFotos');
-        // const urlForTextLink = '/managePictures.html?id=${id}';
-        // link.href = urlForTextLink;
-        // console.log(urlForTextLink + " Dit is de URL meegegeven aan de 'a' tag");
-    }
 
     async function getHouseById(id) {
         const url = `/api/houses/${id}`;
@@ -62,14 +55,19 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    async function deleteHouse(id) {
+    async function deleteHouse(id, headers) {
         const url = `/api/houses/${id}`;
         try {
-            const response = await fetch(url, {method: 'DELETE'});
+            const response = await fetch(url, {
+                method: 'DELETE',
+                headers: {
+                    Authorization: token
+                }
+            });
             if (!response.ok) {
                 throw new Error(`Response status: ${response.status}`);
             }
-            return await response.json();
+            return await response.text();
         } catch (error) {
             console.error(error.message);
         }
@@ -80,7 +78,14 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('houseOwnerId').value = house.houseOwnerId || '';
         document.getElementById('houseOwnerUsername').value = house.houseOwnerUsername || '';
         document.getElementById('houseType').value = house.houseType ? house.houseType.houseTypeId : '';
-        document.getElementById('province').value = house.province || '';
+
+        const provinceSelect = document.getElementById('province');
+        if (house.province) {
+            provinceSelect.value = house.province;
+        } else {
+            provinceSelect.value = 'Kies een provincie';
+        }
+
         document.getElementById('city').value = house.city || '';
         document.getElementById('streetAndNumber').value = house.streetAndNumber || '';
         document.getElementById('zipcode').value = house.zipcode || '';
@@ -117,7 +122,6 @@ document.addEventListener('DOMContentLoaded', function () {
     function makeHouseEditable() {
         document.getElementById('houseName').disabled = false;
         document.getElementById('houseType').disabled = false;
-        document.getElementById('houseType').disabled = false;
         document.getElementById('province').disabled = false;
         document.getElementById('city').disabled = false;
         document.getElementById('streetAndNumber').disabled = false;
@@ -135,19 +139,17 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function handleSaveChanges() {
-        const form = document.getElementById("houseForm")
-        const id = getHouseIdFromURL()
+        if (!validateInputs()) {
+            return;
+        }
 
-        // Create a FormData object
+        const form = document.getElementById("houseForm");
+        const id = getHouseIdFromURL();
+
         const formData = new FormData(form);
-
-        // Prepare the data for sending
         const entries = Object.fromEntries(formData.entries());
 
-        // Get the selected house type element
-        const houseTypeSelect = document.getElementById("houseType")
-
-        // Get the selected option's value (houseTypeId) and text (houseTypeName)
+        const houseTypeSelect = document.getElementById("houseType");
         const houseTypeId = parseInt(houseTypeSelect.value);
         const houseTypeName = houseTypeSelect.options[houseTypeSelect.selectedIndex].text;
 
@@ -158,33 +160,36 @@ document.addEventListener('DOMContentLoaded', function () {
                 houseTypeId,
                 houseTypeName,
             },
-        }
+        };
 
-        updateHouse(id,data, {
-            Authorization: token
-        }).then(response => {
-            console.log({response})
+        updateHouse(id, data, { Authorization: token }).then(response => {
             if (response) {
-                displayHouseDetails(response);
-                alert('House details updated successfully');
-                window.location.href = '/mijn-huisjes.html';
+                showToast(response);
+                setTimeout(() => {
+                    window.location.href = '/mijn-huisjes.html';
+                }, 1000);
             }
         });
     }
+
+
 
     function handleDeleteHouse() {
         if (confirm('Are you sure you want to delete this house?')) {
             deleteHouse(id).then(response => {
                 if (response) {
-                    alert('House deleted successfully');
-                    window.location.href = '/mijn-huisjes.html';
+                    showToast(response);
+
+                    setTimeout(() => {
+                        window.location.href = '/mijn-huisjes.html';
+                    }, 1500)
+
                 }
             });
         }
     }
 
-    //todo in deze methode een popup maken of je zeker weet dat je gemaakte wijzigingen niet wilt opslaan
-    //todo unload / confirm event ??
+
     function handleCancelChanges() {
         getHouseById(id).then(house => {
             if (house) {
@@ -219,7 +224,7 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('cancelChanges').addEventListener('click', handleCancelChanges);
 
 
-    //todo links moeten ook tijdens gemaakte wijziging een waarschuwing geven voordat je wordt doorverwezen?
+
     document.getElementById('managePictures').addEventListener('click', () => {
         const houseId = getHouseIdFromURL();
         if (houseId) {
@@ -233,5 +238,64 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('backToMyHouses').addEventListener('click', () => {
         window.location.href = '/mijn-huisjes.html';
     });
+
+    function validateStreetAndNumber(value) {
+        const regex = /^[a-zA-Z]+(?:\s[a-zA-Z]+)*(?:\s\d+\s?[a-zA-Z]?)$/;
+        return regex.test(value);
+    }
+
+
+    function validateCity(value) {
+        const regex = /^[a-zA-Z\s]+$/;
+        return regex.test(value);
+    }
+
+
+    function validateInputs() {
+        const houseName = document.getElementById('houseName').value;
+        const city = document.getElementById('city').value;
+        const streetAndNumber = document.getElementById('streetAndNumber').value;
+        const maxGuest = parseInt(document.getElementById('maxGuest').value, 10);
+        const pricePPPD = parseFloat(document.getElementById('pricePPPD').value);
+        const description = document.getElementById('description').value;
+
+
+        if (houseName.length > 60) {
+            showToast('Huisnaam mag niet langer zijn dan 60 karakters.');
+            return false;
+        }
+
+
+        if (city.length > 60 || !validateCity(city)) {
+            showToast('Stad mag alleen letters bevatten en mag niet langer zijn dan 60 karakters.');
+            return false;
+        }
+
+
+        if (streetAndNumber.length > 120 || !validateStreetAndNumber(streetAndNumber)) {
+            showToast('Straatnaam moet beginnen met een woord, gevolgd door een huisnummer (bv. "Straatnaam 123").');
+            return false;
+        }
+
+
+        if (isNaN(maxGuest) || maxGuest < 1 || maxGuest > 999) {
+            showToast('Maximaal aantal gasten moet een getal zijn tussen 1 en 999.');
+            return false;
+        }
+
+
+        if (isNaN(pricePPPD) || pricePPPD < 0 || pricePPPD > 999999) {
+            showToast('PPPD moet een positief getal zijn en mag niet hoger zijn dan 999999.');
+            return false;
+        }
+
+
+        if (description.length > 255) {
+            showToast('Omschrijving mag niet langer zijn dan 255 karakters.');
+            return false;
+        }
+
+        return true;
+    }
 
 });

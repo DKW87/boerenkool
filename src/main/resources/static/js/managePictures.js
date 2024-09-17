@@ -1,10 +1,11 @@
 import * as Main from './modules/main.mjs';
 import * as Auth from './modules/auth.mjs';
+import {showToast} from "./modules/notification.mjs"; // waarschuwingen nog implementeren.
 
 Main.loadHeader();
 Main.loadFooter();
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const id = getHouseIdFromURL();
     const token = Auth.getToken();
     // const user = await Auth.getLoggedInUser(token); // functie moet async worden?
@@ -29,7 +30,6 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error('No house ID found in URL.');
     }
 
-    // functions //
     function getHouseIdFromURL() {
         const urlParams = new URLSearchParams(window.location.search);
         return urlParams.get('id');
@@ -75,12 +75,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 img.src = `data:${picture.mimeType};base64,${picture.base64Picture}`;
                 img.alt = picture.description || 'House picture';
 
-                // Add click event to show modal
                 img.addEventListener('click', () => showModal(picture));
 
                 placeholder.appendChild(img);
 
-                const description = document.createElement('div');
+                const description = document.createElement('textarea');
+                description.rows = 5;
                 description.className = 'description';
                 description.textContent = picture.description || 'No description';
 
@@ -115,7 +115,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // action buttons
     document.getElementById('backToManageHouse').addEventListener('click', () => {
         window.location.href = `manageHouseByOwner.html?id=${id}`;
     });
@@ -125,13 +124,11 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
 
-    //todo implementeer logica
-    // index wordt al meegegeven voor elke foto in de forEach loop.
     function editPicture(index) {
         alert(`Edit picture at index: ${index}`);
 
     }
-    //todo implementeer logica
+
     function deletePicture(index) {
         alert(`Delete picture at index: ${index}`);
     }
@@ -145,18 +142,18 @@ document.addEventListener('DOMContentLoaded', function() {
         modalImg.src = `data:${picture.mimeType};base64,${picture.base64Picture}`;
         modalDesc.textContent = picture.description || 'No description';
 
-        modal.style.display = 'flex'; // Show the modal
+        modal.style.display = 'flex';
     }
 
     function closeModal() {
         const modal = document.getElementById('myModal');
-        modal.style.display = 'none'; // Hide the modal
+        modal.style.display = 'none';
     }
 
-    // Event listener for the close button
+
     document.querySelector('.modal .close').addEventListener('click', closeModal);
 
-    // Close the modal when clicking outside the modal content
+
     window.addEventListener('click', (event) => {
         const modal = document.getElementById('myModal');
         if (event.target === modal) {

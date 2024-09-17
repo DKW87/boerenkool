@@ -140,3 +140,7 @@ body {
     background-color: darkgreen;
     transform: translateY(-2px);
 }
+
+.hidden {
+    display: none;
+}
