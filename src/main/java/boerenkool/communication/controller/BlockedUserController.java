@@ -47,11 +47,10 @@ public class BlockedUserController {
         try {
             List<User> blockedUsers = blockedUserService.getBlockedUsers(userId);
 
-            // Log de geblokkeerde gebruikers om te controleren of de juiste IDs worden opgehaald
             blockedUsers.forEach(user -> System.out.println("Geblokkeerde gebruiker ID: " + user.getUserId()));
 
             List<BlockedUserDTO> blockedUserDTOs = blockedUsers.stream()
-                    .map(user -> new BlockedUserDTO(user.getUserId(), user.getUsername()))  // Zorg ervoor dat userId correct wordt gezet
+                    .map(user -> new BlockedUserDTO(user.getUserId(), user.getUsername()))  // Create a BlockedUserDTO for each User
                     .collect(Collectors.toList());
 
             return new ResponseEntity<>(blockedUserDTOs, HttpStatus.OK);

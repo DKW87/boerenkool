@@ -1,6 +1,5 @@
 "use strict";
 
-// Import necessary modules
 import * as Auth from './auth.mjs';
 
 export async function fetchWalletDetails() {

@@ -1,7 +1,4 @@
 "use strict";
-
-// Existing functions in auth.mjs
-
 import {showToast} from "./notification.mjs";
 
 export async function login(username, password) {
@@ -70,8 +67,6 @@ function handleUnexpectedError(error) {
     showToast(error.message);
 }
 
-// Other existing functions
-
 export function logout() {
     localStorage.removeItem('authToken');
 }
@@ -80,7 +75,6 @@ export function getToken() {
     return localStorage.getItem('authToken');
 }
 
-// New functions to add
 
 export async function checkIfLoggedIn() {
     const token = getToken();
@@ -112,8 +106,6 @@ export async function getLoggedInUser(token) {
         return null;
     }
 }
-
-//  functie om de gebruikersnaam op te halen op basis van de UUID
 
 export async function getUsernameByToken() {
     const token = getToken();

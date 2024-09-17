@@ -58,9 +58,10 @@ public class JdbcHouseDAO implements HouseDAO {
 
     @Override
     public List<House> getHousesWithFilter(HouseFilter filter) {
-        StringBuilder sql = new StringBuilder("SELECT * FROM House WHERE 1=1 AND isNotAvailable = 0");
+        StringBuilder sql = new StringBuilder("SELECT house.* FROM House AS house WHERE 1=1 AND house.isNotAvailable = 0");
         List<Object> params = new ArrayList<>();
 
+        addDateFilter(sql, params, filter);
         addProvinceFilter(sql, params, filter);
         addCityFilter(sql, params, filter);
         addHouseTypeFilter(sql, params, filter);
@@ -70,10 +71,26 @@ public class JdbcHouseDAO implements HouseDAO {
         addPriceFilter(sql, params, filter);
         addOrderByClause(sql, filter);
         addLimitOffset(sql, params, filter);
-        System.out.println("Final sql string was: " + sql.toString());
-        System.out.println("Final parameters were: " + params.toString());
 
         return jdbcTemplate.query(sql.toString(), new HouseMapper(), params.toArray());
+    }
+
+    @Override
+    public int countHousesWithFilter(HouseFilter filter) {
+        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM House AS house WHERE 1=1" +
+                " AND house.isNotAvailable = 0");
+        List<Object> params = new ArrayList<>();
+
+        addDateFilter(sql, params, filter);
+        addProvinceFilter(sql, params, filter);
+        addCityFilter(sql, params, filter);
+        addHouseTypeFilter(sql, params, filter);
+        addHouseOwnerFilter(sql, params, filter);
+        addGuestFilter(sql, params, filter);
+        addRoomCountFilter(sql, params, filter);
+        addPriceFilter(sql, params, filter);
+
+        return jdbcTemplate.queryForObject(sql.toString(), Integer.class, params.toArray());
     }
 
     @Override
@@ -81,7 +98,7 @@ public class JdbcHouseDAO implements HouseDAO {
         String sql = "SELECT * FROM House WHERE houseId = ?";
         try {
             House house = jdbcTemplate.queryForObject(sql, new HouseMapper(), id);
-            System.out.println("HouseDAO heeft gegevens uit DB gehaald");
+            System.out.println("HouseDAO heeft eenmalig gegevens uit DB gehaald");
             return Optional.ofNullable(house);
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
@@ -116,15 +133,24 @@ public class JdbcHouseDAO implements HouseDAO {
         return recordsUpdated == 1;
     }
 
+    private void addDateFilter(StringBuilder sql, List<Object> params, HouseFilter filter) {
+        if (filter.getStartDate() != null && filter.getEndDate() != null) {
+            sql.append(" AND NOT EXISTS (SELECT 1 FROM Reservation AS reservation " +
+                    "WHERE reservation.houseId = house.houseId AND reservation.startDate < ? AND reservation.endDate > ?)");
+            params.add(filter.getEndDate());
+            params.add(filter.getStartDate());
+        }
+    }
+
     private void addProvinceFilter(StringBuilder sql, List<Object> params, HouseFilter filter) {
         if (filter.getProvinces() != null && !filter.getProvinces().isEmpty()) {
             List<String> provinces = filter.getProvinces();
 
             if (provinces.size() == 1) {
-                sql.append(" AND province = ?");
+                sql.append(" AND house.province = ?");
                 params.add(provinces.get(0));
             } else {
-                sql.append(" AND province IN (")
+                sql.append(" AND house.province IN (")
                         .append(String.join(", ", Collections.nCopies(provinces.size(), "?")))
                         .append(")");
                 params.addAll(provinces);
@@ -137,10 +163,10 @@ public class JdbcHouseDAO implements HouseDAO {
             List<String> cities = filter.getCities();
 
             if (cities.size() == 1) {
-                sql.append(" AND city = ?");
+                sql.append(" AND house.city = ?");
                 params.add(cities.get(0));
             } else {
-                sql.append(" AND city IN (")
+                sql.append(" AND house.city IN (")
                         .append(String.join(", ", Collections.nCopies(cities.size(), "?")))
                         .append(")");
                 params.addAll(cities);
@@ -153,10 +179,10 @@ public class JdbcHouseDAO implements HouseDAO {
             List<Integer> houseTypes = filter.getHouseTypeIds();
 
             if (houseTypes.size() == 1) {
-                sql.append(" AND houseTypeId = ?");
+                sql.append(" AND house.houseTypeId = ?");
                 params.add(houseTypes.get(0));
             } else {
-                sql.append(" AND houseTypeId IN (")
+                sql.append(" AND house.houseTypeId IN (")
                         .append(String.join(", ", Collections.nCopies(houseTypes.size(), "?")))
                         .append(")");
                 for (Integer type : houseTypes) {
@@ -168,21 +194,21 @@ public class JdbcHouseDAO implements HouseDAO {
 
     private void addHouseOwnerFilter(StringBuilder sql, List<Object> params, HouseFilter filter) {
         if (filter.getHouseOwnerId() > 0) {
-            sql.append(" AND houseOwnerId = ?");
+            sql.append(" AND house.houseOwnerId = ?");
             params.add(filter.getHouseOwnerId());
         }
     }
 
     private void addGuestFilter(StringBuilder sql, List<Object> params, HouseFilter filter) {
         if (filter.getAmountOfGuests() > 0) {
-            sql.append(" AND maxGuest >= ?");
+            sql.append(" AND house.maxGuest >= ?");
             params.add(filter.getAmountOfGuests());
         }
     }
 
     private void addRoomCountFilter(StringBuilder sql, List<Object> params, HouseFilter filter) {
         if (filter.getDesiredRoomCount() > 0) {
-            sql.append(" AND roomCount >= ?");
+            sql.append(" AND house.roomCount >= ?");
             params.add(filter.getDesiredRoomCount());
         }
     }
@@ -190,18 +216,18 @@ public class JdbcHouseDAO implements HouseDAO {
     private void addPriceFilter(StringBuilder sql, List<Object> params, HouseFilter filter) {
         if (filter.getMinPricePPPD() > 0 && filter.getMaxPricePPPD() > 0) {
             if (filter.getMaxPricePPPD() == filter.getMinPricePPPD()) {
-                sql.append(" AND pricePPPD = ?");
+                sql.append(" AND house.pricePPPD = ?");
                 params.add(filter.getMaxPricePPPD());
             } else {
-                sql.append(" AND pricePPPD BETWEEN ? AND ?");
+                sql.append(" AND house.pricePPPD BETWEEN ? AND ?");
                 params.add(filter.getMinPricePPPD());
                 params.add(filter.getMaxPricePPPD());
             }
         } else if (filter.getMinPricePPPD() > 0) {
-            sql.append(" AND pricePPPD >= ?");
+            sql.append(" AND house.pricePPPD >= ?");
             params.add(filter.getMinPricePPPD());
         } else if (filter.getMaxPricePPPD() > 0) {
-            sql.append(" AND pricePPPD <= ?");
+            sql.append(" AND house.pricePPPD <= ?");
             params.add(filter.getMaxPricePPPD());
         }
     }

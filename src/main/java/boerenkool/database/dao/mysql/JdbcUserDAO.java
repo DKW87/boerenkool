@@ -14,6 +14,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -35,7 +36,7 @@ public class JdbcUserDAO implements UserDAO {
         ps.setString(1, user.getTypeOfUser());
         ps.setString(2, user.getUsername());
         ps.setString(3, user.getHashedPassword());
-        ps.setString(4, user.getSalt()); // Ensure salt is set here
+        ps.setString(4, user.getSalt());
         ps.setString(5, user.getFirstName());
         if (user.getInfix() != null) {
             ps.setString(6, user.getInfix());
@@ -49,7 +50,6 @@ public class JdbcUserDAO implements UserDAO {
     }
 
 
-
     private PreparedStatement insertUserStatement(User user, Connection connection) throws SQLException {
         PreparedStatement ps;
         ps = connection.prepareStatement(
@@ -61,7 +61,6 @@ public class JdbcUserDAO implements UserDAO {
     }
 
 
-
     private PreparedStatement updateUserStatement(User user, Connection connection) throws SQLException {
         PreparedStatement ps = connection.prepareStatement(
                 "UPDATE `User` " +
@@ -70,7 +69,7 @@ public class JdbcUserDAO implements UserDAO {
                         " WHERE userId=?");
 
         setCommonParameters(ps, user);
-        ps.setInt(11, user.getUserId()); // Zorg ervoor dat de userId correct wordt ingesteld als de laatste parameter.
+        ps.setInt(11, user.getUserId()); // Set the userId in the WHERE clause
         return ps;
     }
 
@@ -185,6 +184,7 @@ public class JdbcUserDAO implements UserDAO {
             return Optional.of(users.get(0));
         }
     }
+
     @Override
     public Optional<User> getReceiverByMessageId(int messageId) {
         List<User> users = jdbcTemplate.query(
@@ -221,15 +221,22 @@ public class JdbcUserDAO implements UserDAO {
 
     //code Bart
     @Override
-    public Optional<List<Map<String, Object>>> getMapOfCorrespondents(int userId) {
+    public Optional<Map<Integer, String>> getMapOfCorrespondents(int userId) {
         String sql = "SELECT userId, username FROM `User` WHERE userId in " +
                 "(SELECT receiverId FROM Message WHERE senderId = ?) " +
                 "OR userId IN (SELECT senderId FROM Message WHERE receiverId = ?)";
-        List<Map<String, Object>> queryResults = jdbcTemplate.queryForList(sql, userId, userId);
-        if (queryResults.isEmpty()) {
+        HashMap<Integer, String> mappedResults = jdbcTemplate.query(sql, rs -> {
+            HashMap<Integer, String> mapRet1 = new HashMap<>();
+            while (rs.next()) {
+                mapRet1.put(rs.getInt("userId"), rs.getString("username"));
+            }
+            return mapRet1;
+        }, userId, userId);
+        // return results
+        if (mappedResults == null) {
             return Optional.empty();
         } else {
-            return Optional.of(queryResults);
+            return Optional.of(mappedResults);
         }
     }
 
@@ -241,7 +248,7 @@ public class JdbcUserDAO implements UserDAO {
             String typeOfUser = rs.getString("typeOfUser");
             String username = rs.getString("username");
             String hashedPassword = rs.getString("hashedPassword");
-            String salt = rs.getString("salt");  // Retrieve the salt from the ResultSet
+            String salt = rs.getString("salt");
             String firstName = rs.getString("firstName");
             String infix = rs.getString("infix");
             String lastName = rs.getString("lastName");
@@ -249,7 +256,6 @@ public class JdbcUserDAO implements UserDAO {
             String phoneNumber = rs.getString("phoneNumber");
             String email = rs.getString("emailaddress");
 
-            // Pass salt to the User constructor
             User user = new User(typeOfUser, username, hashedPassword, salt, email, phoneNumber, firstName, infix, lastName, coinBalance);
             user.setUserId(id);
             return user;
