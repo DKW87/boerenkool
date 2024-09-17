@@ -76,8 +76,12 @@ public class PasswordService {
         message.setFrom("huisjeboompjeboerenkool@gmail.com");
         message.setTo(email);
         message.setSubject("Wachtwoord resetten");
-        message.setText("Klik op de volgende link om je wachtwoord te resetten: " + BASE_URL + RESET_URL + "\nToken: " + token);
+
+        // Maak de URL voor het resetten van het wachtwoord klikbaar
+        String resetLink = BASE_URL + RESET_URL + "?token=" + token + "&email=" + email;
+        message.setText("Klik op de volgende link om je wachtwoord te resetten: " + resetLink);
         javaMailSender.send(message);
     }
+
 
 }

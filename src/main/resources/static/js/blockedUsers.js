@@ -1,7 +1,6 @@
 "use strict";
 
-import {showToast} from "./modules/notification.mjs";
-
+import { showToast } from "./modules/notification.mjs";
 
 export function loadBlockedUsers(userId, token) {
     if (!userId) {
@@ -12,7 +11,10 @@ export function loadBlockedUsers(userId, token) {
     console.log('Geblokkeerde gebruikers worden geladen voor userId:', userId);
 
     fetchBlockedUsers(userId, token)
-        .then(data => renderBlockedUsers(data, userId, token))
+        .then(data => {
+            console.log('Geblokkeerde gebruikers opgehaald:', data);
+            renderBlockedUsers(data, userId, token);
+        })
         .catch(error => console.error('Fout bij het laden van geblokkeerde gebruikers:', error));
 }
 
@@ -22,7 +24,6 @@ export function fetchBlockedUsers(userId, token) {
     })
         .then(response => {
             console.log('Status bij het laden van geblokkeerde gebruikers:', response.status);
-            // Controleer of de response ok is
             if (!response.ok) {
                 throw new Error('Kon geblokkeerde gebruikers niet laden.');
             }
@@ -30,14 +31,12 @@ export function fetchBlockedUsers(userId, token) {
         });
 }
 
-// Functie om de geblokkeerde gebruikers weer te geven op de pagina
 function renderBlockedUsers(data, userId, token) {
     const blockedUsersList = document.getElementById('blocked-users-list');
     blockedUsersList.innerHTML = '';  // Leeg de lijst voordat nieuwe items worden toegevoegd
 
     console.log('Geblokkeerde gebruikers data:', data);
 
-    // Controleer of de data een array is en niet leeg is
     if (Array.isArray(data) && data.length > 0) {
         data.forEach(user => {
             const listItem = createBlockedUserListItem(user, userId, token);
@@ -53,12 +52,11 @@ function createBlockedUserListItem(user, userId, token) {
     listItem.textContent = user.username;  // Toon de gebruikersnaam in het lijstitem
 
     const unblockButton = createUnblockButton(user.userId, userId, token);
-    listItem.appendChild(unblockButton);  // Voeg de deblokkeerknop toe aan het lijstiem
+    listItem.appendChild(unblockButton);  // Voeg de deblokkeerknop toe aan het lijstitem
 
     return listItem;
 }
 
-// Functie om een deblokkeerknop aan te maken
 function createUnblockButton(userToUnblockId, userId, token) {
     const unblockButton = document.createElement('button');
     unblockButton.textContent = 'Deblokkeer';
@@ -72,27 +70,41 @@ function createUnblockButton(userToUnblockId, userId, token) {
     return unblockButton;
 }
 
-// Functie om een gebruiker te blokkeren
-export function blockUser(userId, token) {
+export async function blockUser(userId, token) {
     const usernameToBlock = getUsernameToBlock();
     if (!usernameToBlock) return;  // Stop als er geen gebruikersnaam is opgegeven
 
     console.log('Blokkeren van gebruiker met username:', usernameToBlock);
 
-    // Haal de gebruiker op aan de hand van de gebruikersnaam
-    fetchUserByUsername(usernameToBlock, token)
-        .then(userToBlockId => {
-            if (!userToBlockId) return;  // Stop als er geen userId is gevonden
+    try {
+        // Haal eerst de lijst met geblokkeerde gebruikers op
+        const blockedUsers = await fetchBlockedUsers(userId, token);
 
-            return blockUserById(userToBlockId, userId, token);  // Blokkeer de gebruiker
-        })
-        .then(response => handleBlockResponse(response, usernameToBlock, userId, token))
-        .catch(error => console.error('Fout bij het blokkeren van gebruiker:', error));
+        // Controleer of de gebruiker al geblokkeerd is
+        const isAlreadyBlocked = blockedUsers.some(user => user.username === usernameToBlock);
+        if (isAlreadyBlocked) {
+            showToast(`${usernameToBlock} is al geblokkeerd.`);
+            return;  // Stop het blokkeerproces als de gebruiker al geblokkeerd is
+        }
+
+        // Zoek de userId van de gebruiker die geblokkeerd moet worden
+        const userToBlockId = await fetchUserByUsername(usernameToBlock, token);
+        if (!userToBlockId) return;  // Stop als er geen userId is gevonden
+
+        // Blokkeer de gebruiker
+        const response = await blockUserById(userToBlockId, userId, token);
+        if (response) {
+            handleBlockResponse(response, usernameToBlock, userId, token);
+        }
+
+    } catch (error) {
+        console.error('Fout bij het blokkeren van gebruiker:', error);
+    }
 }
 
-// Functie om de gebruikersnaam te verkrijgen die geblokkeerd moet worden
 function getUsernameToBlock() {
     const usernameToBlock = document.getElementById('user-to-block').value;
+    console.log('Gebruikersnaam om te blokkeren:', usernameToBlock);
     if (!usernameToBlock) {
         showToast('Voer een geldige gebruikersnaam in.');
     }
@@ -109,8 +121,9 @@ function fetchUserByUsername(username, token) {
                 handleFetchUserError(response, username);
                 return null;
             }
+            return response.json();  // Voeg deze regel toe om de data te retourneren
         })
-        .then(data => data ? data.userId : null);  // Retourneer de userId als deze gevonden is, anders null
+        .then(data => data ? data.userId : null);
 }
 
 function handleFetchUserError(response, username) {
@@ -121,7 +134,7 @@ function handleFetchUserError(response, username) {
     }
 }
 
-export function blockUserById(userToBlockId, userId, token) {
+export async function blockUserById(userToBlockId, userId, token) {
     if (!userToBlockId || !userId) {
         console.error('Gebruikers-ID is niet gedefinieerd.');
         return null;
@@ -133,21 +146,34 @@ export function blockUserById(userToBlockId, userId, token) {
     }
 
     console.log('Blokkeren van gebruiker met userToBlockId:', userToBlockId);
-    showToast('Gebruiker is geblokkeerd.');
 
-    return fetch(`/api/blocked-users/block`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Authorization': token
-        },
-        body: `userToBlockId=${userToBlockId}&userBlockingId=${userId}`
-    });
+    try {
+        const response = await fetch(`/api/blocked-users/block`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Authorization': token
+            },
+            body: `userToBlockId=${userToBlockId}&userBlockingId=${userId}`
+        });
+
+        if (!response.ok) {
+            throw new Error('Fout bij het blokkeren van de gebruiker.');
+        }
+
+        showToast('Gebruiker is geblokkeerd.');
+        return response;
+
+    } catch (error) {
+        console.error('Fout bij het blokkeren van gebruiker:', error);
+        showToast('Er is een fout opgetreden bij het blokkeren van de gebruiker.');
+        return null;
+    }
 }
 
 function handleBlockResponse(response, usernameToBlock, userId, token) {
+    console.log('Status bij het blokkeren van gebruiker:', response);
     if (!response) return;
-    console.log('Status bij het blokkeren van gebruiker:', response.status);
     if (response.ok) {
         showToast(`${usernameToBlock} is geblokkeerd.`);
         loadBlockedUsers(userId, token);

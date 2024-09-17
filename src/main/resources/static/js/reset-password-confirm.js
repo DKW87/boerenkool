@@ -18,7 +18,9 @@ function setupResetPasswordFormHandler() {
 async function handlePasswordReset(event) {
     event.preventDefault();
 
-    const { email, token, newPassword, confirmPassword } = getResetPasswordInputValues();
+    const { email, token } = getUrlParameters();
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
 
     if (!isPasswordValid(newPassword, confirmPassword)) {
         return;
@@ -55,6 +57,14 @@ function isPasswordValid(newPassword, confirmPassword) {
     }
 
     return true;
+}
+
+function getUrlParameters() {
+    const params = new URLSearchParams(window.location.search);
+    return {
+        token: params.get('token'),
+        email: params.get('email')
+    };
 }
 
 async function sendPasswordResetRequest(email, token, newPassword) {

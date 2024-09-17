@@ -27,8 +27,8 @@ async function initPage() {
 
         // Laad alleen de geblokkeerde gebruikers en activeer de block-knop als de gebruiker een 'Verhuurder' is
         if (user.typeOfUser === "Verhuurder") {
+            console.log("Gebruiker is een 'Verhuurder', probeer geblokkeerde gebruikers te laden.");
             loadBlockedUsers(user.userId, Auth.getToken());
-            console.log("Geblokkeerde gebruikers geladen voor 'Verhuurder'");
 
             // Toon de sectie voor geblokkeerde gebruikers en de block-knop
             document.getElementById('blocked-users-container').style.display = 'block';
@@ -94,6 +94,7 @@ function setupEventListeners(user) {
     document.getElementById('profileForm').addEventListener('submit', updateProfile);
     document.getElementById('deleteProfileBtn').addEventListener('click', deleteProfile);
     document.getElementById('block-user-btn').addEventListener('click', () => {
+        console.log('Blokkeer gebruiker knop geklikt');
         blockUser(user.userId, Auth.getToken());
     });
     document.getElementById('logoutBtn').addEventListener('click', () => {

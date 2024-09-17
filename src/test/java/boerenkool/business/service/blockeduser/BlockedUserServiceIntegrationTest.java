@@ -48,6 +48,24 @@ class BlockedUserServiceIntegrationTest {
     }
 
     @Test
+    void testBlockedUserIsCorrectlyDisplayedAfterBlocking() {
+        // Arrange: maak twee gebruikers aan
+        User userBlocking = new User(1, "Huurder", "userBlocking", "hashedPassword", "salt", "email@test.com", "phone", "First", "", "Last", 500);
+        User userToBlock = new User(2, "Huurder", "userToBlock", "hashedPassword", "salt", "email2@test.com", "phone2", "First2", "", "Last2", 500);
+
+        // Voeg de gebruikers toe aan de repository
+        userRepository.storeOne(userBlocking);
+        userRepository.storeOne(userToBlock);
+
+        // Act: Blokkeer de gebruiker
+        blockedUserService.blockUser(userToBlock.getUserId(), userBlocking.getUserId());
+
+        // Assert: Controleer of de geblokkeerde gebruiker correct wordt weergegeven in de lijst
+        List<User> blockedUsers = userRepository.getBlockedUsers(userBlocking);
+        assertTrue(blockedUsers.contains(userToBlock), "De geblokkeerde gebruiker zou in de lijst moeten staan.");
+    }
+
+    @Test
     void testUnblockUser_Integration_Success() {
         // Arrange: We voegen testdata toe en blokkeren een gebruiker
         User userBlocking = new User(1, "Huurder", "userBlocking", "hashedPassword", "salt", "email@test.com", "phone", "First", "", "Last", 500);
