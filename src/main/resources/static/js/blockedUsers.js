@@ -121,7 +121,7 @@ function handleFetchUserError(response, username) {
     }
 }
 
-function blockUserById(userToBlockId, userId, token) {
+export function blockUserById(userToBlockId, userId, token) {
     if (!userToBlockId || !userId) {
         console.error('Gebruikers-ID is niet gedefinieerd.');
         return null;
@@ -155,7 +155,7 @@ function handleBlockResponse(response, usernameToBlock, userId, token) {
     }
 }
 
-function unblockUser(userToUnblockId, userId, token) {
+export function unblockUser(userToUnblockId, userId, token) {
     if (!userToUnblockId || !userId || !token) {
         console.error('Onjuiste parameters voor deblokkeeractie:', {
             userToUnblockId,
