@@ -1,5 +1,9 @@
 import * as Main from './modules/main.mjs';
 import * as Auth from './modules/auth.mjs';
+import { showToast } from './modules/notification.mjs';
+
+
+
 
 Main.loadHeader();
 Main.loadFooter();
@@ -11,7 +15,9 @@ document.addEventListener('DOMContentLoaded', async function() {
         return;
     }
 
+
     await loadHouseTypes();
+    await loadExtraFeatures();
 
     let selectedHouseType = null;
 
@@ -29,10 +35,8 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
     });
 
-
     const isNotAvailableCheckbox = document.getElementById('isNotAvailable');
     const availabilityText = document.getElementById('availabilityText');
-
 
     isNotAvailableCheckbox.addEventListener('change', function() {
         if (isNotAvailableCheckbox.checked) {
@@ -58,6 +62,9 @@ document.addEventListener('DOMContentLoaded', async function() {
         const description = document.getElementById('description').value;
         const isNotAvailable = document.getElementById('isNotAvailable').checked;
 
+        const selectedFeatures = Array.from(document.querySelectorAll('input[name="extraFeatures"]:checked'))
+            .map(checkbox => checkbox.value);
+
         if (!selectedHouseType) {
             alert('Please select a valid house type.');
             return;
@@ -75,7 +82,8 @@ document.addEventListener('DOMContentLoaded', async function() {
             roomCount,
             pricePPPD,
             description,
-            isNotAvailable
+            isNotAvailable,
+            extraFeatures: selectedFeatures
         };
 
         try {
@@ -100,14 +108,11 @@ document.addEventListener('DOMContentLoaded', async function() {
             console.log('API response:', result);
             console.log('API response (detailed):', JSON.stringify(result, null, 2));
 
-
             if (typeof result === "number") {
                 const houseId = result;
-                document.getElementById('message').textContent = `House successfully created: ID ${houseId}`;
+                showToast(`Huis succesvol aangemaakt: ID ${houseId}`);
                 window.location.href = `/upload-pictures.html?houseId=${houseId}`;
-            }
-
-            else if (result.houseId) {
+            } else if (result.houseId) {
                 document.getElementById('message').textContent = `House successfully created: ID ${result.houseId}`;
                 window.location.href = `/upload-pictures.html?houseId=${result.houseId}`;
             } else {
@@ -119,9 +124,9 @@ document.addEventListener('DOMContentLoaded', async function() {
             console.error('Error:', error.message);
             document.getElementById('message').textContent = `Error: ${error.message}`;
         }
-
     });
 });
+
 
 async function loadHouseTypes() {
     const huisTypeSelect = document.getElementById('houseTypes');
@@ -156,3 +161,38 @@ async function loadHouseTypes() {
         console.error("Error loading house types:", error);
     }
 }
+
+async function loadExtraFeatures() {
+    const extraFeaturesContainer = document.getElementById('extraFeaturesContainer');
+
+
+    try {
+        const response = await fetch('/api/extraFeatures');
+        if (!response.ok) {
+            throw new Error('Extra kenmerken konden niet worden geladen.');
+        }
+
+        const extraFeatures = await response.json();
+
+
+        extraFeatures.forEach(feature => {
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.id = `feature_${feature.extraFeatureId}`;
+            checkbox.value = feature.extraFeatureId;
+            checkbox.name = 'extraFeatures';
+
+            const label = document.createElement('label');
+            label.for = checkbox.id;
+            label.textContent = feature.extraFeatureName;
+
+            extraFeaturesContainer.appendChild(checkbox);
+            extraFeaturesContainer.appendChild(label);
+            extraFeaturesContainer.appendChild(document.createElement('br'));
+        });
+    } catch (error) {
+        console.error("Fout bij het installeren van extra kenmerken:", error);
+    }
+}
+
+console.log(extraFeaturesContainer.innerHTML);

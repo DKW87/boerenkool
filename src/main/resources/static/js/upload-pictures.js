@@ -1,5 +1,6 @@
 import * as Main from './modules/main.mjs';
 import * as Auth from './modules/auth.mjs';
+import { showToast } from './modules/notification.mjs';
 
 Main.loadHeader();
 Main.loadFooter();
@@ -120,13 +121,13 @@ async function uploadAllPictures() {
             await uploadSinglePicture(file, description);
         } catch (error) {
             console.error('Fout bij het uploaden van foto\'s:', error.message);
-            document.getElementById('message').textContent = `Fout: ${error.message}`;
+            showToast(`Fout: ${error.message}`);
             return;
         }
     }
 
 
-    document.getElementById('message').textContent = `Foto's succesvol geüpload!`;
+    showToast(`Uw woning is succesvol geregistreerd !`);
 
 
     setTimeout(() => {

@@ -7,7 +7,8 @@ body {
     margin-top: 20px;
     margin-bottom: 20px;
     padding: 10px;
-    font-family: "Playwrite PE", cursive;
+    font-family: "Gill Sans MT";
+
 }
 
 h2 {
@@ -113,3 +114,26 @@ input:checked + .slider:before {
 .slider.round:before {
     border-radius: 50%;
 }
+
+#extraFeaturesContainer {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 5px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+#extraFeaturesContainer label {
+    display: inline-flex;
+    align-items: center;
+    font-size: 14px;
+}
+
+#extraFeaturesContainer input[type="checkbox"] {
+    margin-right: 2px;
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+}
+
+
