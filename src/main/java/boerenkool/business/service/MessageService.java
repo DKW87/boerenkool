@@ -114,6 +114,7 @@ public class MessageService {
     }
 
     private MessageDTO convertMessageToDTO(Message message) {
+//        System.out.println("*********************** convertMessageToDTO message input is " + message);
         int senderId = message.getSender().getUserId();
         int receiverId = message.getReceiver().getUserId();
         return new MessageDTO(message.getMessageId(),

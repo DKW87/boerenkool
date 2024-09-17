@@ -1,17 +1,26 @@
-import * as main from "./modules/main.mjs"
-import * as auth from "./modules/auth.mjs";
+import * as mainJS from "./modules/main.mjs"
+import * as authJS from "./modules/auth.mjs";
 import {getUsername} from "./modules/user.mjs";
 import {showToast} from './modules/notification.mjs';
+import * as sendJS from './send-a-message.js';
+import * as lang from './languages/nl.mjs';
+import {getListOfCorrespondents} from "./send-a-message.js";
 
-// if (document.documentElement.lang === "nl") {
-    import * as lang from './languages/nl.mjs';
-// } else {
-//     import * as lang from './languages/en.mjs';
-// }
+mainJS.loadHeader()
+mainJS.loadFooter()
 
-main.loadHeader()
-main.loadFooter()
+// authenticate user
+const token = authJS.getToken()
+let loggedInUser = await authJS.getLoggedInUser(token)
 
+let inboxArray // change to localStorage item?
+let outboxArray // change to localStorage item?
+let displayedMessage = {}
+let receiverId
+let listOfCorrespondents
+
+let sortAscending = false
+let overviewShowsInbox = true
 const DATE_TIME_OPTIONS = {
     weekday: `long`,
     year: `numeric`,
@@ -20,48 +29,34 @@ const DATE_TIME_OPTIONS = {
     hour: `numeric`,
     minute: `numeric`
 }
-let loggedInUser = {}
-let inboxArray = {}
-let outboxArray = {}
-let selectedMessage = {}
-let sortAscending = false
-let overviewShowsInbox = true
 
-// authenticate user
-const token = auth.getToken()
-await auth.checkIfLoggedIn(token)
-
-setup()
+await setup()
 
 async function setup() {
-    document.querySelector('#refreshInboxButton').addEventListener('click', async () => {
-        console.log("refreshinbox event fired")
-        // TODO extract this to a new function, combined with the one below
-        overviewShowsInbox = true
-        inboxArray = await getInbox()
+    showElement(`writeMessageForm`, false)
+    showElement(`messageSingleView`, false)
+    listOfCorrespondents = await getListOfCorrespondents()
+
+    document.querySelector('#refreshButton').addEventListener('click', async () => {
+        await refreshInbox()
+        await refreshOutbox()
+    })
+
+    //  sendMessageInjectHtml
+    await sendJS.injectHtmlFromFile("sendMessageInjectedHtml", "templates/send-message.html")
+
+    document.querySelector('#showInboxButton').addEventListener('click', async () => {
+        showElement(`writeMessageForm`, false)
         if (inboxArray.length > 0) {
-            sortMessageArray(inboxArray)
-            fillMessageOverview(inboxArray)
-            await showMessageContent(inboxArray[0].messageId)
-            showElement(`messageSingleView`, true)
+            showInbox()
         } else noMessages()
     })
 
-    document.querySelector('#refreshOutboxButton').addEventListener('click', async () => {
-        console.log("refreshoutbox event fired")
-        // TODO extract this to a new function
-        overviewShowsInbox = false
-        outboxArray = await getOutbox()
+    document.querySelector('#showOutboxButton').addEventListener('click', async () => {
+        showElement(`writeMessageForm`, false)
         if (outboxArray.length > 0) {
-            sortMessageArray(outboxArray)
-            fillMessageOverview(outboxArray)
-            await showMessageContent(outboxArray[0].messageId)
-            showElement(`messageSingleView`, true)
+            await showOutbox()
         } else noMessages()
-    })
-
-    document.querySelector('#reverseMessageOverviewButton').addEventListener('click', () => {
-        reverseMessageOverview()
     })
 
     document.querySelector('#overviewVisibilityButton').addEventListener('click', () => {
@@ -69,55 +64,90 @@ async function setup() {
     })
 
     document.querySelector('#writeMessageButton').addEventListener('click', () => {
-        window.location.href = "send-a-message.html"
+        writeNewMessage()
     })
 
     document.querySelector('#deleteMessageButton').addEventListener('click', () => {
-        deleteMessageHelper(selectedMessage)
-        selectedMessage = null
-        if (overviewShowsInbox) {
-            // inboxArray.find(element => element.messageId === Number(messageId))
-            // inboxArray.splice(... , ... ) voor verwijderen van element met bekende index
-            document.querySelector('#refreshInboxButton').click()
-            console.log("refreshinbox.click() inside DeleteMessageButton function")
-        } else {
-            document.querySelector('#refreshOutboxButton').click()
-            console.log("refreshoutbox.click() inside DeleteMessageButton function")
-        }
+        showElement(`writeMessageForm`, false)
+        deleteMessageHelper(displayedMessage)
+        overviewShowsInbox ? refreshInbox() : refreshOutbox()
     })
 
+    document.querySelector('#answerMessageButton').addEventListener('click', () => {
+        replyToMessage()
+    })
 
-    loggedInUser = await auth.getLoggedInUser(token)
-
-    // refresh messageoverview with inbox by default
-    document.querySelector('#refreshInboxButton').click();
+    await refreshInbox()
+    await showInbox()
+    await refreshOutbox()
 }
 
-// // for floatingCheatMenu
-// document.querySelector('#fillListOfCorrespondentsButton').addEventListener('click', () => {
-//     fillCorrespondentsDropDown(listOfCorrespondents, "receiverDropDown")
-// })
-// document.querySelector('#fillReceiverDropDown').addEventListener('click', () => {
-//     fillCorrespondentsDropDown(listOfCorrespondents, "receiverDropDown")
-// })
-
-async function getInbox() {
+function showInbox() {
+    showElement(`writeMessageForm`, false)
+    showElement(`answerMessageButton`, true)
     overviewShowsInbox = true
+    fillMessageOverview(inboxArray)
+    // await showMessageContent(inboxArray[0].messageId)
+    // showElement(`messageSingleView`, true)
+}
+
+async function showOutbox() {
+    showElement(`writeMessageForm`, false)
+    showElement(`answerMessageButton`, false)
+    overviewShowsInbox = false
+    fillMessageOverview(outboxArray)
+    // await showMessageContent(outboxArray[0].messageId)
+    // showElement(`messageSingleView`, true)
+}
+
+async function refreshInbox() {
+    // console.log("inboxArray before getMessages is : ")
+    // console.log(inboxArray)
     inboxArray = await getMessages('in')
-    if (inboxArray === undefined) {
+
+    console.log("inboxArray after getMessages is : ")
+    await console.log(inboxArray)
+
+    // if (inboxArray.length > 0 ) {
+    // if (await inboxArray === undefined) {
+    if (!inboxArray) {
         noMessages()
     } else {
-        return inboxArray
+        // add receiverName and senderName to every message
+        for (const [key, value] of Object.entries(listOfCorrespondents)) {
+            // console.log(`${key}: ${value}`);
+            inboxArray.forEach((message) => {
+                if (message.receiverId === Number(key)) {
+                    message.receiverName = value
+                    // console.log("message.receiverName is " + value)
+                }
+                if (message.senderId === Number(key)) {
+                    message.senderName = value
+                    // console.log("message.senderName is " + value)
+                }
+            })
+        }
+        sortMessageArray(inboxArray)
     }
 }
 
-async function getOutbox() {
-    overviewShowsInbox = false
+async function refreshOutbox() {
     outboxArray = await getMessages('out')
     if (outboxArray === undefined) {
         noMessages()
     } else {
-        return outboxArray
+        // add receiverName and senderName to every message
+        for (const [key, value] of Object.entries(listOfCorrespondents)) {
+            outboxArray.forEach((message) => {
+                if (message.receiverId === Number(key)) {
+                    message.receiverName = value
+                }
+                if (message.senderId === Number(key)) {
+                    message.senderName = value
+                }
+            })
+        }
+        sortMessageArray(outboxArray)
     }
 }
 
@@ -139,26 +169,8 @@ async function getMessages(box) {
         } else if (response.status === 200) {
             return await response.json()
         } else if (response.status === 204) {
+            console.log("box is " + box + " and response.status === 204")
             return [];
-        }
-    } catch
-        (error) {
-        console.error(error.message);
-    }
-}
-
-async function getMessage(messageId) {
-    const url = `/api/messages/${messageId}`
-    try {
-        const response = await fetch(url, {
-            headers: {
-                "Authorization": localStorage.getItem('authToken')
-            }
-        })
-        if (!response.ok) {
-            new Error(`Response status: ${response.status}`)
-        } else {
-            return response.json()
         }
     } catch
         (error) {
@@ -178,6 +190,7 @@ function sortMessageArray(array) {
 }
 
 function fillMessageOverview(listOfMessages) {
+    console.log("fillMessageOverview is called")
     // remove old messages from overview
     document.querySelectorAll(`#messageInOverview`).forEach(e => e.remove())
     // build new element for every message in the list, and add it to messageOverview
@@ -185,20 +198,9 @@ function fillMessageOverview(listOfMessages) {
         listOfMessages.forEach(element => {
             // create new message element
             const newOverviewMessage = document.createElement("div");
-            newOverviewMessage.setAttribute("id", "messageInOverview")
+            newOverviewMessage.setAttribute("id", "messageInOverview") // gebruik class ipv id?
             newOverviewMessage.setAttribute("data-messageid", `${element.messageId}`)
-            // add eventhandler to entire element
-            newOverviewMessage.addEventListener('click', () => {
-                showMessageContent(`${element.messageId}`)
-                console.log("element.readByReceiver is ")
-                console.log(element.readByReceiver)
-                if (overviewShowsInbox && element.readByReceiver === false) {
-                    element.readByReceiver = true
-                    console.log("element.readByReceiver is ")
-                    console.log(element.readByReceiver)
-                    updateMessage(element)
-                }
-            })
+
             // add subject as child
             const subject = document.createElement(`div`)
             subject.setAttribute("class", "subject")
@@ -207,13 +209,26 @@ function fillMessageOverview(listOfMessages) {
 
             // add senderId, dateTimeSent and messageId as child
             const senderAndDateTime = document.createElement(`div`)
-            const senderId = element.senderId
+            // const senderId = element.senderId
+            const username = overviewShowsInbox ? element.senderName : element.receiverName
             const dateTimeSent = formatDateTime(element.dateTimeSent)
             const messageIdElement = element.messageId
-            senderAndDateTime.textContent = `${senderId}, ${dateTimeSent}, ${messageIdElement}`
+            senderAndDateTime.textContent = `${username}, ${dateTimeSent}, ${messageIdElement}`
             newOverviewMessage.appendChild(senderAndDateTime)
 
-            // add newOverviewRow to the overview
+            // add eventhandler
+            newOverviewMessage.addEventListener('click', () => {
+                showMessageContent(`${element.messageId}`)
+                // console.log("element.readByReceiver is ")
+                // console.log(element.readByReceiver)
+                if (overviewShowsInbox && element.readByReceiver === false) {
+                    element.readByReceiver = true
+                    // console.log("element.readByReceiver is ")
+                    // console.log(element.readByReceiver)
+                    updateMessage(element)
+                }
+            })
+            // add newOverviewMessage to the overview
             document.querySelector(`#messageOverview`).appendChild(newOverviewMessage)
         })
     } else {
@@ -222,12 +237,42 @@ function fillMessageOverview(listOfMessages) {
 }
 
 function noMessages() {
+    console.log("noMessages is called")
     document.querySelectorAll(`#messageInOverview`).forEach(e => e.remove())
     let noMessages = document.createElement(`div`)
     noMessages.setAttribute("id", "messageInOverview")
     noMessages.textContent = lang.NO_MESSAGES
+    showToast(lang.NO_MESSAGES)
     document.querySelector(`#messageOverview`).appendChild(noMessages)
     showElement(`messageSingleView`, false)
+    // showElement(`answerMessageButton`, false)
+}
+
+function writeNewMessage() {
+    showElement(`messageSingleView`, false)
+    showElement(`writeMessageForm`, true)
+    // clear subject and body fields (might contain old data from replyToMessage method
+    document.querySelector("#subjectInput").innerText = ``
+    document.querySelector("#bodyInput").innerText = ``
+    sendJS.displayReceiverDropdown()
+}
+
+function replyToMessage() {
+    showElement(`messageSingleView`, false)
+    showElement(`writeMessageForm`, true)
+    showElement(`receiverName`, true)
+    showElement(`receiverDropDown`, false)
+    // prefill receiver, subject and body
+    // TODO check why receiverId is null in checkRequiredFields
+    // console.log("displayedMessage is ")
+    // console.log(displayedMessage)
+    receiverId = displayedMessage.senderId
+    console.log("replyToMessage : receiverId got from senderId is " + receiverId)
+    document.querySelector("#receiverName").innerText = `${displayedMessage.senderName}`
+    document.querySelector("#subjectInput").innerText =
+        `${lang.REPLY_PREFIX_SUBJECT} ${displayedMessage.subject}`
+    document.querySelector("#bodyInput").innerHTML =
+        `\r\n\r\n${lang.REPLY_PREFIX_BODY}\r\n${displayedMessage.body}`
 }
 
 function showElement(elementSelector, boolean) {
@@ -274,35 +319,11 @@ async function deleteMessage(message) {
         })
         if (!response.ok) {
             new Error(`Response status: ${response.status}`)
-        } else {
-            showToast(MESSAGE_DELETED)
-            await getOutbox()
         }
     } catch (error) {
         // TODO add notification for user
         console.error(error.message);
     }
-}
-
-function showDeleteMessageDialog() {
-    // if (!confirm(ASK_CONFIRMATION_FOR_DELETE)) {
-    //     return;
-    // }
-    // let dialog = document.querySelector("dialog")
-    // let dialogText = document.querySelector("#dialogText")
-    // let dialogButtonConfirm = document.querySelector("#dialogButtonConfirm")
-    // let dialogButtonCancel = document.querySelector("#dialogButtonCancel")
-    // dialogText.innerHTML = ASK_CONFIRMATION_FOR_DELETE
-    // dialogButtonConfirm.innerHTML = BUTTON_TEXT_CONFIRM
-    // dialogButtonConfirm.addEventListener("click", () => {
-    //     deleteMessageHelper(selectedMessage)
-    //     dialog.close();
-    // });
-    // dialogButtonCancel.innerHTML = BUTTON_TEXT_CANCEL
-    // dialogButtonCancel.addEventListener("click", () => {
-    //     dialog.close();
-    // });
-    // document.querySelector("dialog").showModal()
 }
 
 async function deleteMessageHelper(message) {
@@ -313,8 +334,12 @@ async function deleteMessageHelper(message) {
     if (message) {
         if (loggedInUser.userId === message.senderId) {
             // sender deletes message; message is deleted from database
+            console.log("message to be deleted: ")
+            console.log(message)
             await deleteMessage(message)
             showToast(lang.CONFIRMED_DELETE)
+            // TODO na debuggen crash on delete weer aanzetten
+            // await refreshOutbox()
         } else {
             // receiver deletes message; message is marked "archivedByReceiver" using updateMessage
             message.archivedByReceiver = true
@@ -325,46 +350,22 @@ async function deleteMessageHelper(message) {
     }
 }
 
-function reverseMessageOverview() {
-    // flip boolean value of sortAscending
-    sortAscending = !sortAscending
-    let listview = document.querySelector("#messageOverview")
-    for (let i = 1; i < listview.childNodes.length; i++) {
-        listview.insertBefore(listview.childNodes[i], listview.firstChild)
-    }
-}
-
 async function showMessageContent(messageId) {
+    // TODO save inbox and outbox to sessionStorage ?
     // check which overview is showing
-    let visibleArray = overviewShowsInbox ? inboxArray : outboxArray
+    let visibleBoxArray = overviewShowsInbox ? inboxArray : outboxArray
     // find the message in the array, using its messageId
-    selectedMessage = visibleArray.find((e) => e.messageId === parseInt(messageId, 10))
+    displayedMessage = visibleBoxArray.find((e) => e.messageId === parseInt(messageId, 10))
+    // sessionStorage.setItem("displayedMessage", displayedMessage)
     // show the message values in the relevant HTML elements
     document.querySelector(`#singleViewUsername`).textContent = overviewShowsInbox ?
-        lang.PREFIX_FROM + await getUsername(selectedMessage.senderId) + ", "
-        : lang.PREFIX_TO + await getUsername(selectedMessage.receiverId) + ", "
-    const messageDateTime = new Date(selectedMessage.dateTimeSent)
+        lang.PREFIX_FROM + displayedMessage.senderName + ", "
+        : lang.PREFIX_TO + displayedMessage.receiverName + ", "
+    const messageDateTime = new Date(displayedMessage.dateTimeSent)
     document.querySelector(`#singleViewDateTimeSent`).textContent = formatDateTime(messageDateTime)
-    document.querySelector(`#singleViewSubject`).textContent = selectedMessage.subject
-    document.querySelector(`#singleViewBody`).textContent = selectedMessage.body
-}
-
-async function getMessageById(messageId) {
-    const url = `/api/messages/${messageId}`
-    try {
-        const response = await fetch(url)
-        if (!response.ok) {
-            new Error(`Response status: ${response.status}`)
-        }
-        return await response.json()
-    } catch (error) {
-        console.error(error.message)
-    }
-}
-
-
-function getMessageIdFromInputField() {
-    return document.querySelector("#messageIdInput").value
+    document.querySelector(`#singleViewSubject`).textContent = displayedMessage.subject
+    document.querySelector(`#singleViewBody`).textContent = displayedMessage.body
+    document.querySelector(`#messageSingleView`).style.display = `block`
 }
 
 // format date syntax according to browser's language setting

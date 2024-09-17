@@ -80,12 +80,7 @@ public class UserService {
 
 
     //code Bart
-    public List<Map<String, Object>> getMapOfCorrespondents(int userId) {
-        Optional<List<Map<String, Object>>> mapOfCorrespondents = userRepository.getMapOfCorrespondents(userId);
-        if (mapOfCorrespondents.isEmpty()) {
-            return new ArrayList<>();
-        } else {
-            return mapOfCorrespondents.get();
-        }
+    public Optional<Map<Integer, String>> getMapOfCorrespondents(int userId) {
+        return userRepository.getMapOfCorrespondents(userId);
     }
 }

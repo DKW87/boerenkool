@@ -24,17 +24,18 @@
 
     <div class="header-div" id="header"></div>
 
+<!--    later om te zetten naar stage / scene / actor classes-->
     <div class="messageMainArea">
 
         <menu>
-            <button id="refreshInboxButton">Inbox</button>
-            <button id="refreshOutboxButton">Outbox</button>
-            <button id="reverseMessageOverviewButton">Sorteer op datum</button>
+            <button id="refreshButton">Refresh</button>
+            <button id="showInboxButton">Inbox</button>
+            <button id="showOutboxButton">Outbox</button>
+<!--            <button id="reverseMessageOverviewButton">Sorteer op datum</button>-->
         </menu>
 
         <menu>
-            <button id="writeMessageButton">Schrijf een bericht</button>
-            <button id="deleteMessageButton">Verwijder dit bericht</button>
+            <button id="writeMessageButton">Schrijf een nieuw bericht</button>
             <button id="overviewVisibilityButton">Overzicht tonen/verbergen</button>
         </menu>
 
@@ -49,24 +50,8 @@
             </div>
             <div><span id="singleViewSubject" class="subject"></span></div>
             <div id="singleViewBody"></div>
-
-<!--            <div id="floatingCheatMenu">-->
-<!--                <h3>floatingCheatMenu</h3>-->
-<!--                <div>-->
-<!--                    <label for="messageIdInput">MessageId :</label>-->
-<!--                    <input type="text" name="" id="messageIdInput" value="1">-->
-<!--                </div>-->
-<!--                <div>-->
-<!--                    <label for="userIdInput">UserId :</label>-->
-<!--                    <input type="text" name="" id="userIdInput" value="1">-->
-<!--                </div>-->
-<!--                <button id="fillListOfCorrespondentsButton">fillListOfCorrespondents</button>-->
-<!--                <button id="fillReceiverDropDown">fillReceiverDropDown</button>-->
-<!--                <select name="receiverDropDown" id="receiverDropDown">-->
-<!--                    <option>Selecteer een gebruikersnaam</option>-->
-<!--                </select>-->
-<!--            </div>-->
-
+            <button id="deleteMessageButton">Verwijder dit bericht</button>
+            <button id="answerMessageButton">Beantwoord dit bericht</button>
         </section>
 
         <dialog>
@@ -75,9 +60,9 @@
             <button id="dialogButtonCancel" autofocus>cancel button text </button>
         </dialog>
 
-    </div>
+        <div id="sendMessageInjectedHtml"></div>
 
-    <div w3-include-html="send-message.html"></div>
+    </div>
 
     <div class="footer-div" id="footer"></div>
 
