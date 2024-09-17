@@ -105,7 +105,9 @@ export function getListOfHousesByURL(url) {
             amountOfHousesDiv.appendChild(amountOfHousesText);
 
             amountOfHousesStringSwitch(amountOfHousesText);
-
+            const urlParams = new URLSearchParams(window.location.search);
+            const startDate = urlParams.get('aankomst') ?? '';
+            const endDate = urlParams.get('vertrek') ?? '';
             houses.forEach(house => {
                 let seoFriendlyName = house.houseName.toLowerCase()
                     .replace(/ /g, "-")
@@ -114,7 +116,7 @@ export function getListOfHousesByURL(url) {
 
                 let linkToDetails = document.createElement('a');
                 linkToDetails.className = 'house-link';
-                linkToDetails.href = 'huisdetail.html?id=' + house.houseId + '&naam=' + seoFriendlyName;
+                linkToDetails.href =`huisdetail.html?id=${house.houseId}&naam=${seoFriendlyName}&startDate=${startDate}&endDate=${endDate}`;
 
                 let outerDiv = document.createElement('div');
                 outerDiv.className = 'huisje';
