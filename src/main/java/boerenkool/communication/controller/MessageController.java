@@ -26,7 +26,6 @@ import java.util.UUID;
  */
 @RestController
 @RequestMapping("/api/messages")
-//@CrossOrigin(origins = {"http://localhost:5500", "http://localhost:8080", "http://localhost:63342/", "http://127.0.0.1:5500/"})
 public class MessageController {
     private final Logger logger = LoggerFactory.getLogger(MessageController.class);
     private final MessageService messageService;
@@ -65,17 +64,6 @@ public class MessageController {
         } else  return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
     }
 
-// not used in front end (security risk)
-//    @GetMapping("/messages")
-//    ResponseEntity<?> getAllMessages() throws MessageDoesNotExistException {
-//        List<MessageDTO> listOfUsersMessages = messageService.getAllMessages();
-//        if (!listOfUsersMessages.isEmpty()) {
-//            return ResponseEntity.ok().body(listOfUsersMessages);
-//        } else {
-//            throw new MessageDoesNotExistException();
-//        }
-//    }
-
     @GetMapping
     ResponseEntity<?> getAllForUser(@RequestParam(name = "box", required = false, defaultValue = "") String box,
                                     @RequestHeader("Authorization") String token) {
@@ -98,15 +86,6 @@ public class MessageController {
             }
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-    }
-
-    @GetMapping("/{messageid}")
-    ResponseEntity<?> getById(@PathVariable("messageid") int messageId) throws MessageDoesNotExistException {
-        // TODO user authentication  (user is receiver of this message)
-        MessageDTO messageDTO = messageService.getByMessageId(messageId);
-        if (messageDTO != null) {
-            return new ResponseEntity<>(messageDTO, HttpStatus.OK);
-        } else throw new MessageDoesNotExistException();
     }
 
     @GetMapping("/unreadmessages")
@@ -141,7 +120,6 @@ public class MessageController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             }
             if (messageService.updateMessage(messageFromDatabase)) {
-                System.out.println(messageFromDatabase);
                 return ResponseEntity.status(HttpStatus.OK).build();
             } else {
                 throw new MessageNotSavedException();

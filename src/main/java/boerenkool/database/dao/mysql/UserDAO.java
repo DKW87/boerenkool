@@ -46,7 +46,7 @@ public interface UserDAO extends GenericDAO<User> {
 
     Optional<String> getUsernameById(int userId);
 
-    Optional<List<Map<String, Object>>> getMapOfCorrespondents(int userId);
+    Optional<Map<Integer, String>> getMapOfCorrespondents(int userId);
 
 }
 

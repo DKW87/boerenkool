@@ -15,6 +15,24 @@ document.addEventListener('DOMContentLoaded', async function () {
     const houseId = urlParams.get('id');
     document.getElementById('houseId').value = houseId;
 
+
+    const startDate = urlParams.get('startDate');
+    const endDate = urlParams.get('endDate');
+    const guestCountInput = document.getElementById("guestCount")
+
+    const startDateInput = document.getElementById('startDate')
+    const endDateInput = document.getElementById('endDate')
+
+    guestCountInput.addEventListener("change", async ()=>{
+        await calculateCost()
+    })
+
+    if (startDate && endDate) {
+        startDateInput.value = startDate;
+        endDateInput.value = endDate;
+    }
+
+
     let totalCost = 0;
     let userBudget = 0;
 
@@ -28,10 +46,10 @@ document.addEventListener('DOMContentLoaded', async function () {
         .then(response => response.json())
         .then(data => {
             document.getElementById('houseName').textContent = `${data.houseName}`;
-            document.getElementById('maxGuest').textContent = `${data.maxGuest}`;
+            document.getElementById('maxGuests').textContent = `${data.maxGuest}`;
         })
         .catch(error => {
-            console.error('Error fetching house data:', error);
+            console.error('Fout bij het ophalen van huisgegevens:', error);
         });
 
     fetch(`/api/users/${user.userId}`, {
@@ -47,21 +65,22 @@ document.addEventListener('DOMContentLoaded', async function () {
             document.getElementById('coinBalance').textContent = `${data.coinBalance} bkC`;
         })
         .catch(error => {
-            console.error('Error fetching user data:', error);
+            console.error('Fout bij het ophalen van gebruikersgegevens:', {e});
         });
 
     // Function to calculate and display the cost
     async function calculateCost() {
         const houseId = document.getElementById('houseId').value;
-        const startDate = document.getElementById('startDate').value;
-        const endDate = document.getElementById('endDate').value;
-        const guestCount = document.getElementById('guestCount').value;
+
+        const startDate = startDateInput.value;
+        const endDate = endDateInput.value;
+        const guestCount = guestCountInput.value?  guestCountInput.value:1;
 
         if (new Date(startDate) < new Date()) {
             alert("Kies huidige data!")
             return
         }
-        // Ensure all necessary fields are filled before making the API call
+
         if (houseId && startDate && endDate) {
             try {
                 const response = await fetch(`/api/reservations/calculate-cost?startDate=${startDate}&endDate=${endDate}&houseId=${houseId}&guestCount=${guestCount}`, {
@@ -90,15 +109,15 @@ document.addEventListener('DOMContentLoaded', async function () {
                 }
 
             } catch (error) {
-                console.error('Error calculating cost:', error);
-                document.getElementById('resCalculate').textContent = 'Error calculating cost';
+                console.error('Fout bij het berekenen van de kosten:', error);
+                document.getElementById('resCalculate').textContent = 'Fout bij het berekenen van de kosten';
             }
         }
     }
+    await calculateCost()
 
-    // Attach event listeners to trigger cost calculation when dates change
-    document.getElementById('startDate').addEventListener('change', calculateCost);
-    document.getElementById('endDate').addEventListener('change', calculateCost);
+    startDateInput.addEventListener('change', calculateCost);
+    endDateInput.addEventListener('change', calculateCost);
 
 
     const reservationForm = document.getElementById('reservation-form');
@@ -139,7 +158,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                 }, 2000);
             })
             .catch(error => {
-                document.getElementById('reservation-result').textContent = `Error: ${error.message}`;
+                document.getElementById('reservation-result').textContent = `${error.message}`;
             });
     });
 

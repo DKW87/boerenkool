@@ -6,14 +6,13 @@ Main.loadFooter();
 
 var user = null;
 
-document.addEventListener('DOMContentLoaded', async function(){
+document.addEventListener('DOMContentLoaded', async function () {
     user = await checkIfLoggedIn();
     await getAllSavedReservation();
 })
 
 
 async function getAllSavedReservation() {
-
 
     fetch(`/api/reservations/reservations-by-userId/${user?.userId}`, {
         method: 'GET',
@@ -36,36 +35,50 @@ async function getAllSavedReservation() {
                 table.innerHTML += node;
 
             });
+            data.forEach(d => {
+                addCancelEventListener(d.endDate, d.reservationId);
+            });
 
-            addCancelEventListener();
         })
         .catch(error => {
-            document.getElementById('reservation-result').textContent = `Error: ${error.message}`;
+            document.getElementById('reservation-result').textContent = `${error.message}`;
         });
 }
 
-function addCancelEventListener() {
-    const cancelButtons = document.querySelectorAll('.cancel-reservation');
-    cancelButtons.forEach(cancelButton => {
+function addCancelEventListener(endDateString, reservationId) {
+    const cancelButton = document.querySelector(`.cancel-reservation[id='${reservationId}']`);
+    const endDate = new Date(endDateString);
 
-            cancelButton.addEventListener('click', event => {
-                Swal.fire({
-                    title: "Weet u het zeker?",
-                    text: "Dit kunt u niet meer ongedaan maken!",
-                    icon: "Waarschuwing",
-                    showCancelButton: true,
-                    confirmButtonColor: "#3085d6",
-                    cancelButtonColor: "#d33",
-                    confirmButtonText: "Ja, verwijder het!"
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        cancelReservation(event.target.id);
-                    }
-                });
+    cancelButton.addEventListener('click', function () {
 
-            })
+        const currentDate = new Date();
+        console.log(endDate);
+        console.log(endDateString);
+
+
+        if (endDate < currentDate) {
+            Swal.fire({
+                title: "Niet toegestaan!",
+                text: "U kunt een reservering uit het verleden niet annuleren.",
+                icon: "error"
+            });
+            return;
         }
-    );
+        Swal.fire({
+            title: "Weet u het zeker?",
+            text: "Dit kunt u niet meer ongedaan maken!",
+            icon: "Waarschuwing",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Ja, verwijder het!"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                cancelReservation(reservationId);
+            }
+        });
+
+    });
 
 }
 
@@ -79,14 +92,14 @@ function cancelReservation(reservationId) {
     })
         .then(response => {
 
-            console.log("response",response);
+                console.log("response", response);
                 if (response.ok) {
                     Swal.fire({
                         title: "Verwijderd!",
                         text: "Uw reservering is verwijderd.",
                         icon: "succes"
                     });
-                    setTimeout(()=>{
+                    setTimeout(() => {
                         window.location.reload();
                     }, 1500)
 
@@ -95,7 +108,7 @@ function cancelReservation(reservationId) {
         )
 
         .catch(error => {
-            document.getElementById('reservation-result').textContent = `Error: ${error.message}`;
+            document.getElementById('reservation-result').textContent = `${error.message}`;
         });
 
 }

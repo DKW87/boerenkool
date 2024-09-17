@@ -37,6 +37,7 @@ public class PictureController {
         List<Picture> pictureList = pictureService.getAllByHouseId(houseId);
         if (pictureList != null && !pictureList.isEmpty()) {
             List<PictureDTO> pictureDTOList = pictureList.stream().map(pictureService::convertToDTO).collect(Collectors.toList());
+            System.out.println("getPicturesByHouseId activated");
 
             return new ResponseEntity<>(pictureDTOList, HttpStatus.OK);
 
@@ -51,7 +52,9 @@ public class PictureController {
         Optional<Picture> picture = pictureService.getFirstPictureByHouseId(houseId);
         if (picture.isPresent()) {
             PictureDTO pictureDTO = pictureService.convertToDTO(picture.get());
+            System.out.println("getFirstPictureByHouseId activated");
             return ResponseEntity.ok(pictureDTO);
+
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -63,6 +66,7 @@ public class PictureController {
         Optional<Picture> pictureOptional = pictureService.getOneById(pictureId);
         if (pictureOptional.isPresent()) {
             PictureDTO pictureDTO = pictureService.convertToDTO(pictureOptional.get());
+            System.out.println("getPictureById activated");
             return ResponseEntity.ok(pictureDTO);
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -81,6 +85,7 @@ public class PictureController {
                 boolean isUpdated = pictureService.savePicture(picture);
 
                 if (isUpdated) {
+                    System.out.println("updatePictureDescription activated");
                     return new ResponseEntity<>("Picture description updated successfully", HttpStatus.OK);
                 } else {
                     return new ResponseEntity<>("Failed to update picture description", HttpStatus.INTERNAL_SERVER_ERROR);
@@ -104,6 +109,7 @@ public class PictureController {
             Picture picture = new Picture(house, pictureData, description);
             boolean isSaved = pictureService.savePicture(picture);
             if (isSaved) {
+                System.out.println("savePicture activated");
                 return new ResponseEntity<>("Picture saved successfully with ID: " + picture.getPictureId(), HttpStatus.CREATED);
             } else {
                 return new ResponseEntity<>("Failed to save picture", HttpStatus.INTERNAL_SERVER_ERROR);
@@ -118,6 +124,7 @@ public class PictureController {
     public ResponseEntity<?> deletePictureById(@PathVariable("pictureId") int pictureId) {
         boolean isDeleted = pictureService.removeOneById(pictureId);
         if (isDeleted) {
+            System.out.println("deletePictureById activated");
             return new ResponseEntity<>("Picture deleted successfully", HttpStatus.OK);
         } else {
             return new ResponseEntity<>("Picture not found or deletion failed", HttpStatus.NOT_FOUND);
