@@ -16,7 +16,7 @@ export function loadBlockedUsers(userId, token) {
         .catch(error => console.error('Fout bij het laden van geblokkeerde gebruikers:', error));
 }
 
-function fetchBlockedUsers(userId, token) {
+export function fetchBlockedUsers(userId, token) {
     return fetch(`/api/blocked-users/${userId}`, {
         headers: { 'Authorization': token }
     })
