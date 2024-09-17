@@ -244,6 +244,10 @@ document.addEventListener('DOMContentLoaded', function () {
         return regex.test(value);
     }
 
+    function validateZipcode(value) {
+        const regex = /^[A-Za-z]{4}\d{2}$/;
+        return regex.test(value);
+    }
 
     function validateCity(value) {
         const regex = /^[a-zA-Z\s]+$/;
@@ -255,6 +259,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const houseName = document.getElementById('houseName').value;
         const city = document.getElementById('city').value;
         const streetAndNumber = document.getElementById('streetAndNumber').value;
+        const zipcode = document.getElementById('zipcode').value;
         const maxGuest = parseInt(document.getElementById('maxGuest').value, 10);
         const pricePPPD = parseFloat(document.getElementById('pricePPPD').value);
         const description = document.getElementById('description').value;
@@ -274,6 +279,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (streetAndNumber.length > 120 || !validateStreetAndNumber(streetAndNumber)) {
             showToast('Straatnaam moet beginnen met een woord, gevolgd door een huisnummer (bv. "Straatnaam 123").');
+            return false;
+        }
+
+        if (zipcode.length > 6 || !validateZipcode(zipcode)) {
+            showToast('Postcode moet beginnen met 4 letters, gevolgd door 2 cijfers zonder spatie ertussen.')
             return false;
         }
 

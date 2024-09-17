@@ -130,15 +130,59 @@ body {
     font-weight: bold;
     border: none;
     border-radius: 5px;
-    background-color: var(--boerenkool-groen);
-    color: var(--boerenkool-wit);
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
-#actionButtons button:hover {
-    background-color: darkgreen;
-    transform: translateY(-2px);
+#editHouse {
+    background-color: #b9c7a0;
+}
+
+#editHouse:hover {
+    background-color: #556B2F;
+}
+
+#managePictures {
+    background-color: #b9c7a0;
+}
+
+#managePictures:hover {
+    background-color: #556B2F;
+}
+
+#managePictures {
+    background-color: #b9c7a0;
+}
+
+#managePictures:hover {
+    background-color: #556B2F;
+}
+
+#backToMyHouses {
+    background-color: #b9c7a0;
+}
+
+#backToMyHouses:hover {
+    background-color: #556B2F;
+}
+
+#saveChanges {
+    background-color: #dbccea;
+    color: white;
+}
+
+#saveChanges:hover {
+    background-color: #a975de;
+}
+
+
+#deleteHouse {
+    background-color: rgb(210, 97, 97);
+    color: white;
+}
+
+#deleteHouse:hover {
+    background-color: #c0392b;
 }
 
 .hidden {

@@ -8,7 +8,7 @@ Main.loadFooter();
 document.addEventListener('DOMContentLoaded', function () {
     const id = getHouseIdFromURL();
     const token = Auth.getToken();
-    // const user = await Auth.getLoggedInUser(token); // functie moet async worden?
+    // const user = Auth.getLoggedInUser(token);
     console.log("id geladen: " + id);
     console.log("token geladen: " + token);
 
