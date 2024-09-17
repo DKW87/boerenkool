@@ -1,5 +1,6 @@
 import * as Main from './modules/main.mjs';
 import * as Auth from "./modules/auth.mjs";
+import { showToast } from './modules/notification.mjs';
 
 Main.loadHeader();
 Main.loadFooter();
@@ -77,7 +78,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         const guestCount = guestCountInput.value?  guestCountInput.value:1;
 
         if (new Date(startDate) < new Date()) {
-            alert("Kies huidige data!")
+            showToast('Kies de huidige data!')
             return
         }
 
@@ -152,13 +153,13 @@ document.addEventListener('DOMContentLoaded', async function () {
                 return response.json();
             })
             .then(data => {
-                document.getElementById('reservation-result').textContent = `Reservering is aangemaakt: ID ${data.reservationId}`;
+                showToast('Uw reservering is aangemaakt');
                 setTimeout(() => {
                     window.location.href = 'saved-reservation.html';
                 }, 2000);
             })
             .catch(error => {
-                document.getElementById('reservation-result').textContent = `${error.message}`;
+                showToast(`${error.message}`);
             });
     });
 
