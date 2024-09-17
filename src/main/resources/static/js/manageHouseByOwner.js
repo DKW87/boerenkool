@@ -1,12 +1,12 @@
 import * as Main from './modules/main.mjs';
-
+import * as Auth from './modules/auth.mjs';
 
 Main.loadHeader();
 Main.loadFooter();
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
 
-
+    const token = Auth.getToken();
     console.log("DOM is volledig geladen");
 
     function getHouseIdFromURL() {
@@ -20,32 +20,19 @@ document.addEventListener('DOMContentLoaded', function() {
     setLinkHref(); // deze methode is extra om link te testen, later weghalen.
 
     function setLinkHref() {
-        const link = document.getElementById('textLinkNaarFotos');
-        const urlForTextLink = '/managePictures.html?id=${id}';
-        link.href = urlForTextLink;
-        console.log(urlForTextLink + " Dit is de URL meegegeven aan de 'a' tag");
+        // const link = document.getElementById('textLinkNaarFotos');
+        // const urlForTextLink = '/managePictures.html?id=${id}';
+        // link.href = urlForTextLink;
+        // console.log(urlForTextLink + " Dit is de URL meegegeven aan de 'a' tag");
     }
 
     async function getHouseById(id) {
         const url = `/api/houses/${id}`;
         try {
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error(`Response status: ${response.status}`);
-            }
-            return await response.json();
-        } catch (error) {
-            console.error(error.message);
-        }
-    }
-
-    async function updateHouse(id, houseData) {
-        const url = `/api/houses/${id}`;
-        try {
             const response = await fetch(url, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(houseData),
+                headers: {
+                    "Authorization": token
+                }
             });
             if (!response.ok) {
                 throw new Error(`Response status: ${response.status}`);
@@ -56,10 +43,29 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    async function updateHouse(id, houseData, headers) {
+        const url = `/api/houses/${id}`;
+
+        try {
+            const response = await fetch(url, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json', ...headers},
+                body: JSON.stringify(houseData),
+
+            });
+            if (!response.ok) {
+                throw new Error(`Response status: ${response.status}`);
+            }
+            return await response.text()
+        } catch (error) {
+            console.error(error.message);
+        }
+    }
+
     async function deleteHouse(id) {
         const url = `/api/houses/${id}`;
         try {
-            const response = await fetch(url, { method: 'DELETE' });
+            const response = await fetch(url, {method: 'DELETE'});
             if (!response.ok) {
                 throw new Error(`Response status: ${response.status}`);
             }
@@ -71,8 +77,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function displayHouseDetails(house) {
         document.getElementById('houseName').value = house.houseName || '';
-        document.getElementById('houseType').value = house.houseType ? house.houseType.houseTypeName : '';
-        document.getElementById('houseOwner').value = house.houseOwner ? house.houseOwner.username : '';
+        document.getElementById('houseOwnerId').value = house.houseOwnerId || '';
+        document.getElementById('houseOwnerUsername').value = house.houseOwnerUsername || '';
+        document.getElementById('houseType').value = house.houseType ? house.houseType.houseTypeId : '';
         document.getElementById('province').value = house.province || '';
         document.getElementById('city').value = house.city || '';
         document.getElementById('streetAndNumber').value = house.streetAndNumber || '';
@@ -110,6 +117,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function makeHouseEditable() {
         document.getElementById('houseName').disabled = false;
         document.getElementById('houseType').disabled = false;
+        document.getElementById('houseType').disabled = false;
         document.getElementById('province').disabled = false;
         document.getElementById('city').disabled = false;
         document.getElementById('streetAndNumber').disabled = false;
@@ -127,21 +135,35 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function handleSaveChanges() {
-        const houseData = {
-            houseName: document.getElementById('houseName').value,
-            houseType: { houseTypeName: document.getElementById('houseType').value },
-            province: document.getElementById('province').value,
-            city: document.getElementById('city').value,
-            streetAndNumber: document.getElementById('streetAndNumber').value,
-            zipcode: document.getElementById('zipcode').value,
-            maxGuest: document.getElementById('maxGuest').value,
-            roomCount: document.getElementById('roomCount').value,
-            pricePPPD: document.getElementById('pricePPPD').value,
-            description: document.getElementById('description').value,
-            isNotAvailable: document.getElementById('isNotAvailable').value === 'true',
-        };
+        const form = document.getElementById("houseForm")
+        const id = getHouseIdFromURL()
 
-        updateHouse(id, houseData).then(response => {
+        // Create a FormData object
+        const formData = new FormData(form);
+
+        // Prepare the data for sending
+        const entries = Object.fromEntries(formData.entries());
+
+        // Get the selected house type element
+        const houseTypeSelect = document.getElementById("houseType")
+
+        // Get the selected option's value (houseTypeId) and text (houseTypeName)
+        const houseTypeId = parseInt(houseTypeSelect.value);
+        const houseTypeName = houseTypeSelect.options[houseTypeSelect.selectedIndex].text;
+
+        const data = {
+            ...entries,
+            houseId: parseInt(id),
+            houseType: {
+                houseTypeId,
+                houseTypeName,
+            },
+        }
+
+        updateHouse(id,data, {
+            Authorization: token
+        }).then(response => {
+            console.log({response})
             if (response) {
                 displayHouseDetails(response);
                 alert('House details updated successfully');
@@ -160,6 +182,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     }
+
     //todo in deze methode een popup maken of je zeker weet dat je gemaakte wijzigingen niet wilt opslaan
     //todo unload / confirm event ??
     function handleCancelChanges() {
@@ -190,18 +213,16 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
 
-
     document.getElementById('editHouse').addEventListener('click', makeHouseEditable);
     document.getElementById('saveChanges').addEventListener('click', handleSaveChanges);
     document.getElementById('deleteHouse').addEventListener('click', handleDeleteHouse);
     document.getElementById('cancelChanges').addEventListener('click', handleCancelChanges);
 
 
-
     //todo links moeten ook tijdens gemaakte wijziging een waarschuwing geven voordat je wordt doorverwezen?
     document.getElementById('managePictures').addEventListener('click', () => {
         const houseId = getHouseIdFromURL();
-        if(houseId) {
+        if (houseId) {
             window.location.href = `/managePictures.html?id=${houseId}`;
             console.log("succes !")
         } else {

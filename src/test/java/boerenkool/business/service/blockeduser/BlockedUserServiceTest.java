@@ -97,7 +97,8 @@ class BlockedUserServiceTest {
         UserNotFoundException exception = assertThrows(UserNotFoundException.class, () ->
                 blockedUserService.unblockUser(1, 2));
         assertEquals("User with id 1 not found.", exception.getMessage());
-
+/*controleert dat de methode removeBlockedUser nooit is aangeroepen op het userRepository.
+ Dit is belangrijk omdat als de gebruiker niet bestaat, de poging om deze te deblokkeren niet zou moeten plaatsvinden.*/
         verify(userRepository, never()).removeBlockedUser(any(User.class), any(User.class));
     }
 

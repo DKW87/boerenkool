@@ -99,7 +99,6 @@ public class RegistrationController {
         boolean emailExists = registrationService.sendPasswordResetEmail(email);
 
         if (!emailExists) {
-            // Als de gebruiker niet bestaat, retourneer een 404 status
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("E-mailadres niet gevonden");
         }
 

@@ -7,17 +7,12 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class LoginAttemptService {
-
-    // Maximum allowed failed login attempts before locking the account
     private final int MAX_ATTEMPT = 3;
-
-    // Duration for which the account will be locked (in minutes)
     private final int LOCK_TIME_DURATION = 15;
 
     // In-memory storage for tracking failed login attempts
     // Key: username, Value: number of failed attempts
     private ConcurrentHashMap<String, Integer> attemptsCache = new ConcurrentHashMap<>();
-
     // In-memory storage for tracking when a user is locked out
     // Key: username, Value: lockout expiration time
     private ConcurrentHashMap<String, LocalDateTime> lockoutCache = new ConcurrentHashMap<>();
@@ -47,7 +42,7 @@ public class LoginAttemptService {
         // If the user has exceeded the maximum number of attempts, lock the account
         if (attempts >= MAX_ATTEMPT) {
             lockoutCache.put(username, LocalDateTime.now().plusMinutes(LOCK_TIME_DURATION));
-            System.out.println("User " + username + " is now locked out until " + lockoutCache.get(username)); // Debugging
+            System.out.println("User " + username + " is now locked out until " + lockoutCache.get(username));
         }
     }
 

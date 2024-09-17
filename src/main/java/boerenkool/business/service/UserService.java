@@ -68,13 +68,8 @@ public class UserService {
     }
 
     public boolean updateBoerenkoolcoins(User user, int additionalCoins) {
-        // Retrieve the current coin balance, defaulting to 0 if null
         int currentCoins = Optional.ofNullable(user.getCoinBalance()).orElse(0);
-
-        // Calculate the new coin balance by adding the additionalCoins
         int newCoins = currentCoins + additionalCoins;
-
-        // Update the coin balance in the database
         return userRepository.updateBoerenkoolcoins(user.getUserId(), newCoins);
     }
 
