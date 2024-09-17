@@ -138,6 +138,7 @@ export function blockUserById(userToBlockId, userId, token) {
         },
         body: `userToBlockId=${userToBlockId}&userBlockingId=${userId}`
     });
+    showToast('Gebruiker is geblokkeerd.');
 }
 
 function handleBlockResponse(response, usernameToBlock, userId, token) {
