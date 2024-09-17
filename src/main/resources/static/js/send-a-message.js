@@ -17,7 +17,7 @@ let receiverId
 let receiverName
 let listOfCorrespondents
 
-await injectHtmlFromFile("sendMessageInjectedHtml", "templates/send-message.html")
+await injectHtmlFromFile("writeMessageSection", "templates/send-message.html")
 await setup()
 
 export async function injectHtmlFromFile(elementId, pathToHtmlFile) {
@@ -56,6 +56,7 @@ async function setup() {
             await displayReceiverDropdown()
         }
     }
+    document.getElementById(`writeMessageForm`).style.display = "block"
 }
 
 

@@ -121,7 +121,7 @@ function handleFetchUserError(response, username) {
     }
 }
 
-function blockUserById(userToBlockId, userId, token) {
+export function blockUserById(userToBlockId, userId, token) {
     if (!userToBlockId || !userId) {
         console.error('Gebruikers-ID is niet gedefinieerd.');
         return null;
