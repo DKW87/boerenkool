@@ -13,7 +13,6 @@ await auth.checkIfLoggedIn()
 const token = auth.getToken()
 let loggedInUser = await auth.getLoggedInUser(token)
 
-// variables used in different methods
 let receiverId
 let receiverName
 let listOfCorrespondents
@@ -108,13 +107,10 @@ export async function checkRequiredFields() {
     if (document.querySelector("#receiverDropDown").style.display === `block`) {
         receiverId = document.querySelector("#receiverDropDown").value
     } else if  (document.querySelector("#receiverName").style.display === `block`) {
-        // TODO variabele in messages.js kan niet overgedragen worden aan andere module...
-        // receiverId = displayedMessage.senderId
+        receiverId = document.querySelector("#receiverName").getAttribute("data-receiverid")
     }
     const subject = document.querySelector("#subjectInput").value;
     const body = document.querySelector("#bodyInput").value;
-
-    console.log("checkRequiredFields : receiverId is " + receiverId)
 
     if (receiverId === undefined || receiverId === String(0)) {
         showToast(lang.SELECT_A_RECEIVER)
@@ -153,9 +149,8 @@ export async function sendMessage(receiverId, subject, body) {
         })
         if (response.status === 201) {
             showToast(lang.MESSAGE_SENT)
-            // TODO onderstaande lijken niets te doen, tekst in velden blijft gewoon staan
-            document.querySelector("#subjectInput").innerText = ``
-            document.querySelector("#bodyInput").innerText = ``
+            document.querySelector("#subjectInput").value = ``
+            document.querySelector("#bodyInput").value = ``
         } else if (response.status === 403) {
             showToast(lang.BLOCKED_BY_RECEIVER)
         } else {
