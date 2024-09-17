@@ -116,7 +116,11 @@ export function getListOfHousesByURL(url) {
 
                 let linkToDetails = document.createElement('a');
                 linkToDetails.className = 'house-link';
-                linkToDetails.href =`huisdetail.html?id=${house.houseId}&naam=${seoFriendlyName}&startDate=${startDate}&endDate=${endDate}`;
+                if (startDate !== '' && endDate !== '') {
+                    linkToDetails.href =`huisdetail.html?id=${house.houseId}&naam=${seoFriendlyName}&startDate=${startDate}&endDate=${endDate}`;
+                } else {
+                    linkToDetails.href =`huisdetail.html?id=${house.houseId}&naam=${seoFriendlyName}`;
+                }
 
                 let outerDiv = document.createElement('div');
                 outerDiv.className = 'huisje';

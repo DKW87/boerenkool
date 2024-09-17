@@ -11,10 +11,6 @@ import boerenkool.database.repository.HouseRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.Cache;
-import org.springframework.cache.CacheManager;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -30,7 +26,6 @@ import java.util.NoSuchElementException;
 @Service
 public class HouseService {
 
-    private CacheManager cacheManager;
     private final Logger logger = LoggerFactory.getLogger(HouseService.class);
     private final HouseRepository houseRepository;
     private final UserService userService;
@@ -38,10 +33,8 @@ public class HouseService {
 
 
     @Autowired
-    public HouseService(HouseRepository houseRepository, CacheManager cacheManager, UserService userService,
-                        PictureService pictureService) {
+    public HouseService(HouseRepository houseRepository, UserService userService, PictureService pictureService) {
         this.houseRepository = houseRepository;
-        this.cacheManager = cacheManager;
         this.userService = userService;
         this.pictureService = pictureService;
         logger.info("New HouseService");
@@ -52,7 +45,6 @@ public class HouseService {
         return houseRepository.getHouseById(houseId).orElse(null);
     }
 
-    @Cacheable(value = "houses", key = "#houseId")
     public HouseDetailsDTO getOneByIdAndConvertToDTO(int houseId) {
         House house = getOneById(houseId);
         return house == null
@@ -98,18 +90,10 @@ public class HouseService {
     public boolean saveHouse(HouseDetailsDTO house) {
         House fullHouse = convertHouseDetailsDTOToHouse(house);
         boolean result = houseRepository.saveHouse(fullHouse);
-        if (result) {
-            house.setHouseId(fullHouse.getHouseId()); // set new house id for cache and to return as response in controller
-            updateCache(house);
+        if (house.getHouseId() == 0) {
+            house.setHouseId(fullHouse.getHouseId()); // set new house id to return as a response in controller
         }
         return result;
-    }
-
-    private void updateCache(HouseDetailsDTO house) {
-        Cache cache = cacheManager.getCache("houses");
-        if (cache != null) {
-            cache.put(house.getHouseId(), house);
-        }
     }
 
     private List<HouseListDTO> convertListToHouseListDTO(List<House> houses) {
@@ -165,6 +149,9 @@ public class HouseService {
 
     private House convertHouseDetailsDTOToHouse(HouseDetailsDTO houseDetailsDTO) {
         House house = new House();
+        if (houseDetailsDTO.getHouseId() > 0) {
+            house.setHouseId(houseDetailsDTO.getHouseId());
+        }
         house.setHouseId(houseDetailsDTO.getHouseId());
         house.setHouseName(houseDetailsDTO.getHouseName());
         house.setHouseType(houseDetailsDTO.getHouseType());
@@ -182,7 +169,6 @@ public class HouseService {
         return house;
     }
 
-    @CacheEvict(value = "houses", key = "#houseId")
     public boolean deleteHouse(int houseId) {
         return houseRepository.deleteHouse(houseId);
     }
