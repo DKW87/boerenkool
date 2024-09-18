@@ -1,15 +1,24 @@
 import * as Main from './modules/main.mjs';
 import * as Auth from "./modules/auth.mjs";
 import { showToast } from './modules/notification.mjs';
+import {getToken} from "./modules/auth.mjs";
 
 Main.loadHeader();
 Main.loadFooter();
 
 document.addEventListener('DOMContentLoaded', async function () {
 
-    const user = await Auth.checkIfLoggedIn();
-    if (!user) {
-        return;
+    const loginBtn = document.getElementById("go-login")
+
+    const reservationContainer  = document.getElementById("make-reservation")
+
+
+    const token =  Auth.getToken();
+    let user = null
+    if (token) {
+        user = await Auth.checkIfLoggedIn()
+        reservationContainer.style.display="block"
+        loginBtn.style.display = "none"
     }
 
     const urlParams = new URLSearchParams(window.location.search);

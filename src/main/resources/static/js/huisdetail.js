@@ -58,6 +58,7 @@ async function fetchHouseDetails(houseId) {
             throw new Error(`Response status: ${response.status}`);
         }
         house = await response.json();
+        console.log({house})
         displayHouseDetails(house);  // Display house details in the DOM
     } catch (error) {
         console.error('Error fetching house details:', error);
