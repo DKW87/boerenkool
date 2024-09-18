@@ -39,4 +39,7 @@ public interface HouseDAO extends GenericDAO<House> {
     @Override
     boolean removeOneById(int id);
 
+
+    void addExtraFeaturesToHouse(House house);
+
 }

@@ -117,6 +117,7 @@ public class JdbcHouseDAO implements HouseDAO {
         int recordInserted = jdbcTemplate.update(connection -> insertHouseStatement(house, connection), keyHolder);
         int pKey = keyHolder.getKey().intValue();
         house.setHouseId(pKey);
+        addExtraFeaturesToHouse(house);
         return recordInserted == 1;
     }
 
@@ -131,6 +132,15 @@ public class JdbcHouseDAO implements HouseDAO {
         String sql = "DELETE FROM House WHERE houseId = ?";
         int recordsUpdated = jdbcTemplate.update(sql, id);
         return recordsUpdated == 1;
+    }
+
+    @Override
+    public void addExtraFeaturesToHouse(House house) {
+        String sql = "insert into HouseExtraFeature (houseId,featureId) values (?,?)";
+        var extraFeatures = house.getExtraFeatures();
+        extraFeatures.forEach(feature -> {
+            jdbcTemplate.update(sql,house.getHouseId(),feature.getExtraFeatureId());
+        });
     }
 
     private void addDateFilter(StringBuilder sql, List<Object> params, HouseFilter filter) {

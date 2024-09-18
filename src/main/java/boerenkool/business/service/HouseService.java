@@ -166,6 +166,7 @@ public class HouseService {
         house.setPricePPPD(houseDetailsDTO.getPricePPPD());
         house.setDescription(houseDetailsDTO.getDescription());
         house.setIsNotAvailable(houseDetailsDTO.isNotAvailable());
+        house.setExtraFeatures(houseDetailsDTO.getExtraFeatures());
         return house;
     }
 
