@@ -97,6 +97,7 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('description').value = house.description || '';
         document.getElementById('isNotAvailable').value = house.isNotAvailable ? 'true' : 'false';
 
+        // pictures container
         const picturesContainer = document.getElementById('pictures');
         picturesContainer.innerHTML = '';
         if (house.pictures && house.pictures.length > 0) {
@@ -111,6 +112,39 @@ document.addEventListener('DOMContentLoaded', function () {
         } else {
             picturesContainer.textContent = 'Geen foto\'s beschikbaar';
         }
+
+        // extra features container
+        const extraFeaturesContainer = document.getElementById('extraFeaturesContainer');
+        extraFeaturesContainer.innerHTML = '';
+        console.log("wordt hier aangemaakt:" + [extraFeatures] + extraFeatures)
+
+        if (house.extraFeatures && house.extraFeatures.length > 0) {
+            console.log("in de if statement:" + [extraFeatures] + extraFeatures)
+            house.extraFeatures.forEach(feature => {
+                const featureContainer = document.createElement('div');
+                featureContainer.className = 'feature-container';
+
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = `feature-${feature.id}`;
+                checkbox.disabled = true;
+
+                const label = document.createElement('label');
+                label.htmlFor = checkbox.id;
+                label.textContent = feature.getExtraFeatureName;
+
+                featureContainer.appendChild(checkbox);
+                featureContainer.appendChild(label);
+                extraFeaturesContainer.appendChild(featureContainer);
+
+                checkbox.checked = feature.hasFeature;
+            });
+
+        } else {
+            extraFeaturesContainer.textContent = 'Geen extra kenmerken beschikbaar';
+        }
+
+
     }
 
     getHouseById(id).then(house => {
@@ -138,6 +172,12 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('saveChanges').style.display = 'block';
         document.getElementById('cancelChanges').style.display = 'block';
         document.getElementById('deleteHouse').style.display = 'block';
+
+        // extra features
+        document.querySelectorAll('#extraFeaturesContainer input[type="checkbox"]').forEach(checkbox => {
+            checkbox.disabled = false;
+        });
+
     }
 
     function handleSaveChanges() {
@@ -156,6 +196,15 @@ document.addEventListener('DOMContentLoaded', function () {
         const houseTypeId = parseInt(houseTypeSelect.value);
         const houseTypeName = houseTypeSelect.options[houseTypeSelect.selectedIndex].text;
 
+        const extraFeatures = [];
+        console.log("wordt hier aangemaakt:" + [extraFeatures] + extraFeatures);
+        document.querySelectorAll('#extraFeaturesContainer input[type="checkbox"]').forEach(checkbox => {
+            extraFeatures.push({
+                id: checkbox.id.replace('feature-', ''),
+                hasFeature: checkbox.checked
+            });
+        });
+
         const data = {
             ...entries,
             houseId: parseInt(id),
@@ -163,6 +212,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 houseTypeId,
                 houseTypeName,
             },
+            extraFeatures,
         };
 
         updateHouse(id, data, { Authorization: token }).then(response => {
