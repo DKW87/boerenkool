@@ -66,8 +66,8 @@ async function fetchHouseDetails(houseId) {
 
 async function fetchExtraFeatures(houseId) {
     try {
-        // URL'de boşluk veya yeni satır olmadığından emin olun
-        const url = `/api/houses/${houseId}/extraFeatures`.trim();  // trim() ile boşlukları temizle
+
+        const url = `/api/extraFeatures/houses/${houseId}`;
         const response = await fetch(url);
         if (!response.ok) {
             throw new Error(`Error fetching extra features: ${response.status}`);
@@ -79,18 +79,20 @@ async function fetchExtraFeatures(houseId) {
     }
 }
 
-// Display the extra features in the DOM
 function displayExtraFeatures(extraFeatures) {
     const featuresContainer = document.getElementById('extraFeatures');
     featuresContainer.innerHTML = '';
+
     if (extraFeatures.length === 0) {
-        featuresContainer.innerHTML = '<p>Geen extra functies beschikbaar.</p>';  // Eğer özellik yoksa mesaj göster
+        featuresContainer.innerHTML = '<p>Geen extra functies beschikbaar.</p>';
     } else {
+        const ulElement = document.createElement('ul');
         extraFeatures.forEach(feature => {
             const featureItem = document.createElement('li');
-            featureItem.textContent = feature.name;
-            featuresContainer.appendChild(featureItem);
+            featureItem.textContent = feature.extraFeatureName;
+            ulElement.appendChild(featureItem);
         });
+        featuresContainer.appendChild(ulElement);
     }
 }
 
@@ -184,5 +186,5 @@ function displayHouseDetails(house) {
 // Display an error message if fetching house details fails
 function displayErrorMessage() {
     const container = document.getElementById('house-details');
-    //container.innerHTML = '<p>Kan huisdetails niet laden. Probeer het later opnieuw.</p>';  // Dutch error message
+    //container.innerHTML = '<p>Kan huisdetails niet laden. Probeer het later opnieuw.</p>';
 }

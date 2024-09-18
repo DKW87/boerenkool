@@ -2,8 +2,6 @@ body {
     font-family: Arial, sans-serif;
 }
 
-
-
 #form-header {
     text-align: center;
     margin-top: 20px;
@@ -115,23 +113,3 @@ input:checked + .slider:before {
 .slider.round:before {
     border-radius: 50%;
 }
-
-
-/* Header ve Footer genişlik ayarları */
-.header-div, .footer-div {
-    width: 100%; /* Header ve Footer tam genişlikte */
-    padding: 0; /* Ekstra boşlukları kaldırın */
-    margin: 0;
-
-}
-
-
-
-.footer-div {
-    position: relative;
-    bottom: 0;
-    left: 0;
-    padding: 10px;
-    text-align: center;
-}
-
