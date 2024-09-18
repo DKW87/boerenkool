@@ -63,7 +63,7 @@
                 </p>
                 <p><strong>Stad:</strong> <input type="text" id="city" disabled name="city" /></p>
                 <p><strong>Straat en huisnummer:</strong> <input type="text" id="streetAndNumber" disabled name="streetAndNumber" /></p>
-                <p><strong>Postcode:</strong> <input type="text" id="zipcode" disabled name="zipcode" /></p>
+                <p><strong>Postcode:</strong> <input type="text" id="zipcode" disabled name="zipcode" maxlength="6" /></p>
                 <p><strong>Max gasten:</strong> <input type="number" id="maxGuest" disabled name="maxGuest"/></p>
                 <p><strong>Aantal kamers:</strong> <input type="number" id="roomCount" disabled name="roomCount" /></p>
                 <p><strong>Prijs per persoon, per dag:</strong> <input type="number" id="pricePPPD" disabled name="pricePPPD"  /></p>
@@ -88,7 +88,9 @@
                 <br>
                 <br>
                 <p><strong>Extra voorzieningen:</strong></p>
-                <ul id="extraFeatures"></ul>
+                <div id="extraFeaturesContainer">
+
+                </div>
                 <br>
                 <br>
                 <div id="actionButtons">

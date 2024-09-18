@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             });
             if (!response.ok) {
-                throw new Error(`Response status: ${response.status}`);
+                throw new Error(`Error tijdens het ophalen van huisje: ${response.status}`);
             }
             return await response.json();
         } catch (error) {
@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             });
             if (!response.ok) {
-                throw new Error(`Response status: ${response.status}`);
+                throw new Error(`Error tijdens het updaten van Huisje: ${response.status}`);
             }
             return await response.text()
         } catch (error) {
@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             });
             if (!response.ok) {
-                throw new Error(`Response status: ${response.status}`);
+                throw new Error(`Error tijdens het verwijderen van huisje: ${response.status}`);
             }
             return await response.text();
         } catch (error) {
@@ -74,6 +74,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function displayHouseDetails(house) {
+        console.log("opgehaald huis object: " + house)
         document.getElementById('houseName').value = house.houseName || '';
         document.getElementById('houseOwnerId').value = house.houseOwnerId || '';
         document.getElementById('houseOwnerUsername').value = house.houseOwnerUsername || '';
@@ -89,6 +90,7 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('city').value = house.city || '';
         document.getElementById('streetAndNumber').value = house.streetAndNumber || '';
         document.getElementById('zipcode').value = house.zipcode || '';
+        console.log("dit is de zipcode opgehaald uit house: " + house.zipcode)
         document.getElementById('maxGuest').value = house.maxGuest || '';
         document.getElementById('roomCount').value = house.roomCount || '';
         document.getElementById('pricePPPD').value = house.pricePPPD || '';
@@ -140,6 +142,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function handleSaveChanges() {
         if (!validateInputs()) {
+            console.log("Not validate Inputs" + validateInputs())
             return;
         }
 
@@ -175,7 +178,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
     function handleDeleteHouse() {
-        if (confirm('Are you sure you want to delete this house?')) {
+        if (confirm('Weet je zeker dat je dit huisje wilt verwijderen?')) {
             deleteHouse(id).then(response => {
                 if (response) {
                     showToast(response);
@@ -245,8 +248,8 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function validateZipcode(value) {
-        const regex = /^[A-Za-z]{4}\d{2}$/;
-        return regex.test(value);
+        const regex = /^\d{4}[a-zA-Z]{2}$/;
+        return regex.test(value)
     }
 
     function validateCity(value) {
@@ -260,6 +263,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const city = document.getElementById('city').value;
         const streetAndNumber = document.getElementById('streetAndNumber').value;
         const zipcode = document.getElementById('zipcode').value;
+        console.log("dit is zipcode binnen validateInputs: " + zipcode)
         const maxGuest = parseInt(document.getElementById('maxGuest').value, 10);
         const pricePPPD = parseFloat(document.getElementById('pricePPPD').value);
         const description = document.getElementById('description').value;
@@ -283,7 +287,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         if (zipcode.length > 6 || !validateZipcode(zipcode)) {
-            showToast('Postcode moet beginnen met 4 letters, gevolgd door 2 cijfers zonder spatie ertussen.')
+            showToast('Postcode moet beginnen met 4 nummers, gevolgd door 2 letters zonder spatie ertussen.')
             return false;
         }
 

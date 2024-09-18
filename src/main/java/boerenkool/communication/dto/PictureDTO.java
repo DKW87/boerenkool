@@ -15,9 +15,15 @@ public class PictureDTO {
 
 
 
+    public PictureDTO(Integer pictureId, Integer houseId, String base64Picture, String mimeType, String description) {
+        this.pictureId = pictureId;
+        this.houseId = houseId;
+        this.base64Picture = base64Picture;
+        this.mimeType = mimeType;
+        this.description = description;
+    }
 
     public PictureDTO(Integer houseId, String base64Picture, String mimeType, String description) {
-        this.pictureId = pictureId;
         this.houseId = houseId;
         this.base64Picture = base64Picture;
         this.mimeType = mimeType;
@@ -30,7 +36,13 @@ public class PictureDTO {
         this.description = description;
     }
 
+    public Integer getPictureId() {
+        return pictureId;
+    }
 
+    public void setPictureId(Integer pictureId) {
+        this.pictureId = pictureId;
+    }
 
     public Integer getHouseId() {
         return houseId;
