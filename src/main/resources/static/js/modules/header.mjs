@@ -64,7 +64,7 @@ function replaceUsername(username) {
     usernameToReplace.innerHTML = username;
 }
 
-function checkForUnreadMessages() {
+export function checkForUnreadMessages() {
     const messagesReadOrUnread = document.getElementById('messagesReadOrUnread');
 
     if (messagesReadOrUnread) {
@@ -84,13 +84,13 @@ function checkForUnreadMessages() {
             .then(text => {
                 
                 const intValue = parseInt(text, 10);
-                console.log(intValue);
-
                 if (intValue > 0) {
                     messagesReadOrUnread.src = './images/message_unread.png';
-                    messagesReadOrUnread.alt = 'icoon van een bericht die aangeeft dat alle berichten van de gebruiker gelezen zijn';
+                    messagesReadOrUnread.alt = 'icoon van een ongelezen bericht die aangeeft dat niet alle berichten van de gebruiker gelezen zijn';
+                } else {
+                    messagesReadOrUnread.src = "./images/message_read.png"
+                    messagesReadOrUnread.alt = 'icoon van een gelezen bericht';
                 }
-
             })
             .catch(error => {
                 console.error('Er is een probleem opgetreden met fetch:', error);

@@ -4,11 +4,20 @@
 
 .messageMainArea {
     display: grid;
-    grid-template-columns: 2fr 4fr;
+    grid-template-columns: 3fr 4fr;
     background-color: var(--boerenkool-grijs);
 }
 
-.messageMainArea menu {
+.selected {
+    background-color: var(--boerenkool-lichtgroen);
+}
+
+.readMessage {
+    background-color: white;
+}
+
+.unreadMessage {
+    background-color: var(--boerenkool-lichtpaars);
 }
 
 /* messageOverview ; contains the list of inbox/outbox messages */
@@ -19,8 +28,7 @@
     overflow: hidden;
 }
 
-#messageInOverview {
-    background-color: white;
+.messageInOverview {
     border: 1px;
     border-style: solid;
     border-color: var(--borderGrey);
@@ -34,13 +42,17 @@
     overflow: hidden;
 }
 
-/* messageSingleView ; contains readMessageView or writeMessageView */
-.messageSingleView {
-    background-color: var(--boerenkool-grijs);
+.subject {
+    font-weight: bold;
+}
+
+.readAndWriteSections {
+    display: none;
+    /*background-color: var(--boerenkool-grijs);*/
     min-height: 60vh;
 }
 
-.messageSingleView div {
+.readAndWriteSections div {
     background-color: white;
     border: 1px;
     border-style: solid;
@@ -50,29 +62,15 @@
     margin: 3px;
 }
 
-#readMessageView div {
-    /* background-color: white;
-    border: 1px;
-    border-style: solid;
-    border-color: var(--borderGrey);
-    border-radius: 4px;
-    padding: 10px;
-    margin: 3px; */
-}
-
-#writeMessageView {
-    display: flex;
-    flex-direction: column;
-}
+/*#writeMessageView {*/
+/*    display: flex;*/
+/*    flex-direction: column;*/
+/*}*/
 
 .inputField {
     /*font-size: var(--font-size-large);*/
     width: 300px;
     height: 2em;
-}
-
-.subject {
-    font-weight: bold;
 }
 
 button {
@@ -83,25 +81,3 @@ button {
     padding: 3px;
     margin: 3px;
 }
-
-/*dialog {*/
-/*    position:fixed;*/
-/*    left: 50%;*/
-/*    top: 40%;*/
-/*    border-style: solid;*/
-/*    border-color: var(--borderGrey);*/
-/*    border-radius: 4px;*/
-/*    padding: 20px;*/
-/*}*/
-
-/*#notification {*/
-/*    position: absolute;*/
-/*    bottom: 10px;*/
-/*    right: 10px;*/
-/*    background-color: white;*/
-/*    border: 3px;*/
-/*    border-style: solid;*/
-/*    border-color: var(--boerenkool-groen);*/
-/*    border-radius: 4px;*/
-/*    text-align: center;*/
-/*}*/

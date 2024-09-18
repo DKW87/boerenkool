@@ -1,4 +1,5 @@
-export const NO_MESSAGES = "Geen berichten"
+export const NO_MESSAGES_INBOX = "U heeft geen berichten ontvangen"
+export const NO_MESSAGES_OUTBOX = "U heeft geen berichten verzonden"
 export const PREFIX_FROM = "Van : "
 export const PREFIX_TO = "Aan : "
 export const SELECT_A_MESSAGE = "Selecteer een bericht"
