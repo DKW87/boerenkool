@@ -91,7 +91,6 @@ function cancelReservation(reservationId) {
         }
     })
         .then(response => {
-
                 console.log("response", response);
                 if (response.ok) {
                     Swal.fire({

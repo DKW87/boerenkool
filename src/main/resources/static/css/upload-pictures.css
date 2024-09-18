@@ -1,22 +1,16 @@
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    margin: 0;
-    padding: 0;
-    width: 100%;
-}
-
-.main-grid-area {
-    display: flex; /* Tüm alanı flexbox yap */
+.body-div {
+    background-color: var(--boerenkool-grijs);
+    display: flex;
     flex-direction: column;
-    justify-content: flex-start; /* Başlangıçta hizala */
-    align-items: center; /* İçindeki elemanları ortala */
-    width: 100%; /* Sayfanın tamamını kapsasın */
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+    padding: 20px;
 }
 
 .upload-container {
-    width: 40%; /* Formun genişliği */
-    margin: 50px auto; /* Sadece formu ortalar */
+    width: 40%;
+    margin: 50px auto;
     background-color: #fff;
     padding: 20px;
     border-radius: 10px;
@@ -28,7 +22,7 @@ body {
     margin-top: 20px;
     margin-bottom: 20px;
     padding: 10px;
-    font-family: "Playwrite PE", cursive;
+    font-family: "Gill Sans MT";
 }
 
 form {
@@ -126,22 +120,3 @@ button:hover {
 .close:hover {
     color: #ccc;
 }
-
-
-
-.header-div, .footer-div {
-    width: 100%;
-    padding: 0;
-    margin: 0;
-}
-
-
-
-.footer-div {
-    position: relative;
-    bottom: 0;
-    left: 0;
-    padding: 10px;
-    text-align: center;
-}
-
