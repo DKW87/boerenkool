@@ -10,9 +10,10 @@ import { showToast } from './modules/notification.mjs';
 /* global var */
 const params = new URLSearchParams(window.location.search);
 const token = getToken();
+const user = await getLoggedInUser(token);
 const houseOwnerId = params.get('id');
 const houseOwnerUsername = await getUsername(houseOwnerId);
-let userId = 0;
+let userId = user.userId;
 let houseOwnerIsBlocked = false;
 
 /* load all page elements */
@@ -94,7 +95,16 @@ async function loadHouses() {
     }
 }
 
+function hideProfileOptions() {
+    if (houseOwnerUsername == user.username) {
+        document.getElementById('profileOptions').style.visibility = "hidden";
+    }
+}
+
 function setSendUserMessage() {
+    if (houseOwnerUsername == user.username) {
+        return;
+    }
     const messageOptionLink = document.getElementById('messageOptionLink');
     const messageOptionLabel = document.getElementById('messageOptionLabel');
     messageOptionLink.href = `send-a-message.html?userid=${houseOwnerId}`;
@@ -110,11 +120,15 @@ async function setPageAndProfileTitle() {
 
 async function setBlockOption() {
     const blockOptionLabel = document.getElementById('blockOptionLabel');
+
+    if (houseOwnerUsername == user.username) {
+        hideProfileOptions();
+        return;
+    }
+    
     if (!token) {
         blockOptionLabel.remove();
     } else {
-        const user = await getLoggedInUser(token);
-        userId = user.userId;
         console.log(`Dit is het userId dat ik heb gekregen: ${userId}`);
         const blockedUserList = await fetchBlockedUsers(user.userId, token);
 
@@ -139,11 +153,6 @@ async function setBlockOption() {
 async function blockUserListener() {
     document.getElementById('blockOptionLink').addEventListener('click', function(event) {
         event.preventDefault();
-
-        if (Number(houseOwnerId) === Number(userId)) {
-            showToast('Je kan jezelf niet blokkeren!');
-            return;
-        }
 
         if (houseOwnerIsBlocked) {
             unblockUser(houseOwnerId, userId, token);
