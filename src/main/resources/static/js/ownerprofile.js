@@ -9,14 +9,19 @@ import { showToast } from './modules/notification.mjs';
 
 /* global var */
 const params = new URLSearchParams(window.location.search);
-const token = getToken();
-const user = await getLoggedInUser(token);
 const houseOwnerId = params.get('id');
 const houseOwnerUsername = await getUsername(houseOwnerId);
-let houseOwnerBlockedList = [];
-let userId = user.userId;
-let houseOwnerIsBlocked = false;
+const token = getToken();
+let user;
+if (token) {
+    user = await getLoggedInUser(token);
+} else {
+    user = { username: '', userId: Number(0) };
+}
+const userId = user.userId;
 let userIsBlocked = false;
+let houseOwnerIsBlocked = false;
+let houseOwnerBlockedList = [];
 
 /* load all page elements */
 Main.loadHeader();
@@ -146,6 +151,8 @@ async function setBlockOption() {
     }
 
     if (!token) {
+        const seperator = document.getElementById('seperator');
+        seperator.remove();
         blockOptionLabel.remove();
     } else {
         console.log(`Dit is het userId dat ik heb gekregen: ${userId}`);
