@@ -221,6 +221,7 @@ function deleteOneListener() {
 
             Swal.fire({
                 title: `Huis verwijderen`,
+                heightAuto: false,
                 text: `Weet je zeker dat je "${houseName}" met ID: ${houseId} wil verwijderen?`,
                 icon: "warning",
                 showCancelButton: true,
@@ -252,6 +253,7 @@ function deleteMultipleListener(checkboxes) {
     deleteAllButton.addEventListener('click', function () {
         Swal.fire({
             title: `Huis(jes) verwijderen`,
+            heightAuto: false,
             text: `Weet je zeker dat je ${amountChecked} huis(jes) met ID(s): ${houseIdArray} wil verwijderen?`,
             icon: "warning",
             showCancelButton: true,

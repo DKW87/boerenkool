@@ -290,21 +290,27 @@ export function setTodayAsMinValueDateInput() {
 
 async function createPageNumbers() {
     const params = new URLSearchParams(window.location.search);
+    let pageLimit = Number(params.get('limit')) || 12; // fallback to default of 12 results per page if no param
+    let offset = Number(params.get('offset')) || 0; // fallback to default of 0 if no param
+
+    if (amountOfFilteredHouses < pageLimit) {
+        return; 
+    }
+
+    params.delete('limit');
+    params.delete('offset');
+
     const parentElement = document.getElementById('body');
     const pageNumbersDiv = document.createElement('div');
     pageNumbersDiv.className = 'page-numbers';
     parentElement.appendChild(pageNumbersDiv);
+
     const pageNumberSpan = document.createElement('span');
     pageNumberSpan.id = 'pageNumberSpan';
     pageNumbersDiv.appendChild(pageNumberSpan);
 
     let pageCounter = 1; // start on page 1
-    let pageLimit = Number(params.get('limit')) || 12; // fallback to default of 12 results per page if no param
-    let offset = Number(params.get('offset')) || 0; // fallback to default of 0 if no param
     let currentPage = (offset / pageLimit) + 1;
-
-    params.delete('limit');
-    params.delete('offset');
 
     for (let i = 1; i < amountOfFilteredHouses; i++) {
 
