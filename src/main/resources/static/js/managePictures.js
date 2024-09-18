@@ -1,6 +1,6 @@
 import * as Main from './modules/main.mjs';
 import * as Auth from './modules/auth.mjs';
-import { showToast } from "./modules/notification.mjs";
+import {showToast} from "./modules/notification.mjs";
 
 Main.loadHeader();
 Main.loadFooter();

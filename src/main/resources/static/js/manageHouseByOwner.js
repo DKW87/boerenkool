@@ -36,6 +36,8 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+
+
     async function updateHouse(id, houseData, headers) {
         const url = `/api/houses/${id}`;
 
@@ -73,35 +75,49 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    function displayHouseDetails(house) {
-        console.log("opgehaald huis object: " + house)
+    async function fetchExtraFeatures() {
+        try {
+            const response = await fetch('/api/extraFeatures');
+            if (!response.ok) {
+                showToast("Error fetching extra features");
+                throw new Error(`Error fetching extra features: ${response.status}`);
+            }
+            const features = await response.json();
+            console.log("Fetched extra features:", features);
+            return features;
+        } catch (error) {
+            console.error(error.message);
+            return [];
+        }
+    }
+
+    async function displayHouseDetails(house) {
+        console.log("Opgehaald huis object:", house);
+
         document.getElementById('houseName').value = house.houseName || '';
         document.getElementById('houseOwnerId').value = house.houseOwnerId || '';
         document.getElementById('houseOwnerUsername').value = house.houseOwnerUsername || '';
         document.getElementById('houseType').value = house.houseType ? house.houseType.houseTypeId : '';
 
         const provinceSelect = document.getElementById('province');
-        if (house.province) {
-            provinceSelect.value = house.province;
-        } else {
-            provinceSelect.value = 'Kies een provincie';
-        }
+        provinceSelect.value = house.province || 'Kies een provincie';
 
         document.getElementById('city').value = house.city || '';
         document.getElementById('streetAndNumber').value = house.streetAndNumber || '';
         document.getElementById('zipcode').value = house.zipcode || '';
-        console.log("dit is de zipcode opgehaald uit house: " + house.zipcode)
         document.getElementById('maxGuest').value = house.maxGuest || '';
         document.getElementById('roomCount').value = house.roomCount || '';
         document.getElementById('pricePPPD').value = house.pricePPPD || '';
         document.getElementById('description').value = house.description || '';
         document.getElementById('isNotAvailable').value = house.isNotAvailable ? 'true' : 'false';
 
-        // pictures container
+
         const picturesContainer = document.getElementById('pictures');
         picturesContainer.innerHTML = '';
         if (house.pictures && house.pictures.length > 0) {
             house.pictures.forEach(picture => {
+                console.log(`Picture MIME Type: ${picture.mimeType}`);
+                console.log(`Picture Description: ${picture.description}`);
                 const img = document.createElement('img');
                 img.src = `data:${picture.mimeType};base64,${picture.base64Picture}`;
                 img.alt = picture.description || 'House picture';
@@ -113,38 +129,36 @@ document.addEventListener('DOMContentLoaded', function () {
             picturesContainer.textContent = 'Geen foto\'s beschikbaar';
         }
 
-        // extra features container
+        const extraFeaturesList = await fetchExtraFeatures();
+        console.log("Extra feature lijstje", extraFeaturesList);
         const extraFeaturesContainer = document.getElementById('extraFeaturesContainer');
         extraFeaturesContainer.innerHTML = '';
-        console.log("wordt hier aangemaakt:" + [extraFeatures] + extraFeatures)
-
-        if (house.extraFeatures && house.extraFeatures.length > 0) {
-            console.log("in de if statement:" + [extraFeatures] + extraFeatures)
-            house.extraFeatures.forEach(feature => {
-                const featureContainer = document.createElement('div');
-                featureContainer.className = 'feature-container';
-
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.id = `feature-${feature.id}`;
-                checkbox.disabled = true;
-
-                const label = document.createElement('label');
-                label.htmlFor = checkbox.id;
-                label.textContent = feature.getExtraFeatureName;
-
-                featureContainer.appendChild(checkbox);
-                featureContainer.appendChild(label);
-                extraFeaturesContainer.appendChild(featureContainer);
-
-                checkbox.checked = feature.hasFeature;
-            });
-
-        } else {
-            extraFeaturesContainer.textContent = 'Geen extra kenmerken beschikbaar';
-        }
 
 
+        extraFeaturesList.forEach(feature => {
+            const featureContainer = document.createElement('div');
+            featureContainer.className = 'feature-container';
+
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.id = feature.extraFeatureId;
+            checkbox.disabled = true;
+            checkbox.name = feature.extraFeatureName;
+
+            const houseHasFeature = house.extraFeatures.some(houseFeature =>
+                houseFeature.extraFeatureId === feature.extraFeatureId);
+
+            checkbox.checked = houseHasFeature;
+            checkbox.disabled = !houseHasFeature;
+
+            const label = document.createElement('label');
+            label.htmlFor = checkbox.id;
+            label.textContent = feature.extraFeatureName;
+
+            featureContainer.appendChild(checkbox);
+            featureContainer.appendChild(label);
+            extraFeaturesContainer.appendChild(featureContainer);
+        });
     }
 
     getHouseById(id).then(house => {
@@ -173,16 +187,17 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('cancelChanges').style.display = 'block';
         document.getElementById('deleteHouse').style.display = 'block';
 
-        // extra features
         document.querySelectorAll('#extraFeaturesContainer input[type="checkbox"]').forEach(checkbox => {
             checkbox.disabled = false;
         });
 
     }
 
-    function handleSaveChanges() {
+    // endpoint van updateAllExtraFeaturesForHouse niet beschikbaar, lukt mij niet om saved changes te implementeren
+    // voor extra house features. code staat erin maar is niet functioneel.
+    async function handleSaveChanges() {
         if (!validateInputs()) {
-            console.log("Not validate Inputs" + validateInputs())
+            console.log("Inputs niet gevalideerd");
             return;
         }
 
@@ -196,14 +211,20 @@ document.addEventListener('DOMContentLoaded', function () {
         const houseTypeId = parseInt(houseTypeSelect.value);
         const houseTypeName = houseTypeSelect.options[houseTypeSelect.selectedIndex].text;
 
-        const extraFeatures = [];
-        console.log("wordt hier aangemaakt:" + [extraFeatures] + extraFeatures);
-        document.querySelectorAll('#extraFeaturesContainer input[type="checkbox"]').forEach(checkbox => {
-            extraFeatures.push({
-                id: checkbox.id.replace('feature-', ''),
-                hasFeature: checkbox.checked
-            });
-        });
+
+        const extraFeaturesList = await fetchExtraFeatures();
+
+
+        const checkedFeatureIds = Array.from(document.querySelectorAll('#extraFeaturesContainer input[type="checkbox"]:checked'))
+            .map(checkbox => parseInt(checkbox.id));
+
+
+        const extraFeatures = extraFeaturesList
+            .filter(feature => checkedFeatureIds.includes(feature.extraFeatureId))
+            .map(feature => ({
+                extraFeatureId: feature.extraFeatureId,
+                hasFeature: true
+            }));
 
         const data = {
             ...entries,
@@ -215,17 +236,17 @@ document.addEventListener('DOMContentLoaded', function () {
             extraFeatures,
         };
 
+        console.log("Sending data for update:", data);
+
         updateHouse(id, data, { Authorization: token }).then(response => {
             if (response) {
-                showToast(response);
+                showToast("Huisgegevens bijgewerkt!");
                 setTimeout(() => {
                     window.location.href = '/mijn-huisjes.html';
                 }, 1000);
             }
         });
     }
-
-
 
     function handleDeleteHouse() {
         if (confirm('Weet je zeker dat je dit huisje wilt verwijderen?')) {
@@ -263,7 +284,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 document.getElementById('editHouse').style.display = 'block';
                 document.getElementById('saveChanges').style.display = 'none';
                 document.getElementById('cancelChanges').style.display = 'none';
-                document.getElementById('deleteHouse').style.display = 'none';
+                document.getElementById('deleteHouse').style.display = 'block';
             } else {
                 console.error('Error tijdens het ophalen van een huis');
             }

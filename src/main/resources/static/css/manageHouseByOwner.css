@@ -92,6 +92,10 @@ body {
     background-color: var(--boerenkool-wit);
 }
 
+h2 {
+    color: #a975de;
+}
+
 #pictures img {
     height: 150px;
     width: auto;
@@ -178,8 +182,4 @@ body {
 
 #deleteHouse:hover {
     background-color: rgb(210, 97, 97);
-}
-
-.hidden {
-    display: none;
 }
