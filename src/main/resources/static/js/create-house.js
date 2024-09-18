@@ -63,7 +63,12 @@ document.addEventListener('DOMContentLoaded', async function() {
         const isNotAvailable = document.getElementById('isNotAvailable').checked;
 
         const selectedFeatures = Array.from(document.querySelectorAll('input[name="extraFeatures"]:checked'))
-            .map(checkbox => checkbox.value);
+            .map(checkbox => {
+                return {
+                    extraFeatureId:checkbox.value,
+                    extraFeatureName : ""
+                }
+            } );
 
         if (!selectedHouseType) {
             alert('Please select a valid house type.');
@@ -95,6 +100,8 @@ document.addEventListener('DOMContentLoaded', async function() {
                 },
                 body: JSON.stringify(houseData)
             });
+
+            alert(JSON.stringify(houseData))
 
             const contentType = response.headers.get("content-type");
 
