@@ -37,8 +37,6 @@ const DATE_TIME_OPTIONS = {
 await setup()
 
 async function setup() {
-    // showElement(`writeMessageSection`, false)
-    // showElement(`readMessageSection`, false)
     listOfCorrespondents = await getListOfCorrespondents()
 
     //  inject send-message.html fragment
@@ -200,7 +198,6 @@ function fillMessageOverview(listOfMessages) {
             newOverviewMessage.addEventListener('click', messageSelected)
             document.querySelector(`#messageOverview`).appendChild(newOverviewMessage)
         })
-        // document.querySelector(`#messageOverview`).onclick = highlight;
     } else {
         noMessages()
     }

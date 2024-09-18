@@ -33,11 +33,6 @@ public class MessageRepository {
     // add users to EXISTING (already stored) message
     // not used for new messages (that do not have a messageId yet)
     private void addUsersToMessage(Message message) {
-        if (userDAO.getSenderByMessageId(message.getMessageId()).orElse(null) == null) {
-            // TODO debug delete from sent messages;
-            System.out.println("addUsersToMessage getSenderByMessageId(message.getmessageId) is null");
-            System.out.println(message);
-        }
         message.setSender(userDAO.getSenderByMessageId(message.getMessageId()).orElse(null));
         message.setReceiver(userDAO.getReceiverByMessageId(message.getMessageId()).orElse(null));
     }
