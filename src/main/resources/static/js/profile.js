@@ -23,17 +23,7 @@ async function initPage() {
         if (!user) return;
 
         populateForm(user);
-
-
-        // Laad alleen de geblokkeerde gebruikers en activeer de block-knop als de gebruiker een 'Verhuurder' is
-        if (user.typeOfUser === "Verhuurder") {
-            console.log("Gebruiker is een 'Verhuurder', probeer geblokkeerde gebruikers te laden.");
-            loadBlockedUsers(user.userId, Auth.getToken());
-
-            // Toon de sectie voor geblokkeerde gebruikers en de block-knop
-            document.getElementById('blocked-users-container').style.display = 'block';
-            document.getElementById('block-user-section').style.display = 'block';
-        }
+        loadBlockedUsers(user.userId, Auth.getToken());
         setupEventListeners(user);
 
         const coinBalance = await fetchWalletDetails();
