@@ -5,6 +5,7 @@ main.loadFooter();
 
 let currentImageIndex = 0;
 let allImages = [];
+let house = {};
 
 // Wait for the DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', async function () {
@@ -56,7 +57,7 @@ async function fetchHouseDetails(houseId) {
         if (!response.ok) {
             throw new Error(`Response status: ${response.status}`);
         }
-        const house = await response.json();
+        house = await response.json();
         displayHouseDetails(house);  // Display house details in the DOM
     } catch (error) {
         console.error('Error fetching house details:', error);
@@ -119,6 +120,10 @@ function updateModalImage() {
 
     const prevBtn = document.getElementById('prev');
     const nextBtn = document.getElementById('next');
+
+
+    const description = house.pictures[currentImageIndex].description || "Geen beschrijving";
+    document.getElementById('caption').innerHTML = description;
 
     // Hide or show navigation buttons based on the number of images
     if (allImages.length <= 1) {

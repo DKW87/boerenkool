@@ -1,16 +1,16 @@
 .body-div {
-    background-color: var(--boerenkool-grijs); /* Global.css'te tanımlı renk değişkenini kullanın */
+    background-color: var(--boerenkool-grijs);
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    width: 100%; /* Sadece içerik alanı için genişlik ayarlarını yapın */
+    width: 100%;
     padding: 20px;
 }
 
 .upload-container {
-    width: 40%; /* Formun genişliği */
-    margin: 50px auto; /* Sadece formu ortalar */
+    width: 40%;
+    margin: 50px auto;
     background-color: #fff;
     padding: 20px;
     border-radius: 10px;
@@ -22,7 +22,7 @@
     margin-top: 20px;
     margin-bottom: 20px;
     padding: 10px;
-    font-family: "Playwrite PE", cursive; /* Bu font global'de tanımlı değilse bırakabilirsiniz */
+    font-family: "Gill Sans MT";
 }
 
 form {

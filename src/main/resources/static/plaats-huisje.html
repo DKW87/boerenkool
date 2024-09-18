@@ -68,16 +68,19 @@
             <input type="text" id="zipcode" required>
 
             <label for="maxGuest">Max Gasten</label>
-            <input type="number" id="maxGuest" required>
+            <input type="number" id="maxGuest" required min="1">
 
             <label for="roomCount">Aantal Kamers</label>
-            <input type="number" id="roomCount" required>
+            <input type="number" id="roomCount" required min="1">
 
             <label for="pricePPPD">Prijs per Persoon per Dag</label>
-            <input type="number" id="pricePPPD" required>
+            <input type="number" id="pricePPPD" required min="1">
 
             <label for="description">Beschrijving</label>
             <textarea id="description" rows="4" required></textarea>
+
+            <label>Extra Kenmerken</label><br>
+            <div id="extraFeaturesContainer"></div><br>
 
             <!-- Beschikbaarheid Toggle -->
             <label for="isNotAvailable">Beschikbaarheid</label>
@@ -85,7 +88,7 @@
                 <input type="checkbox" id="isNotAvailable">
                 <span class="slider round"></span>
             </label>
-            <span id="availabilityText">Beschikbaar</span>
+            <span id="availabilityText">Beschikbaar</span><br>
 
             <button type="submit">Maak Huis Aan</button>
             <p id="message"></p>
