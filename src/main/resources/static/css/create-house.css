@@ -2,14 +2,13 @@ body {
     font-family: Arial, sans-serif;
 }
 
-
-
 #form-header {
     text-align: center;
     margin-top: 20px;
     margin-bottom: 20px;
     padding: 10px;
-    font-family: "Playwrite PE", cursive;
+    font-family: "Gill Sans MT";
+
 }
 
 h2 {
@@ -116,22 +115,25 @@ input:checked + .slider:before {
     border-radius: 50%;
 }
 
-
-/* Header ve Footer genişlik ayarları */
-.header-div, .footer-div {
-    width: 100%; /* Header ve Footer tam genişlikte */
-    padding: 0; /* Ekstra boşlukları kaldırın */
-    margin: 0;
-
+#extraFeaturesContainer {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 5px;
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
 
-
-
-.footer-div {
-    position: relative;
-    bottom: 0;
-    left: 0;
-    padding: 10px;
-    text-align: center;
+#extraFeaturesContainer label {
+    display: inline-flex;
+    align-items: center;
+    font-size: 14px;
 }
+
+#extraFeaturesContainer input[type="checkbox"] {
+    margin-right: 2px;
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+}
+
 

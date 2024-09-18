@@ -18,27 +18,30 @@
     <script src="js/upload-pictures.js" type="module"></script>
 </head>
 
+
 <body>
 <div class="main-grid-area">
     <div class="header-div" id="header"></div>
 
-    <!-- Container voor het formulier -->
-    <div class="upload-container">
-        <div id="upload-pictures" class="container">
-            <h1 id="form-header">Foto's uploaden voor het huis</h1><br><br>
-            <form id="pictureForm">
-                <label for="housePictures">Foto's toevoegen</label>
-                <input type="file" id="housePictures" multiple accept="image/*">
-                <div id="imagePreview" class="image-preview"></div>
-                <button type="submit">Foto's uploaden</button>
-                <p id="message"></p>
-            </form>
+    <div class="body-div">
+        <!-- Container voor het formulier -->
+        <div class="upload-container">
+            <div id="upload-pictures" class="container">
+                <h1 id="form-header">Foto's uploaden voor het huis</h1><br><br>
+                <form id="pictureForm">
+                    <label for="housePictures">Foto's toevoegen</label>
+                    <input type="file" id="housePictures" multiple accept="image/*">
+                    <div id="imagePreview" class="image-preview"></div>
+                    <button type="submit">Foto's uploaden</button>
+                    <p id="message"></p>
+                </form>
 
-            <!-- Modal voor vergroot beeld -->
-            <div id="imageModal" class="modal">
-                <span class="close">&times;</span>
-                <img class="modal-content" id="modalImage">
-                <div id="caption"></div>
+                <!-- Modal voor vergroot beeld -->
+                <div id="imageModal" class="modal">
+                    <span class="close">&times;</span>
+                    <img class="modal-content" id="modalImage">
+                    <div id="caption"></div>
+                </div>
             </div>
         </div>
     </div>
