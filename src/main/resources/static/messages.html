@@ -27,38 +27,33 @@
 <!--    later om te zetten naar stage / scene / actor classes-->
     <div class="messageMainArea">
 
-        <menu>
-            <button id="refreshButton">Refresh</button>
-            <button id="showInboxButton">Inbox</button>
-            <button id="showOutboxButton">Outbox</button>
-        </menu>
+        <div>
+            <div id="buttonBar" style="display:none">
+                <button id="showInboxButton">Inbox</button>
+                <button id="showOutboxButton">Outbox</button>
+                <button id="writeMessageButton">Schrijf een nieuw bericht</button>
 
-        <menu>
-            <button id="writeMessageButton">Schrijf een nieuw bericht</button>
-        </menu>
-
-        <section id="messageOverview">
-        </section>
-
-        <section class="messageSingleView" id="messageSingleView">
-            <div>
-                <span id="singleViewPrefix"></span>
-                <span id="singleViewUsername"></span>
-                <span id="singleViewDateTimeSent"></span>
             </div>
-            <div><span id="singleViewSubject" class="subject"></span></div>
-            <div id="singleViewBody"></div>
-            <button id="deleteMessageButton">Verwijder dit bericht</button>
-            <button id="answerMessageButton">Beantwoord dit bericht</button>
-        </section>
 
-        <dialog>
-            <p id="dialogText">dialog text</p>
-            <button id="dialogButtonConfirm">confirm button text </button>
-            <button id="dialogButtonCancel" autofocus>cancel button text </button>
-        </dialog>
+            <section id="messageOverview"></section>
+        </div>
 
-        <div id="sendMessageInjectedHtml"></div>
+        <div>
+            <section class="readAndWriteSections" id="readMessageSection" style="display:none">
+                <div>
+                    <span id="singleViewPrefix"></span>
+                    <span id="singleViewUsername"></span>
+                    <span id="singleViewDateTimeSent"></span>
+                </div>
+                <div><span id="singleViewSubject" class="subject"></span></div>
+                <div id="singleViewBody"></div>
+                <button id="deleteMessageButton">Verwijder dit bericht</button>
+                <button id="blockUserButton">Blokkeer deze persoon</button>
+                <button id="answerMessageButton">Beantwoord dit bericht</button>
+            </section>
+
+            <section id="writeMessageSection" style="display:none"></section>
+        </div>
 
     </div>
 

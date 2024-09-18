@@ -30,22 +30,8 @@ public class MessageRepository {
         logger.info("New MessageRepository");
     }
 
-    private Optional<Message> addUsersToMessage(Optional<Message> message) {
-        if (message.isPresent()) {
-            message.get().setSender(userDAO.getSenderByMessageId(message.get().getMessageId())
-                    .orElse(null));
-            message.get().setReceiver(userDAO.getReceiverByMessageId(message.get().getMessageId())
-                    .orElse(null));
-        }
-        return message;
-    }
-
-    /**
-     * add users to EXISTING (already stored) message
-     * not used for new messages (that do not have a messageId yet)
-     * @param message
-     * @return
-     */
+    // add users to EXISTING (already stored) message
+    // not used for new messages (that do not have a messageId yet)
     private void addUsersToMessage(Message message) {
         message.setSender(userDAO.getSenderByMessageId(message.getMessageId()).orElse(null));
         message.setReceiver(userDAO.getReceiverByMessageId(message.getMessageId()).orElse(null));
@@ -78,8 +64,6 @@ public class MessageRepository {
 
     public List<Message> getAllFromSenderId(int senderId) {
         List<Message> listOfMessages = messageDAO.getAllFromSenderId(senderId);
-//        // TODO debug delete from sent messages;
-//        System.out.println("***********************listOfMessages is " + listOfMessages);
         addUsersToMessages(listOfMessages);
         return listOfMessages;
     }
