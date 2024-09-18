@@ -13,8 +13,10 @@ const token = getToken();
 const user = await getLoggedInUser(token);
 const houseOwnerId = params.get('id');
 const houseOwnerUsername = await getUsername(houseOwnerId);
+let houseOwnerBlockedList = [];
 let userId = user.userId;
 let houseOwnerIsBlocked = false;
+let userIsBlocked = false;
 
 /* load all page elements */
 Main.loadHeader();
@@ -30,6 +32,21 @@ async function loadHouses() {
     const url = api + houseOwnerId;
 
     if (housesBox) {
+
+        houseOwnerBlockedList = await fetchBlockedUsers(houseOwnerId, token);
+
+        houseOwnerBlockedList.forEach(blockedUser => {
+            if (blockedUser.userId == userId) {
+                userIsBlocked = true;
+            }
+        });
+
+        if (userIsBlocked) {
+            hideProfileOptions();
+            showToast('Deze gebruiker heeft jou geblokkeerd');
+            return;
+        }
+
         try {
             const response = await fetch(url);
             if (!response.ok) {
@@ -98,6 +115,8 @@ async function loadHouses() {
 function hideProfileOptions() {
     if (houseOwnerUsername == user.username) {
         document.getElementById('profileOptions').style.visibility = "hidden";
+    } else if (userIsBlocked) {
+        document.getElementById('profileOptions').innerHTML = 'Deze gebruiker heeft jou geblokkeerd';
     }
 }
 
@@ -125,7 +144,7 @@ async function setBlockOption() {
         hideProfileOptions();
         return;
     }
-    
+
     if (!token) {
         blockOptionLabel.remove();
     } else {
@@ -151,7 +170,7 @@ async function setBlockOption() {
 }
 
 async function blockUserListener() {
-    document.getElementById('blockOptionLink').addEventListener('click', function(event) {
+    document.getElementById('blockOptionLink').addEventListener('click', function (event) {
         event.preventDefault();
 
         if (houseOwnerIsBlocked) {
@@ -168,7 +187,7 @@ async function blockUserListener() {
 
 function setAmountOfHouses(amountOfHouses) {
     const element = document.getElementById('amountOfHouses');
-    
+
     switch (amountOfHouses) {
         case undefined:
             element.innerHTML = 'Geen huisjes voor deze verhuurder gevonden.';
