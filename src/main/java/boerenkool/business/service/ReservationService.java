@@ -14,6 +14,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * @author Adnan Kilic
+ * @project Boerenkool
+ */
+
 @Service
 public class ReservationService {
 
@@ -39,30 +44,33 @@ public class ReservationService {
     }
 
     public Reservation saveReservation(Reservation reservation) {
-        checkGuestCount(reservation.getHouse(), reservation.getGuestCount());
-        checkDateOverlap(reservation.getHouse().getHouseId(), reservation.getStartDate(), reservation.getEndDate());
-
-        User user = reservation.getReservedByUser();
-
+        validateReservationDetails(reservation);
         int totalCost = calculateReservationCost(
                 reservation.getStartDate(),
                 reservation.getEndDate(),
                 reservation.getHouse().getHouseId(),
                 reservation.getGuestCount()
         );
-
+        User user = reservation.getReservedByUser();
         validateUserBudget(totalCost, user);
-
         Reservation savedReservation = reservationRepository.saveReservation(reservation);
+        updateUserBalance(user, totalCost);
 
+        return savedReservation;
+    }
+
+    private void validateReservationDetails(Reservation reservation) {
+        checkGuestCount(reservation.getHouse(), reservation.getGuestCount());
+        checkDateOverlap(reservation.getHouse().getHouseId(), reservation.getStartDate(), reservation.getEndDate());
+    }
+
+    private void updateUserBalance(User user, int totalCost) {
         int newBalance = user.getCoinBalance() - totalCost;
         boolean updateSuccess = userRepository.updateBoerenkoolcoins(user.getUserId(), newBalance);
 
         if (!updateSuccess) {
             throw new RuntimeException("Failed to update user balance");
         }
-
-        return savedReservation;
     }
 
     public int calculateReservationCost(LocalDate startDate, LocalDate endDate, int houseId, int guestCount) {
@@ -82,7 +90,7 @@ public class ReservationService {
 
     public void validateUserBudget(int totalCost, User user) {
         int userBudget = user.getCoinBalance();
-        if (totalCost> userBudget) {
+        if (totalCost > userBudget) {
             throw new IllegalArgumentException("De reserveringskosten overschrijden uw budget!");
         }
     }
@@ -114,17 +122,9 @@ public class ReservationService {
 
 
     public boolean deleteReservationById(int id) {
+        Reservation reservation = findReservationById(id);
+        validateReservationForDeletion(reservation);
 
-        Reservation reservation = reservationRepository.getReservationById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Reservering niet gevonden!"));
-
-        LocalDate currentDate = LocalDate.now();
-
-        if (reservation.getEndDate().isBefore(currentDate)) {
-            throw new IllegalArgumentException("Eerdere reserveringen kunnen niet worden verwijderd!");
-        }
-
-        User user = reservation.getReservedByUser();
         int totalCost = calculateReservationCost(
                 reservation.getStartDate(),
                 reservation.getEndDate(),
@@ -132,13 +132,32 @@ public class ReservationService {
                 reservation.getGuestCount()
         );
 
+        updateUserBalanceAfterCancellation(reservation.getReservedByUser(), totalCost);
+
+        return cancelReservation(id);
+    }
+
+    private Reservation findReservationById(int id) {
+        return reservationRepository.getReservationById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Reservering niet gevonden!"));
+    }
+
+    private void validateReservationForDeletion(Reservation reservation) {
+        if (reservation.getEndDate().isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException("Eerdere reserveringen kunnen niet worden verwijderd!");
+        }
+    }
+
+    private void updateUserBalanceAfterCancellation(User user, int totalCost) {
         int newBalance = user.getCoinBalance() + totalCost;
         boolean updateSuccess = userRepository.updateBoerenkoolcoins(user.getUserId(), newBalance);
 
         if (!updateSuccess) {
             throw new RuntimeException("Het is niet gelukt om het saldo van de gebruiker bij te werken");
         }
+    }
 
+    private boolean cancelReservation(int id) {
         boolean cancellationSuccess = reservationRepository.deleteReservationById(id);
 
         if (!cancellationSuccess) {
@@ -216,10 +235,6 @@ public class ReservationService {
         reservation.setHouse(house);
         reservation.setReservedByUser(user);
         return reservation;
-    }
-
-    public List<Reservation> getAllReservationsByUserId(int userId) {
-        return reservationRepository.getAllReservationsByUserId(userId);
     }
 }
 

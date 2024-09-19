@@ -2,6 +2,11 @@ package boerenkool.communication.dto;
 
 import java.time.LocalDate;
 
+/**
+ * @author Adnan Kilic
+ * @project Boerenkool
+ */
+
 public class ReservationDTO {
 
     private int reservationId;
@@ -14,18 +19,6 @@ public class ReservationDTO {
 
     public ReservationDTO() {
     }
-
-    public ReservationDTO(int reservationId, LocalDate startDate, LocalDate endDate, int guestCount, int houseId, String houseName, int userId) {
-        this.reservationId = reservationId;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.guestCount = guestCount;
-        this.houseId = houseId;
-        this.houseName = houseName;
-        this.userId = userId;
-    }
-
-    // Getters and Setters
 
     public int getReservationId() {
         return reservationId;
@@ -67,9 +60,7 @@ public class ReservationDTO {
         this.houseId = houseId;
     }
 
-    public String getHouseName() {
-        return houseName;
-    }
+    public String getHouseName() {return houseName;}
 
     public void setHouseName(String houseName) {
         this.houseName = houseName;

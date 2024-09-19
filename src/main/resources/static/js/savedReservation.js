@@ -1,6 +1,11 @@
 import * as Main from './modules/main.mjs';
 import {checkIfLoggedIn} from "./modules/auth.mjs";
 
+/**
+ * @author Adnan Kilic
+ * @project Boerenkool
+ */
+
 Main.loadHeader();
 Main.loadFooter();
 
@@ -10,7 +15,6 @@ document.addEventListener('DOMContentLoaded', async function () {
     user = await checkIfLoggedIn();
     await getAllSavedReservation();
 })
-
 
 async function getAllSavedReservation() {
 
@@ -55,10 +59,10 @@ function addCancelEventListener(endDateString, reservationId) {
         console.log(endDate);
         console.log(endDateString);
 
-
         if (endDate < currentDate) {
             Swal.fire({
                 title: "Niet toegestaan!",
+                heightAuto: false,
                 text: "U kunt een reservering uit het verleden niet annuleren.",
                 icon: "error"
             });
@@ -66,6 +70,7 @@ function addCancelEventListener(endDateString, reservationId) {
         }
         Swal.fire({
             title: "Weet u het zeker?",
+            heightAuto: false,
             text: "Dit kunt u niet meer ongedaan maken!",
             icon: "Waarschuwing",
             showCancelButton: true,
@@ -79,7 +84,6 @@ function addCancelEventListener(endDateString, reservationId) {
         });
 
     });
-
 }
 
 function cancelReservation(reservationId) {
@@ -95,6 +99,7 @@ function cancelReservation(reservationId) {
                 if (response.ok) {
                     Swal.fire({
                         title: "Verwijderd!",
+                        heightAuto: false,
                         text: "Uw reservering is verwijderd.",
                         icon: "succes"
                     });
