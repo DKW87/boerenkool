@@ -42,11 +42,6 @@ async function getUserProfile() {
         console.log("Auth object:", Auth);
         console.log("Checken of gebruiker is ingelogd...");
 
-        if (typeof Auth.checkIfLoggedIn !== "function") {
-            console.error("Auth.checkIfLoggedIn is geen functie");
-            return null;
-        }
-
         const user = await Auth.checkIfLoggedIn();
         console.log("Gebruiker opgehaald:", user);
         return user;
