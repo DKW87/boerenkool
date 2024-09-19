@@ -1,7 +1,11 @@
 import * as Main from './modules/main.mjs';
 import * as Auth from "./modules/auth.mjs";
 import { showToast } from './modules/notification.mjs';
-import {getToken} from "./modules/auth.mjs";
+
+/**
+ * @author Adnan Kilic
+ * @project Boerenkool
+ */
 
 Main.loadHeader();
 Main.loadFooter();
@@ -9,9 +13,7 @@ Main.loadFooter();
 document.addEventListener('DOMContentLoaded', async function () {
 
     const loginBtn = document.getElementById("go-login")
-
     const reservationContainer  = document.getElementById("make-reservation")
-
 
     const token =  Auth.getToken();
     let user = null
@@ -29,7 +31,6 @@ document.addEventListener('DOMContentLoaded', async function () {
     const startDate = urlParams.get('startDate');
     const endDate = urlParams.get('endDate');
     const guestCountInput = document.getElementById("guestCount")
-
     const startDateInput = document.getElementById('startDate')
     const endDateInput = document.getElementById('endDate')
 
@@ -41,7 +42,6 @@ document.addEventListener('DOMContentLoaded', async function () {
         startDateInput.value = startDate;
         endDateInput.value = endDate;
     }
-
 
     let totalCost = 0;
     let userBudget = 0;
@@ -78,7 +78,6 @@ document.addEventListener('DOMContentLoaded', async function () {
             console.error('Fout bij het ophalen van gebruikersgegevens:', {e});
         });
 
-    // Function to calculate and display the cost
     async function calculateCost() {
         const houseId = document.getElementById('houseId').value;
 
@@ -129,7 +128,6 @@ document.addEventListener('DOMContentLoaded', async function () {
     startDateInput.addEventListener('change', calculateCost);
     endDateInput.addEventListener('change', calculateCost);
 
-
     const reservationForm = document.getElementById('reservation-form');
 
     reservationForm.addEventListener('submit', function (event) {
@@ -173,3 +171,4 @@ document.addEventListener('DOMContentLoaded', async function () {
     });
 
 });
+

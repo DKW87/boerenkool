@@ -3,8 +3,6 @@ package boerenkool.database.dao.mysql;
 import boerenkool.business.model.House;
 import boerenkool.business.model.Reservation;
 import boerenkool.business.model.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -22,19 +20,16 @@ import java.util.Optional;
 /**
  * @author Adnan Kilic
  * @project Boerenkool
- * @created 07/08/2024 - 20:53
  */
 
 @Repository
 public class JdbcReservationDAO implements ReservationDAO {
 
-    private final Logger logger = LoggerFactory.getLogger(JdbcReservationDAO.class);
-    private JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
 
     @Autowired
     public JdbcReservationDAO(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-        logger.info("New JdbcReservationDAO instance created.");
     }
 
     @Override
