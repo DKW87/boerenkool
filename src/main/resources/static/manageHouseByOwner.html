@@ -21,8 +21,8 @@
 
 <div class="main-grid-area">
 
-    <div class="header-div" id="header"></div><!-- loads header here -->
-    <div class="left-sidebar-div" id="left-sidebar"></div><!-- loads left sidebar here -->
+    <div class="header-div" id="header"></div>
+    <div class="left-sidebar-div" id="left-sidebar"></div>
 
     <div class="body-div" id="body">
         <div class="house-details" id="house-details">
@@ -43,13 +43,27 @@
 
 
                 </p>
-                <p><input  type="hidden" id="houseOwnerId" readonly name="houseOwnerId" /></p>
-                <p><strong id="houseOwnerLabel">Eigenaar:</strong> <input type="text" id="houseOwnerUsername" readonly  /></p>
-                <p><strong>Provincie:</strong> <input type="text" id="province" disabled name="provincie" /></p>
-                <p><strong>BSN:</strong> <input type="text" id="bsn" disabled name="bsn" /></p>
+                <p><input type="hidden" id="houseOwnerId" name="houseOwnerId" /></p>
+                <p><input type="hidden" id="houseOwnerUsername" name="houseOwnerUsername" /></p>
+                <p><strong>Provincie:</strong>
+                    <select id="province" name="province" disabled>
+                        <option value="Groningen">Groningen</option>
+                        <option value="Friesland">Friesland</option>
+                        <option value="Drenthe">Drenthe</option>
+                        <option value="Overijssel">Overijssel</option>
+                        <option value="Gelderland">Gelderland</option>
+                        <option value="Flevoland">Flevoland</option>
+                        <option value="Utrecht">Utrecht</option>
+                        <option value="Noord-Holland">Noord-Holland</option>
+                        <option value="Zuid-Holland">Zuid-Holland</option>
+                        <option value="Zeeland">Zeeland</option>
+                        <option value="Noord-Brabant">Noord-Brabant</option>
+                        <option value="Limburg">Limburg</option>
+                    </select>
+                </p>
                 <p><strong>Stad:</strong> <input type="text" id="city" disabled name="city" /></p>
                 <p><strong>Straat en huisnummer:</strong> <input type="text" id="streetAndNumber" disabled name="streetAndNumber" /></p>
-                <p><strong>Postcode:</strong> <input type="text" id="zipcode" disabled name="zipcode" /></p>
+                <p><strong>Postcode:</strong> <input type="text" id="zipcode" disabled name="zipcode" maxlength="6" /></p>
                 <p><strong>Max gasten:</strong> <input type="number" id="maxGuest" disabled name="maxGuest"/></p>
                 <p><strong>Aantal kamers:</strong> <input type="number" id="roomCount" disabled name="roomCount" /></p>
                 <p><strong>Prijs per persoon, per dag:</strong> <input type="number" id="pricePPPD" disabled name="pricePPPD"  /></p>
@@ -74,14 +88,16 @@
                 <br>
                 <br>
                 <p><strong>Extra voorzieningen:</strong></p>
-                <ul id="extraFeatures"></ul>
+                <div id="extraFeaturesContainer">
+
+                </div>
                 <br>
                 <br>
                 <div id="actionButtons">
-                    <button type="button" id="editHouse">Wijzigen</button>
+                    <button type="button" id="editHouse">Wijzig details</button>
                     <button type="button" id="saveChanges" style="display:none;">Opslaan</button>
                     <button type="button" id="cancelChanges" style="display:none;">Annuleren</button>
-                    <button type="button" id="deleteHouse">Verwijderen</button>
+                    <button type="button" id="deleteHouse">Verwijder huis</button>
                     <button type="button" id="managePictures">Beheer foto's</button>
                     <button type="button" id="backToMyHouses">Terug naar overzicht</button>
                 </div>
@@ -89,7 +105,7 @@
         </div>
         <script src="/js/manageHouseByOwner.js" type="module" defer></script>
     </div>
-    <div class="footer-div" id="footer"></div><!-- loads footer here -->
+    <div class="footer-div" id="footer"></div>
 
 </div>
 
