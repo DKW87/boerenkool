@@ -1,6 +1,7 @@
-package boerenkool.business.service;
+package boerenkool.business.service.registration;
 
 import boerenkool.business.model.User;
+import boerenkool.business.service.RegistrationService;
 import boerenkool.communication.dto.UserDto;
 import boerenkool.database.repository.UserRepository;
 import boerenkool.utilities.exceptions.RegistrationFailedException;
