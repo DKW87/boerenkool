@@ -60,7 +60,6 @@ public class MessageControllerTests {
         MockHttpServletRequestBuilder request =
                 MockMvcRequestBuilders.get("/api/messages/1");
         String jsonString = "{\"messageId\":1,\"senderId\":1,\"receiverId\":2,\"dateTimeSent\":\"2024-01-19T03:14:07\",\"subject\":\"subject\",\"body\":\"body\",\"archivedBySender\":false,\"readByReceiver\":false,\"archivedByReceiver\":false}";
-//        request.param("roman", "MCMXX");
         try {
             ResultActions response = mockMvc.perform(request);
             response.andExpect(MockMvcResultMatchers.status().isOk());
