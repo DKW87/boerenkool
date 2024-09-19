@@ -52,11 +52,11 @@ export async function updateWalletCoins(newCoins) {
             throw new Error('Kon BoerenkoolCoins niet updaten.');
         }
 
-        alert('BoerenkoolCoins succesvol bijgewerkt!');
+        showToast('BoerenkoolCoins succesvol bijgewerkt!');
         return true;
 
     } catch (error) {
-        alert('Fout bij het updaten van BoerenkoolCoins.');
+        showToast('Fout bij het updaten van BoerenkoolCoins.');
         console.error(error);
         return false;
     }
