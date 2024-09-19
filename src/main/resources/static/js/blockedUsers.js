@@ -182,31 +182,25 @@ function handleBlockResponse(response, usernameToBlock, userId, token) {
     }
 }
 
-export function unblockUser(userToUnblockId, userId, token) {
-    if (!userToUnblockId || !userId || !token) {
-        console.error('Onjuiste parameters voor deblokkeeractie:', {
-            userToUnblockId,
-            userId,
-            token
+export async function unblockUser(userToUnblockId, userId, token) {
+    try {
+        const response = await fetch(`/api/blocked-users/unblock`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Authorization': token
+            },
+            body: `userToUnblockId=${userToUnblockId}&userBlockingId=${userId}`
         });
-        return;
-    }
 
-    fetch(`/api/blocked-users/unblock`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Authorization': token
-        },
-        body: `userToUnblockId=${userToUnblockId}&userBlockingId=${userId}`
-    })
-        .then(response => {
-            if (response.ok) {
-                showToast('Gebruiker is gedeblokkeerd.');
-                loadBlockedUsers(userId, token);
-            } else {
-                throw new Error('Fout bij het deblokkeren van de gebruiker.');
-            }
-        })
-        .catch(error => console.error('Fout bij het deblokkeren van gebruiker:', error));
+        if (response.ok) {
+            showToast('Gebruiker is gedeblokkeerd.');
+            await loadBlockedUsers(userId, token);
+        } else {
+            throw new Error('Fout bij het deblokkeren van de gebruiker.');
+        }
+    } catch (error) {
+        console.error('Fout bij het deblokkeren van gebruiker:', error);
+    }
 }
+
