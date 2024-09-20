@@ -54,11 +54,6 @@ public class Message implements Comparable<Message> {
                 '}';
     }
 
-    /**
-     * compare messages by their sent date (old < new)
-     * @param otherMessage the object to be compared.
-     * @return
-     */
     @Override
     public int compareTo(Message otherMessage) {
         return this.dateTimeSent.compareTo(otherMessage.dateTimeSent);
