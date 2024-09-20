@@ -2,13 +2,10 @@
 package boerenkool.business.model;
 
 import java.time.LocalDate;
-import java.util.Objects;
-
 
 /**
  * @author Adnan Kilic
  * @project Boerenkool
- * @created 07/08/2024 - 19:49
  */
 
 
@@ -27,7 +24,7 @@ public class Reservation {
         this.reservedByUser = reservedByUser;
         this.startDate = startDate;
         this.endDate = endDate;
-        setGuestCount(guestCount);
+        this.guestCount = guestCount;
     }
 
     public Reservation() {}
