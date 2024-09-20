@@ -26,6 +26,7 @@ import java.util.NoSuchElementException;
 @Service
 public class HouseService {
 
+    public static final int NEW_HOUSE_ID = 0;
     private final Logger logger = LoggerFactory.getLogger(HouseService.class);
     private final HouseRepository houseRepository;
     private final UserService userService;
@@ -45,37 +46,29 @@ public class HouseService {
         return houseRepository.getHouseById(houseId).orElse(null);
     }
 
-    public HouseDetailsDTO getOneByIdAndConvertToDTO(int houseId) {
+    public HouseDetailsDTO getOneByIdToDTO(int houseId) {
         House house = getOneById(houseId);
         return house == null
                 ? null
-                : convertHouseToHouseDetailsDTO(house);
+                : toHouseDetailsDTO(house);
     }
 
-    public List<House> getAllHouses() {
-        return houseRepository.getListOfAllHouses();
-    }
-
-    public List<HouseListDTO> getListOfHousesByOwnerId(int houseOwnerId) {
+    public List<HouseListDTO> getListByOwnerId(int houseOwnerId) {
         List<House> houses = houseRepository.getListOfAllHousesByOwner(houseOwnerId);
 
         return houses.isEmpty()
                 ? null
-                : convertListToHouseListDTO(houses);
+                : toHouseListDTO(houses);
     }
 
-    public String getHouseOwnerName(int houseOwnerId) {
-        return userService.getOneById(houseOwnerId).get().getUsername();
-    }
-
-    public List<HouseListDTO> getFilteredListOfHouses(HouseFilter filter) {
+    public List<HouseListDTO> getFilteredList(HouseFilter filter) {
         List<House> filteredHouses = houseRepository.getHousesWithFilter(filter);
         return filteredHouses.isEmpty()
                 ? null
-                : convertListToHouseListDTO(filteredHouses);
+                : toHouseListDTO(filteredHouses);
     }
 
-    public int countFilteredListOfHouses(HouseFilter filter) {
+    public int countFilterResult(HouseFilter filter) {
         return houseRepository.countHousesWithFilter(filter);
     }
 
@@ -88,15 +81,15 @@ public class HouseService {
     }
 
     public boolean saveHouse(HouseDetailsDTO house) {
-        House fullHouse = convertHouseDetailsDTOToHouse(house);
+        House fullHouse = toHouse(house);
         boolean result = houseRepository.saveHouse(fullHouse);
-        if (house.getHouseId() == 0) {
-            house.setHouseId(fullHouse.getHouseId()); // set new house id to return as a response in controller
+        if (house.getHouseId() == NEW_HOUSE_ID) {
+            house.setHouseId(fullHouse.getHouseId()); 
         }
         return result;
     }
 
-    private List<HouseListDTO> convertListToHouseListDTO(List<House> houses) {
+    private List<HouseListDTO> toHouseListDTO(List<House> houses) {
         List<HouseListDTO> strippedFilteredHouses = new ArrayList<>();
         for (House fullHouse : houses) {
             HouseListDTO strippedHouse = new HouseListDTO();
@@ -115,7 +108,7 @@ public class HouseService {
         return strippedFilteredHouses;
     }
 
-    private HouseDetailsDTO convertHouseToHouseDetailsDTO(House house) {
+    private HouseDetailsDTO toHouseDetailsDTO(House house) {
         HouseDetailsDTO houseDetailsDTO = new HouseDetailsDTO();
         houseDetailsDTO.setHouseId(house.getHouseId());
         houseDetailsDTO.setHouseName(house.getHouseName());
@@ -132,13 +125,13 @@ public class HouseService {
         houseDetailsDTO.setDescription(house.getDescription());
         houseDetailsDTO.setIsNotAvailable(house.getIsNotAvailable());
         if (house.getPictures() != null) {
-            houseDetailsDTO.setPictures(convertListOfPicturesToDTO(house.getPictures()));
+            houseDetailsDTO.setPictures(picturesToDTOs(house.getPictures()));
         }
         houseDetailsDTO.setExtraFeatures(house.getExtraFeatures());
         return houseDetailsDTO;
     }
 
-    private List<PictureDTO> convertListOfPicturesToDTO(List<Picture> pictures) {
+    private List<PictureDTO> picturesToDTOs(List<Picture> pictures) {
         List<PictureDTO> listPictureDTO = new ArrayList<>();
         for (Picture picture : pictures) {
             PictureDTO pictureDTO = pictureService.convertToDTO(picture);
@@ -147,9 +140,9 @@ public class HouseService {
         return listPictureDTO;
     }
 
-    private House convertHouseDetailsDTOToHouse(HouseDetailsDTO houseDetailsDTO) {
+    private House toHouse(HouseDetailsDTO houseDetailsDTO) {
         House house = new House();
-        if (houseDetailsDTO.getHouseId() > 0) {
+        if (houseDetailsDTO.getHouseId() != NEW_HOUSE_ID) {
             house.setHouseId(houseDetailsDTO.getHouseId());
         }
         house.setHouseId(houseDetailsDTO.getHouseId());
