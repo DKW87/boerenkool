@@ -1,7 +1,5 @@
 package boerenkool.communication.dto;
 
-import boerenkool.business.model.Message;
-
 import java.time.LocalDateTime;
 
 /**

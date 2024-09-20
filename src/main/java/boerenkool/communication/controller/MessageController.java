@@ -9,7 +9,6 @@ import boerenkool.utilities.authorization.AuthorizationService;
 import boerenkool.utilities.exceptions.MessageDoesNotExistException;
 import boerenkool.utilities.exceptions.MessageNotSavedException;
 import boerenkool.utilities.exceptions.UserIsNotSenderOfMessage;
-import boerenkool.utilities.exceptions.UserNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +52,7 @@ public class MessageController {
         int receiverId = messageDTO.getReceiverId();
         if (validatedUser.isPresent() && userService.getOneById(receiverId).isPresent()) {
             int senderId = validatedUser.get().getUserId();
-            // perhaps overkill ; to prevent hacking the dto for sender spoofing
+            // prevent hacking the dto for sender spoofing
             messageDTO.setSenderId(senderId);
             // check if sender is blocked by receiver
             if (blockedUserService.isUserBlocked(senderId, receiverId)) {

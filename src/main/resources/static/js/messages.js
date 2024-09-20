@@ -267,8 +267,8 @@ function blockUserHelper() {
 }
 
 
-function showElement(elementSelector, boolean) {
-    const element = document.getElementById(`${elementSelector}`);
+function showElement(elementId, boolean) {
+    const element = document.querySelector(`#${elementId}`);
     if (boolean) {
         element.style.display = "block";
     } else {
