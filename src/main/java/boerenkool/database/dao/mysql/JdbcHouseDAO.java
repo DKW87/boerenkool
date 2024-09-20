@@ -257,33 +257,24 @@ public class JdbcHouseDAO implements HouseDAO {
     }
 
     private PreparedStatement insertHouseStatement(House house, Connection connection) throws SQLException {
-        PreparedStatement preparedStatement;
         String sql = "INSERT INTO House (houseName, houseTypeId, houseOwnerId, province, city, streetAndNumber, zipcode, "
                 + "maxGuest, roomCount, pricePPPD, description, isNotAvailable) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+        PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
-        preparedStatement.setString(1, house.getHouseName());
-        preparedStatement.setInt(2, house.getHouseType().getHouseTypeId());
-        preparedStatement.setInt(3, house.getHouseOwner().getUserId());
-        preparedStatement.setString(4, house.getProvince());
-        preparedStatement.setString(5, house.getCity());
-        preparedStatement.setString(6, house.getStreetAndNumber());
-        preparedStatement.setString(7, house.getZipcode());
-        preparedStatement.setInt(8, house.getMaxGuest());
-        preparedStatement.setInt(9, house.getRoomCount());
-        preparedStatement.setInt(10, house.getPricePPPD());
-        preparedStatement.setString(11, house.getDescription());
-        preparedStatement.setBoolean(12, house.getIsNotAvailable());
-
-        return preparedStatement;
+        return setHouseParameters(preparedStatement, house);
     }
 
     private PreparedStatement updateHouseStatement(House house, Connection connection) throws SQLException {
-        String sql = "UPDATE House SET houseName=?, houseTypeId=?, houseOwnerId=?, province=?, city=?, streetAndNumber=?, " +
-                "zipcode=?, maxGuest=?, roomCount=?, pricePPPD=?, description=?, isNotAvailable=? WHERE houseId = ?";
-        PreparedStatement preparedStatement;
-        preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+        String sql = "UPDATE House SET houseName=?, houseTypeId=?, houseOwnerId=?, province=?, city=?, streetAndNumber=?, "
+                + "zipcode=?, maxGuest=?, roomCount=?, pricePPPD=?, description=?, isNotAvailable=? WHERE houseId = ?";
+        PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
+        setHouseParameters(preparedStatement, house);
+        preparedStatement.setInt(13, house.getHouseId());
+        return preparedStatement;
+    }
+
+    private PreparedStatement setHouseParameters(PreparedStatement preparedStatement, House house) throws SQLException {
         preparedStatement.setString(1, house.getHouseName());
         preparedStatement.setInt(2, house.getHouseType().getHouseTypeId());
         preparedStatement.setInt(3, house.getHouseOwner().getUserId());
@@ -296,8 +287,6 @@ public class JdbcHouseDAO implements HouseDAO {
         preparedStatement.setInt(10, house.getPricePPPD());
         preparedStatement.setString(11, house.getDescription());
         preparedStatement.setBoolean(12, house.getIsNotAvailable());
-        preparedStatement.setInt(13, house.getHouseId());
-
         return preparedStatement;
     }
 
