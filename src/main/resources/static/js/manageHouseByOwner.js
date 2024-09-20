@@ -1,5 +1,6 @@
 import * as Main from './modules/main.mjs';
 import * as Auth from './modules/auth.mjs';
+import {showToast} from "./modules/notification.mjs";
 
 Main.loadHeader();
 Main.loadFooter();
@@ -17,14 +18,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const id = getHouseIdFromURL();
     console.log(id + "Dit is de constante house id: " + id);
-    setLinkHref(); // deze methode is extra om link te testen, later weghalen.
-
-    function setLinkHref() {
-        // const link = document.getElementById('textLinkNaarFotos');
-        // const urlForTextLink = '/managePictures.html?id=${id}';
-        // link.href = urlForTextLink;
-        // console.log(urlForTextLink + " Dit is de URL meegegeven aan de 'a' tag");
-    }
 
     async function getHouseById(id) {
         const url = `/api/houses/${id}`;
@@ -35,13 +28,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             });
             if (!response.ok) {
-                throw new Error(`Response status: ${response.status}`);
+                throw new Error(`Error tijdens het ophalen van huisje: ${response.status}`);
             }
             return await response.json();
         } catch (error) {
             console.error(error.message);
         }
     }
+
+
 
     async function updateHouse(id, houseData, headers) {
         const url = `/api/houses/${id}`;
@@ -54,7 +49,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             });
             if (!response.ok) {
-                throw new Error(`Response status: ${response.status}`);
+                throw new Error(`Error tijdens het updaten van Huisje: ${response.status}`);
             }
             return await response.text()
         } catch (error) {
@@ -62,25 +57,51 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    async function deleteHouse(id) {
+    async function deleteHouse(id, headers) {
         const url = `/api/houses/${id}`;
         try {
-            const response = await fetch(url, {method: 'DELETE'});
+            const response = await fetch(url, {
+                method: 'DELETE',
+                headers: {
+                    Authorization: token
+                }
+            });
             if (!response.ok) {
-                throw new Error(`Response status: ${response.status}`);
+                throw new Error(`Error tijdens het verwijderen van huisje: ${response.status}`);
             }
-            return await response.json();
+            return await response.text();
         } catch (error) {
             console.error(error.message);
         }
     }
 
-    function displayHouseDetails(house) {
+    async function fetchExtraFeatures() {
+        try {
+            const response = await fetch('/api/extraFeatures');
+            if (!response.ok) {
+                showToast("Error fetching extra features");
+                throw new Error(`Error fetching extra features: ${response.status}`);
+            }
+            const features = await response.json();
+            console.log("Fetched extra features:", features);
+            return features;
+        } catch (error) {
+            console.error(error.message);
+            return [];
+        }
+    }
+
+    async function displayHouseDetails(house) {
+        console.log("Opgehaald huis object:", house);
+
         document.getElementById('houseName').value = house.houseName || '';
         document.getElementById('houseOwnerId').value = house.houseOwnerId || '';
         document.getElementById('houseOwnerUsername').value = house.houseOwnerUsername || '';
         document.getElementById('houseType').value = house.houseType ? house.houseType.houseTypeId : '';
-        document.getElementById('province').value = house.province || '';
+
+        const provinceSelect = document.getElementById('province');
+        provinceSelect.value = house.province || 'Kies een provincie';
+
         document.getElementById('city').value = house.city || '';
         document.getElementById('streetAndNumber').value = house.streetAndNumber || '';
         document.getElementById('zipcode').value = house.zipcode || '';
@@ -90,10 +111,13 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('description').value = house.description || '';
         document.getElementById('isNotAvailable').value = house.isNotAvailable ? 'true' : 'false';
 
+
         const picturesContainer = document.getElementById('pictures');
         picturesContainer.innerHTML = '';
         if (house.pictures && house.pictures.length > 0) {
             house.pictures.forEach(picture => {
+                console.log(`Picture MIME Type: ${picture.mimeType}`);
+                console.log(`Picture Description: ${picture.description}`);
                 const img = document.createElement('img');
                 img.src = `data:${picture.mimeType};base64,${picture.base64Picture}`;
                 img.alt = picture.description || 'House picture';
@@ -104,6 +128,37 @@ document.addEventListener('DOMContentLoaded', function () {
         } else {
             picturesContainer.textContent = 'Geen foto\'s beschikbaar';
         }
+
+        const extraFeaturesList = await fetchExtraFeatures();
+        console.log("Extra feature lijstje", extraFeaturesList);
+        const extraFeaturesContainer = document.getElementById('extraFeaturesContainer');
+        extraFeaturesContainer.innerHTML = '';
+
+
+        extraFeaturesList.forEach(feature => {
+            const featureContainer = document.createElement('div');
+            featureContainer.className = 'feature-container';
+
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.id = feature.extraFeatureId;
+            checkbox.disabled = true;
+            checkbox.name = feature.extraFeatureName;
+
+            const houseHasFeature = house.extraFeatures.some(houseFeature =>
+                houseFeature.extraFeatureId === feature.extraFeatureId);
+
+            checkbox.checked = houseHasFeature;
+            checkbox.disabled = !houseHasFeature;
+
+            const label = document.createElement('label');
+            label.htmlFor = checkbox.id;
+            label.textContent = feature.extraFeatureName;
+
+            featureContainer.appendChild(checkbox);
+            featureContainer.appendChild(label);
+            extraFeaturesContainer.appendChild(featureContainer);
+        });
     }
 
     getHouseById(id).then(house => {
@@ -116,7 +171,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function makeHouseEditable() {
         document.getElementById('houseName').disabled = false;
-        document.getElementById('houseType').disabled = false;
         document.getElementById('houseType').disabled = false;
         document.getElementById('province').disabled = false;
         document.getElementById('city').disabled = false;
@@ -132,24 +186,45 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('saveChanges').style.display = 'block';
         document.getElementById('cancelChanges').style.display = 'block';
         document.getElementById('deleteHouse').style.display = 'block';
+
+        document.querySelectorAll('#extraFeaturesContainer input[type="checkbox"]').forEach(checkbox => {
+            checkbox.disabled = false;
+        });
+
     }
 
-    function handleSaveChanges() {
-        const form = document.getElementById("houseForm")
-        const id = getHouseIdFromURL()
+    // endpoint van updateAllExtraFeaturesForHouse niet beschikbaar, lukt mij niet om saved changes te implementeren
+    // voor extra house features. code staat erin maar is niet functioneel.
+    async function handleSaveChanges() {
+        if (!validateInputs()) {
+            console.log("Inputs niet gevalideerd");
+            return;
+        }
 
-        // Create a FormData object
+        const form = document.getElementById("houseForm");
+        const id = getHouseIdFromURL();
+
         const formData = new FormData(form);
-
-        // Prepare the data for sending
         const entries = Object.fromEntries(formData.entries());
 
-        // Get the selected house type element
-        const houseTypeSelect = document.getElementById("houseType")
-
-        // Get the selected option's value (houseTypeId) and text (houseTypeName)
+        const houseTypeSelect = document.getElementById("houseType");
         const houseTypeId = parseInt(houseTypeSelect.value);
         const houseTypeName = houseTypeSelect.options[houseTypeSelect.selectedIndex].text;
+
+
+        const extraFeaturesList = await fetchExtraFeatures();
+
+
+        const checkedFeatureIds = Array.from(document.querySelectorAll('#extraFeaturesContainer input[type="checkbox"]:checked'))
+            .map(checkbox => parseInt(checkbox.id));
+
+
+        const extraFeatures = extraFeaturesList
+            .filter(feature => checkedFeatureIds.includes(feature.extraFeatureId))
+            .map(feature => ({
+                extraFeatureId: feature.extraFeatureId,
+                hasFeature: true
+            }));
 
         const data = {
             ...entries,
@@ -158,33 +233,37 @@ document.addEventListener('DOMContentLoaded', function () {
                 houseTypeId,
                 houseTypeName,
             },
-        }
+            extraFeatures,
+        };
 
-        updateHouse(id,data, {
-            Authorization: token
-        }).then(response => {
-            console.log({response})
+        console.log("Sending data for update:", data);
+
+        updateHouse(id, data, { Authorization: token }).then(response => {
             if (response) {
-                displayHouseDetails(response);
-                alert('House details updated successfully');
-                window.location.href = '/mijn-huisjes.html';
+                showToast("Huisgegevens bijgewerkt!");
+                setTimeout(() => {
+                    window.location.href = '/mijn-huisjes.html';
+                }, 1000);
             }
         });
     }
 
     function handleDeleteHouse() {
-        if (confirm('Are you sure you want to delete this house?')) {
+        if (confirm('Weet je zeker dat je dit huisje wilt verwijderen?')) {
             deleteHouse(id).then(response => {
                 if (response) {
-                    alert('House deleted successfully');
-                    window.location.href = '/mijn-huisjes.html';
+                    showToast(response);
+
+                    setTimeout(() => {
+                        window.location.href = '/mijn-huisjes.html';
+                    }, 1500)
+
                 }
             });
         }
     }
 
-    //todo in deze methode een popup maken of je zeker weet dat je gemaakte wijzigingen niet wilt opslaan
-    //todo unload / confirm event ??
+
     function handleCancelChanges() {
         getHouseById(id).then(house => {
             if (house) {
@@ -205,7 +284,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 document.getElementById('editHouse').style.display = 'block';
                 document.getElementById('saveChanges').style.display = 'none';
                 document.getElementById('cancelChanges').style.display = 'none';
-                document.getElementById('deleteHouse').style.display = 'none';
+                document.getElementById('deleteHouse').style.display = 'block';
             } else {
                 console.error('Error tijdens het ophalen van een huis');
             }
@@ -219,7 +298,7 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('cancelChanges').addEventListener('click', handleCancelChanges);
 
 
-    //todo links moeten ook tijdens gemaakte wijziging een waarschuwing geven voordat je wordt doorverwezen?
+
     document.getElementById('managePictures').addEventListener('click', () => {
         const houseId = getHouseIdFromURL();
         if (houseId) {
@@ -233,5 +312,75 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('backToMyHouses').addEventListener('click', () => {
         window.location.href = '/mijn-huisjes.html';
     });
+
+    function validateStreetAndNumber(value) {
+        const regex = /^[a-zA-Z]+(?:\s[a-zA-Z]+)*(?:\s\d+\s?[a-zA-Z]?)$/;
+        return regex.test(value);
+    }
+
+    function validateZipcode(value) {
+        const regex = /^\d{4}[a-zA-Z]{2}$/;
+        return regex.test(value)
+    }
+
+    function validateCity(value) {
+        const regex = /^[a-zA-Z\s]+$/;
+        return regex.test(value);
+    }
+
+
+    function validateInputs() {
+        const houseName = document.getElementById('houseName').value;
+        const city = document.getElementById('city').value;
+        const streetAndNumber = document.getElementById('streetAndNumber').value;
+        const zipcode = document.getElementById('zipcode').value;
+        console.log("dit is zipcode binnen validateInputs: " + zipcode)
+        const maxGuest = parseInt(document.getElementById('maxGuest').value, 10);
+        const pricePPPD = parseFloat(document.getElementById('pricePPPD').value);
+        const description = document.getElementById('description').value;
+
+
+        if (houseName.length > 60) {
+            showToast('Huisnaam mag niet langer zijn dan 60 karakters.');
+            return false;
+        }
+
+
+        if (city.length > 60 || !validateCity(city)) {
+            showToast('Stad mag alleen letters bevatten en mag niet langer zijn dan 60 karakters.');
+            return false;
+        }
+
+
+        if (streetAndNumber.length > 120 || !validateStreetAndNumber(streetAndNumber)) {
+            showToast('Straatnaam moet beginnen met een woord, gevolgd door een huisnummer (bv. "Straatnaam 123").');
+            return false;
+        }
+
+        if (zipcode.length > 6 || !validateZipcode(zipcode)) {
+            showToast('Postcode moet beginnen met 4 nummers, gevolgd door 2 letters zonder spatie ertussen.')
+            return false;
+        }
+
+
+        if (isNaN(maxGuest) || maxGuest < 1 || maxGuest > 999) {
+            showToast('Maximaal aantal gasten moet een getal zijn tussen 1 en 999.');
+            return false;
+        }
+
+
+        if (isNaN(pricePPPD) || pricePPPD < 0 || pricePPPD > 999999) {
+            showToast('PPPD moet een positief getal zijn en mag niet hoger zijn dan 999999.');
+            return false;
+        }
+
+
+        if (description.length > 255) {
+            showToast('Omschrijving mag niet langer zijn dan 255 karakters.');
+            return false;
+        }
+
+        return true;
+    }
 
 });

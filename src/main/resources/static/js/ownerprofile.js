@@ -9,11 +9,19 @@ import { showToast } from './modules/notification.mjs';
 
 /* global var */
 const params = new URLSearchParams(window.location.search);
-const token = getToken();
 const houseOwnerId = params.get('id');
 const houseOwnerUsername = await getUsername(houseOwnerId);
-let userId = 0;
+const token = getToken();
+let user;
+if (token) {
+    user = await getLoggedInUser(token);
+} else {
+    user = { username: '', userId: Number(0) };
+}
+const userId = user.userId;
+let userIsBlocked = false;
 let houseOwnerIsBlocked = false;
+let houseOwnerBlockedList = [];
 
 /* load all page elements */
 Main.loadHeader();
@@ -29,6 +37,21 @@ async function loadHouses() {
     const url = api + houseOwnerId;
 
     if (housesBox) {
+
+        houseOwnerBlockedList = await fetchBlockedUsers(houseOwnerId, token);
+
+        houseOwnerBlockedList.forEach(blockedUser => {
+            if (blockedUser.userId == userId) {
+                userIsBlocked = true;
+            }
+        });
+
+        if (userIsBlocked) {
+            hideProfileOptions();
+            showToast('Deze gebruiker heeft jou geblokkeerd');
+            return;
+        }
+
         try {
             const response = await fetch(url);
             if (!response.ok) {
@@ -94,7 +117,18 @@ async function loadHouses() {
     }
 }
 
+function hideProfileOptions() {
+    if (houseOwnerUsername == user.username) {
+        document.getElementById('profileOptions').style.visibility = "hidden";
+    } else if (userIsBlocked) {
+        document.getElementById('profileOptions').innerHTML = 'Deze gebruiker heeft jou geblokkeerd';
+    }
+}
+
 function setSendUserMessage() {
+    if (houseOwnerUsername == user.username) {
+        return;
+    }
     const messageOptionLink = document.getElementById('messageOptionLink');
     const messageOptionLabel = document.getElementById('messageOptionLabel');
     messageOptionLink.href = `send-a-message.html?userid=${houseOwnerId}`;
@@ -110,11 +144,17 @@ async function setPageAndProfileTitle() {
 
 async function setBlockOption() {
     const blockOptionLabel = document.getElementById('blockOptionLabel');
+
+    if (houseOwnerUsername == user.username) {
+        hideProfileOptions();
+        return;
+    }
+
     if (!token) {
+        const seperator = document.getElementById('seperator');
+        seperator.remove();
         blockOptionLabel.remove();
     } else {
-        const user = await getLoggedInUser(token);
-        userId = user.userId;
         console.log(`Dit is het userId dat ik heb gekregen: ${userId}`);
         const blockedUserList = await fetchBlockedUsers(user.userId, token);
 
@@ -137,13 +177,8 @@ async function setBlockOption() {
 }
 
 async function blockUserListener() {
-    document.getElementById('blockOptionLink').addEventListener('click', function(event) {
+    document.getElementById('blockOptionLink').addEventListener('click', function (event) {
         event.preventDefault();
-
-        if (Number(houseOwnerId) === Number(userId)) {
-            showToast('Je kan jezelf niet blokkeren!');
-            return;
-        }
 
         if (houseOwnerIsBlocked) {
             unblockUser(houseOwnerId, userId, token);
@@ -159,7 +194,7 @@ async function blockUserListener() {
 
 function setAmountOfHouses(amountOfHouses) {
     const element = document.getElementById('amountOfHouses');
-    
+
     switch (amountOfHouses) {
         case undefined:
             element.innerHTML = 'Geen huisjes voor deze verhuurder gevonden.';

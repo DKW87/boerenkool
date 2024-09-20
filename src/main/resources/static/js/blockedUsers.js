@@ -2,7 +2,7 @@
 
 import { showToast } from "./modules/notification.mjs";
 
-export function loadBlockedUsers(userId, token) {
+export async function loadBlockedUsers(userId, token) {
     if (!userId) {
         console.error('Gebruikers-ID is niet gedefinieerd bij het laden van geblokkeerde gebruikers.');
         return;
@@ -10,26 +10,35 @@ export function loadBlockedUsers(userId, token) {
 
     console.log('Geblokkeerde gebruikers worden geladen voor userId:', userId);
 
-    fetchBlockedUsers(userId, token)
-        .then(data => {
-            console.log('Geblokkeerde gebruikers opgehaald:', data);
-            renderBlockedUsers(data, userId, token);
-        })
-        .catch(error => console.error('Fout bij het laden van geblokkeerde gebruikers:', error));
+    try {
+        // Wacht op de fetchBlockedUsers promise en verkrijg de data
+        const data = await fetchBlockedUsers(userId, token);
+        console.log('Geblokkeerde gebruikers opgehaald:', data);
+        renderBlockedUsers(data, userId, token);
+    } catch (error) {
+        console.error('Fout bij het laden van geblokkeerde gebruikers:', error);
+    }
 }
 
-export function fetchBlockedUsers(userId, token) {
-    return fetch(`/api/blocked-users/${userId}`, {
-        headers: { 'Authorization': token }
-    })
-        .then(response => {
-            console.log('Status bij het laden van geblokkeerde gebruikers:', response.status);
-            if (!response.ok) {
-                throw new Error('Kon geblokkeerde gebruikers niet laden.');
-            }
-            return response.json();
+
+export async function fetchBlockedUsers(userId, token) {
+    try {
+        const response = await fetch(`/api/blocked-users/${userId}`, {
+            headers: { 'Authorization': token }
         });
+
+        console.log('Status bij het laden van geblokkeerde gebruikers:', response.status);
+
+        if (!response.ok) {
+            throw new Error('Kon geblokkeerde gebruikers niet laden.');
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Fout bij het laden van geblokkeerde gebruikers:', error);
+        throw error; // Hergooi de fout zodat de aanroepende functie dit ook kan opvangen
+    }
 }
+
 
 function renderBlockedUsers(data, userId, token) {
     const blockedUsersList = document.getElementById('blocked-users-list');
@@ -111,19 +120,24 @@ function getUsernameToBlock() {
     return usernameToBlock;
 }
 
-function fetchUserByUsername(username, token) {
-    return fetch(`/api/users/username/${username}`, {
-        headers: { 'Authorization': token }
-    })
-        .then(response => {
-            console.log('Status bij het ophalen van gebruiker:', response.status);
-            if (!response.ok) {
-                handleFetchUserError(response, username);
-                return null;
-            }
-            return response.json();  // Voeg deze regel toe om de data te retourneren
-        })
-        .then(data => data ? data.userId : null);
+async function fetchUserByUsername(username, token) {
+    try {
+        const response = await fetch(`/api/users/username/${username}`, {
+            headers: { 'Authorization': token }
+        });
+        console.log('Status bij het ophalen van gebruiker:', response.status);
+        if (!response.ok) {
+            handleFetchUserError(response, username);
+            return null;
+        }
+        const data = await response.json(); // Wacht op de JSON data
+        // Retourneer userId als de data beschikbaar is, anders null
+        return data ? data.userId : null;
+
+    } catch (error) {
+        console.error('Fout bij het ophalen van gebruiker:', error);
+        return null;
+    }
 }
 
 function handleFetchUserError(response, username) {
@@ -182,31 +196,25 @@ function handleBlockResponse(response, usernameToBlock, userId, token) {
     }
 }
 
-export function unblockUser(userToUnblockId, userId, token) {
-    if (!userToUnblockId || !userId || !token) {
-        console.error('Onjuiste parameters voor deblokkeeractie:', {
-            userToUnblockId,
-            userId,
-            token
+export async function unblockUser(userToUnblockId, userId, token) {
+    try {
+        const response = await fetch(`/api/blocked-users/unblock`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Authorization': token
+            },
+            body: `userToUnblockId=${userToUnblockId}&userBlockingId=${userId}`
         });
-        return;
-    }
 
-    fetch(`/api/blocked-users/unblock`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Authorization': token
-        },
-        body: `userToUnblockId=${userToUnblockId}&userBlockingId=${userId}`
-    })
-        .then(response => {
-            if (response.ok) {
-                showToast('Gebruiker is gedeblokkeerd.');
-                loadBlockedUsers(userId, token);
-            } else {
-                throw new Error('Fout bij het deblokkeren van de gebruiker.');
-            }
-        })
-        .catch(error => console.error('Fout bij het deblokkeren van gebruiker:', error));
+        if (response.ok) {
+            showToast('Gebruiker is gedeblokkeerd.');
+            await loadBlockedUsers(userId, token);
+        } else {
+            throw new Error('Fout bij het deblokkeren van de gebruiker.');
+        }
+    } catch (error) {
+        console.error('Fout bij het deblokkeren van gebruiker:', error);
+    }
 }
+

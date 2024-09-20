@@ -108,7 +108,9 @@ public class PictureService {
         String base64Picture = Base64.getEncoder().encodeToString(imageBytes);
         String mimeType = detectImageFormat(imageBytes);
 
+
         return new PictureDTO(
+                picture.getPictureId(),
                 picture.getHouseId(),
                 base64Picture,
                 mimeType,

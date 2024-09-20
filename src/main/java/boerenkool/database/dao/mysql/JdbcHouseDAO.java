@@ -98,7 +98,6 @@ public class JdbcHouseDAO implements HouseDAO {
         String sql = "SELECT * FROM House WHERE houseId = ?";
         try {
             House house = jdbcTemplate.queryForObject(sql, new HouseMapper(), id);
-            System.out.println("HouseDAO heeft eenmalig gegevens uit DB gehaald");
             return Optional.ofNullable(house);
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();

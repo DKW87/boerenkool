@@ -12,28 +12,27 @@
     <link rel="stylesheet" href="css/managePictures.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playwrite+BE+VLG:wght@100..400&family=Playwrite+PE:wght@100..400&display=swap"
-          rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playwrite+BE+VLG:wght@100..400&family=Playwrite+PE:wght@100..400&display=swap" rel="stylesheet">
     <title>Beheer foto's</title>
 </head>
 <body>
 <div class="main-grid-area">
-    <div class="header-div" id="header"></div><!-- loads header here -->
-    <div class="left-sidebar-div" id="left-sidebar"></div><!-- loads left sidebar here -->
-
+    <div class="overlay" id="overlay"></div>
+    <div class="header-div" id="header"></div>
+    <div class="left-sidebar-div" id="left-sidebar"></div>
     <div class="body-div" id="body">
+        <h2>Beheer foto's</h2>
         <div id="picturesContainer" class="pictures-gallery">
-            <!-- Pictures will be dynamically loaded here -->
         </div>
-        <!-- Action buttons -->
         <div id="actionButtons">
+            <button type="button" id="uploadPicture">Foto uploaden</button>
             <button type="button" id="backToManageHouse">Terug naar beheren</button>
             <button type="button" id="backToMyHouses">Terug naar overzicht</button>
         </div>
     </div>
+    <div class="footer-div" id="footer"></div>
 </div>
 
-<!-- Modal for displaying picture in fullscreen -->
 <div id="myModal" class="modal">
     <div class="modal-content">
         <span class="close">&times;</span>
@@ -42,7 +41,18 @@
     </div>
 </div>
 
-<script src="/js/managePictures.js" type="module" defer></script>
+<div id="uploadModal" class="upload-modal">
+    <div class="upload-modal-content">
+        <span class="close-upload-modal">&times;</span>
+        <h2>Foto uploaden</h2>
+        <form id="uploadForm">
+            <input type="file" id="pictureFile" name="picture" accept="image/*" required>
+            <textarea id="description" name="description" placeholder="Omschrijving" rows="4" required></textarea>
+            <button type="submit">Uploaden</button>
+        </form>
+    </div>
+</div>
 
+<script src="/js/managePictures.js" type="module" defer></script>
 </body>
 </html>
