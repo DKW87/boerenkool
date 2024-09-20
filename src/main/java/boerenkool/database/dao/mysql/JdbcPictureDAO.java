@@ -21,9 +21,8 @@ import java.util.Optional;
 
 @Repository
 public class JdbcPictureDAO implements PictureDAO {
-    /**
-     * Logger class to track the flow throughout the application
-     */
+
+
     private final Logger logger = LoggerFactory.getLogger(JdbcPictureDAO.class);
     JdbcTemplate jdbcTemplate;
 
@@ -70,7 +69,6 @@ public class JdbcPictureDAO implements PictureDAO {
         }
     }
 
-    // jdbcTemplate.update methods returns a int value of the amount of rows affected.
     @Override
     public boolean storeOne(Picture picture) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -87,8 +85,6 @@ public class JdbcPictureDAO implements PictureDAO {
         return jdbcTemplate.update(connection -> updatePictureStatement(picture, connection)) != 0;
     }
 
-    // gives a value of amount of rows deleted, since ID's are unique and only one can be deleted from this method.
-    // it will either be 1 or 0. if its != 0, it means its true.
     @Override
     public boolean removeOneById(int pictureId) {
         String sql = "DELETE FROM Picture WHERE pictureId = ?";
@@ -111,7 +107,7 @@ public class JdbcPictureDAO implements PictureDAO {
         return ps;
     }
 
-    // set CommonParameters eruit gehaald ivm dat je alleen de picture description wilt updaten.
+
     private PreparedStatement updatePictureStatement(Picture picture, Connection connection) throws SQLException {
         String sql = "UPDATE Picture SET pictureDescription=? WHERE pictureId=?";
         PreparedStatement ps = connection.prepareStatement(sql);
@@ -120,10 +116,6 @@ public class JdbcPictureDAO implements PictureDAO {
         return ps;
     }
 
-    /**
-     * PictureRowMapper makes KeyMap from picture object for more efficient searching
-     * Creates new picture with a house value of null. This will be implemented later in the Repo class
-     */
     private static class PictureRowMapper implements RowMapper<Picture> {
         @Override
         public Picture mapRow(ResultSet resultSet, int rowNum) throws SQLException {
