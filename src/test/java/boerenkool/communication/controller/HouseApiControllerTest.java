@@ -47,7 +47,7 @@ class HouseApiControllerTest {
     void test_getOneHouseById_statusOK() {
         int houseId = 1;
         HouseDetailsDTO houseDetails = new HouseDetailsDTO();
-        when(houseService.getOneByIdAndConvertToDTO(houseId)).thenReturn(houseDetails);
+        when(houseService.getOneByIdToDTO(houseId)).thenReturn(houseDetails);
 
         ResponseEntity<?> response = houseApiController.getOneHouseById(houseId);
 
@@ -58,7 +58,7 @@ class HouseApiControllerTest {
     void test_getOneHouseById_statusBAD_REQUEST() {
         int houseId = 0;
         HouseDetailsDTO houseDetails = new HouseDetailsDTO();
-        when(houseService.getOneByIdAndConvertToDTO(houseId)).thenReturn(houseDetails);
+        when(houseService.getOneByIdToDTO(houseId)).thenReturn(houseDetails);
 
         ResponseEntity<?> response = houseApiController.getOneHouseById(houseId);
 
@@ -69,7 +69,7 @@ class HouseApiControllerTest {
     void test_getOneHouseById_statusNOT_FOUND() {
         int houseId = 1;
         HouseDetailsDTO houseDetails = null;
-        when(houseService.getOneByIdAndConvertToDTO(houseId)).thenReturn(houseDetails);
+        when(houseService.getOneByIdToDTO(houseId)).thenReturn(houseDetails);
 
         ResponseEntity<?> response = houseApiController.getOneHouseById(houseId);
 
@@ -80,7 +80,7 @@ class HouseApiControllerTest {
     void test_getListOfHousesByOwnerId_statusOK() {
         int ownerId = 1;
         List<HouseListDTO> houses = Arrays.asList(new HouseListDTO());
-        when(houseService.getListOfHousesByOwnerId(ownerId)).thenReturn(houses);
+        when(houseService.getListByOwnerId(ownerId)).thenReturn(houses);
 
         ResponseEntity<?> response = houseApiController.getListOfHousesByOwnerId(ownerId);
 
@@ -91,7 +91,7 @@ class HouseApiControllerTest {
     void test_getListOfHousesByOwnerId_statusBAD_REQUEST() {
         int ownerId = 0;
         List<HouseListDTO> houses = Arrays.asList(new HouseListDTO());
-        when(houseService.getListOfHousesByOwnerId(ownerId)).thenReturn(houses);
+        when(houseService.getListByOwnerId(ownerId)).thenReturn(houses);
 
         ResponseEntity<?> response = houseApiController.getListOfHousesByOwnerId(ownerId);
 
@@ -102,7 +102,7 @@ class HouseApiControllerTest {
     void test_getListOfHousesByOwnerId_statusNO_CONTENT() {
         int ownerId = 1;
         List<HouseListDTO> houses = null;
-        when(houseService.getListOfHousesByOwnerId(ownerId)).thenReturn(houses);
+        when(houseService.getListByOwnerId(ownerId)).thenReturn(houses);
 
         ResponseEntity<?> response = houseApiController.getListOfHousesByOwnerId(ownerId);
 
@@ -152,7 +152,7 @@ class HouseApiControllerTest {
     @Test
     void test_getListOfHousesByFilter_statusOK() {
         List<HouseListDTO> filteredHouses = Arrays.asList(new HouseListDTO());
-        when(houseService.getFilteredListOfHouses(any(HouseFilter.class))).thenReturn(filteredHouses);
+        when(houseService.getFilteredList(any(HouseFilter.class))).thenReturn(filteredHouses);
 
         ResponseEntity<?> response = houseApiController.getListOfHousesByFilter(
                 "", "",
@@ -177,7 +177,7 @@ class HouseApiControllerTest {
     @Test
     void test_getListOfHousesByFilter_statusNO_CONTENT() {
         List<HouseListDTO> filteredHouses = new ArrayList<>();
-        when(houseService.getFilteredListOfHouses(any(HouseFilter.class))).thenReturn(filteredHouses);
+        when(houseService.getFilteredList(any(HouseFilter.class))).thenReturn(filteredHouses);
 
         ResponseEntity<?> response = houseApiController.getListOfHousesByFilter(
                 "", "",
@@ -202,7 +202,7 @@ class HouseApiControllerTest {
     @Test
     void test_getListOfHousesByFilter_statusOK_withCount() {
         int houseCount = 5;
-        when(houseService.countFilteredListOfHouses(any(HouseFilter.class))).thenReturn(houseCount);
+        when(houseService.countFilterResult(any(HouseFilter.class))).thenReturn(houseCount);
 
         ResponseEntity<?> response = houseApiController.getListOfHousesByFilter(
                 "", "",

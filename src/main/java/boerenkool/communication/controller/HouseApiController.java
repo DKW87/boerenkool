@@ -15,9 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.view.RedirectView;
 
-import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -46,20 +44,6 @@ public class HouseApiController {
         logger.info("New HouseApiController");
     }
 
-    @GetMapping
-    public ResponseEntity<?> getAllHouses() {
-        List<House> allHouses = houseService.getAllHouses();
-        return allHouses.isEmpty()
-                ? new ResponseEntity<>("No houses in Database", HttpStatus.NO_CONTENT)
-                : new ResponseEntity<>(allHouses, HttpStatus.OK);
-    }
-
-    /**
-     * BUG: Nadat ik een house update met de PUT dan krijg ik een response terug uit de API die geen pictures bevatten.
-     * De pictures zijn dan null. Zie https://imgur.com/a/jaWtDVY
-     * @param houseId
-     * @return
-     */
     @GetMapping(value = "/{houseId}")
     public ResponseEntity<?> getOneHouseById(@PathVariable int houseId) {
 
@@ -67,7 +51,7 @@ public class HouseApiController {
             return new ResponseEntity<>("House ID is invalid and cannot be 0 or negative", HttpStatus.BAD_REQUEST);
         }
 
-        HouseDetailsDTO houseDetailsDTO = houseService.getOneByIdAndConvertToDTO(houseId);
+        HouseDetailsDTO houseDetailsDTO = houseService.getOneByIdToDTO(houseId);
 
         if (houseDetailsDTO == null) {
             return new ResponseEntity<>("House was not found", HttpStatus.NOT_FOUND);
@@ -82,7 +66,7 @@ public class HouseApiController {
             return new ResponseEntity<>("Owner ID cannot be 0 or negative", HttpStatus.BAD_REQUEST);
         }
 
-        List<HouseListDTO> listOfHousesByOwner = houseService.getListOfHousesByOwnerId(id);
+        List<HouseListDTO> listOfHousesByOwner = houseService.getListByOwnerId(id);
 
         if (listOfHousesByOwner == null) {
             return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
@@ -152,9 +136,9 @@ public class HouseApiController {
                 .build();
 
         if (count) {
-            return new ResponseEntity<>(houseService.countFilteredListOfHouses(filter), HttpStatus.OK);
+            return new ResponseEntity<>(houseService.countFilterResult(filter), HttpStatus.OK);
         } else {
-            List<HouseListDTO> filteredHouses = houseService.getFilteredListOfHouses(filter);
+            List<HouseListDTO> filteredHouses = houseService.getFilteredList(filter);
 
             return filteredHouses.isEmpty()
                     ? new ResponseEntity<>(filteredHouses, HttpStatus.NO_CONTENT)
