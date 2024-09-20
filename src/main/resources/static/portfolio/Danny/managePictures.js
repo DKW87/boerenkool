@@ -82,14 +82,17 @@ document.addEventListener('DOMContentLoaded', function () {
                 description.className = 'description';
                 description.textContent = picture.description || 'Geen omschrijving';
                 description.readOnly = true;
+                description.dataset.pictureId = picture.pictureId;
 
                 const actions = document.createElement('div');
                 actions.className = 'actions';
+                actions.dataset.pictureId = picture.pictureId;
 
                 const editButton = document.createElement('button');
                 editButton.className = 'edit-btn';
                 editButton.textContent = 'Wijzig';
-                editButton.addEventListener("click", () => editPicture(picture.pictureId, description, editButton, actions));
+                editButton.dataset.pictureId = picture.pictureId;
+                editButton.addEventListener("click", () => editPicture(picture.pictureId));
 
                 const deleteButton = document.createElement('button');
                 deleteButton.className = 'delete-btn';
@@ -110,7 +113,11 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    function editPicture(pictureId, description, editButton, actions) {
+    function editPicture(pictureId) {
+        const actions = document.querySelector(`.actions[data-picture-id="${pictureId}"]`);
+        const description = document.querySelector(`.description[data-picture-id="${pictureId}"]`);
+        const editButton = document.querySelector(`.edit-btn[data-picture-id="${pictureId}"]`);
+        
         description.readOnly = false;
 
         editButton.style.display = 'none';
