@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -64,7 +65,7 @@ public class ReservationController {
             List<ReservationDTO> reservationDTOs = reservationService.getReservationsByUserId(userId);
             if (reservationDTOs.isEmpty()) {
                 logger.warn("No reservations found for user ID: {}", userId);
-                return ResponseEntity.notFound().build();
+                return ResponseEntity.ok(new ArrayList<>());
             }
             logger.info("Fetched reservations for user ID: {}", userId);
             return ResponseEntity.ok(reservationDTOs);

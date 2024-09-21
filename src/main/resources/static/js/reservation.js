@@ -10,6 +10,8 @@ import { showToast } from './modules/notification.mjs';
 Main.loadHeader();
 Main.loadFooter();
 
+let houseOwnerId = 0;
+
 document.addEventListener('DOMContentLoaded', async function () {
 
     const loginBtn = document.getElementById("go-login")
@@ -57,6 +59,11 @@ document.addEventListener('DOMContentLoaded', async function () {
         .then(data => {
             document.getElementById('houseName').textContent = `${data.houseName}`;
             document.getElementById('maxGuests').textContent = `${data.maxGuest}`;
+
+            if(data.houseOwnerId===user.userId) {
+                houseOwnerId = user.userId;
+            }
+
         })
         .catch(error => {
             console.error('Fout bij het ophalen van huisgegevens:', error);
@@ -79,19 +86,32 @@ document.addEventListener('DOMContentLoaded', async function () {
         });
 
     async function calculateCost() {
-        const houseId = document.getElementById('houseId').value;
 
+        const houseId = document.getElementById('houseId').value;
         const startDate = startDateInput.value;
         const endDate = endDateInput.value;
         const guestCount = guestCountInput.value?  guestCountInput.value:1;
 
-        if (new Date(startDate) < new Date()) {
-            showToast('Kies de huidige data!')
-            return
+        function resetTime(date) {
+            date.setHours(0, 0, 0, 0);
+            return date;
+        }
+
+        if (resetTime(new Date(startDate)) < resetTime(new Date())) {
+            showToast('Kies de huidige data!');
+            return;
         }
 
         if (houseId && startDate && endDate) {
             try {
+
+                if (houseOwnerId > 0) {
+                    totalCost = 0;
+                    document.getElementById('resCalculate').textContent = `0 bkC`;
+                    document.querySelector('button[type="submit"]').disabled = false;
+                    return;
+                }
+
                 const response = await fetch(`/api/reservations/calculate-cost?startDate=${startDate}&endDate=${endDate}&houseId=${houseId}&guestCount=${guestCount}`, {
                     method: 'GET',
                     headers: {
@@ -110,11 +130,11 @@ document.addEventListener('DOMContentLoaded', async function () {
                 document.getElementById('resCalculate').textContent = `${data} bkC`;
 
                 if (totalCost > userBudget) {
-                    document.getElementById('reservation-result').textContent = 'Kosten overschrijdt uw budget!';
-                    document.querySelector('button[type="submit"]').disabled = true; // Disable form submission
+                    showToast('Kosten overschrijdt uw budget!');
+                    document.querySelector('button[type="submit"]').disabled = true;
                 } else {
-                    document.getElementById('reservation-result').textContent = ''; // Clear any previous errors
-                    document.querySelector('button[type="submit"]').disabled = false; // Enable form submission
+                    document.getElementById('reservation-result').textContent = '';
+                    document.querySelector('button[type="submit"]').disabled = false;
                 }
 
             } catch (error) {
