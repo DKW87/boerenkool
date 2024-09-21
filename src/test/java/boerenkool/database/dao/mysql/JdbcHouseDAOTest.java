@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -63,19 +62,19 @@ class JdbcHouseDAOTest {
     }
 
     @Test
-    void test_getAllHousesByOwner() {
-        List<House> houses = jdbcHouseDAO.getAllHousesByOwner(1);
+    void test_getHousesByOwner() {
+        List<House> houses = jdbcHouseDAO.getHousesByOwner(1);
         assertNotNull(houses);
         assertEquals(5, houses.size());
     }
 
     @Test
-    void test_getHousesWithFilter() {
+    void test_getHousesByFilter() {
         HouseFilter filter = new HouseFilter.Builder()
                 .setCities(Arrays.asList("Heerenveen"))
                 .build();
 
-        List<House> houses = jdbcHouseDAO.getHousesWithFilter(filter);
+        List<House> houses = jdbcHouseDAO.getHousesByFilter(filter);
         assertNotNull(houses);
         assertEquals(2, houses.size());
         assertEquals("Kippenhok", houses.get(0).getHouseName());
@@ -83,12 +82,12 @@ class JdbcHouseDAOTest {
     }
 
     @Test
-    void test_countHousesWithFilter() {
+    void test_countHousesByFilter() {
         HouseFilter filter = new HouseFilter.Builder()
                 .setCities(Arrays.asList("Heerenveen"))
                 .build();
 
-        int count = jdbcHouseDAO.countHousesWithFilter(filter);
+        int count = jdbcHouseDAO.countHousesByFilter(filter);
         assertEquals(2, count);
     }
 
