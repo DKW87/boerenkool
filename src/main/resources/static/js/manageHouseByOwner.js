@@ -168,8 +168,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     }
 
-    // endpoint van updateAllExtraFeaturesForHouse niet beschikbaar, lukt mij niet om saved changes te implementeren
-    // voor extra house features. code staat erin maar is niet functioneel.
+    // endpoint van updateAllExtraFeaturesForHouse niet beschikbaar, Geprobeerd om dit terug te mappen naar de extraFeatures Json object.
+    // helaas geen succes.
     async function handleSaveChanges() {
         if (!validateInputs()) {
             console.log("Inputs niet gevalideerd");
