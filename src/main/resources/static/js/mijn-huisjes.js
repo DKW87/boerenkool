@@ -86,63 +86,65 @@ function createTopPageElements(parentElement, amount) {
 }
 
 function createHouse(parentElement, house) {
-    let outerDiv = document.createElement('div');
-    outerDiv.className = 'inline-house';
-    outerDiv.dataset.houseId = house.houseId;
+    const { houseId, houseName, houseType, province, city, picture } = house;
 
-    let checkbox = document.createElement('input');
-    checkbox.type = 'checkbox';
-    checkbox.className = 'inline-checkbox';
-    checkbox.value = house.houseId;
+    let outerDiv = createElement('div', { 
+        className: 'inline-house', 
+        dataset: { houseId } 
+    });
 
-    let deleteButton = document.createElement('button');
-    deleteButton.className = 'inline-del';
-    deleteButton.dataset.houseId = house.houseId;
-    deleteButton.dataset.houseName = house.houseName;
+    let checkbox = createElement('input', { 
+        type: 'checkbox', 
+        className: 'inline-checkbox', 
+        value: houseId 
+    });
 
-    let deleteImg = document.createElement('img');
-    deleteImg.className = 'inline-del-img';
-    deleteImg.src = './images/delete.png';
-    deleteImg.alt = 'prullenbak icoon die aangeeft dat je hiermee het huisje verwijderd';
+    let deleteButton = createElement('button', { 
+        className: 'inline-del', 
+        dataset: { houseId, houseName } 
+    });
 
-    let urlToHouse = document.createElement('a');
-    urlToHouse.href = 'manageHouseByOwner.html?id=' + house.houseId;
+    let deleteImg = createElement('img', { 
+        className: 'inline-del-img', 
+        src: './images/delete.png', 
+        alt: 'prullenbak icoon die aangeeft dat je hiermee het huisje verwijderd' 
+    });
 
-    let image = document.createElement('img');
+    let urlToHouse = createElement('a', { 
+        href: `manageHouseByOwner.html?id=${houseId}` 
+    });
 
-    image.className = 'inline-img';
+    let image = createElement('img', { 
+        className: 'inline-img', 
+        src: picture ? `data:${picture.mimeType};base64,${picture.base64Picture}` : './images/notAvailable.png', 
+        alt: picture ? houseName : 'afbeelding niet gevonden' 
+    });
 
-    if (house.picture !== null) {
-        image.src = `data:${house.picture.mimeType};base64,${house.picture.base64Picture}`;
-        image.alt = house.houseName;
-    } else {
-        image.src = './images/notAvailable.png';
-        image.alt = 'afbeelding niet gevonden';
-    }
+    let innerDiv = createElement('div', { className: 'inline-text' });
+    let title = createElement('h2', { innerHTML: houseName, className: 'inline-text' });
+    let typeAndLocation = createElement('p', { 
+        innerHTML: `ID: ${houseId} - ${houseType} in ${province}, ${city}`, 
+        className: 'inline-text' 
+    });
 
-    let innerDiv = document.createElement('div');
-    innerDiv.className = 'inline-text';
-
-    let title = document.createElement('h2');
-    title.innerHTML = house.houseName;
-    title.className = 'inline-text';
-
-    let typeAndLocation = document.createElement('p');
-    typeAndLocation.innerHTML = 'ID: ' + house.houseId + ' - ' + house.houseType + ' in ' + house.province + ', ' + house.city;
-    typeAndLocation.className = 'inline-text';
-
+    appendChildren(innerDiv, [urlToHouse, typeAndLocation]);
+    appendChildren(urlToHouse, [title]);
+    appendChildren(outerDiv, [checkbox, deleteButton, deleteImg, image, innerDiv]);
     parentElement.appendChild(outerDiv);
-    outerDiv.appendChild(checkbox);
-    outerDiv.appendChild(deleteButton);
-    deleteButton.appendChild(deleteImg);
-    outerDiv.appendChild(image);
-    outerDiv.appendChild(innerDiv);
-    innerDiv.appendChild(urlToHouse);
-    urlToHouse.appendChild(title);
-    innerDiv.appendChild(typeAndLocation);
 
     deleteOneListener();
 }
+
+function createElement(tag, attributes) {
+    let element = document.createElement(tag);
+    Object.assign(element, attributes);
+    return element;
+}
+
+function appendChildren(parent, children) {
+    children.forEach(child => parent.appendChild(child));
+}
+
 
 function createBottomPageElements(parentElement) {
     const deleteAllButton = document.createElement('button');
