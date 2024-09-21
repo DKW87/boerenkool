@@ -4,6 +4,7 @@ import boerenkool.business.model.ExtraFeature;
 import boerenkool.business.model.HouseExtraFeature;
 import boerenkool.business.service.ExtraFeatureService;
 import boerenkool.business.service.HouseExtraFeatureService;
+import boerenkool.communication.dto.HouseExtraFeatureDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "/api/extraFeatures")
@@ -34,6 +36,17 @@ public class ExtraFeatureController {
     public List<ExtraFeature> getAllExtraFeatures() {
         logger.info("Alle extra features ophalen");
         return extraFeatureService.getAllExtraFeatures();
+    }
+
+    @GetMapping(value = "/name/{name}")
+    public ResponseEntity<?> findExtraFeatureByName(@PathVariable String name) {
+        logger.info("Extra feature ophalen met naam: {}", name);
+        Optional<ExtraFeature> extraFeature = extraFeatureService.findExtraFeatureByName(name);
+        if (extraFeature.isPresent()) {
+            return new ResponseEntity<>(extraFeature.get(), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("ExtraFeature niet gevonden", HttpStatus.NOT_FOUND);
+        }
     }
 
     @GetMapping(value = "/houses/{houseId}")
@@ -69,6 +82,25 @@ public class ExtraFeatureController {
         }
     }
 
+    @PostMapping("/houses/{houseId}/features")
+    public ResponseEntity<String> saveHouseExtraFeatures(
+            @PathVariable int houseId,
+            @RequestBody List<HouseExtraFeatureDTO> extraFeatures) {
+
+        try {
+            List<HouseExtraFeature> houseExtraFeatures = extraFeatures.stream()
+                    .map(dto -> new HouseExtraFeature(houseId, dto.getExtraFeatureId()))
+                    .collect(Collectors.toList());
+
+            houseExtraFeatureService.saveAllHouseExtraFeatures(houseExtraFeatures);
+
+            return new ResponseEntity<>("Extra features successfully saved.", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Failed to save extra features.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
 
     @PutMapping(value = "/{id}")
     public ResponseEntity<?> updateExtraFeature(@PathVariable int id, @RequestBody ExtraFeature extraFeature) {
@@ -81,6 +113,30 @@ public class ExtraFeatureController {
             return new ResponseEntity<>("Mislukt om ExtraFeature bij te werken", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @PutMapping("/houses/{houseId}/features")
+    public ResponseEntity<String> updateHouseExtraFeatures(
+            @PathVariable int houseId,
+            @RequestBody List<HouseExtraFeatureDTO> extraFeatures) {
+
+        try {
+
+            List<HouseExtraFeature> houseExtraFeatures = extraFeatures.stream()
+                    .map(dto -> new HouseExtraFeature(houseId, dto.getExtraFeatureId()))
+                    .collect(Collectors.toList());
+
+            houseExtraFeatureService.removeAllExtraFeaturesFromHouse(houseId);
+
+            houseExtraFeatureService.saveAllHouseExtraFeatures(houseExtraFeatures);
+
+            return new ResponseEntity<>("Extra features successfully updated.", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Failed to update extra features.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+
 
 
     @DeleteMapping(value = "/{id}")
@@ -95,14 +151,4 @@ public class ExtraFeatureController {
     }
 
 
-    @GetMapping(value = "/name/{name}")
-    public ResponseEntity<?> findExtraFeatureByName(@PathVariable String name) {
-        logger.info("Extra feature ophalen met naam: {}", name);
-        Optional<ExtraFeature> extraFeature = extraFeatureService.findExtraFeatureByName(name);
-        if (extraFeature.isPresent()) {
-            return new ResponseEntity<>(extraFeature.get(), HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>("ExtraFeature niet gevonden", HttpStatus.NOT_FOUND);
-        }
-    }
 }

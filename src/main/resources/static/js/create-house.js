@@ -87,8 +87,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             roomCount,
             pricePPPD,
             description,
-            isNotAvailable,
-            extraFeatures: selectedFeatures
+            isNotAvailable
         };
 
         try {
@@ -101,7 +100,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                 body: JSON.stringify(houseData)
             });
 
-            alert(JSON.stringify(houseData))
+
 
             const contentType = response.headers.get("content-type");
 
@@ -115,22 +114,46 @@ document.addEventListener('DOMContentLoaded', async function() {
             console.log('API response:', result);
             console.log('API response (detailed):', JSON.stringify(result, null, 2));
 
+            let houseId;
             if (typeof result === "number") {
-                const houseId = result;
-                showToast(`Huis succesvol aangemaakt: ID ${houseId}`);
-                window.location.href = `/upload-pictures.html?houseId=${houseId}`;
-            } else if (result.houseId) {
-                document.getElementById('message').textContent = `House successfully created: ID ${result.houseId}`;
-                window.location.href = `/upload-pictures.html?houseId=${result.houseId}`;
-            } else {
-                console.error('No houseId returned from API.', result);
+                houseId = result;}
+            else if (result.houseId){
+                houseId=result.houseId;}
+            else { console.error('No houseId returned from API.', result);
                 document.getElementById('message').textContent = 'No houseId returned from API.';
+                return;
+            }
+
+
+            const extraFeaturesData = selectedFeatures.map(feature => ({
+                houseId: houseId,
+                extraFeatureId: feature.extraFeatureId
+            }));
+
+            const extraFeaturesResponse = await fetch(`/api/extraFeatures/houses/${houseId}/features`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': Auth.getToken()
+                },
+                body: JSON.stringify(extraFeaturesData)
+            });
+
+            if (extraFeaturesResponse.ok) {
+                showToast(`Huis succesvol aangemaakt met extra features: ID ${houseId}`);
+                window.location.href = `/upload-pictures.html?houseId=${houseId}`;
+            } else {
+                const error = await extraFeaturesResponse.text();
+                console.error('Failed to save extra features:', error);
+                document.getElementById('message').textContent = 'Error saving extra features.';
             }
 
         } catch (error) {
             console.error('Error:', error.message);
             document.getElementById('message').textContent = `Error: ${error.message}`;
         }
+
+
     });
 });
 

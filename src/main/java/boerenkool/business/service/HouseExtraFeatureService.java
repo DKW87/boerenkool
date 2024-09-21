@@ -32,14 +32,24 @@ public class HouseExtraFeatureService {
         return houseExtraFeatureRepository.getAllFeaturesByHouseIdWithNames(houseId);
     }
 
+
+    public void saveAllHouseExtraFeatures(List<HouseExtraFeature> houseExtraFeatures) {
+        houseExtraFeatures.forEach(this::saveHouseExtraFeature);
+    }
+
     public HouseExtraFeature saveHouseExtraFeature(HouseExtraFeature houseExtraFeature) {
-        if (houseExtraFeatureRepository.getOneByIds(houseExtraFeature.getHouseId(), houseExtraFeature.getFeatureId()).isPresent()) {
-            throw new IllegalArgumentException("Een HouseExtraFeature met deze houseId en featureId bestaat al.");
-        }
-        validateHouseExtraFeature(houseExtraFeature);
         houseExtraFeatureRepository.storeOne(houseExtraFeature);
         return houseExtraFeature;
     }
+
+    public void updateHouseExtraFeatures(int houseId, List<HouseExtraFeature> newFeatures) {
+
+        houseExtraFeatureRepository.removeAllByHouseId(houseId);
+
+
+        houseExtraFeatureRepository.storeAll(newFeatures);
+    }
+
 
 
     public boolean deleteHouseExtraFeatureByIds(int houseId, int featureId) {
@@ -57,6 +67,13 @@ public class HouseExtraFeatureService {
     private void validateHouseExtraFeature(HouseExtraFeature houseExtraFeature) {
         if (houseExtraFeature.getHouseId() <= 0 || houseExtraFeature.getFeatureId() <= 0) {
             throw new IllegalArgumentException("Zowel houseId als featureId moeten geldig zijn (groter dan 0).");
+        }
+    }
+
+    public void removeAllExtraFeaturesFromHouse(int houseId) {
+        List<HouseExtraFeature> features = houseExtraFeatureRepository.getAllFeaturesByHouseId(houseId);
+        for (HouseExtraFeature feature : features) {
+            houseExtraFeatureRepository.removeOneByIds(houseId, feature.getFeatureId());
         }
     }
 }
