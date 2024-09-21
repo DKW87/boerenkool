@@ -57,6 +57,7 @@
 }
 
 .page-numbers {
+    font-size: var(--font-size-large);
     display: flex;
     justify-content: center;  
     align-items: flex-start;  
@@ -67,14 +68,21 @@
     top: 0;  
 }
 
-.house-link {
+.page-numbers a,
+.page-numbers a:link,
+.page-numbers a:visited,
+.page-numbers a:active {
     text-decoration: none;
+    color: var(--boerenkool-paars);
 }
 
-.individual-page-number {
-    margin: 5px;
-    color: var(--boerenkool-paars);
-    text-decoration: underline;
+.number-link {
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.house-link {
+    text-decoration: none;
 }
 
 .amount-of-houses {

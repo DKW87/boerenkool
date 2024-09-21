@@ -323,6 +323,7 @@ async function createPageNumbers() {
             } else {
                 const linkToPage = document.createElement('a');
                 linkToPage.href = `index.html?${params}&limit=${pageLimit}&offset=0`;
+                pageNumberOne.className = 'number-link';
                 pageNumberSpan.appendChild(linkToPage);
                 linkToPage.appendChild(pageNumberOne);
             }
@@ -344,6 +345,7 @@ async function createPageNumbers() {
                 linkToPage.href = `index.html?${params}&limit=${pageLimit}&offset=${nextPageOffset}`;
                 pageNumberSpan.appendChild(linkToPage);
                 linkToPage.appendChild(nextPageNumber);
+                nextPageNumber.className = 'number-link';
             }
         }
     }
