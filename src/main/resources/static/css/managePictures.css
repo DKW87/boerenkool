@@ -222,12 +222,12 @@ h2 {
 }
 
 #uploadPicture {
-    background-color: #a975de;
+    background-color: #893dbf;
     color: white;
 }
 
 #uploadPicture:hover {
-    background-color: #af92d8;
+    background-color: #a683dd;
 }
 
 .upload-modal {

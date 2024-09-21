@@ -8,133 +8,69 @@ Main.loadFooter();
 document.addEventListener('DOMContentLoaded', function () {
 
     const token = Auth.getToken();
-    console.log("DOM is volledig geladen");
 
     function getHouseIdFromURL() {
         const urlParams = new URLSearchParams(window.location.search);
         return urlParams.get('id');
-        console.log("getHouseIdFromURL voltooid");
     }
 
     const id = getHouseIdFromURL();
-    console.log(id + "Dit is de constante house id: " + id);
 
-    async function getHouseById(id) {
-        const url = `/api/houses/${id}`;
+    async function fetcherino(url, method = 'GET', token = null, body = null) {
         try {
+            const headers = {
+                'Content-Type': 'application/json',
+            };
+            if (token) {
+                headers["Authorization"] = token;
+            }
             const response = await fetch(url, {
-                headers: {
-                    "Authorization": token
-                }
+                method,
+                headers,
+                body: body ? JSON.stringify(body) : null,
             });
             if (!response.ok) {
-                throw new Error(`Error tijdens het ophalen van huisje: ${response.status}`);
+                throw new Error(`Error: ${response.status} - ${response.statusText}`);
+            }
+            if (method === 'DELETE' || method === 'PUT') {
+                return await response.text();
             }
             return await response.json();
         } catch (error) {
-            console.error(error.message);
+            return null;
         }
     }
 
-
-
-    async function updateHouse(id, houseData, headers) {
+    async function getHouseById(id) {
         const url = `/api/houses/${id}`;
+        return fetcherino(url, 'GET', token);
+    }
 
-        try {
-            const response = await fetch(url, {
-                method: 'PUT',
-                headers: {'Content-Type': 'application/json', ...headers},
-                body: JSON.stringify(houseData),
-
-            });
-            if (!response.ok) {
-                throw new Error(`Error tijdens het updaten van Huisje: ${response.status}`);
-            }
-            return await response.text()
-        } catch (error) {
-            console.error(error.message);
-        }
+    async function updateHouse(id, houseData, token) {
+        const url = `/api/houses/${id}`;
+        return fetcherino(url, 'PUT', token, houseData);
     }
 
     async function deleteHouse(id, headers) {
         const url = `/api/houses/${id}`;
-        try {
-            const response = await fetch(url, {
-                method: 'DELETE',
-                headers: {
-                    Authorization: token
-                }
-            });
-            if (!response.ok) {
-                throw new Error(`Error tijdens het verwijderen van huisje: ${response.status}`);
-            }
-            return await response.text();
-        } catch (error) {
-            console.error(error.message);
-        }
+        return fetcherino(url, 'DELETE', token);
     }
 
     async function fetchExtraFeatures() {
-        try {
-            const response = await fetch('/api/extraFeatures');
-            if (!response.ok) {
-                showToast("Error fetching extra features");
-                throw new Error(`Error fetching extra features: ${response.status}`);
-            }
-            const features = await response.json();
-            console.log("Fetched extra features:", features);
-            return features;
-        } catch (error) {
-            console.error(error.message);
-            return [];
-        }
+        const url = '/api/extraFeatures';
+        return fetcherino(url, 'GET');
     }
 
     async function displayHouseDetails(house) {
-        console.log("Opgehaald huis object:", house);
+        insertDetails(house);
+        insertPictures(house);
+        await insertExtraFeatures(house);
+    }
 
-        document.getElementById('houseName').value = house.houseName || '';
-        document.getElementById('houseOwnerId').value = house.houseOwnerId || '';
-        document.getElementById('houseOwnerUsername').value = house.houseOwnerUsername || '';
-        document.getElementById('houseType').value = house.houseType ? house.houseType.houseTypeId : '';
-
-        const provinceSelect = document.getElementById('province');
-        provinceSelect.value = house.province || 'Kies een provincie';
-
-        document.getElementById('city').value = house.city || '';
-        document.getElementById('streetAndNumber').value = house.streetAndNumber || '';
-        document.getElementById('zipcode').value = house.zipcode || '';
-        document.getElementById('maxGuest').value = house.maxGuest || '';
-        document.getElementById('roomCount').value = house.roomCount || '';
-        document.getElementById('pricePPPD').value = house.pricePPPD || '';
-        document.getElementById('description').value = house.description || '';
-        document.getElementById('isNotAvailable').value = house.isNotAvailable ? 'true' : 'false';
-
-
-        const picturesContainer = document.getElementById('pictures');
-        picturesContainer.innerHTML = '';
-        if (house.pictures && house.pictures.length > 0) {
-            house.pictures.forEach(picture => {
-                console.log(`Picture MIME Type: ${picture.mimeType}`);
-                console.log(`Picture Description: ${picture.description}`);
-                const img = document.createElement('img');
-                img.src = `data:${picture.mimeType};base64,${picture.base64Picture}`;
-                img.alt = picture.description || 'House picture';
-                img.style.maxWidth = '100%';
-                img.style.marginBottom = '10px';
-                picturesContainer.appendChild(img);
-            });
-        } else {
-            picturesContainer.textContent = 'Geen foto\'s beschikbaar';
-        }
-
+    async function insertExtraFeatures(house) {
         const extraFeaturesList = await fetchExtraFeatures();
-        console.log("Extra feature lijstje", extraFeaturesList);
         const extraFeaturesContainer = document.getElementById('extraFeaturesContainer');
         extraFeaturesContainer.innerHTML = '';
-
-
         extraFeaturesList.forEach(feature => {
             const featureContainer = document.createElement('div');
             featureContainer.className = 'feature-container';
@@ -160,6 +96,45 @@ document.addEventListener('DOMContentLoaded', function () {
             extraFeaturesContainer.appendChild(featureContainer);
         });
     }
+
+    function insertPictures(house) {
+        const picturesContainer = document.getElementById('pictures');
+        picturesContainer.innerHTML = '';
+        if (house.pictures && house.pictures.length > 0) {
+            house.pictures.forEach(picture => {
+                console.log(`Picture MIME Type: ${picture.mimeType}`);
+                console.log(`Picture Description: ${picture.description}`);
+                const img = document.createElement('img');
+                img.src = `data:${picture.mimeType};base64,${picture.base64Picture}`;
+                img.alt = picture.description || 'House picture';
+                img.style.maxWidth = '100%';
+                img.style.marginBottom = '10px';
+                picturesContainer.appendChild(img);
+            });
+        } else {
+            picturesContainer.textContent = 'Geen foto\'s beschikbaar';
+        }
+    }
+
+    function insertDetails(house) {
+        document.getElementById('houseName').value = house.houseName || '';
+        document.getElementById('houseOwnerId').value = house.houseOwnerId || '';
+        document.getElementById('houseOwnerUsername').value = house.houseOwnerUsername || '';
+        document.getElementById('houseType').value = house.houseType ? house.houseType.houseTypeId : '';
+
+        const provinceSelect = document.getElementById('province');
+        provinceSelect.value = house.province || 'Kies een provincie';
+
+        document.getElementById('city').value = house.city || '';
+        document.getElementById('streetAndNumber').value = house.streetAndNumber || '';
+        document.getElementById('zipcode').value = house.zipcode || '';
+        document.getElementById('maxGuest').value = house.maxGuest || '';
+        document.getElementById('roomCount').value = house.roomCount || '';
+        document.getElementById('pricePPPD').value = house.pricePPPD || '';
+        document.getElementById('description').value = house.description || '';
+        document.getElementById('isNotAvailable').value = house.isNotAvailable ? 'true' : 'false';
+    }
+
 
     getHouseById(id).then(house => {
         if (house) {
@@ -193,8 +168,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     }
 
-    // endpoint van updateAllExtraFeaturesForHouse niet beschikbaar, lukt mij niet om saved changes te implementeren
-    // voor extra house features. code staat erin maar is niet functioneel.
+    // endpoint van updateAllExtraFeaturesForHouse niet beschikbaar, Geprobeerd om dit terug te mappen naar de extraFeatures Json object.
+    // helaas geen succes.
     async function handleSaveChanges() {
         if (!validateInputs()) {
             console.log("Inputs niet gevalideerd");
@@ -211,13 +186,9 @@ document.addEventListener('DOMContentLoaded', function () {
         const houseTypeId = parseInt(houseTypeSelect.value);
         const houseTypeName = houseTypeSelect.options[houseTypeSelect.selectedIndex].text;
 
-
         const extraFeaturesList = await fetchExtraFeatures();
-
-
         const checkedFeatureIds = Array.from(document.querySelectorAll('#extraFeaturesContainer input[type="checkbox"]:checked'))
             .map(checkbox => parseInt(checkbox.id));
-
 
         const extraFeatures = extraFeaturesList
             .filter(feature => checkedFeatureIds.includes(feature.extraFeatureId))
@@ -238,7 +209,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         console.log("Sending data for update:", data);
 
-        updateHouse(id, data, { Authorization: token }).then(response => {
+        updateHouse(id, data, token).then(response => {
             if (response) {
                 showToast("Huisgegevens bijgewerkt!");
                 setTimeout(() => {
