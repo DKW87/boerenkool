@@ -50,13 +50,8 @@ public class HouseRepository {
             house.setHouseType(houseTypeDAO.getOneById(house.accessOtherEntityIds().getHouseTypeId())
                     .orElseThrow(() -> new NoSuchElementException("houseType not found")));
             house.setExtraFeatures(extraFeatureDAO.getExtraFeaturesByHouseId(house.getHouseId()));
-
             house.setPictures(pictureDAO.getAllByHouseId(house.getHouseId()));
-            System.out.printf("%s", house.getHouseId());
-
         }
-
-
         return allHouses;
     }
 

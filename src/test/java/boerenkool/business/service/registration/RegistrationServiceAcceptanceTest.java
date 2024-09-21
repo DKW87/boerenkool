@@ -1,11 +1,15 @@
 package boerenkool.business.service.registration;
 
+import boerenkool.business.model.User;
 import boerenkool.business.service.RegistrationService;
 import boerenkool.communication.dto.UserDto;
+import boerenkool.database.repository.UserRepository;
 import boerenkool.utilities.exceptions.RegistrationFailedException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -14,6 +18,8 @@ class RegistrationServiceAcceptanceTest {
 
     @Autowired
     private RegistrationService registrationService;
+    @Autowired
+    private UserRepository userRepository;
 
     @Test
     void testRegisterUser_Acceptance_Success() throws RegistrationFailedException {
@@ -26,8 +32,12 @@ class RegistrationServiceAcceptanceTest {
         // Act: Register the user
         registrationService.register(userDto);
 
-        // Assert: If the user was registered without exceptions, the test passes
-        assertTrue(true);
+        // Assert: Verify if the user is registered (for example, check the repository or service method)
+        Optional<User> registeredUserOpt = userRepository.findByUsername("acceptanceTestUser");
+        assertTrue(registeredUserOpt.isPresent(), "User should be present");
+        User registeredUser = registeredUserOpt.get(); // Get the actual User object from Optional
+        assertEquals("acceptanceTestUser", registeredUser.getUsername());
+        assertEquals("acceptance@test.com", registeredUser.getEmail());
     }
 
     @Test

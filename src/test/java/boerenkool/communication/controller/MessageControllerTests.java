@@ -53,20 +53,22 @@ public class MessageControllerTests {
         messageDTO1 = new MessageDTO(1, 1, 2, LocalDateTime.parse("2024-01-19T03:14:07"),
                 "subject", "body", false, false, false);
     }
-    @Test
-    public void getByIdTest() throws MessageDoesNotExistException {
-        Mockito.when(messageService.getByMessageId(1)).thenReturn(messageDTO1);
 
-        MockHttpServletRequestBuilder request =
-                MockMvcRequestBuilders.get("/api/messages/1");
-        String jsonString = "{\"messageId\":1,\"senderId\":1,\"receiverId\":2,\"dateTimeSent\":\"2024-01-19T03:14:07\",\"subject\":\"subject\",\"body\":\"body\",\"archivedBySender\":false,\"readByReceiver\":false,\"archivedByReceiver\":false}";
-//        request.param("roman", "MCMXX");
-        try {
-            ResultActions response = mockMvc.perform(request);
-            response.andExpect(MockMvcResultMatchers.status().isOk());
-            response.andExpect(MockMvcResultMatchers.content().json(jsonString));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+    // Monument voor de getById methode, die niet werd gebruikt door de front-end
+    // Hier bewaard als bewijs van geofferd bloed, zweet en tranen
+//    @Test
+//    public void getByIdTest() throws MessageDoesNotExistException {
+//        Mockito.when(messageService.getByMessageId(1)).thenReturn(messageDTO1);
+//
+//        MockHttpServletRequestBuilder request =
+//                MockMvcRequestBuilders.get("/api/messages/1");
+//        String jsonString = "{\"messageId\":1,\"senderId\":1,\"receiverId\":2,\"dateTimeSent\":\"2024-01-19T03:14:07\",\"subject\":\"subject\",\"body\":\"body\",\"archivedBySender\":false,\"readByReceiver\":false,\"archivedByReceiver\":false}";
+//        try {
+//            ResultActions response = mockMvc.perform(request);
+//            response.andExpect(MockMvcResultMatchers.status().isOk());
+//            response.andExpect(MockMvcResultMatchers.content().json(jsonString));
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
 }
