@@ -3,9 +3,25 @@
 }
 
 .messageMainArea {
-    display: grid;
-    grid-template-columns: 3fr 4fr;
+    display: flex;
+    justify-content: center;
     background-color: var(--boerenkool-grijs);
+}
+
+#overviewPane {
+    max-width: 40%;
+    min-width: 400px;
+}
+
+
+.messageInOverview {
+    border: 1px;
+    border-color: var(--borderGrey);
+    border-style: solid;
+    border-radius: 10px;
+
+    padding: 8px;
+    margin: 6px;
 }
 
 .selected {
@@ -13,11 +29,14 @@
 }
 
 .readMessage {
+    /*border-color: grey;*/
     background-color: white;
 }
 
 .unreadMessage {
-    background-color: var(--boerenkool-lichtpaars);
+    /*border-color: grey;*/
+    color: white;
+    background-color: var(--boerenkool-paars);
 }
 
 /* messageOverview ; contains the list of inbox/outbox messages */
@@ -26,58 +45,116 @@
     flex-direction: column;
     flex-wrap: nowrap;
     overflow: hidden;
-}
 
-.messageInOverview {
-    border: 1px;
+    background-color: white;
+
+    max-width: 400px;
+
     border-style: solid;
-    border-color: var(--borderGrey);
-    border-radius: 4px;
-    padding: 3px;
-    margin: 3px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+    margin: 5px;
 }
 
-#messageInOverview div {
+
+.messageInOverview div {
     text-overflow: ellipsis;
     overflow: hidden;
 }
 
-.subject {
+
+#usernamePrefix, #dateTimeSentPrefix, #subjectPrefix, #bodyPrefix {
+    font-style: italic;
+}
+
+#username, #receiverName, #dateTimeSent, #subject, #body {
+    position: relative;
+    left: 30px;
+    width: 85%;
+    white-space: pre-wrap;
+}
+
+
+.subject, #username, #receiverName {
     font-weight: bold;
 }
 
-.readAndWriteSections {
-    display: none;
-    /*background-color: var(--boerenkool-grijs);*/
-    min-height: 60vh;
+.readAndWritePanes {
+    width: 400px;
+    padding: 8px;
 }
 
-.readAndWriteSections div {
+.messageContent {
+    display: flex;
+    flex-direction: column;
+    /*flex-wrap: nowrap;*/
+    /*overflow: hidden;*/
     background-color: white;
-    border: 1px;
     border-style: solid;
-    border-color: var(--borderGrey);
-    border-radius: 4px;
-    padding: 10px;
-    margin: 3px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin: 5px;
 }
 
-/*#writeMessageView {*/
-/*    display: flex;*/
-/*    flex-direction: column;*/
-/*}*/
+.messageContent div {
+    margin: 6px;
+}
 
-.inputField {
-    /*font-size: var(--font-size-large);*/
-    width: 300px;
-    height: 2em;
+#writeMessageForm label {
+    font-style: italic;
+}
+
+#receiverDropDown {
+    font-size: 16px;
+    text-align: center;
+    color: white;
+    background-color: var(--boerenkool-groen);
+    border-radius: 8px;
+    width: 100%;
+    padding: 8px;
+}
+
+.messageContent textarea {
+    border-width: 1px;
+    border-color: var(--borderGrey);
+    border-radius: 8px;
+    width: 100%;
+    resize: vertical;
+    padding: 8px;
+    white-space: pre-wrap;
+}
+
+#subjectInput {
+    min-height: 30px;
+    /*white-space: pre-wrap;*/
+}
+
+#bodyInput {
+    min-height: 200px;
+    /*white-space: pre-wrap;*/
 }
 
 button {
-    border: 1px;
-    border-style: solid;
-    border-color: var(--borderGrey);
-    border-radius: 4px;
-    padding: 3px;
-    margin: 3px;
+    font-size: 16px;
+    color: white;
+    background-color: grey;
+    border-radius: 8px;
+    padding: 10px;
+    margin: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+#overviewButtonBox, #readButtonBox {
+    display: flex;
+    justify-content: space-between;
+}
+
+#writeMessageButton, #answerMessageButton, #sendMessageButton {
+    background-color: var(--boerenkool-groen);
+}
+
+#sendButtonBox {
+    display: flex;
+    justify-content: flex-end;
 }

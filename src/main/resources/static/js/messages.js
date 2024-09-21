@@ -3,8 +3,6 @@ import * as authJS from "./modules/auth.mjs"
 import {showToast} from './modules/notification.mjs'
 import * as sendJS from './send-a-message.js'
 import * as lang from './languages/nl.mjs'
-import {getListOfCorrespondents} from "./send-a-message.js"
-import {CONFIRMED_DELETE} from "./languages/nl.mjs"
 import {blockUserById} from "./blockedUsers.js"
 import {checkForUnreadMessages} from "./modules/header.mjs"
 
@@ -37,10 +35,12 @@ const DATE_TIME_OPTIONS = {
 await setup()
 
 async function setup() {
-    listOfCorrespondents = await getListOfCorrespondents()
+    listOfCorrespondents = await sendJS.getListOfCorrespondents()
 
     //  inject send-message.html fragment
-    await sendJS.injectHtmlFromFile("writeMessageSection", "templates/send-message.html")
+    await sendJS.injectHtmlFromFile("writeMessagePane", "templates/send-message.html")
+
+    await loadLanguage()
 
     document.querySelector('#showInboxButton').addEventListener('click', async () => {
         await showInbox()
@@ -55,7 +55,7 @@ async function setup() {
     })
 
     document.querySelector('#deleteMessageButton').addEventListener('click', () => {
-        showElement(`writeMessageSection`, false)
+        showElement(`writeMessagePane`, false)
         deleteMessageHelper(displayedMessage)
     })
 
@@ -68,21 +68,33 @@ async function setup() {
     })
 
     // show menubar and inbox after loading page
-    document.getElementById(`buttonBar`).style.display = "block"
+    document.getElementById(`overviewButtonBox`).style.display = "flex"
     await showInbox()
 }
 
+function loadLanguage() {
+    document.querySelector(`title`).textContent = lang.SITE_NAME + " - " + lang.MESSAGES
+    document.querySelector(`#dateTimeSentPrefix`).textContent = lang.SENT_ON
+    document.querySelector(`#subjectPrefix`).textContent = lang.SUBJECT
+    document.querySelector(`#bodyPrefix`).textContent = lang.BODY
+    document.querySelector(`#writeMessageButton`).textContent = lang.WRITE_MESSAGE
+    document.querySelector(`#deleteMessageButton`).textContent = lang.DELETE
+    document.querySelector(`#blockUserButton`).textContent = lang.BLOCK_USER
+    document.querySelector(`#answerMessageButton`).textContent = lang.ANSWER_MESSAGE
+    document.querySelector(`#sendMessageButton`).textContent = lang.SEND_THIS_MESSAGE
+}
+
 async function showInbox() {
-    showElement(`writeMessageSection`, false)
-    showElement(`readMessageSection`, false)
+    showElement(`writeMessagePane`, false)
+    showElement(`readMessagePane`, false)
     showElement(`answerMessageButton`, true)
     overviewShowsInbox = true
     await refreshInbox()
 }
 
 async function showOutbox() {
-    showElement(`writeMessageSection`, false)
-    showElement(`readMessageSection`, false)
+    showElement(`writeMessagePane`, false)
+    showElement(`readMessagePane`, false)
     showElement(`answerMessageButton`, false)
     overviewShowsInbox = false
     await refreshOutbox()
@@ -205,7 +217,7 @@ function fillMessageOverview(listOfMessages) {
 
 // event handler for clicks on messages in messageOverview
 function messageSelected(event) {
-    showElement(`writeMessageSection`, false)
+    showElement(`writeMessagePane`, false)
     const thisElement = event.currentTarget
     const messageId = thisElement.getAttribute(`data-messageId`)
     let visibleBoxArray = overviewShowsInbox ? inboxArray : outboxArray
@@ -229,30 +241,30 @@ function noMessages() {
     noMessages.className = `messageInOverview readMessage`
     noMessages.textContent = overviewShowsInbox ? lang.NO_MESSAGES_INBOX : lang.NO_MESSAGES_OUTBOX
     document.querySelector(`#messageOverview`).appendChild(noMessages)
-    showElement(`readMessageSection`, false)
+    showElement(`readMessagePane`, false)
 }
 
 function writeNewMessage() {
-    showElement(`readMessageSection`, false)
-    showElement(`writeMessageSection`, true)
-    // clear subject and body fields (might contain old data from replyToMessage method
+    showElement(`readMessagePane`, false)
+    showElement(`writeMessagePane`, true)
+    // clear subject and body fields as they might contain old input from user
     document.querySelector("#subjectInput").value = ``
     document.querySelector("#bodyInput").value = ``
     sendJS.displayReceiverDropdown()
 }
 
 function replyToMessage() {
-    showElement(`readMessageSection`, false)
-    showElement(`writeMessageSection`, true)
+    showElement(`readMessagePane`, false)
+    showElement(`writeMessagePane`, true)
     showElement(`receiverName`, true)
     showElement(`receiverDropDown`, false)
     // prefill receiver, subject and body
     receiverId = displayedMessage.senderId
     document.querySelector("#receiverName").textContent = `${displayedMessage.senderName}`
     document.querySelector("#receiverName").setAttribute("data-receiverid", displayedMessage.senderId)
-    document.querySelector("#subjectInput").textContent =
+    document.querySelector("#subjectInput").value =
         `${lang.REPLY_PREFIX_SUBJECT} ${displayedMessage.subject}`
-    document.querySelector("#bodyInput").innerHTML
+    document.querySelector("#bodyInput").value =
         `\r\n\r\n${lang.REPLY_PREFIX_BODY}\r\n${displayedMessage.body}`
 }
 
@@ -331,16 +343,16 @@ async function deleteMessageHelper(message) {
                 showToast(lang.CONFIRMED_DELETE)
                 outboxArray.splice(outboxArray.indexOf(displayedMessage), 1)
                 fillMessageOverview(outboxArray)
-                showElement(`readMessageSection`, false)
+                showElement(`readMessagePane`, false)
             }
         } else {
             // receiver deletes message; message is marked "archivedByReceiver" using updateMessage
             message.archivedByReceiver = true
             if (await updateMessage(message)) {
-                showToast(CONFIRMED_DELETE)
+                showToast(lang.CONFIRMED_DELETE)
                 inboxArray.splice(inboxArray.indexOf(displayedMessage), 1)
                 fillMessageOverview(inboxArray)
-                showElement(`readMessageSection`, false)
+                showElement(`readMessagePane`, false)
             }
         }
     } else {
@@ -354,15 +366,24 @@ async function showMessageContent(messageId) {
     // find the message in the array, using its messageId
     displayedMessage = visibleBoxArray.find((e) => e.messageId === parseInt(messageId, 10))
     // show the message values in the relevant HTML elements
-    document.querySelector(`#singleViewUsername`).textContent = overviewShowsInbox ?
-        lang.PREFIX_FROM + displayedMessage.senderName + ", "
-        : lang.PREFIX_TO + displayedMessage.receiverName + ", "
+    const singleViewUsername = document.querySelector(`#username`)
+    const usernamePrefix = document.querySelector(`#usernamePrefix`)
+    usernamePrefix.textContent = overviewShowsInbox ? lang.FROM : lang.TO
+    singleViewUsername.textContent = overviewShowsInbox ? displayedMessage.senderName : displayedMessage.receiverName
+    // if (overviewShowsInbox) {
+    //     usernamePrefix.textContent = lang.FROM
+    //     singleViewUsername.textContent = displayedMessage.senderName
+    // } else {
+    //     usernamePrefix.textContent = lang.TO
+    //     singleViewUsername.textContent = displayedMessage.receiverName
+    // }
     const messageDateTime = new Date(displayedMessage.dateTimeSent)
-    document.querySelector(`#singleViewDateTimeSent`).textContent = formatDateTime(messageDateTime)
-    document.querySelector(`#singleViewSubject`).textContent = displayedMessage.subject
-    document.querySelector(`#singleViewBody`).textContent = displayedMessage.body
-    showElement(`readMessageSection`, true)
+    document.querySelector(`#dateTimeSent`).textContent = formatDateTime(messageDateTime)
+    document.querySelector(`#subject`).textContent = displayedMessage.subject
+    document.querySelector(`#body`).textContent = displayedMessage.body
+    showElement(`readMessagePane`, true)
 }
+
 
 // format date syntax according to browser's language setting
 function formatDateTime(dateTimeSent) {

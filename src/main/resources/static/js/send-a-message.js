@@ -3,6 +3,7 @@ import * as auth from "./modules/auth.mjs";
 import {getUsername} from "./modules/user.mjs";
 import {showToast} from './modules/notification.mjs';
 import * as lang from './languages/nl.mjs';
+import {SELECT_A_RECEIVER} from "./languages/nl.mjs";
 
 main.loadHeader()
 main.loadFooter()
@@ -17,7 +18,7 @@ let receiverId
 let receiverName
 let listOfCorrespondents
 
-await injectHtmlFromFile("writeMessageSection", "templates/send-message.html")
+await injectHtmlFromFile("writeMessagePane", "templates/send-message.html")
 await setup()
 
 export async function injectHtmlFromFile(elementId, pathToHtmlFile) {
@@ -29,12 +30,13 @@ export async function injectHtmlFromFile(elementId, pathToHtmlFile) {
         } else {
             elementToFill.innerHTML = await response.text()
             // prepare HTML after loading
-            document.querySelector("title").textContent = lang.PAGE_TITLE
-            document.querySelector('#headerSendMessage').textContent = lang.SEND_A_MESSAGE
-            document.querySelector('#labelForReceiverInput').textContent = lang.TO + " :"
-            document.querySelector('#labelForSubjectInput').textContent = lang.SUBJECT + " :"
-            document.querySelector('#labelForBodyInput').textContent = lang.BODY + " :"
+            // document.querySelector(`title`).textContent = lang.SITE_NAME + " - " + lang.WRITE_MESSAGE
+            // document.querySelector('#headerSendMessage').textContent = lang.WRITE_MESSAGE
+            // document.querySelector('#usernamePrefix').textContent = lang.TO
+            // document.querySelector('#subjectPrefix').textContent = lang.SUBJECT
+            // document.querySelector('#bodyPrefix').textContent = lang.BODY
             document.querySelector('#sendMessageButton').textContent = lang.SEND_THIS_MESSAGE
+
             document.querySelector('#sendMessageButton').addEventListener('click', () => {
                 checkRequiredFields()
             })
@@ -71,7 +73,7 @@ export async function displayReceiverDropdown() {
     document.querySelector("#receiverName").style.display = "none"
     listOfCorrespondents = await getListOfCorrespondents()
     let receiverDropdownElement = document.querySelector("#receiverDropDown")
-    receiverDropdownElement.innerHTML = "<option value=\"0\">" + lang.SELECT_A_USERNAME + "</option>"
+    receiverDropdownElement.innerHTML = "<option value=\"0\">" + lang.SELECT_A_RECEIVER + "</option>"
     fillCorrespondentsDropDown(listOfCorrespondents, "receiverDropDown")
     receiverDropdownElement.style.display = `block`
 }
