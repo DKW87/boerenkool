@@ -1,5 +1,6 @@
 package boerenkool.database.dao.mysql;
 
+import boerenkool.business.model.House;
 import boerenkool.business.model.HouseExtraFeature;
 import boerenkool.database.dao.GenericDAO;
 
@@ -28,4 +29,8 @@ public interface HouseExtraFeatureDAO extends GenericDAO<HouseExtraFeature> {
     List<HouseExtraFeature> getAllFeaturesByHouseId(int houseId);
 
     List<HouseExtraFeature> getAllFeaturesByHouseIdWithNames(int houseId);
+
+    void addExtraFeaturesToHouse(int houseId, List<HouseExtraFeature> extraFeatures);
+
+    void removeAllByHouseId(int houseId);
 }
