@@ -293,7 +293,7 @@ async function createPageNumbers() {
     let pageLimit = Number(params.get('limit')) || 12; // fallback to default of 12 results per page if no param
     let offset = Number(params.get('offset')) || 0; // fallback to default of 0 if no param
 
-    if (amountOfFilteredHouses < pageLimit) {
+    if (amountOfFilteredHouses <= pageLimit) {
         return; 
     }
 
