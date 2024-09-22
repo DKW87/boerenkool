@@ -16,6 +16,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * @author Timothy Houweling
+ * @project Boerenkool
+ */
+
 @RestController
 @RequestMapping("api/pictures")
 public class PictureController {

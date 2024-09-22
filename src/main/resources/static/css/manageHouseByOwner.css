@@ -1,3 +1,7 @@
+/**
+ * @author Timothy Houweling
+ * @project Boerenkool
+ */
 
 body {
     margin: 0;
@@ -176,9 +180,9 @@ h2 {
     background-color: rgb(210, 97, 97);
 }#extraFeaturesContainer {
      display: grid;
-     grid-template-columns: repeat(2, 1fr); /* Two equal-width columns */
-     gap: 10px 20px; /* Row gap 10px, column gap 20px */
-     max-width: 600px; /* Adjust to your layout */
+     grid-template-columns: repeat(2, 1fr);
+     gap: 10px 20px;
+     max-width: 600px;
  }
 
 .feature-container {
