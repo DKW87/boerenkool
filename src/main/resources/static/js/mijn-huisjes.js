@@ -13,144 +13,148 @@ Main.loadFooter();
 
 async function loadListOfHousesFromOwner() {
     const parentElement = document.getElementById('huisjes-container');
+    if (!parentElement) return showError('Element met ID "huisjes-container" niet gevonden.');
 
-    if (parentElement) {
 
-        const token = Auth.getToken();
-
-        if (token !== null) {
-
-            const user = await Auth.getLoggedInUser(token);
-
-            if (user.typeOfUser === 'Verhuurder') {
-                const api = 'api/houses/l/';
-                const url = api + user.userId;
-
-                console.log(user.username);
-                console.log(url);
-
-                fetch(url)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Netwerkreactie was niet ok.');
-                        } else {
-                            return response.json();
-                        }
-
-                    })
-                    .then(houses => {
-
-                        const amountOfHouses = document.createElement('p');
-                        amountOfHouses.innerHTML = 'Aantal huisjes: ' + houses.length;
-                        amountOfHouses.id = 'amountOfHouses';
-
-                        parentElement.appendChild(amountOfHouses);
-
-                        const selectAllLink = document.createElement('a');
-                        selectAllLink.href = '#';
-                        selectAllLink.id = 'selectAllLink';
-
-                        parentElement.appendChild(selectAllLink);
-
-                        const selectAll = document.createElement('p');
-                        selectAll.innerHTML = 'Selecteer alles';
-                        selectAll.className = 'selectAll';
-                        selectAll.id = 'selectAll';
-
-                        selectAllLink.appendChild(selectAll);
-
-                        houses.forEach(house => {
-
-                            let outerDiv = document.createElement('div');
-                            outerDiv.className = 'inline-house';
-                            outerDiv.dataset.houseId = house.houseId;
-
-                            let checkbox = document.createElement('input');
-                            checkbox.type = 'checkbox';
-                            checkbox.className = 'inline-checkbox';
-                            checkbox.value = house.houseId;
-
-                            let deleteButton = document.createElement('button');
-                            deleteButton.className = 'inline-del';
-                            deleteButton.dataset.houseId = house.houseId;
-                            deleteButton.dataset.houseName = house.houseName;
-
-                            let deleteImg = document.createElement('img');
-                            deleteImg.className = 'inline-del-img';
-                            deleteImg.src = './images/delete.png';
-                            deleteImg.alt = 'prullenbak icoon die aangeeft dat je hiermee het huisje verwijderd';
-
-                            let urlToHouse = document.createElement('a');
-                            urlToHouse.href = 'manageHouseByOwner.html?id=' + house.houseId;
-
-                            let image = document.createElement('img');
-
-                            image.className = 'inline-img';
-
-                            if (house.picture !== null) {
-                                image.src = `data:${house.picture.mimeType};base64,${house.picture.base64Picture}`;
-                                image.alt = house.houseName;
-                            } else {
-                                image.src = './images/notAvailable.png';
-                                image.alt = 'afbeelding niet gevonden';
-                            }
-
-                            let innerDiv = document.createElement('div');
-                            innerDiv.className = 'inline-text';
-
-                            let title = document.createElement('h2');
-                            title.innerHTML = house.houseName;
-                            title.className = 'inline-text';
-
-                            let typeAndLocation = document.createElement('p');
-                            typeAndLocation.innerHTML = 'ID: ' + house.houseId + ' - ' + house.houseType + ' in ' + house.province + ', ' + house.city;
-                            typeAndLocation.className = 'inline-text';
-
-                            parentElement.appendChild(outerDiv);
-                            outerDiv.appendChild(checkbox);
-                            outerDiv.appendChild(deleteButton);
-                            deleteButton.appendChild(deleteImg);
-                            outerDiv.appendChild(image);
-                            outerDiv.appendChild(innerDiv);
-                            innerDiv.appendChild(urlToHouse);
-                            urlToHouse.appendChild(title);
-                            innerDiv.appendChild(typeAndLocation);
-
-                            
-                            deleteOneListener();
-
-                        });
-
-                        const deleteAllButton = document.createElement('button');
-                        deleteAllButton.type = 'button';
-                        deleteAllButton.className = 'deleteAllButton';
-                        deleteAllButton.id = 'deleteAllButton';
-                        deleteAllButton.innerHTML = 'Verwijder';
-
-                        parentElement.appendChild(deleteAllButton);
-
-                        selectAllListener();
-                        deleteAllButtonListener();
-
-                    })
-                    .catch(error => {
-                        console.error('Er is een probleem opgetreden met fetch:', error);
-                        showToast(`Er is een probleem opgetreden met fetch: ${error}`);
-                    });
-            } else {
-
-                const notALandlord = document.createElement('p');
-                notALandlord.innerHTML = `Als huurder heb je geen toegang tot deze pagina. 
-                Ga naar je <a href="profile.html">profiel</a> om verhuurder te worden.`;
-
-                parentElement.appendChild(notALandlord);
-            }
-        }
-
-    } else {
-        console.error('Element met ID "huisjes-container" niet gevonden.');
-        showToast('Element met ID "huisjes-container" niet gevonden.');
+    const token = Auth.getToken();
+    if (!token) {
+        window.location.href = 'login.html';
+        return;
     }
+
+    const user = await Auth.getLoggedInUser(token);
+    if (user.typeOfUser !== 'Verhuurder') return showNotLandlordMessage(parentElement);
+
+    const api = 'api/houses/l/';
+    const url = api + user.userId;
+    fetchHouses(url, parentElement);
+}
+
+function showError(message) {
+    console.error(message);
+    showToast(message);
+}
+
+function showNotLandlordMessage(parentElement) {
+    parentElement.innerHTML = `
+        <p>Als huurder heb je geen toegang tot deze pagina. 
+        Ga naar je <a href="profile.html">profiel</a> om verhuurder te worden.</p>`;
+}
+
+function fetchHouses(url, parentElement){
+    fetch(url)
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Netwerkreactie was niet ok.');
+        } else {
+            return response.json();
+        }
+    })
+    .then(houses => {
+
+        createTopPageElements(parentElement, houses.length);
+
+        houses.forEach(house => {
+            createHouse(parentElement, house);
+        });
+
+        createBottomPageElements(parentElement);
+
+    })
+    .catch(error => { showError(`Er is een probleem opgetreden met fetch: ${error}`); });
+}
+
+function createTopPageElements(parentElement, amount) {
+    const amountOfHouses = document.createElement('p');
+    amountOfHouses.innerHTML = 'Aantal huisjes: ' + amount;
+    amountOfHouses.id = 'amountOfHouses';
+
+    parentElement.appendChild(amountOfHouses);
+
+    const selectAllLink = document.createElement('a');
+    selectAllLink.href = '#';
+    selectAllLink.id = 'selectAllLink';
+
+    parentElement.appendChild(selectAllLink);
+
+    const selectAll = document.createElement('p');
+    selectAll.innerHTML = 'Selecteer alles';
+    selectAll.className = 'selectAll';
+    selectAll.id = 'selectAll';
+
+    selectAllLink.appendChild(selectAll);
+}
+
+function createHouse(parentElement, house) {
+    let outerDiv = document.createElement('div');
+    outerDiv.className = 'inline-house';
+    outerDiv.dataset.houseId = house.houseId;
+
+    let checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.className = 'inline-checkbox';
+    checkbox.value = house.houseId;
+
+    let deleteButton = document.createElement('button');
+    deleteButton.className = 'inline-del';
+    deleteButton.dataset.houseId = house.houseId;
+    deleteButton.dataset.houseName = house.houseName;
+
+    let deleteImg = document.createElement('img');
+    deleteImg.className = 'inline-del-img';
+    deleteImg.src = './images/delete.png';
+    deleteImg.alt = 'prullenbak icoon die aangeeft dat je hiermee het huisje verwijderd';
+
+    let urlToHouse = document.createElement('a');
+    urlToHouse.href = 'manageHouseByOwner.html?id=' + house.houseId;
+
+    let image = document.createElement('img');
+
+    image.className = 'inline-img';
+
+    if (house.picture !== null) {
+        image.src = `data:${house.picture.mimeType};base64,${house.picture.base64Picture}`;
+        image.alt = house.houseName;
+    } else {
+        image.src = './images/notAvailable.png';
+        image.alt = 'afbeelding niet gevonden';
+    }
+
+    let innerDiv = document.createElement('div');
+    innerDiv.className = 'inline-text';
+
+    let title = document.createElement('h2');
+    title.innerHTML = house.houseName;
+    title.className = 'inline-text';
+
+    let typeAndLocation = document.createElement('p');
+    typeAndLocation.innerHTML = 'ID: ' + house.houseId + ' - ' + house.houseType + ' in ' + house.province + ', ' + house.city;
+    typeAndLocation.className = 'inline-text';
+
+    parentElement.appendChild(outerDiv);
+    outerDiv.appendChild(checkbox);
+    outerDiv.appendChild(deleteButton);
+    deleteButton.appendChild(deleteImg);
+    outerDiv.appendChild(image);
+    outerDiv.appendChild(innerDiv);
+    innerDiv.appendChild(urlToHouse);
+    urlToHouse.appendChild(title);
+    innerDiv.appendChild(typeAndLocation);
+
+    deleteOneListener();
+}
+
+function createBottomPageElements(parentElement) {
+    const deleteAllButton = document.createElement('button');
+    deleteAllButton.type = 'button';
+    deleteAllButton.className = 'deleteAllButton';
+    deleteAllButton.id = 'deleteAllButton';
+    deleteAllButton.innerHTML = 'Verwijder';
+
+    parentElement.appendChild(deleteAllButton);
+
+    selectAllListener();
+    deleteAllButtonListener();
 }
 
 function selectAllListener() {
@@ -159,7 +163,7 @@ function selectAllListener() {
 
     selectAllLink.addEventListener('click', function (event) {
         event.preventDefault();
-        
+
         const allChecked = Array.from(checkboxes).every(checkbox => checkbox.checked);
 
         if (!allChecked) {
@@ -176,7 +180,7 @@ function selectAllListener() {
     });
 
     checkboxes.forEach(checkbox => {
-        checkbox.addEventListener('change', updateSelectAllText); 
+        checkbox.addEventListener('change', updateSelectAllText);
     });
 }
 
@@ -221,6 +225,7 @@ function deleteOneListener() {
 
             Swal.fire({
                 title: `Huis verwijderen`,
+                heightAuto: false,
                 text: `Weet je zeker dat je "${houseName}" met ID: ${houseId} wil verwijderen?`,
                 icon: "warning",
                 showCancelButton: true,
@@ -252,6 +257,7 @@ function deleteMultipleListener(checkboxes) {
     deleteAllButton.addEventListener('click', function () {
         Swal.fire({
             title: `Huis(jes) verwijderen`,
+            heightAuto: false,
             text: `Weet je zeker dat je ${amountChecked} huis(jes) met ID(s): ${houseIdArray} wil verwijderen?`,
             icon: "warning",
             showCancelButton: true,

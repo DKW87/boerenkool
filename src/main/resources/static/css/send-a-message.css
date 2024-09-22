@@ -1,129 +1,93 @@
-
-.stage {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    /* height: 300px; */
-    /*min-height: 100vh;*/
-    /* min-width: 200px; */
+:root {
+    --borderGrey: #ccc;
 }
 
-.scene {
+.messageMainArea {
     display: flex;
-    flex-direction: column;
     justify-content: center;
     background-color: var(--boerenkool-grijs);
-    min-width: 300px;
-    max-width: 80vw;
 }
 
-.scene h3 {
-    text-align: center;
-    margin: 10px;
+#usernamePrefix, #dateTimeSentPrefix, #subjectPrefix, #bodyPrefix {
+    font-style: italic;
 }
 
-.scene label {
-    font-size: 14px;
-    color: #555;
-    padding: 10px;
-    margin: 10px;
+#username, #receiverName, #dateTimeSent, #subject, #body {
+    position: relative;
+    left: 30px;
+    width: 85%;
+    white-space: pre-wrap;
 }
 
-.scene input, textarea {
-    font-size: 14px;
-    width: 95%;
-    resize: none;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    padding: 10px;
-    margin: 10px;
-    /*text wraps on line breaks (necessary for space above reply)*/
-    white-space: pre-line;
+.subject, #username, #receiverName {
+    font-weight: bold;
 }
 
-.scene button {
-    font-size: 16px;
-    color: var(--boerenkool-wit);
-    background-color: var(--boerenkool-groen);
-    width: 95%;
-    border-radius: 4px;
-    padding: 10px;
-    margin: 10px;
+.readAndWritePanes {
+    width: 400px;
+    padding: 8px;
 }
 
-.scene button:hover {
-    background-color: var(--boerenkool-paars);
+.messageContent {
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    border-style: solid;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin: 5px;
 }
 
-#writeMessageForm {
-
+.messageContent div {
+    margin: 6px;
 }
 
 #writeMessageForm label {
-
+    font-style: italic;
 }
 
-
-/* messageOverview ; contains the list of inbox/outbox messages */
-#messageOverview {
-    /*display: flex;*/
-    /*flex-direction: column;*/
-    /*flex-wrap: nowrap;*/
-    /*overflow: hidden;*/
+#receiverDropDown {
+    font-size: 16px;
+    text-align: center;
+    color: white;
+    background-color: var(--boerenkool-groen);
+    border-radius: 8px;
+    width: 100%;
+    padding: 8px;
 }
-#messageInOverview {
-    /*background-color: white;*/
-    /*border: 1px;*/
-    /*border-style: solid;*/
-    /*border-color: gray;*/
-    /*border-radius: 4px;*/
-    /*padding: 3px;*/
-    /*margin: 3px;*/
-}
-#messageInOverview div {
-    /*text-overflow: ellipsis;*/
-    /*overflow: hidden;*/
-}
-/* end of messageOverview */
 
-/*.messageSingleView div {*/
-/*    background-color: white;*/
-/*    border: 1px;*/
-/*    border-style: solid;*/
-/*    border-color: var(--borderGrey);*/
-/*    border-radius: 4px;*/
-/*    padding: 10px;*/
-/*    margin: 3px;*/
-/*}*/
-
-#readMessageView div {
-    /* background-color: white;
-    border: 1px;
-    border-style: solid;
+.messageContent textarea {
+    border-width: 1px;
     border-color: var(--borderGrey);
-    border-radius: 4px;
+    border-radius: 8px;
+    width: 100%;
+    resize: vertical;
+    padding: 8px;
+    white-space: pre-wrap;
+}
+
+#subjectInput {
+    min-height: 30px;
+}
+
+#bodyInput {
+    min-height: 200px;
+}
+
+button {
+    font-size: 16px;
+    color: white;
+    background-color: grey;
+    border-radius: 8px;
     padding: 10px;
-    margin: 3px; */
+    margin: 6px;
 }
 
-
-form input {
-    /*padding: 8px;*/
-    /*margin-top: 5px;*/
-    /*border-radius: 4px;*/
-    /*border: 1px solid #ccc;*/
+#writeMessageButton, #answerMessageButton, #sendMessageButton {
+    background-color: var(--boerenkool-groen);
 }
 
-.subject {
-    /*font-weight: bold;*/
+#sendButtonBox {
+    display: flex;
+    justify-content: flex-end;
 }
-
-/*#floatingCheatMenu {*/
-/*    position: absolute;*/
-/*    bottom: 10px;*/
-/*    right: 10px;*/
-/*    background-color: aqua;*/
-/*    border: 3px solid black;*/
-/*    text-align: center;*/
-/*}*/
-

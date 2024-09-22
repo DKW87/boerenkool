@@ -8,17 +8,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+
+/**
+ * @author Adnan Kilic
+ * @project Boerenkool
+ */
 
 
 @Repository
 public class ReservationRepository {
 
     private final Logger logger = LoggerFactory.getLogger(ReservationRepository.class);
-
     private final ReservationDAO reservationDAO;
     private final UserDAO userDAO;
     private final HouseDAO houseDAO;
@@ -35,12 +38,6 @@ public class ReservationRepository {
         List<Reservation> reservations = reservationDAO.getAll();
         reservations.forEach(this::loadRelatedEntities);
         logger.debug("Fetched all reservations, count: {}", reservations.size());
-        return reservations;
-    }
-    public List<Reservation> getAllReservationsByUserId(int userId) {
-        List<Reservation> reservations = reservationDAO.getAllReservationsByUserId(userId);
-        reservations.forEach(this::loadRelatedEntities);
-        logger.debug("Fetched reservations for userId with ID: {}", userId);
         return reservations;
     }
 
@@ -78,7 +75,7 @@ public class ReservationRepository {
     }
 
     public List<Reservation> getAllReservationsByLandlord(int landlordId) {
-        List<Reservation> reservations = reservationDAO.getAllReservationsByLandlord(landlordId);
+        List<Reservation> reservations = reservationDAO.getAllReservationsByUserId(landlordId);
         reservations.forEach(this::loadRelatedEntities);
         logger.debug("Fetched reservations for landlord with ID: {}", landlordId);
         return reservations;
@@ -101,7 +98,6 @@ public class ReservationRepository {
     public boolean checkDateOverlap(int houseId, LocalDate startDate, LocalDate endDate) {
         return reservationDAO.existsByHouseIdAndDatesOverlap(houseId, startDate, endDate);
     }
-
 
     private void loadRelatedEntities(Reservation reservation) {
         int userId = reservation.getReservedByUser().getUserId();

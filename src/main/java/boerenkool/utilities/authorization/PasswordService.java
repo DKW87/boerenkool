@@ -19,7 +19,7 @@ public class PasswordService {
     private JavaMailSender javaMailSender;
 
     private static final String PEPPER = "TheWholeWorldHatesBoerenkool";
-    private static final String BASE_URL = "http://localhost:8080/";
+    private static final String BASE_URL = "miw-team-2.nl/";
     private static final String RESET_URL = "reset-password-confirm.html";
 
 

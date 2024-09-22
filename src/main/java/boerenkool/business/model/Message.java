@@ -34,10 +34,6 @@ public class Message implements Comparable<Message> {
 
     }
 
-//    public Message(User sender, User receiver, String subject, String body) {
-//        this(0, sender, receiver, null, subject, body, false, false, false);
-//    }
-
     // necessary for contructing a Message from JSON
     public Message() {
         this(0, null, null, null, null, null, false, false, false);
@@ -58,11 +54,6 @@ public class Message implements Comparable<Message> {
                 '}';
     }
 
-    /**
-     * compare messages by their sent date (old < new)
-     * @param otherMessage the object to be compared.
-     * @return
-     */
     @Override
     public int compareTo(Message otherMessage) {
         return this.dateTimeSent.compareTo(otherMessage.dateTimeSent);
@@ -96,6 +87,7 @@ public class Message implements Comparable<Message> {
         return dateTimeSent;
     }
 
+    // necessary for contructing a Message from JSON
     public void setDateTimeSent(LocalDateTime dateTimeSent) {
         this.dateTimeSent = dateTimeSent;
     }
@@ -112,6 +104,7 @@ public class Message implements Comparable<Message> {
         return readByReceiver;
     }
 
+    // necessary for contructing a Message from JSON
     public void setReadByReceiver(boolean readByReceiver) {
         this.readByReceiver = readByReceiver;
     }
@@ -120,6 +113,7 @@ public class Message implements Comparable<Message> {
         return archivedBySender;
     }
 
+    // necessary for contructing a Message from JSON
     public void setArchivedBySender(boolean archivedBySender) {
         this.archivedBySender = archivedBySender;
     }
@@ -128,6 +122,7 @@ public class Message implements Comparable<Message> {
         return archivedByReceiver;
     }
 
+    // necessary for contructing a Message from JSON
     public void setArchivedByReceiver(boolean archivedByReceiver) {
         this.archivedByReceiver = archivedByReceiver;
     }

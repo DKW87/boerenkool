@@ -25,7 +25,7 @@ form {
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
-label {
+.container label {
     display: block;
     margin: 10px 0 5px;
     font-weight: bold;

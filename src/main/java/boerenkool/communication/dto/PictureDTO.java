@@ -1,12 +1,14 @@
 package boerenkool.communication.dto;
-
 import boerenkool.business.model.Picture;
-
 import java.util.Base64;
+
+/**
+ * @author Timothy Houweling
+ * @project Boerenkool
+ */
 
 public class PictureDTO {
 
-    // Integer used instead of int because Integers can be null. Usefull for debugging.
     private Integer pictureId;
     private Integer houseId;
     private String base64Picture;
@@ -15,9 +17,15 @@ public class PictureDTO {
 
 
 
+    public PictureDTO(Integer pictureId, Integer houseId, String base64Picture, String mimeType, String description) {
+        this.pictureId = pictureId;
+        this.houseId = houseId;
+        this.base64Picture = base64Picture;
+        this.mimeType = mimeType;
+        this.description = description;
+    }
 
     public PictureDTO(Integer houseId, String base64Picture, String mimeType, String description) {
-        this.pictureId = pictureId;
         this.houseId = houseId;
         this.base64Picture = base64Picture;
         this.mimeType = mimeType;
@@ -30,7 +38,13 @@ public class PictureDTO {
         this.description = description;
     }
 
+    public Integer getPictureId() {
+        return pictureId;
+    }
 
+    public void setPictureId(Integer pictureId) {
+        this.pictureId = pictureId;
+    }
 
     public Integer getHouseId() {
         return houseId;
@@ -38,6 +52,14 @@ public class PictureDTO {
 
     public void setHouseId(Integer houseId) {
         this.houseId = houseId;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getBase64Picture() {
@@ -56,13 +78,6 @@ public class PictureDTO {
         this.mimeType = mimeType;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
 
 
 }

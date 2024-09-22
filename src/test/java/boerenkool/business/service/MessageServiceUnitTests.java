@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.context.ActiveProfiles;
 
 
 import java.time.LocalDateTime;
@@ -18,7 +19,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-
+@ActiveProfiles("localtest")
 @ExtendWith(MockitoExtension.class)
 public class MessageServiceUnitTests {
 

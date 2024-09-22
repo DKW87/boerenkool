@@ -1,3 +1,7 @@
+/**
+ * @author Timothy Houweling
+ * @project Boerenkool
+ */
 
 body {
     margin: 0;
@@ -29,6 +33,7 @@ body {
     color: var(--boerenkool-wit);
 }
 
+
 .body-div {
     background-color: var(--boerenkool-grijs);
     grid-column: 1 / 2;
@@ -38,6 +43,8 @@ body {
     justify-content: center;
     padding: 0;
     height: 100%;
+    margin-bottom: 75px;
+    margin-top: 20px;
 }
 
 
@@ -62,6 +69,7 @@ body {
     align-items: center;
     width: 100%;
     max-width: 600px;
+
 }
 
 .house-details h2 {
@@ -71,8 +79,10 @@ body {
 }
 
 .house-details strong {
+    font-size: var(--font-size-large);
     justify-self: start;
     text-align: left;
+
 }
 
 .house-details input,
@@ -81,6 +91,11 @@ body {
     justify-self: end;
     width: 100%;
     max-width: 300px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: var(--font-size-large);
+    margin-bottom: 20px;
 }
 
 #pictures {
@@ -90,6 +105,10 @@ body {
     justify-content: center;
     padding: 10px;
     background-color: var(--boerenkool-wit);
+}
+
+h2 {
+    color: #a975de;
 }
 
 #pictures img {
@@ -130,13 +149,64 @@ body {
     font-weight: bold;
     border: none;
     border-radius: 5px;
-    background-color: var(--boerenkool-groen);
-    color: var(--boerenkool-wit);
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
-#actionButtons button:hover {
-    background-color: darkgreen;
-    transform: translateY(-2px);
+#editHouse, #saveChanges {
+    background-color: #a975de;
+    color: white;
+}
+
+#editHouse:hover, #saveChanges:hover {
+    background-color: #af92d8;
+}
+
+#managePictures, #backToMyHouses {
+    background-color: #556B2F;
+    color: white;
+}
+
+#managePictures:hover, #backToMyHouses:hover {
+    background-color: #b9c7a0;
+}
+
+#deleteHouse {
+    background-color: #c0392b;
+    color: white;
+}
+
+#deleteHouse:hover {
+    background-color: rgb(210, 97, 97);
+}#extraFeaturesContainer {
+     display: grid;
+     grid-template-columns: repeat(2, 1fr);
+     gap: 10px 20px;
+     max-width: 600px;
+ }
+
+.feature-container {
+    display: flex;
+    align-items: center;
+}
+
+.feature-container input[type="checkbox"] {
+    margin-right: 10px;
+    width: 16px;
+    height: 16px;
+    position: relative;
+    top: 10px;
+}
+
+.feature-container label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+    line-height: 1.2;
+}
+
+.feature-container input {
+    width: 16px;
+    height: 16px;
 }

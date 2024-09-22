@@ -290,21 +290,23 @@ export function setTodayAsMinValueDateInput() {
 
 async function createPageNumbers() {
     const params = new URLSearchParams(window.location.search);
-    const parentElement = document.getElementById('body');
-    const pageNumbersDiv = document.createElement('div');
-    pageNumbersDiv.className = 'page-numbers';
-    parentElement.appendChild(pageNumbersDiv);
-    const pageNumberSpan = document.createElement('span');
-    pageNumberSpan.id = 'pageNumberSpan';
-    pageNumbersDiv.appendChild(pageNumberSpan);
-
-    let pageCounter = 1; // start on page 1
     let pageLimit = Number(params.get('limit')) || 12; // fallback to default of 12 results per page if no param
     let offset = Number(params.get('offset')) || 0; // fallback to default of 0 if no param
-    let currentPage = (offset / pageLimit) + 1;
+
+    if (amountOfFilteredHouses <= pageLimit) return; 
 
     params.delete('limit');
     params.delete('offset');
+
+    const parentElement = document.getElementById('body');
+    const pageNumbersDiv = Object.assign(document.createElement('div'), { className: 'page-numbers' });
+    const pageNumberSpan = Object.assign(document.createElement('span'), { id: 'pageNumberSpan' });
+    
+    parentElement.appendChild(pageNumbersDiv);
+    pageNumbersDiv.appendChild(pageNumberSpan);
+
+    let pageCounter = 1; // start on page 1
+    let currentPage = (offset / pageLimit) + 1;
 
     for (let i = 1; i < amountOfFilteredHouses; i++) {
 
@@ -317,6 +319,7 @@ async function createPageNumbers() {
             } else {
                 const linkToPage = document.createElement('a');
                 linkToPage.href = `index.html?${params}&limit=${pageLimit}&offset=0`;
+                pageNumberOne.className = 'number-link';
                 pageNumberSpan.appendChild(linkToPage);
                 linkToPage.appendChild(pageNumberOne);
             }
@@ -338,6 +341,7 @@ async function createPageNumbers() {
                 linkToPage.href = `index.html?${params}&limit=${pageLimit}&offset=${nextPageOffset}`;
                 pageNumberSpan.appendChild(linkToPage);
                 linkToPage.appendChild(nextPageNumber);
+                nextPageNumber.className = 'number-link';
             }
         }
     }
@@ -358,13 +362,7 @@ function setSelectedOptions(elementId, values) {
 async function amountOfHousesStringSwitch(element) {
     const api = '/api/houses/l/filter?count=true';
     const params = new URLSearchParams(window.location.search);
-    let url;
-
-    if (params.toString() === '') {
-        url = api;
-    } else {
-        url = api + '&' + params.toString();
-    }
+    let url = params.toString === '' ? api : api + '&' + params.toString();
 
     try {
         const response = await fetch(url);

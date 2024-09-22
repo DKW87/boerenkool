@@ -155,7 +155,7 @@ function displayHouseDetails(house) {
     document.getElementById('maxGuests').textContent = house.maxGuest;
     document.getElementById('roomCount').textContent = house.roomCount;
     document.getElementById('pricePPPD').textContent = `${house.pricePPPD} bkC`;
-    document.getElementById('description').innerHTML  = house.description;
+    document.getElementById('description').innerHTML = house.description.replace(/\n/g, '<br>');
     document.getElementById('availability').textContent = house.isNotAvailable ? 'Niet Beschikbaar' : 'Beschikbaar';  // Dutch UI
 
     const picturesContainer = document.getElementById('pictures');

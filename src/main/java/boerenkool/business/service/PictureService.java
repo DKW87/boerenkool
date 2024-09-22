@@ -18,6 +18,11 @@ import java.util.Optional;
 
 import static org.springframework.http.MediaType.*;
 
+/**
+ * @author Timothy Houweling
+ * @project Boerenkool
+ */
+
 @Service
 public class PictureService {
 
@@ -30,11 +35,9 @@ public class PictureService {
         logger.info("New PictureService");
     }
 
-    // save includes store and update
     public boolean savePicture(Picture picture) {
         return pictureRepository.savePicture(picture);
     }
-
 
     public boolean removeOneById(int pictureId) {
         return pictureRepository.removeOneById(pictureId);
@@ -75,7 +78,7 @@ public class PictureService {
 
     public String detectImageFormat(byte[] imageBytes) {
         if (imageBytes == null || imageBytes.length < 4) {
-            return "unknown"; // Return "unknown" if imageBytes is null or too short
+            return "unknown"; //
         }
 
         // Check PNG signature
@@ -108,7 +111,9 @@ public class PictureService {
         String base64Picture = Base64.getEncoder().encodeToString(imageBytes);
         String mimeType = detectImageFormat(imageBytes);
 
+
         return new PictureDTO(
+                picture.getPictureId(),
                 picture.getHouseId(),
                 base64Picture,
                 mimeType,
