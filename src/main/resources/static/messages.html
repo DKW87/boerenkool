@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HuisjeBoompjeBoerenkool - Berichten</title>
+    <title></title>
 
     <script src="js/messages.js" type="module"></script>
 
@@ -14,7 +14,8 @@
     <link rel="stylesheet" href="css/footer.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playwrite+BE+VLG:wght@100..400&family=Playwrite+PE:wght@100..400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playwrite+BE+VLG:wght@100..400&family=Playwrite+PE:wght@100..400&display=swap"
+          rel="stylesheet">
 
 </head>
 
@@ -24,35 +25,44 @@
 
     <div class="header-div" id="header"></div>
 
-<!--    later om te zetten naar stage / scene / actor classes-->
+    <!--    later om te zetten naar stage / scene / actor classes-->
     <div class="messageMainArea">
 
-        <div>
-            <div id="buttonBar" style="display:none">
-                <button id="showInboxButton">Inbox</button>
-                <button id="showOutboxButton">Outbox</button>
-                <button id="writeMessageButton">Schrijf een nieuw bericht</button>
+        <div id="overviewPane">
+            <div id="overviewButtonBox" style="display:none">
+                <button id="showInboxButton" class="messageButtons">Inbox</button>
+                <button id="showOutboxButton" class="messageButtons">Outbox</button>
+                <button id="writeMessageButton" class="messageButtons"></button>
+            </div>
+
+            <div id="messageOverview"></div>
+        </div>
+
+        <div class="readAndWritePanes">
+
+            <div id="readMessagePane" style="display:none">
+
+                <div class="messageContent">
+                    <div id="usernamePrefix"></div>
+                    <div id="username"></div>
+                    <div id="dateTimeSentPrefix"></div>
+                    <div id="dateTimeSent"></div>
+                    <div id="subjectPrefix"></div>
+                    <div id="subject" class="subject"></div>
+                    <div id="bodyPrefix"></div>
+                    <div id="body"></div>
+                </div>
+
+                <div id="readButtonBox">
+                    <button id="deleteMessageButton" class="messageButtons"></button>
+                    <button id="blockUserButton" class="messageButtons"></button>
+                    <button id="answerMessageButton" class="messageButtons"></button>
+                </div>
 
             </div>
 
-            <section id="messageOverview"></section>
-        </div>
+            <div id="writeMessagePane" style="display:none"></div>
 
-        <div>
-            <section class="readAndWriteSections" id="readMessageSection" style="display:none">
-                <div>
-                    <span id="singleViewPrefix"></span>
-                    <span id="singleViewUsername"></span>
-                    <span id="singleViewDateTimeSent"></span>
-                </div>
-                <div><span id="singleViewSubject" class="subject"></span></div>
-                <div id="singleViewBody"></div>
-                <button id="deleteMessageButton">Verwijder dit bericht</button>
-                <button id="blockUserButton">Blokkeer deze persoon</button>
-                <button id="answerMessageButton">Beantwoord dit bericht</button>
-            </section>
-
-            <section id="writeMessageSection" style="display:none"></section>
         </div>
 
     </div>

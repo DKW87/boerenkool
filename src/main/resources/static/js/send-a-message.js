@@ -17,7 +17,7 @@ let receiverId
 let receiverName
 let listOfCorrespondents
 
-await injectHtmlFromFile("writeMessageSection", "templates/send-message.html")
+await injectHtmlFromFile("writeMessagePane", "templates/send-message.html")
 await setup()
 
 export async function injectHtmlFromFile(elementId, pathToHtmlFile) {
@@ -28,12 +28,6 @@ export async function injectHtmlFromFile(elementId, pathToHtmlFile) {
             new Error(`Response status: ${response.status}`)
         } else {
             elementToFill.innerHTML = await response.text()
-            // prepare HTML after loading
-            document.querySelector("title").textContent = lang.PAGE_TITLE
-            document.querySelector('#headerSendMessage').textContent = lang.SEND_A_MESSAGE
-            document.querySelector('#labelForReceiverInput').textContent = lang.TO + " :"
-            document.querySelector('#labelForSubjectInput').textContent = lang.SUBJECT + " :"
-            document.querySelector('#labelForBodyInput').textContent = lang.BODY + " :"
             document.querySelector('#sendMessageButton').textContent = lang.SEND_THIS_MESSAGE
             document.querySelector('#sendMessageButton').addEventListener('click', () => {
                 checkRequiredFields()
@@ -59,7 +53,6 @@ async function setup() {
     document.getElementById(`writeMessageForm`).style.display = "block"
 }
 
-
 export async function displayReceiverName(receiverName) {
     document.querySelector("#receiverDropDown").style.display = "none"
     let receiverNameElement = document.querySelector("#receiverName")
@@ -71,7 +64,7 @@ export async function displayReceiverDropdown() {
     document.querySelector("#receiverName").style.display = "none"
     listOfCorrespondents = await getListOfCorrespondents()
     let receiverDropdownElement = document.querySelector("#receiverDropDown")
-    receiverDropdownElement.innerHTML = "<option value=\"0\">" + lang.SELECT_A_USERNAME + "</option>"
+    receiverDropdownElement.innerHTML = "<option value=\"0\">" + lang.SELECT_A_RECEIVER + "</option>"
     fillCorrespondentsDropDown(listOfCorrespondents, "receiverDropDown")
     receiverDropdownElement.style.display = `block`
 }
@@ -97,7 +90,7 @@ export function fillCorrespondentsDropDown(listOfCorrespondents, optionElementId
     for (const [key, value] of Object.entries(listOfCorrespondents)) {
         let optionElement = document.createElement("option")
         optionElement.value = key
-        optionElement.text = value
+        optionElement.text = String(value)
         dropDownElement.appendChild(optionElement)
     }
 }
@@ -117,8 +110,12 @@ export async function checkRequiredFields() {
         showToast(lang.SELECT_A_RECEIVER)
     } else if (subject === null || subject === "") {
         showToast(lang.FILL_IN_SUBJECT_FIELD)
+    } else if (subject.length > 150) {
+        showToast(lang.SUBJECT_TOO_LONG)
     } else if (body === null || body === "") {
         showToast(lang.FILL_IN_BODY_FIELD)
+    } else if (body.length > 2550) {
+        showToast(lang.BODY_TOO_LONG)
     } else {
         await sendMessage(receiverId, subject, body)
     }
@@ -138,7 +135,6 @@ export async function sendMessage(receiverId, subject, body) {
         "readByReceiver": false,
         "archivedByReceiver": false
     })
-    // POST message to database
     try {
         const response = await fetch(url, {
             method: "POST",

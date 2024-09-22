@@ -1,25 +1,32 @@
 <form id="writeMessageForm" onsubmit="return false">
 
-    <h3 id="headerSendMessage">Send a message</h3>
+    <div class="messageContent">
 
-    <!--        <button id="goToMessagesButton">Naar mijn berichten</button>-->
+        <div>
+            <label for="receiverDropDown">Aan : </label>
+        </div>
+        <div>
+            <span id="receiverName"></span>
+            <select name="receiverDropDown" id="receiverDropDown"></select>
+        </div>
+        <div>
+            <label for="subjectInput">Onderwerp : </label>
+        </div>
+        <div>
+            <textarea id="subjectInput" name="subject"></textarea>
+        </div>
 
-    <label id="labelForReceiverInput">To : </label>
+        <div>
+            <label for="bodyInput">Bericht : </label>
+        </div>
+        <div>
+            <textarea id="bodyInput" name="body"></textarea>
+        </div>
 
-    <span id="receiverName"></span>
-
-    <select name="receiverDropDown" id="receiverDropDown"></select>
-
-    <label for="subjectInput" id="labelForSubjectInput">Subject : </label>
-    <div>
-        <textarea id="subjectInput" name="subject"></textarea>
     </div>
 
-    <label for="bodyInput" id="labelForBodyInput">Message : </label>
-    <div>
-        <textarea id="bodyInput" name="body"></textarea>
+    <div id="sendButtonBox">
+        <button id="sendMessageButton" class="messageButtons">Verstuur dit bericht</button>
     </div>
-
-    <button id="sendMessageButton">Send this message</button>
 
 </form>
