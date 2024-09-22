@@ -8,6 +8,7 @@ import boerenkool.database.repository.ReservationRepository;
 import boerenkool.database.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
@@ -52,11 +53,12 @@ public class ReservationService {
                 reservation.getGuestCount()
         );
         User user = reservation.getReservedByUser();
+        if (user.getUserId() == reservation.getHouse().getHouseOwner().getUserId()) {
+            totalCost = 0;
+        }
         validateUserBudget(totalCost, user);
-        Reservation savedReservation = reservationRepository.saveReservation(reservation);
         updateUserBalance(user, totalCost);
-
-        return savedReservation;
+        return reservationRepository.saveReservation(reservation);
     }
 
     private void validateReservationDetails(Reservation reservation) {
@@ -120,20 +122,16 @@ public class ReservationService {
         }
     }
 
-
     public boolean deleteReservationById(int id) {
         Reservation reservation = findReservationById(id);
         validateReservationForDeletion(reservation);
-
         int totalCost = calculateReservationCost(
                 reservation.getStartDate(),
                 reservation.getEndDate(),
                 reservation.getHouse().getHouseId(),
                 reservation.getGuestCount()
         );
-
         updateUserBalanceAfterCancellation(reservation.getReservedByUser(), totalCost);
-
         return cancelReservation(id);
     }
 
@@ -186,7 +184,7 @@ public class ReservationService {
 
         List<Reservation> reservations = fetchReservationsByUserType(user);
 
-        return reservations.stream()
+        return reservations.isEmpty() ? Collections.emptyList() : reservations.stream()
                 .map(this::convertToDto)
                 .toList();
     }

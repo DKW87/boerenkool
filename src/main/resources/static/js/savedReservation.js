@@ -27,6 +27,13 @@ async function getAllSavedReservation() {
         .then(response => response.json())
         .then(data => {
             var table = document.getElementById('reservation-table');
+            if (data.length === 0) {
+                table.innerHTML = `<div class="empty-cart">
+                                   <div class="empty-cart-content">
+                                   <p>Geen reservering gevonden!</p>   
+                                   </div>`;
+                return;
+            }
             data.map((d, i) => {
                 var node = `<tr>
                                             <td>${d.reservationId}</td>

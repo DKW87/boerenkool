@@ -75,7 +75,7 @@ public class ReservationRepository {
     }
 
     public List<Reservation> getAllReservationsByLandlord(int landlordId) {
-        List<Reservation> reservations = reservationDAO.getAllReservationsByLandlord(landlordId);
+        List<Reservation> reservations = reservationDAO.getAllReservationsByUserId(landlordId);
         reservations.forEach(this::loadRelatedEntities);
         logger.debug("Fetched reservations for landlord with ID: {}", landlordId);
         return reservations;
