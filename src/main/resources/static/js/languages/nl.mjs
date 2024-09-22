@@ -13,6 +13,8 @@ export const FILL_IN_BODY_FIELD = "Vul een bericht in"
 export const SELECT_A_RECEIVER = "Selecteer een ontvanger"
 
 
+export const SUBJECT_TOO_LONG = "Het onderwerp is te lang: ten hoogste 150 tekens"
+export const BODY_TOO_LONG = "Het bericht is te lang: ten hoogste 2550 tekens"
 export const BLOCKED_BY_RECEIVER = "U bent geblokkeerd door de ontvanger"
 export const RESPONSE_ERROR = "Er is iets mis gegaan"
 export const NO_MESSAGES_INBOX = "U heeft geen berichten ontvangen"

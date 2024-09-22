@@ -3,7 +3,6 @@ import * as auth from "./modules/auth.mjs";
 import {getUsername} from "./modules/user.mjs";
 import {showToast} from './modules/notification.mjs';
 import * as lang from './languages/nl.mjs';
-import {SELECT_A_RECEIVER} from "./languages/nl.mjs";
 
 main.loadHeader()
 main.loadFooter()
@@ -29,14 +28,7 @@ export async function injectHtmlFromFile(elementId, pathToHtmlFile) {
             new Error(`Response status: ${response.status}`)
         } else {
             elementToFill.innerHTML = await response.text()
-            // prepare HTML after loading
-            // document.querySelector(`title`).textContent = lang.SITE_NAME + " - " + lang.WRITE_MESSAGE
-            // document.querySelector('#headerSendMessage').textContent = lang.WRITE_MESSAGE
-            // document.querySelector('#usernamePrefix').textContent = lang.TO
-            // document.querySelector('#subjectPrefix').textContent = lang.SUBJECT
-            // document.querySelector('#bodyPrefix').textContent = lang.BODY
             document.querySelector('#sendMessageButton').textContent = lang.SEND_THIS_MESSAGE
-
             document.querySelector('#sendMessageButton').addEventListener('click', () => {
                 checkRequiredFields()
             })
@@ -60,7 +52,6 @@ async function setup() {
     }
     document.getElementById(`writeMessageForm`).style.display = "block"
 }
-
 
 export async function displayReceiverName(receiverName) {
     document.querySelector("#receiverDropDown").style.display = "none"
@@ -99,7 +90,7 @@ export function fillCorrespondentsDropDown(listOfCorrespondents, optionElementId
     for (const [key, value] of Object.entries(listOfCorrespondents)) {
         let optionElement = document.createElement("option")
         optionElement.value = key
-        optionElement.text = value
+        optionElement.text = String(value)
         dropDownElement.appendChild(optionElement)
     }
 }
@@ -119,8 +110,12 @@ export async function checkRequiredFields() {
         showToast(lang.SELECT_A_RECEIVER)
     } else if (subject === null || subject === "") {
         showToast(lang.FILL_IN_SUBJECT_FIELD)
+    } else if (subject.length > 150) {
+        showToast(lang.SUBJECT_TOO_LONG)
     } else if (body === null || body === "") {
         showToast(lang.FILL_IN_BODY_FIELD)
+    } else if (body.length > 2550) {
+        showToast(lang.BODY_TOO_LONG)
     } else {
         await sendMessage(receiverId, subject, body)
     }
@@ -140,7 +135,6 @@ export async function sendMessage(receiverId, subject, body) {
         "readByReceiver": false,
         "archivedByReceiver": false
     })
-    // POST message to database
     try {
         const response = await fetch(url, {
             method: "POST",

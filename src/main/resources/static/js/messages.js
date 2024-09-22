@@ -13,7 +13,6 @@ mainJS.loadFooter()
 const token = authJS.getToken()
 let loggedInUser = await authJS.getLoggedInUser(token)
 
-// TODO save inbox and outbox to sessionStorage ?
 let inboxArray
 let outboxArray
 let displayedMessage
@@ -31,6 +30,14 @@ const DATE_TIME_OPTIONS = {
     hour: `numeric`,
     minute: `numeric`
 }
+
+// document.addEventListener('DOMContentLoaded', () => {
+//     Main.loadHeader()
+//     Main.loadFooter()
+//
+//     setup()
+// });
+
 
 await setup()
 

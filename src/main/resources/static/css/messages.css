@@ -13,7 +13,6 @@
     min-width: 400px;
 }
 
-
 .messageInOverview {
     border: 1px;
     border-color: var(--borderGrey);
@@ -29,31 +28,24 @@
 }
 
 .readMessage {
-    /*border-color: grey;*/
     background-color: white;
 }
 
 .unreadMessage {
-    /*border-color: grey;*/
-    color: white;
+    border-color: var(--boerenkool-paars);
     background-color: var(--boerenkool-paars);
 }
 
-/* messageOverview ; contains the list of inbox/outbox messages */
 #messageOverview {
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
     overflow: hidden;
-
     background-color: white;
-
     max-width: 400px;
-
     border-style: solid;
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-
     margin: 5px;
 }
 
@@ -62,7 +54,6 @@
     text-overflow: ellipsis;
     overflow: hidden;
 }
-
 
 #usernamePrefix, #dateTimeSentPrefix, #subjectPrefix, #bodyPrefix {
     font-style: italic;
@@ -74,7 +65,6 @@
     width: 85%;
     white-space: pre-wrap;
 }
-
 
 .subject, #username, #receiverName {
     font-weight: bold;
@@ -127,12 +117,10 @@
 
 #subjectInput {
     min-height: 30px;
-    /*white-space: pre-wrap;*/
 }
 
 #bodyInput {
     min-height: 200px;
-    /*white-space: pre-wrap;*/
 }
 
 button {
@@ -142,7 +130,6 @@ button {
     border-radius: 8px;
     padding: 10px;
     margin: 6px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 #overviewButtonBox, #readButtonBox {
