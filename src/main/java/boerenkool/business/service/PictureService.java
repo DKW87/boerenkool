@@ -18,6 +18,11 @@ import java.util.Optional;
 
 import static org.springframework.http.MediaType.*;
 
+/**
+ * @author Timothy Houweling
+ * @project Boerenkool
+ */
+
 @Service
 public class PictureService {
 
@@ -30,11 +35,9 @@ public class PictureService {
         logger.info("New PictureService");
     }
 
-    // save includes store and update
     public boolean savePicture(Picture picture) {
         return pictureRepository.savePicture(picture);
     }
-
 
     public boolean removeOneById(int pictureId) {
         return pictureRepository.removeOneById(pictureId);

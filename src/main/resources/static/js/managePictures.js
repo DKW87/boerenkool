@@ -1,3 +1,8 @@
+/**
+ * @author Timothy Houweling
+ * @project Boerenkool
+ */
+
 import * as Main from './modules/main.mjs';
 import * as Auth from './modules/auth.mjs';
 import {showToast} from "./modules/notification.mjs";

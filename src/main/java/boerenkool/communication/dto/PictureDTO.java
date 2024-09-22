@@ -1,12 +1,12 @@
 package boerenkool.communication.dto;
 
-import boerenkool.business.model.Picture;
-
-import java.util.Base64;
+/**
+ * @author Timothy Houweling
+ * @project Boerenkool
+ */
 
 public class PictureDTO {
 
-    // Integer used instead of int because Integers can be null. Usefull for debugging.
     private Integer pictureId;
     private Integer houseId;
     private String base64Picture;
@@ -50,22 +50,6 @@ public class PictureDTO {
 
     public void setHouseId(Integer houseId) {
         this.houseId = houseId;
-    }
-
-    public String getBase64Picture() {
-        return base64Picture;
-    }
-
-    public void setBase64Picture(String base64Picture) {
-        this.base64Picture = base64Picture;
-    }
-
-    public String getMimeType() {
-        return mimeType;
-    }
-
-    public void setMimeType(String mimeType) {
-        this.mimeType = mimeType;
     }
 
     public String getDescription() {

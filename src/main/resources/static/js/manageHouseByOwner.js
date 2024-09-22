@@ -1,3 +1,8 @@
+/**
+ * @author Timothy Houweling
+ * @project Boerenkool
+ */
+
 import * as Main from './modules/main.mjs';
 import * as Auth from './modules/auth.mjs';
 import {showToast} from "./modules/notification.mjs";
@@ -305,25 +310,24 @@ document.addEventListener('DOMContentLoaded', function () {
         const city = document.getElementById('city').value;
         const streetAndNumber = document.getElementById('streetAndNumber').value;
         const zipcode = document.getElementById('zipcode').value;
-        console.log("dit is zipcode binnen validateInputs: " + zipcode)
         const maxGuest = parseInt(document.getElementById('maxGuest').value, 10);
         const pricePPPD = parseFloat(document.getElementById('pricePPPD').value);
         const description = document.getElementById('description').value;
 
 
-        if (houseName.length > 60) {
-            showToast('Huisnaam mag niet langer zijn dan 60 karakters.');
+        if (houseName.length > 150) {
+            showToast('Huisnaam mag niet langer zijn dan 150 karakters.');
             return false;
         }
 
 
-        if (city.length > 60 || !validateCity(city)) {
-            showToast('Stad mag alleen letters bevatten en mag niet langer zijn dan 60 karakters.');
+        if (city.length > 150 || !validateCity(city)) {
+            showToast('Stad mag alleen letters bevatten en mag niet langer zijn dan 150 karakters.');
             return false;
         }
 
 
-        if (streetAndNumber.length > 120 || !validateStreetAndNumber(streetAndNumber)) {
+        if (streetAndNumber.length > 150 || !validateStreetAndNumber(streetAndNumber)) {
             showToast('Straatnaam moet beginnen met een woord, gevolgd door een huisnummer (bv. "Straatnaam 123").');
             return false;
         }
@@ -346,8 +350,8 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
 
-        if (description.length > 255) {
-            showToast('Omschrijving mag niet langer zijn dan 255 karakters.');
+        if (description.length > 10000) {
+            showToast('Omschrijving mag niet langer zijn dan 10000 karakters.');
             return false;
         }
 
