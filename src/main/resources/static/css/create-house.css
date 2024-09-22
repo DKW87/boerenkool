@@ -117,23 +117,28 @@ input:checked + .slider:before {
 
 #extraFeaturesContainer {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 5px;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 10px;
     margin-top: 10px;
     margin-bottom: 10px;
+    align-items: end;
 }
 
 #extraFeaturesContainer label {
     display: inline-flex;
-    align-items: center;
+    align-items: flex-end;
     font-size: 14px;
+    margin-bottom: 10px;
 }
 
 #extraFeaturesContainer input[type="checkbox"] {
-    margin-right: 2px;
+    margin-right: 8px;
     width: 16px;
     height: 16px;
-    vertical-align: middle;
+    vertical-align: center;
+
+
 }
+
 
 

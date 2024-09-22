@@ -10,7 +10,7 @@
     padding: 10px 20px;
     text-align: center;
     border-radius: 5px;
-    margin-bottom: 20px;
+    margin-bottom: 40px;
     font-family: "Gill Sans MT";
 
 }
@@ -154,9 +154,41 @@
     cursor: pointer;
 }
 
-ul {
+ul{
     color: black;
+    list-style: none;
+    font-family: "Gill Sans MT" ;
 }
+
+ul li {
+
+    position: relative;
+    padding-left: 25px;
+    margin-bottom: 20px;
+
+}
+
+ul li::before{
+
+    content: "\f005";
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    color: #6aa84f;
+    position: absolute;
+    left: 0;
+    font-size: 1.2em;
+
+
+}
+
+#houseOwnerUsername , #houseOwnerUsernameLink {
+    color: #a975de;
+
+}
+
+
+
+
 
 #caption {
     position: absolute;
@@ -176,3 +208,17 @@ ul {
 .modal-content-wrapper {
     position: relative;
 }
+
+.formatted-description {
+    white-space: pre-wrap;
+    line-height: 1.6;
+    font-size: 16px;
+    margin-bottom: 15px;
+    font-family: "Gill Sans MT", sans-serif;
+}
+
+
+
+
+
+
