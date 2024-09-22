@@ -290,7 +290,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     function validateStreetAndNumber(value) {
-        const regex = /^[a-zA-Z]+(?:\s[a-zA-Z]+)*(?:\s\d+\s?[a-zA-Z]?)$/;
+        const regex = /^(?:[A-Z][a-z]*\.\s)*(?:[a-zA-Z]+(?:\s[a-zA-Z]+)*)+\s\d+\s?[a-zA-Z]?$/;
         return regex.test(value);
     }
 
