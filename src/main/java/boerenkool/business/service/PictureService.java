@@ -75,7 +75,7 @@ public class PictureService {
 
     public String detectImageFormat(byte[] imageBytes) {
         if (imageBytes == null || imageBytes.length < 4) {
-            return "unknown"; // Return "unknown" if imageBytes is null or too short
+            return "unknown"; //
         }
 
         // Check PNG signature

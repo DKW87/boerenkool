@@ -2,8 +2,6 @@ package boerenkool.database.dao.mysql;
 
 import boerenkool.business.model.House;
 import boerenkool.business.model.HouseFilter;
-import boerenkool.business.model.HouseType;
-import boerenkool.business.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,30 +43,18 @@ public class JdbcHouseDAO implements HouseDAO {
     }
 
     @Override
-    public List<House> getAllHousesByOwner(int ownerId) {
+    public List<House> getHousesByOwner(int ownerId) {
         String sql = "SELECT * FROM House WHERE houseOwnerId = ?";
         return jdbcTemplate.query(sql, new HouseMapper(), ownerId);
     }
 
     @Override
-    public List<House> getLimitedList(int limit, int offset) {
-        String sql = "SELECT * FROM House LIMIT ? OFFSET ?";
-        return jdbcTemplate.query(sql, new HouseMapper(), limit, offset);
-    }
-
-    @Override
-    public List<House> getHousesWithFilter(HouseFilter filter) {
-        StringBuilder sql = new StringBuilder("SELECT house.* FROM House AS house WHERE 1=1 AND house.isNotAvailable = 0");
+    public List<House> getHousesByFilter(HouseFilter filter) {
+        StringBuilder sql = new StringBuilder("SELECT house.* FROM House AS house WHERE 1=1" +
+                " AND house.isNotAvailable = 0");
         List<Object> params = new ArrayList<>();
 
-        addDateFilter(sql, params, filter);
-        addProvinceFilter(sql, params, filter);
-        addCityFilter(sql, params, filter);
-        addHouseTypeFilter(sql, params, filter);
-        addHouseOwnerFilter(sql, params, filter);
-        addGuestFilter(sql, params, filter);
-        addRoomCountFilter(sql, params, filter);
-        addPriceFilter(sql, params, filter);
+        setCommonFilter(sql, params, filter);
         addOrderByClause(sql, filter);
         addLimitOffset(sql, params, filter);
 
@@ -76,19 +62,12 @@ public class JdbcHouseDAO implements HouseDAO {
     }
 
     @Override
-    public int countHousesWithFilter(HouseFilter filter) {
+    public int countHousesByFilter(HouseFilter filter) {
         StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM House AS house WHERE 1=1" +
                 " AND house.isNotAvailable = 0");
         List<Object> params = new ArrayList<>();
 
-        addDateFilter(sql, params, filter);
-        addProvinceFilter(sql, params, filter);
-        addCityFilter(sql, params, filter);
-        addHouseTypeFilter(sql, params, filter);
-        addHouseOwnerFilter(sql, params, filter);
-        addGuestFilter(sql, params, filter);
-        addRoomCountFilter(sql, params, filter);
-        addPriceFilter(sql, params, filter);
+        setCommonFilter(sql, params, filter);
 
         return jdbcTemplate.queryForObject(sql.toString(), Integer.class, params.toArray());
     }
@@ -130,6 +109,17 @@ public class JdbcHouseDAO implements HouseDAO {
         String sql = "DELETE FROM House WHERE houseId = ?";
         int recordsUpdated = jdbcTemplate.update(sql, id);
         return recordsUpdated == 1;
+    }
+
+    private void setCommonFilter(StringBuilder sql, List<Object> params, HouseFilter filter) {
+        addDateFilter(sql, params, filter);
+        addProvinceFilter(sql, params, filter);
+        addCityFilter(sql, params, filter);
+        addHouseTypeFilter(sql, params, filter);
+        addHouseOwnerFilter(sql, params, filter);
+        addGuestFilter(sql, params, filter);
+        addRoomCountFilter(sql, params, filter);
+        addPriceFilter(sql, params, filter);
     }
 
     private void addDateFilter(StringBuilder sql, List<Object> params, HouseFilter filter) {
@@ -234,11 +224,10 @@ public class JdbcHouseDAO implements HouseDAO {
     private void addOrderByClause(StringBuilder sql, HouseFilter filter) {
         if (filter.getSortBy() != null && !filter.getSortBy().isEmpty()) {
             String sortBy = filter.getSortBy();
-            String sortOrder = filter.getSortOrder() != null ? filter.getSortOrder() : "ASC"; // Default to ASC
+            String sortOrder = filter.getSortOrder() != null ? filter.getSortOrder() : "ASC";
 
-            // Zorg ervoor dat de sortOrder geldig is
             if (!"ASC".equalsIgnoreCase(sortOrder) && !"DESC".equalsIgnoreCase(sortOrder)) {
-                sortOrder = "ASC"; // Default to ASC if invalid value
+                sortOrder = "ASC";
             }
 
             sql.append(" ORDER BY ").append(sortBy).append(" ").append(sortOrder);
@@ -257,33 +246,24 @@ public class JdbcHouseDAO implements HouseDAO {
     }
 
     private PreparedStatement insertHouseStatement(House house, Connection connection) throws SQLException {
-        PreparedStatement preparedStatement;
         String sql = "INSERT INTO House (houseName, houseTypeId, houseOwnerId, province, city, streetAndNumber, zipcode, "
                 + "maxGuest, roomCount, pricePPPD, description, isNotAvailable) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+        PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
-        preparedStatement.setString(1, house.getHouseName());
-        preparedStatement.setInt(2, house.getHouseType().getHouseTypeId());
-        preparedStatement.setInt(3, house.getHouseOwner().getUserId());
-        preparedStatement.setString(4, house.getProvince());
-        preparedStatement.setString(5, house.getCity());
-        preparedStatement.setString(6, house.getStreetAndNumber());
-        preparedStatement.setString(7, house.getZipcode());
-        preparedStatement.setInt(8, house.getMaxGuest());
-        preparedStatement.setInt(9, house.getRoomCount());
-        preparedStatement.setInt(10, house.getPricePPPD());
-        preparedStatement.setString(11, house.getDescription());
-        preparedStatement.setBoolean(12, house.getIsNotAvailable());
-
-        return preparedStatement;
+        return setHouseParameters(preparedStatement, house);
     }
 
     private PreparedStatement updateHouseStatement(House house, Connection connection) throws SQLException {
-        String sql = "UPDATE House SET houseName=?, houseTypeId=?, houseOwnerId=?, province=?, city=?, streetAndNumber=?, " +
-                "zipcode=?, maxGuest=?, roomCount=?, pricePPPD=?, description=?, isNotAvailable=? WHERE houseId = ?";
-        PreparedStatement preparedStatement;
-        preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+        String sql = "UPDATE House SET houseName=?, houseTypeId=?, houseOwnerId=?, province=?, city=?, streetAndNumber=?, "
+                + "zipcode=?, maxGuest=?, roomCount=?, pricePPPD=?, description=?, isNotAvailable=? WHERE houseId = ?";
+        PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
+        setHouseParameters(preparedStatement, house);
+        preparedStatement.setInt(13, house.getHouseId());
+        return preparedStatement;
+    }
+
+    private PreparedStatement setHouseParameters(PreparedStatement preparedStatement, House house) throws SQLException {
         preparedStatement.setString(1, house.getHouseName());
         preparedStatement.setInt(2, house.getHouseType().getHouseTypeId());
         preparedStatement.setInt(3, house.getHouseOwner().getUserId());
@@ -296,8 +276,6 @@ public class JdbcHouseDAO implements HouseDAO {
         preparedStatement.setInt(10, house.getPricePPPD());
         preparedStatement.setString(11, house.getDescription());
         preparedStatement.setBoolean(12, house.getIsNotAvailable());
-        preparedStatement.setInt(13, house.getHouseId());
-
         return preparedStatement;
     }
 

@@ -51,9 +51,9 @@ public class JdbcHouseExtraFeatureDAO implements HouseExtraFeatureDAO {
         if (exists(houseExtraFeature)) {
             updateOne(houseExtraFeature);
         } else {
-            insert(houseExtraFeature);
+            addExtraFeaturesToHouse(houseExtraFeature.getHouseId(), List.of(houseExtraFeature));
         }
-        return false;
+        return true;
     }
 
     @Override
@@ -65,6 +65,12 @@ public class JdbcHouseExtraFeatureDAO implements HouseExtraFeatureDAO {
     @Override
     public boolean removeOneById(int id) {
         return false;
+    }
+
+    @Override
+    public void removeAllByHouseId(int houseId) {
+        String sql = "DELETE FROM HouseExtraFeature WHERE houseId = ?";
+        jdbcTemplate.update(sql, houseId);
     }
 
     @Override
@@ -89,6 +95,8 @@ public class JdbcHouseExtraFeatureDAO implements HouseExtraFeatureDAO {
 
         return jdbcTemplate.query(sql, new HouseExtraFeatureWithNamesRowMapper(), houseId);
     }
+
+
 
     private void insert(HouseExtraFeature houseExtraFeature) {
         String sql = "INSERT INTO HouseExtraFeature (houseId, featureId) VALUES (?, ?)";
@@ -124,4 +132,14 @@ public class JdbcHouseExtraFeatureDAO implements HouseExtraFeatureDAO {
         }
     }
 
+    @Override
+    public void addExtraFeaturesToHouse(int houseId, List<HouseExtraFeature> extraFeatures) {
+        String sql = "insert into HouseExtraFeature (houseId, featureId) values (?, ?)";
+
+        extraFeatures.forEach(feature -> {
+            jdbcTemplate.update(sql, houseId, feature.getFeatureId());
+        });
+    }
+
 }
+

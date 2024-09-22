@@ -5,6 +5,8 @@ import boerenkool.database.dao.mysql.HouseExtraFeatureDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,13 +18,18 @@ public class HouseExtraFeatureRepository {
 
     private final HouseExtraFeatureDAO houseExtraFeatureDAO;
 
-    public HouseExtraFeatureRepository(HouseExtraFeatureDAO houseExtraFeatureDAO) {
+    private final JdbcTemplate jdbcTemplate;
+
+
+    public HouseExtraFeatureRepository(HouseExtraFeatureDAO houseExtraFeatureDAO, JdbcTemplate jdbcTemplate) {
         this.houseExtraFeatureDAO = houseExtraFeatureDAO;
+        this.jdbcTemplate = jdbcTemplate;
         logger.info("New HouseExtraFeatureRepository");
     }
 
     public void storeOne(HouseExtraFeature houseExtraFeature) {
-        houseExtraFeatureDAO.storeOne(houseExtraFeature);
+        String sql = "INSERT INTO HouseExtraFeature (houseId, featureId) VALUES (?, ?)";
+        jdbcTemplate.update(sql, houseExtraFeature.getHouseId(), houseExtraFeature.getFeatureId());
     }
 
     public void removeOneByIds(int houseId, int featureId) {
@@ -48,5 +55,20 @@ public class HouseExtraFeatureRepository {
     public List<HouseExtraFeature> getAllFeaturesByHouseIdWithNames(int houseId) {
         return houseExtraFeatureDAO.getAllFeaturesByHouseIdWithNames(houseId);
     }
+
+    public void removeAllByHouseId(int houseId) {
+        houseExtraFeatureDAO.removeAllByHouseId(houseId);
+    }
+
+    public void storeAll(List<HouseExtraFeature> houseExtraFeatures) {
+        String sql = "INSERT INTO HouseExtraFeature (houseId, featureId) VALUES (?, ?)";
+
+        houseExtraFeatures.forEach(feature -> {
+            jdbcTemplate.update(sql, feature.getHouseId(), feature.getFeatureId());
+        });
+    }
+
+
+
 
 }

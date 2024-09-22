@@ -45,9 +45,7 @@ public class PictureController {
         if (pictureList != null && !pictureList.isEmpty()) {
             List<PictureDTO> pictureDTOList = pictureList.stream().map(pictureService::convertToDTO).collect(Collectors.toList());
             System.out.println("getPicturesByHouseId activated");
-
             return new ResponseEntity<>(pictureDTOList, HttpStatus.OK);
-
         } else {
             return new ResponseEntity<>("Geen pictures gevonden bij dit huis: ", HttpStatus.NOT_FOUND);
         }

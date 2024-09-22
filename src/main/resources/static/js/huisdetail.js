@@ -86,7 +86,7 @@ function displayExtraFeatures(extraFeatures) {
     featuresContainer.innerHTML = '';
 
     if (extraFeatures.length === 0) {
-        featuresContainer.innerHTML = '<p>Geen extra functies beschikbaar.</p>';
+        featuresContainer.innerHTML = '<p>Geen extra voorzieningen beschikbaar.</p>';
     } else {
         const ulElement = document.createElement('ul');
         extraFeatures.forEach(feature => {
@@ -155,7 +155,7 @@ function displayHouseDetails(house) {
     document.getElementById('maxGuests').textContent = house.maxGuest;
     document.getElementById('roomCount').textContent = house.roomCount;
     document.getElementById('pricePPPD').textContent = `${house.pricePPPD} bkC`;
-    document.getElementById('description').textContent = house.description;
+    document.getElementById('description').innerHTML = house.description.replace(/\n/g, '<br>');
     document.getElementById('availability').textContent = house.isNotAvailable ? 'Niet Beschikbaar' : 'Beschikbaar';  // Dutch UI
 
     const picturesContainer = document.getElementById('pictures');
