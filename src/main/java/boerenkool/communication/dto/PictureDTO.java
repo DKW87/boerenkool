@@ -1,4 +1,6 @@
 package boerenkool.communication.dto;
+import boerenkool.business.model.Picture;
+import java.util.Base64;
 
 /**
  * @author Timothy Houweling
@@ -59,6 +61,23 @@ public class PictureDTO {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    public String getBase64Picture() {
+        return base64Picture;
+    }
+
+    public void setBase64Picture(String base64Picture) {
+        this.base64Picture = base64Picture;
+    }
+
+    public String getMimeType() {
+        return mimeType;
+    }
+
+    public void setMimeType(String mimeType) {
+        this.mimeType = mimeType;
+    }
+
 
 
 }
