@@ -89,7 +89,7 @@ export function checkForUnreadMessages() {
                     messagesReadOrUnread.alt = 'icoon van een ongelezen bericht die aangeeft dat niet alle berichten van de gebruiker gelezen zijn';
                 } else {
                     messagesReadOrUnread.src = "./images/message_read.png"
-                    messagesReadOrUnread.alt = 'icoon van een gelezen bericht';
+                    messagesReadOrUnread.alt = 'icoon van een gelezen bericht die aangeeft dat alle berichten van de gebruiker gelezen zijn';
                 }
             })
             .catch(error => {

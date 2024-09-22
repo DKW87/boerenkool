@@ -71,7 +71,7 @@ public class House implements Comparable<House> {
     }
 
     public House() {
-        // Standaardconstructor, nodig voor Jackson (de library die JSON naar Java-objecten omzet heeft dit schijnbaar nodig)
+        // Empty constructor required for Jackson
     }
 
     // methods

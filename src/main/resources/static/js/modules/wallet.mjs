@@ -1,6 +1,7 @@
 "use strict";
 
 import * as Auth from './auth.mjs';
+import { showToast } from './notification.mjs'
 
 export async function fetchWalletDetails() {
     const token = Auth.getToken();
@@ -24,7 +25,7 @@ export async function fetchWalletDetails() {
         return user.coinBalance || 0;
 
     } catch (error) {
-        alert('Kon walletinformatie niet ophalen.');
+        showToast('Kon walletinformatie niet ophalen.');
         console.error(error);
         return null;
     }
@@ -63,9 +64,10 @@ export async function updateWalletCoins(newCoins) {
 }
 
 export async function handleUpdateCoins() {
+    const coinsToAdd = 100;
     const currentCoins = parseInt(document.getElementById('boerenkoolCoins').value, 10) || 0;
-    const newCoins = currentCoins + 100; // Add 100 to the current balance
-    const success = await updateWalletCoins(newCoins);
+    const newCoins = currentCoins + coinsToAdd; // Add 100 to the current balance
+    const success = await updateWalletCoins(coinsToAdd);
     if (success) {
         document.getElementById('boerenkoolCoins').value = newCoins; // Update the input field
     }

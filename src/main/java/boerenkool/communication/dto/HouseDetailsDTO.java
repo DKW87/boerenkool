@@ -27,7 +27,7 @@ public class HouseDetailsDTO {
     int pricePPPD;
     String description;
     boolean isNotAvailable;
-    List<PictureDTO> pictures; // needs MIME-type for front-end
+    List<PictureDTO> pictures;
     List<ExtraFeature> extraFeatures;
 
     public HouseDetailsDTO() { /* empty constructor for jackson, use setters */ }

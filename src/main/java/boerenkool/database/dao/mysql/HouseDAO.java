@@ -17,13 +17,11 @@ public interface HouseDAO extends GenericDAO<House> {
     @Override
     List<House> getAll();
 
-    List<House> getAllHousesByOwner(int ownerId);
+    List<House> getHousesByOwner(int ownerId);
 
-    List<House> getLimitedList(int limit, int offset);
+    List<House> getHousesByFilter(HouseFilter filter);
 
-    List<House> getHousesWithFilter(HouseFilter filter);
-
-    int countHousesWithFilter(HouseFilter filter);
+    int countHousesByFilter(HouseFilter filter);
 
     List<String> getUniqueCities();
 

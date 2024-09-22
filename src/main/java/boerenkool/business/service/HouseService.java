@@ -54,7 +54,7 @@ public class HouseService {
     }
 
     public List<HouseListDTO> getListByOwnerId(int houseOwnerId) {
-        List<House> houses = houseRepository.getListOfAllHousesByOwner(houseOwnerId);
+        List<House> houses = houseRepository.getListOfHousesByOwner(houseOwnerId);
 
         return houses.isEmpty()
                 ? null

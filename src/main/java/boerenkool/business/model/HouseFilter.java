@@ -1,7 +1,5 @@
 package boerenkool.business.model;
 
-import org.springframework.cglib.core.Local;
-
 import java.time.LocalDate;
 import java.util.List;
 
