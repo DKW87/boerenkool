@@ -131,7 +131,7 @@ async function uploadAllPictures() {
 
 
     setTimeout(() => {
-        window.location.href = 'http://localhost:8080/mijn-huisjes.html';
+        window.location.href = 'mijn-huisjes.html';
     }, 2000);
 }
 

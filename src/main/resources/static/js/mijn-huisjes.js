@@ -42,12 +42,6 @@ function fetchHouses(url, parentElement){
         if (!response.ok) {
             throw new Error('Netwerkreactie was niet ok.');
         } else {
-            if (response.json.length === 0) {
-                const element = document.createElement('p');
-                element.innerHTML = 'Geen huisjes gevonden.';
-                parentElement.appendChild(element);
-                return;
-            }
             return response.json();
         }
     })
