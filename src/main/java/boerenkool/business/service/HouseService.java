@@ -57,7 +57,7 @@ public class HouseService {
         List<House> houses = houseRepository.getListOfHousesByOwner(houseOwnerId);
 
         return houses.isEmpty()
-                ? null
+                ? new ArrayList<>()
                 : toHouseListDTO(houses);
     }
 
