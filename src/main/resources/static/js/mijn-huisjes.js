@@ -13,7 +13,7 @@ Main.loadFooter();
 
 async function loadListOfHousesFromOwner() {
     const parentElement = document.getElementById('huisjes-container');
-    if (!parentElement) return showError('Element met ID "huisjes-container" niet gevonden.');
+    if (!parentElement) return console.log('Element met ID "huisjes-container" niet gevonden.');
 
 
     const token = Auth.getToken();
@@ -30,11 +30,6 @@ async function loadListOfHousesFromOwner() {
     fetchHouses(url, parentElement);
 }
 
-function showError(message) {
-    console.error(message);
-    showToast(message);
-}
-
 function showNotLandlordMessage(parentElement) {
     parentElement.innerHTML = `
         <p>Als huurder heb je geen toegang tot deze pagina. 
@@ -47,6 +42,12 @@ function fetchHouses(url, parentElement){
         if (!response.ok) {
             throw new Error('Netwerkreactie was niet ok.');
         } else {
+            if (response.json.length === 0) {
+                const element = document.createElement('p');
+                element.innerHTML = 'Geen huisjes gevonden.';
+                parentElement.appendChild(element);
+                return;
+            }
             return response.json();
         }
     })
@@ -61,7 +62,7 @@ function fetchHouses(url, parentElement){
         createBottomPageElements(parentElement);
 
     })
-    .catch(error => { showError(`Er is een probleem opgetreden met fetch: ${error}`); });
+    .catch(error => { console.log(`Er is een probleem opgetreden met fetch: ${error}`); });
 }
 
 function createTopPageElements(parentElement, amount) {

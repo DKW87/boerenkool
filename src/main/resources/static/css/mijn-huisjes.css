@@ -11,6 +11,7 @@ a {
 }
 
 .huisjes-container {
+    min-width: 500px;
     height: auto;
     background-color: var(--boerenkool-wit);
     border-radius: 12px;
