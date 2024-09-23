@@ -64,7 +64,7 @@ public class HouseService {
     public List<HouseListDTO> getFilteredList(HouseFilter filter) {
         List<House> filteredHouses = houseRepository.getHousesWithFilter(filter);
         return filteredHouses.isEmpty()
-                ? null
+                ? new ArrayList<>()
                 : toHouseListDTO(filteredHouses);
     }
 
