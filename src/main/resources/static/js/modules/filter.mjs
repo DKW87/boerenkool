@@ -94,9 +94,7 @@ export async function getListOfHousesByURL(url) {
     try {
         const response = await fetch(url);
         const text = await response.text();
-        console.log(text);
         const houses = text ? JSON.parse(text) : [];
-        console.log(houses)
 
         let amountOfHousesDiv = document.createElement('div');
         amountOfHousesDiv.className = 'amount-of-houses';
