@@ -57,14 +57,14 @@ public class HouseService {
         List<House> houses = houseRepository.getListOfHousesByOwner(houseOwnerId);
 
         return houses.isEmpty()
-                ? null
+                ? new ArrayList<>()
                 : toHouseListDTO(houses);
     }
 
     public List<HouseListDTO> getFilteredList(HouseFilter filter) {
         List<House> filteredHouses = houseRepository.getHousesWithFilter(filter);
         return filteredHouses.isEmpty()
-                ? null
+                ? new ArrayList<>()
                 : toHouseListDTO(filteredHouses);
     }
 

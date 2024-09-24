@@ -4,7 +4,7 @@
 import * as Main from './modules/main.mjs';
 import * as Auth from './modules/auth.mjs';
 import * as DeleteHouse from './modules/deleteHouse.mjs';
-import { showToast } from './modules/notification.mjs';
+import {showToast} from './modules/notification.mjs';
 
 /* load all page elements of index.html */
 Main.loadHeader();
@@ -36,16 +36,15 @@ function showNotLandlordMessage(parentElement) {
         Ga naar je <a href="profile.html">profiel</a> om verhuurder te worden.</p>`;
 }
 
-function fetchHouses(url, parentElement){
-    fetch(url)
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Netwerkreactie was niet ok.');
-        } else {
-            return response.json();
-        }
-    })
-    .then(houses => {
+async function fetchHouses(url, parentElement) {
+    try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Netwerkreactie was niet ok.');
+
+        const text = await response.text();
+        const houses = text ? JSON.parse(text) : [];
+
+        if (checkForHouses(houses.length, parentElement)) return;
 
         createTopPageElements(parentElement, houses.length);
 
@@ -55,8 +54,19 @@ function fetchHouses(url, parentElement){
 
         createBottomPageElements(parentElement);
 
-    })
-    .catch(error => { console.log(`Er is een probleem opgetreden met fetch: ${error}`); });
+
+    } catch (error) {
+        console.log(`Er is een probleem opgetreden met fetch: ${error}`);
+    }
+}
+
+function checkForHouses(length, parentElement){
+    if (length === 0) {
+        const element = document.createElement('p');
+        element.innerHTML = 'Geen huisjes gevonden.';
+        parentElement.appendChild(element);
+        return true;
+    }
 }
 
 function createTopPageElements(parentElement, amount) {
