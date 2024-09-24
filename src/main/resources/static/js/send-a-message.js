@@ -45,7 +45,7 @@ async function setup() {
         receiverId = parameters.get("userid")
         if (receiverId) {
             receiverName = await getUsername(receiverId)
-            await displayReceiverName(receiverName)
+            await displayReceiverName(receiverName, receiverId)
         } else {
             await displayReceiverDropdown()
         }
@@ -53,9 +53,10 @@ async function setup() {
     document.getElementById(`writeMessageForm`).style.display = "block"
 }
 
-export async function displayReceiverName(receiverName) {
+export async function displayReceiverName(receiverName, receiverId) {
     document.querySelector("#receiverDropDown").style.display = "none"
     let receiverNameElement = document.querySelector("#receiverName")
+    receiverNameElement.setAttribute("data-receiverid", receiverId)
     receiverNameElement.innerText = `${receiverName}`
     receiverNameElement.style.display = `block`
 }
