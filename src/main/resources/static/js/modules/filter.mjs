@@ -87,80 +87,83 @@ export function applyFilterListener() {
     });
 }
 
-export function getListOfHousesByURL(url) {
-
+export async function getListOfHousesByURL(url) {
     const parentElement = document.getElementById('body');
     parentElement.innerHTML = '';
 
-    fetch(url)
-        .then(response => response.json())
-        .then(houses => {
+    try {
+        const response = await fetch(url);
+        const text = await response.text();
+        const houses = text ? JSON.parse(text) : [];
 
-            let amountOfHousesDiv = document.createElement('div');
-            amountOfHousesDiv.className = 'amount-of-houses';
-            parentElement.appendChild(amountOfHousesDiv);
+        let amountOfHousesDiv = document.createElement('div');
+        amountOfHousesDiv.className = 'amount-of-houses';
+        parentElement.appendChild(amountOfHousesDiv);
 
-            let amountOfHousesText = document.createElement('p');
-            amountOfHousesText.id = 'amountOfHousesText';
-            amountOfHousesDiv.appendChild(amountOfHousesText);
+        let amountOfHousesText = document.createElement('p');
+        amountOfHousesText.id = 'amountOfHousesText';
+        amountOfHousesDiv.appendChild(amountOfHousesText);
 
-            amountOfHousesStringSwitch(amountOfHousesText);
-            const urlParams = new URLSearchParams(window.location.search);
-            const startDate = urlParams.get('aankomst') ?? '';
-            const endDate = urlParams.get('vertrek') ?? '';
-            houses.forEach(house => {
-                let seoFriendlyName = house.houseName.toLowerCase()
-                    .replace(/ /g, "-")
-                    .replace(/[^a-z0-9\-]/g, "");
+        if (houses.length === 0) {
+            amountOfHousesText.innerHTML = '0 huisjes gevonden. Verbreed je zoekcriteria en probeer het opnieuw.';
+            return;
+        }
 
+        setAmountOfHousesText(amountOfHousesText);
+        const urlParams = new URLSearchParams(window.location.search);
+        const startDate = urlParams.get('aankomst') ?? '';
+        const endDate = urlParams.get('vertrek') ?? '';
 
-                let linkToDetails = document.createElement('a');
-                linkToDetails.className = 'house-link';
-                if (startDate !== '' && endDate !== '') {
-                    linkToDetails.href =`huisdetail.html?id=${house.houseId}&naam=${seoFriendlyName}&startDate=${startDate}&endDate=${endDate}`;
-                } else {
-                    linkToDetails.href =`huisdetail.html?id=${house.houseId}&naam=${seoFriendlyName}`;
-                }
+        houses.forEach(house => {
+            let seoFriendlyName = house.houseName.toLowerCase()
+                .replace(/ /g, "-")
+                .replace(/[^a-z0-9\-]/g, "");
 
-                let outerDiv = document.createElement('div');
-                outerDiv.className = 'huisje';
+            let linkToDetails = document.createElement('a');
+            linkToDetails.className = 'house-link';
+            if (startDate !== '' && endDate !== '') {
+                linkToDetails.href = `huisdetail.html?id=${house.houseId}&naam=${seoFriendlyName}&startDate=${startDate}&endDate=${endDate}`;
+            } else {
+                linkToDetails.href = `huisdetail.html?id=${house.houseId}&naam=${seoFriendlyName}`;
+            }
 
-                let thumbnail = document.createElement('img');
-                thumbnail.alt = house.houseName;
+            let outerDiv = document.createElement('div');
+            outerDiv.className = 'huisje';
 
-                if (house.picture !== null) {
-                    thumbnail.src = `data:${house.picture.mimeType};base64,${house.picture.base64Picture}`;
-                } else {
-                    thumbnail.src = './images/notAvailable.png';
-                }
+            let thumbnail = document.createElement('img');
+            thumbnail.alt = house.houseName;
 
-                let innerDiv = document.createElement('div');
-                innerDiv.className = 'huisje-details';
+            if (house.picture !== null) {
+                thumbnail.src = `data:${house.picture.mimeType};base64,${house.picture.base64Picture}`;
+            } else {
+                thumbnail.src = './images/notAvailable.png';
+            }
 
-                let title = document.createElement('h2');
-                title.innerHTML = house.houseName;
+            let innerDiv = document.createElement('div');
+            innerDiv.className = 'huisje-details';
 
-                let location = document.createElement('p');
-                location.innerHTML = house.houseType + ' in ' + house.province + ', ' + house.city;
+            let title = document.createElement('h2');
+            title.innerHTML = house.houseName;
 
-                let price = document.createElement('p');
-                price.innerHTML = house.price + 'bkC per nacht';
-                price.className = 'prijs';
+            let location = document.createElement('p');
+            location.innerHTML = house.houseType + ' in ' + house.province + ', ' + house.city;
 
+            let price = document.createElement('p');
+            price.innerHTML = house.price + 'bkC per nacht';
+            price.className = 'prijs';
 
-                parentElement.appendChild(linkToDetails);
-                linkToDetails.appendChild(outerDiv);
-                outerDiv.appendChild(thumbnail);
-                outerDiv.appendChild(innerDiv);
-                innerDiv.appendChild(title);
-                innerDiv.appendChild(location);
-                innerDiv.appendChild(price);
-            });
-
-        })
-        .catch(error => {
-            console.error('Error:', error)
+            parentElement.appendChild(linkToDetails);
+            linkToDetails.appendChild(outerDiv);
+            outerDiv.appendChild(thumbnail);
+            outerDiv.appendChild(innerDiv);
+            innerDiv.appendChild(title);
+            innerDiv.appendChild(location);
+            innerDiv.appendChild(price);
         });
+
+    } catch (error) {
+        console.error('Error:', error);
+    }
 }
 
 export function applyFiltersFromUrl() {
@@ -359,7 +362,7 @@ function setSelectedOptions(elementId, values) {
     });
 }
 
-async function amountOfHousesStringSwitch(element) {
+async function setAmountOfHousesText(element) {
     const api = '/api/houses/l/filter?count=true';
     const params = new URLSearchParams(window.location.search);
     let url = params.toString === '' ? api : api + '&' + params.toString();
@@ -373,16 +376,11 @@ async function amountOfHousesStringSwitch(element) {
 
         amountOfFilteredHouses = parseInt(data);
 
-        switch (amountOfFilteredHouses) {
-            case 0:
-                element.innerHTML = '0 huisjes gevonden. Verbreed je zoekcriteria en probeer het opnieuw.';
-                break;
-            case 1:
-                element.innerHTML = '<b>1</b> geurig huisje gevonden om te boeken. Wees er snel bij!';
-                break;
-            default:
-                element.innerHTML = '<b>' + amountOfFilteredHouses + '</b> geurige huisjes gevonden om te boeken!';
-                createPageNumbers();
+        if (amountOfFilteredHouses > 1) {
+            element.innerHTML = '<b>' + amountOfFilteredHouses + '</b> geurige huisjes gevonden om te boeken!';
+            createPageNumbers();
+        }  else {
+            element.innerHTML = '<b>1</b> geurig huisje gevonden om te boeken. Wees er snel bij!';
         }
     } catch (error) {
         console.error('Error:', error);

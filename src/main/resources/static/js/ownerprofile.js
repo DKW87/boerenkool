@@ -64,7 +64,8 @@ async function fetchOwnedHouses(url, housesBox) {
         if (!response.ok) {
             throw new Error(`Netwerkreactie was niet ok, statuscode: ${response.status}.`);
         }
-        const houses = await response.json();
+        const text = await response.text();
+        const houses = text ? JSON.parse(text) : [];
 
         setAmountOfHouses(houses.length);
 
@@ -192,7 +193,7 @@ function setAmountOfHouses(amountOfHouses) {
     const element = document.getElementById('amountOfHouses');
 
     switch (amountOfHouses) {
-        case undefined:
+        case 0:
             element.innerHTML = 'Geen huisjes voor deze verhuurder gevonden.';
             break;
         case 1:
